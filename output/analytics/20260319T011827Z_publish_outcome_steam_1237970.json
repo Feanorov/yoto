@@ -1,0 +1,528 @@
+{
+  "created_at": "2026-03-19T01:18:27.869669",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1237970_titanfall_2.png",
+  "lane": "high_value_discount",
+  "message_id": 171,
+  "offer_id": "steam:1237970",
+  "publish_outcome": {
+    "message_id": 171,
+    "outbox_status": "published",
+    "published": true,
+    "reason": "published"
+  },
+  "published": true,
+  "reason": "published",
+  "render": {
+    "assets_used": [
+      "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a2ac8a200ace102660bf07cf10bf51db3b5c2ceda42c42019fcb7c7a43ea2e0b.jpg",
+      "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\25d5e04cbeb5967ba2a95300c2246035d40f1bfd2f22c5d5397eb01b9168c78e.jpg",
+      "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+      "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a56a79d7d30163c3b3d68beee0b9d0e68b9bcd4433d6f1595c9b3be49846a15c.jpg",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/57d686ff679cca0b5697b5ef0d07a4f9.avif?t=1726160226",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/e86ff554fd07065d0f741e80a19c3067.avif?t=1726160226"
+    ],
+    "caption_debug": {
+      "cta": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 0,
+        "fallback_used": false,
+        "near_repeat_relaxed": false,
+        "near_repeat_window_hits": 0,
+        "pool_size": 2,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "repeat_risk": false,
+        "selected": "Якщо давно чекали приводу повернути цю гру на радар, він уже є."
+      },
+      "fallback_used": true,
+      "lane": "high_value_discount",
+      "normalization_applied": {
+        "normalized_dashes": false,
+        "normalized_punctuation_spacing": false,
+        "normalized_whitespace": false,
+        "removed_garbage_unicode": false,
+        "removed_replacement_chars": false
+      },
+      "offer_id": "steam:1237970",
+      "opening": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 4,
+        "fallback_used": false,
+        "line": "Йото радить придивитися.",
+        "near_repeat_relaxed": false,
+        "near_repeat_window_hits": 0,
+        "pool_size": 3,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "repeat_risk": false,
+        "selected": "Йото радить придивитися."
+      },
+      "presence": "direct",
+      "repeat_risk": false,
+      "selected_opener": "Йото радить придивитися.",
+      "style": "recommend",
+      "weird_symbol_detected": false
+    },
+    "caption_hash": "71dd44845123de1fae87ea006af76c0f31788590d0012fc3b2a68234d5dda44a",
+    "card_qa_summary": {
+      "artifact_type": "card_qa_summary",
+      "card_type_mix": {
+        "DISCOUNT": 2,
+        "FREE_GAME": 3
+      },
+      "csv_path": "D:\\Telegram\\output\\analytics\\20260319T011830Z_card_qa_summary_steam_1237970.csv",
+      "hero_fallback_count": 0,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260319T011830Z_card_qa_summary_steam_1237970.json",
+      "leading_card_family_streak": {
+        "card_family": "DISCOUNT",
+        "flagged": false,
+        "length": 1
+      },
+      "placeholder_artwork_count": 0,
+      "renderer_fallback_count": 0
+    },
+    "image_hash": "e5d5234d5e63e45ea068f2b451cf23889df3c5e9045998a3d24eb67204fa299b",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1237970_titanfall_2.png",
+    "render_diagnostics": {
+      "asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": "Critically loved",
+      "gameplay_candidates_count": 3,
+      "gameplay_count": 1,
+      "gameplay_rejected_ui_like": 2,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.756,
+          "score": 16.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": true,
+          "text_coverage_ratio": 0.908,
+          "text_heavy": true,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        },
+        {
+          "aspect_mismatched": true,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/57d686ff679cca0b5697b5ef0d07a4f9.avif?t=1726160226",
+          "available": true,
+          "banner_like": true,
+          "horizontal_text_block": false,
+          "index": 1,
+          "low_info": true,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "marketing_frame",
+          "scene_richness_score": 0.082,
+          "score": -110.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "gameplay_media",
+          "source_types": [
+            "media_still"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.413,
+          "text_heavy": false,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        },
+        {
+          "aspect_mismatched": true,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/e86ff554fd07065d0f741e80a19c3067.avif?t=1726160226",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": false,
+          "index": 2,
+          "low_info": false,
+          "meets_gameplay_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "scene_richness_score": 0.682,
+          "score": 82.0,
+          "selected": true,
+          "similar_scene": false,
+          "source_type": "gameplay_media",
+          "source_types": [
+            "media_still"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.906,
+          "text_heavy": false,
+          "ui_like": false,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 1,
+      "gameplay_selection": {
+        "candidates_evaluated": 3,
+        "reason": "selected_single_strong_frame",
+        "score_summary": [
+          {
+            "aspect_mismatched": false,
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.756,
+            "score": 16.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": true,
+            "text_coverage_ratio": 0.908,
+            "text_heavy": true,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          },
+          {
+            "aspect_mismatched": true,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/57d686ff679cca0b5697b5ef0d07a4f9.avif?t=1726160226",
+            "available": true,
+            "banner_like": true,
+            "horizontal_text_block": false,
+            "index": 1,
+            "low_info": true,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "marketing_frame",
+            "scene_richness_score": 0.082,
+            "score": -110.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "gameplay_media",
+            "source_types": [
+              "media_still"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.413,
+            "text_heavy": false,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          },
+          {
+            "aspect_mismatched": true,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/e86ff554fd07065d0f741e80a19c3067.avif?t=1726160226",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": false,
+            "index": 2,
+            "low_info": false,
+            "meets_gameplay_floor": true,
+            "promotional_layout": false,
+            "rejection_reason": null,
+            "scene_richness_score": 0.682,
+            "score": 82.0,
+            "selected": true,
+            "similar_scene": false,
+            "source_type": "gameplay_media",
+            "source_types": [
+              "media_still"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.906,
+            "text_heavy": false,
+            "ui_like": false,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 1,
+        "selected_urls": [
+          "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/extras/e86ff554fd07065d0f741e80a19c3067.avif?t=1726160226"
+        ],
+        "ui_like_rejected": 2
+      },
+      "gameplay_selection_reason": "selected_single_strong_frame",
+      "has_gameplay_strip": true,
+      "hero_asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+      "hero_candidates_count": 4,
+      "hero_capsule_rejected": false,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_with_gameplay_strip",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [],
+      "hero_score_summary": [
+        {
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a2ac8a200ace102660bf07cf10bf51db3b5c2ceda42c42019fcb7c7a43ea2e0b.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.961,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 45.6,
+          "selected": false,
+          "source_type": "hero",
+          "source_types": [
+            "hero"
+          ],
+          "subject_detection_score": 0.946,
+          "text_coverage_ratio": 0.905,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\25d5e04cbeb5967ba2a95300c2246035d40f1bfd2f22c5d5397eb01b9168c78e.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.336,
+          "entropy_score": 0.856,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": -21.6,
+          "selected": false,
+          "source_type": "header",
+          "source_types": [
+            "header"
+          ],
+          "subject_detection_score": 0.604,
+          "text_coverage_ratio": 0.648,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.883,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 90.89,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "screenshot"
+          ],
+          "subject_detection_score": 0.841,
+          "text_coverage_ratio": 0.908,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a56a79d7d30163c3b3d68beee0b9d0e68b9bcd4433d6f1595c9b3be49846a15c.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.327,
+          "entropy_score": 0.825,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": -38.53,
+          "selected": false,
+          "source_type": "fallback",
+          "source_types": [
+            "fallback"
+          ],
+          "subject_detection_score": 0.623,
+          "text_coverage_ratio": 0.655,
+          "ui_heavy": true
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 4,
+        "fallback_used": false,
+        "reason": "selected_gameplay_screenshot",
+        "rejected_capsules": [],
+        "score_summary": [
+          {
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a2ac8a200ace102660bf07cf10bf51db3b5c2ceda42c42019fcb7c7a43ea2e0b.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.961,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 45.6,
+            "selected": false,
+            "source_type": "hero",
+            "source_types": [
+              "hero"
+            ],
+            "subject_detection_score": 0.946,
+            "text_coverage_ratio": 0.905,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\25d5e04cbeb5967ba2a95300c2246035d40f1bfd2f22c5d5397eb01b9168c78e.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.336,
+            "entropy_score": 0.856,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": -21.6,
+            "selected": false,
+            "source_type": "header",
+            "source_types": [
+              "header"
+            ],
+            "subject_detection_score": 0.604,
+            "text_coverage_ratio": 0.648,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\6c5417cca6e5ef5569c7d292d11d462d3afab203a5484bbd57eb20ea522f9660.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.883,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 90.89,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "screenshot"
+            ],
+            "subject_detection_score": 0.841,
+            "text_coverage_ratio": 0.908,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a56a79d7d30163c3b3d68beee0b9d0e68b9bcd4433d6f1595c9b3be49846a15c.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.327,
+            "entropy_score": 0.825,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": -38.53,
+            "selected": false,
+            "source_type": "fallback",
+            "source_types": [
+              "fallback"
+            ],
+            "subject_detection_score": 0.623,
+            "text_coverage_ratio": 0.655,
+            "ui_heavy": true
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "selected_gameplay_screenshot",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_discount",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "steam_discount",
+      "title_font_size": null,
+      "title_lines": [
+        "Titanfall® 2"
+      ]
+    },
+    "template_id": "steam_discount"
+  },
+  "run_key": "20260319T011827Z",
+  "selection": {
+    "decision_reasons": [
+      "high_value_discount",
+      "hero_discount",
+      "editorial_importance:mega_popular",
+      "editorial_importance:critical_favorite",
+      "editorial_importance:card_ready"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [
+      "source_alternation",
+      "genre_alternation",
+      "franchise_alternation"
+    ],
+    "editorial_adjustment": {
+      "base_total": 648.85,
+      "content_type": "discount",
+      "final_total": 648.85,
+      "reasons": [],
+      "rule_deltas": {},
+      "total_delta": 0.0
+    },
+    "event_sale_influence": {},
+    "lane": "high_value_discount",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "publish_priority": {
+      "bucket": "planned",
+      "decision_score": 296.85,
+      "lane": "high_value_discount",
+      "lane_priority": 340.0,
+      "lane_repeat_penalty": 0.0,
+      "manual_override_bonus": 0.0,
+      "must_ship_bonus": 0.0,
+      "reserve_penalty": 0.0,
+      "total": 648.85,
+      "urgency_bonus": 12.0
+    },
+    "quality_reasons": [
+      "review_threshold"
+    ],
+    "queue_bucket": "planned",
+    "recommended_post_mode": "solo_post",
+    "roundup_injection": {
+      "attempted": false,
+      "json_path": null,
+      "lookup_mode": null,
+      "queue_snapshot_at": null,
+      "reason": "no_reserve_candidates",
+      "release_status": "not_applicable",
+      "roundup_id": null,
+      "roundup_run_key": null,
+      "status": "rejected",
+      "strict_rejection_reason": null
+    },
+    "score": 296.85,
+    "selection_outcome": "planned",
+    "template_id": "steam_discount"
+  },
+  "title": "Titanfall® 2"
+}

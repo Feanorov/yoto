@@ -1,0 +1,558 @@
+{
+  "generated_at": "2026-03-12T21:52:27.115239",
+  "queue_snapshot_at": "2026-03-12T21:41:16.184714",
+  "notes": [
+    "The live queue was read from the current database state; refresh it with `python -m dealbot.main --preview` before rerunning if you want a newer stream.",
+    "Solo captions are generated only from the current planned queue, so reserve items are represented through rebuilt roundups instead of fake solo posts.",
+    "The recent archive addendum exists to expose real shipped voice behavior, including freebie cases that may be absent from the current live queue."
+  ],
+  "sections": [
+    {
+      "name": "current_live_planned_solos",
+      "label": "Current Live Planned Solo Posts",
+      "summary": {
+        "total": 8,
+        "presence_counts": {
+          "direct": 2,
+          "indirect": 5,
+          "neutral": 1
+        },
+        "style_counts": {
+          "neutral": 1,
+          "recommend": 7
+        },
+        "direct_mode_counts": {
+          "recommend": 2
+        },
+        "lane_counts": {
+          "event_festival": 1,
+          "high_value_discount": 7
+        },
+        "source_counts": {
+          "event": 1,
+          "steam": 7
+        },
+        "average_caption_chars": 555.5,
+        "max_caption_chars": 740,
+        "direct_rate": 0.25
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 1,
+          "origin": "live_queue",
+          "title": "Steam Tower Defense Fest is on now!",
+          "offer_id": "event:category:tower_defense",
+          "source": "event",
+          "offer_kind": "festival",
+          "bucket": "planned",
+          "lane": "event_festival",
+          "score": 120.75,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "festival_event",
+          "decision_reasons": [
+            "event_festival",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "neutral",
+          "voice_style": "neutral",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#festival",
+            "#gaming"
+          ],
+          "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/tower_defense\"><b>Steam Tower Defense Fest is on now!</b></a>\n\nSteam Tower Defense Fest is on now! збирає знижки, демо та жанрові знахідки в одному місці.\n\nТематична подія зі знижками, демоверсіями та тематичними добірками, тож це хороший момент пройтися по фестивалю.\n\nФестиваль триває до 16 березня 2026, 17:00.\n\nПерегляньте фестиваль зараз, поки він у розпалі.\n\n#steam #festival #gaming",
+          "caption_text": "🎉 Steam Tower Defense Fest is on now!\n\nSteam Tower Defense Fest is on now! збирає знижки, демо та жанрові знахідки в одному місці.\n\nТематична подія зі знижками, демоверсіями та тематичними добірками, тож це хороший момент пройтися по фестивалю.\n\nФестиваль триває до 16 березня 2026, 17:00.\n\nПерегляньте фестиваль зараз, поки він у розпалі.\n\n#steam #festival #gaming",
+          "caption_char_count": 440,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 2,
+          "origin": "live_queue",
+          "title": "Slay the Spire",
+          "offer_id": "steam:646570",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 289.28,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "recommend",
+          "direct_mode": "recommend",
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/646570/Slay_the_Spire/\"><b>Slay the Spire</b></a>\n\nЙото радить не проходити повз.\n\nМи поєднали карткові та мандрівні ігри, створивши найкращий однокористувацький складальник колоди, який ми тільки могли. Створіть свою унікальну колоду, зустріньтесь із чудернацькими істотами, знайдіть амулети надприродної сили, та підкоріть Вежу!\n\nЗараз <a href=\"https://store.steampowered.com/app/646570/Slay_the_Spire/\"><b>124 грн</b></a> замість 499 грн; економія 375 грн.\n\nПропозиція активна просто зараз.\n\n98% позитивних із 207722 оцінок • 46 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_text": "🔥 Slay the Spire\n\nЙото радить не проходити повз.\n\nМи поєднали карткові та мандрівні ігри, створивши найкращий однокористувацький складальник колоди, який ми тільки могли. Створіть свою унікальну колоду, зустріньтесь із чудернацькими істотами, знайдіть амулети надприродної сили, та підкоріть Вежу!\n\nЗараз 124 грн замість 499 грн; економія 375 грн.\n\nПропозиція активна просто зараз.\n\n98% позитивних із 207722 оцінок • 46 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_char_count": 682,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 3,
+          "origin": "live_queue",
+          "title": "Hearts of Iron IV",
+          "offer_id": "steam:394360",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 278.83,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "recommend",
+          "direct_mode": "recommend",
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a>\n\nЙото радить придивитися.\n\nЗараз <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>404 грн</b></a> замість 1349 грн; економія 945 грн.\n\n90% позитивних із 358304 оцінок • 266 досягнень • є картки\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_text": "🔥 Hearts of Iron IV\n\nЙото радить придивитися.\n\nЗараз 404 грн замість 1349 грн; економія 945 грн.\n\n90% позитивних із 358304 оцінок • 266 досягнень • є картки\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_char_count": 410,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 4,
+          "origin": "live_queue",
+          "title": "Crusader Kings III",
+          "offer_id": "steam:1158310",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 278.79,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "indirect",
+          "voice_style": "recommend",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a>\n\nДля цієї гри цінник уже виглядає значно цікавіше.\n\nЗараз <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>404 грн</b></a> замість 1349 грн; економія 945 грн.\n\n91% позитивних із 136726 оцінок • 188 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_text": "🔥 Crusader Kings III\n\nДля цієї гри цінник уже виглядає значно цікавіше.\n\nЗараз 404 грн замість 1349 грн; економія 945 грн.\n\n91% позитивних із 136726 оцінок • 188 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_char_count": 434,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 5,
+          "origin": "live_queue",
+          "title": "Dead Space",
+          "offer_id": "steam:1693980",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 270.34,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "indirect",
+          "voice_style": "recommend",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1693980/Dead_Space/\"><b>Dead Space</b></a>\n\nЯкщо гра давно у списку, це вже знижка правильного масштабу.\n\nКласична науково-фантастична гра у жанрі виживання серед жаху повертається у повністю перебудованому вигляді, щоб запропонувати ще більший ефект занурення, включаючи покращення візуальної складової, звуків та ігрового процесу, але залишається вірним захоплюючій концепції оригінальної гри.\n\nЗараз <a href=\"https://store.steampowered.com/app/1693980/Dead_Space/\"><b>224 грн</b></a> замість 1499 грн; економія 1275 грн.\n\nПропозиція активна просто зараз.\n\n91% позитивних із 62247 оцінок • 47 досягнень\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_text": "🔥 Dead Space\n\nЯкщо гра давно у списку, це вже знижка правильного масштабу.\n\nКласична науково-фантастична гра у жанрі виживання серед жаху повертається у повністю перебудованому вигляді, щоб запропонувати ще більший ефект занурення, включаючи покращення візуальної складової, звуків та ігрового процесу, але залишається вірним захоплюючій концепції оригінальної гри.\n\nЗараз 224 грн замість 1499 грн; економія 1275 грн.\n\nПропозиція активна просто зараз.\n\n91% позитивних із 62247 оцінок • 47 досягнень\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_char_count": 740,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 6,
+          "origin": "live_queue",
+          "title": "Bloons TD 6",
+          "offer_id": "steam:960090",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 261.21,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "indirect",
+          "voice_style": "recommend",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/960090/Bloons_TD_6/\"><b>Bloons TD 6</b></a>\n\nДля такого тайтлу пропозиція вже виглядає дуже робочою.\n\nЦе стратегії, тож пропозиція добре підійде тим, хто любить стратегія.\n\nЗараз <a href=\"https://store.steampowered.com/app/960090/Bloons_TD_6/\"><b>87 грн</b></a> замість 219 грн; економія 132 грн.\n\n97% позитивних із 380924 оцінок • 153 досягнення\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_text": "🔥 Bloons TD 6\n\nДля такого тайтлу пропозиція вже виглядає дуже робочою.\n\nЦе стратегії, тож пропозиція добре підійде тим, хто любить стратегія.\n\nЗараз 87 грн замість 219 грн; економія 132 грн.\n\n97% позитивних із 380924 оцінок • 153 досягнення\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_char_count": 476,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 7,
+          "origin": "live_queue",
+          "title": "STAR WARS Jedi: Survivor™",
+          "offer_id": "steam:1774580",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 253.76,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "indirect",
+          "voice_style": "recommend",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a>\n\nДля цієї гри цінник уже виглядає значно цікавіше.\n\nІсторія Кела Кестіса продовжується в STAR WARS Jedi: Survivor™ — пригодницькій грі від третьої особи.\n\nЗараз <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>169 грн</b></a> замість 1699 грн; економія 1530 грн.\n\nПропозиція активна просто зараз.\n\n70% позитивних із 78578 оцінок • 53 досягнення\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_text": "🔥 STAR WARS Jedi: Survivor™\n\nДля цієї гри цінник уже виглядає значно цікавіше.\n\nІсторія Кела Кестіса продовжується в STAR WARS Jedi: Survivor™ — пригодницькій грі від третьої особи.\n\nЗараз 169 грн замість 1699 грн; економія 1530 грн.\n\nПропозиція активна просто зараз.\n\n70% позитивних із 78578 оцінок • 53 досягнення\n\nДля такого тайтлу це вже ціна, яку варто перевірити без зайвого шуму.\n\n#steam #steamsale",
+          "caption_char_count": 583,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 8,
+          "origin": "live_queue",
+          "title": "Satisfactory",
+          "offer_id": "steam:526870",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 230.17,
+          "created_at": "2026-03-12T21:41:16.179924",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "indirect",
+          "voice_style": "recommend",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/526870/Satisfactory/\"><b>Satisfactory</b></a>\n\nЯкщо гра давно у списку, це вже знижка правильного масштабу.\n\nЦе гра, що відбувається від першої особи, створена за концепцією відкритого світу для будівництва фабрик, в поєднанні із дослідженнями та боями. Грайте наодинці або з друзями, досліджуйте іншу планету, створюйте багатоповерхові фабрики і відвідайте конвеєрний рай!\n\nЗараз <a href=\"https://store.steampowered.com/app/526870/Satisfactory/\"><b>518 грн</b></a> замість 740 грн; економія 222 грн.\n\n97% позитивних із 262910 оцінок • 44 досягнення\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_text": "🔥 Satisfactory\n\nЯкщо гра давно у списку, це вже знижка правильного масштабу.\n\nЦе гра, що відбувається від першої особи, створена за концепцією відкритого світу для будівництва фабрик, в поєднанні із дослідженнями та боями. Грайте наодинці або з друзями, досліджуйте іншу планету, створюйте багатоповерхові фабрики і відвідайте конвеєрний рай!\n\nЗараз 518 грн замість 740 грн; економія 222 грн.\n\n97% позитивних із 262910 оцінок • 44 досягнення\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_char_count": 679,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "current_live_roundups",
+      "label": "Current Live Roundups Rebuilt From Reserve",
+      "summary": {
+        "total": 3,
+        "presence_counts": {
+          "direct": 3
+        },
+        "style_counts": {
+          "roundup": 3
+        },
+        "direct_mode_counts": {
+          "roundup": 3
+        },
+        "lane_counts": {
+          "hero_discount": 2,
+          "mixed": 1
+        },
+        "source_counts": {
+          "roundup": 3
+        },
+        "average_caption_chars": 843.0,
+        "max_caption_chars": 971,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 1,
+          "origin": "live_reserve_roundup",
+          "title": "Що взяти зі знижок просто зараз, частина 1",
+          "roundup_id": "roundup_01_big_discount_highlights",
+          "group_type": "hero_discount",
+          "theme_label": "Big Discount Highlights",
+          "item_count": 5,
+          "item_titles": [
+            "Grand Theft Auto V Enhanced",
+            "Trailmakers",
+            "Teardown",
+            "Valheim",
+            "The Riftbreaker"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 1</b>\n\n🐱 Йото зібрав те, що не варто губити в резерві. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> - 56% до 879 грн, знаковий хіт\n2. <a href=\"https://store.steampowered.com/app/585420/Trailmakers/\"><b>Trailmakers</b></a> - 75% до 82 грн, високий рейтинг\n3. <a href=\"https://store.steampowered.com/app/1167630/Teardown/\"><b>Teardown</b></a> - 50% до 324 грн, критичний фаворит\n4. <a href=\"https://store.steampowered.com/app/892970/Valheim/\"><b>Valheim</b></a> - 50% до 269 грн, дуже популярна гра\n5. <a href=\"https://store.steampowered.com/app/780310/The_Riftbreaker/\"><b>The Riftbreaker</b></a> - 67% до 198 грн, високий рейтинг\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_text": "Що взяти зі знижок просто зараз, частина 1\n\n🐱 Йото зібрав те, що не варто губити в резерві. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. Grand Theft Auto V Enhanced - 56% до 879 грн, знаковий хіт\n2. Trailmakers - 75% до 82 грн, високий рейтинг\n3. Teardown - 50% до 324 грн, критичний фаворит\n4. Valheim - 50% до 269 грн, дуже популярна гра\n5. The Riftbreaker - 67% до 198 грн, високий рейтинг\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_char_count": 971,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 2,
+          "origin": "live_reserve_roundup",
+          "title": "Що взяти зі знижок просто зараз, частина 2",
+          "roundup_id": "roundup_02_big_discount_highlights",
+          "group_type": "hero_discount",
+          "theme_label": "Big Discount Highlights",
+          "item_count": 3,
+          "item_titles": [
+            "Dome Keeper",
+            "R.E.P.O.",
+            "Red Dead Redemption"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 2</b>\n\n🐱 Йото зібрав добірку сильних знижок. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/1637320/Dome_Keeper/\"><b>Dome Keeper</b></a> - 60% до 150 грн, перевірений хіт\n2. <a href=\"https://store.steampowered.com/app/3241660/REPO/\"><b>R.E.P.O.</b></a> - 30% до 135 грн, критичний фаворит\n3. <a href=\"https://store.steampowered.com/app/2668510/Red_Dead_Redemption/\"><b>Red Dead Redemption</b></a> - 50% до 1099 грн, знаковий хіт\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_text": "Що взяти зі знижок просто зараз, частина 2\n\n🐱 Йото зібрав добірку сильних знижок. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. Dome Keeper - 60% до 150 грн, перевірений хіт\n2. R.E.P.O. - 30% до 135 грн, критичний фаворит\n3. Red Dead Redemption - 50% до 1099 грн, знаковий хіт\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_char_count": 691,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 3,
+          "origin": "live_reserve_roundup",
+          "title": "Що ще варте уваги в резерві, частина 1",
+          "roundup_id": "roundup_03_reserve_deals_watch",
+          "group_type": "mixed",
+          "theme_label": "Reserve Deals Watch",
+          "item_count": 5,
+          "item_titles": [
+            "Victoria 3",
+            "NBA 2K26",
+            "Isonzo",
+            "EA SPORTS FC™ 26",
+            "Cozy Grove"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що ще варте уваги в резерві, частина 1</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. <a href=\"https://store.steampowered.com/app/529340/Victoria_3/\"><b>Victoria 3</b></a> - 70% до 404 грн, помітний хіт\n2. <a href=\"https://store.steampowered.com/app/3472040/NBA_2K26/\"><b>NBA 2K26</b></a> - 75% до 574 грн, сильний франчайз\n3. <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a> - безкоштовно в Epic, варта уваги\n4. <a href=\"https://store.steampowered.com/app/3405690/EA_SPORTS_FC_26/\"><b>EA SPORTS FC™ 26</b></a> - 70% до 509 грн, добрий кандидат для добірки\n5. <a href=\"https://store.epicgames.com/uk/p/cozy-grove\"><b>Cozy Grove</b></a> - безкоштовно в Epic, варта уваги\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+          "caption_text": "Що ще варте уваги в резерві, частина 1\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. Victoria 3 - 70% до 404 грн, помітний хіт\n2. NBA 2K26 - 75% до 574 грн, сильний франчайз\n3. Isonzo - безкоштовно в Epic, варта уваги\n4. EA SPORTS FC™ 26 - 70% до 509 грн, добрий кандидат для добірки\n5. Cozy Grove - безкоштовно в Epic, варта уваги\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+          "caption_char_count": 867,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "recent_archive_addendum",
+      "label": "Recent Published Post Addendum",
+      "summary": {
+        "total": 2,
+        "presence_counts": {
+          "direct": 2
+        },
+        "style_counts": {
+          "freebie": 2
+        },
+        "direct_mode_counts": {
+          "freebie": 2
+        },
+        "lane_counts": {
+          "breaking_freebie": 2
+        },
+        "source_counts": {
+          "epic": 2
+        },
+        "average_caption_chars": 501.0,
+        "max_caption_chars": 508,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 1,
+          "origin": "post_artifact",
+          "title": "Idle Champions of the Forgotten Realms",
+          "offer_id": "epic:a9748abde1c94b66aae5250bb9fc5503",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-10T16:44:16.867770",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/idle-champions-of-the-forgotten-realms\"><b>Idle Champions of the Forgotten Realms</b></a>\n\n🎁 Йото вихопив роздачу.\n\nЦе freegames, games та edition, тож гру варто додати до бібліотеки, якщо вам близькі яскраві ігрові відкриття.\n\nЗамість 0 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Idle Champions of the Forgotten Realms\n\n🎁 Йото вихопив роздачу.\n\nЦе freegames, games та edition, тож гру варто додати до бібліотеки, якщо вам близькі яскраві ігрові відкриття.\n\nЗамість 0 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 508,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 2,
+          "origin": "post_artifact",
+          "title": "Turnip Boy Robs a Bank",
+          "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-10T23:17:58.343127",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/turnip-boy-robs-a-bank-3fae0e\"><b>Turnip Boy Robs a Bank</b></a>\n\n🎁 Йото витягнув безкоштовну гру.\n\nЦе freegames, games та edition, тож гру варто додати до бібліотеки, якщо вам близькі яскраві ігрові відкриття.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Turnip Boy Robs a Bank\n\n🎁 Йото витягнув безкоштовну гру.\n\nЦе freegames, games та edition, тож гру варто додати до бібліотеки, якщо вам близькі яскраві ігрові відкриття.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 494,
+          "caption_limit_safe": true
+        }
+      ]
+    }
+  ],
+  "live_stream_summary": {
+    "total": 11,
+    "presence_counts": {
+      "direct": 5,
+      "indirect": 5,
+      "neutral": 1
+    },
+    "style_counts": {
+      "neutral": 1,
+      "recommend": 7,
+      "roundup": 3
+    },
+    "direct_mode_counts": {
+      "recommend": 2,
+      "roundup": 3
+    },
+    "lane_counts": {
+      "event_festival": 1,
+      "hero_discount": 2,
+      "high_value_discount": 7,
+      "mixed": 1
+    },
+    "source_counts": {
+      "event": 1,
+      "roundup": 3,
+      "steam": 7
+    },
+    "average_caption_chars": 633.9,
+    "max_caption_chars": 971,
+    "direct_rate": 0.455
+  },
+  "archive_summary": {
+    "total": 2,
+    "presence_counts": {
+      "direct": 2
+    },
+    "style_counts": {
+      "freebie": 2
+    },
+    "direct_mode_counts": {
+      "freebie": 2
+    },
+    "lane_counts": {
+      "breaking_freebie": 2
+    },
+    "source_counts": {
+      "epic": 2
+    },
+    "average_caption_chars": 501.0,
+    "max_caption_chars": 508,
+    "direct_rate": 1.0
+  }
+}

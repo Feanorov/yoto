@@ -1,0 +1,2 @@
+blocker_reason,command,next_action,ready_for_reaper,status,telegram_verified,truth_ready,verdict
+no_offers_ingested,preview,"Fix the ingest source issue, then rerun yoto.bat preview.",,ok,False,False,truthful_send_test_blocked

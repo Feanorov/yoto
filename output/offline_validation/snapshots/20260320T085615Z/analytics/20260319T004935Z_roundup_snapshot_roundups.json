@@ -1,0 +1,500 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-19T00:49:35",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 17,
+      "hard_suppress": 1967,
+      "roundup_candidate": 18,
+      "solo_post": 0
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-19T00:49:35.612834",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085615Z\\assets\\roundup\\409bbcd341b54b02e1e4e97e4b8373e9db2c918687a26c7f887321c7b11ccc1d.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1726160226",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1726160226",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1726160226",
+            "discount_percent": 90,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1237970_fddb6383c4fb.jpg",
+            "offer_id": "steam:1237970",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 96,
+            "selection_score": 382.75,
+            "source": "steam",
+            "title": "Titanfall® 2"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/394360/23155197fecebda734fae4bd073674b27a4e4a58/header_alt_assets_8_ukrainian.jpg?t=1773756061",
+            "discount_percent": 70,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_394360_70326e14d0f6.jpg",
+            "offer_id": "steam:394360",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 90,
+            "selection_score": 360.83,
+            "source": "steam",
+            "title": "Hearts of Iron IV"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1158310/8a7e814d13f8e73c0d40471f585ece908f9be282/header.jpg?t=1773741822",
+            "discount_percent": 70,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1158310_ec1d38bd7ab4.jpg",
+            "offer_id": "steam:1158310",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 91,
+            "selection_score": 354.94,
+            "source": "steam",
+            "title": "Crusader Kings III"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222680/header.jpg?t=1716831270",
+            "discount_percent": 95,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1222680_e27cd297395b.jpg",
+            "offer_id": "steam:1222680",
+            "rank": 4,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 84,
+            "selection_score": 351.21,
+            "source": "steam",
+            "title": "Need for Speed™ Heat"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238810/header.jpg?t=1772707365",
+            "discount_percent": 95,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1238810_092fae3609d0.jpg",
+            "offer_id": "steam:1238810",
+            "rank": 5,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 71,
+            "selection_score": 338.6,
+            "source": "steam",
+            "title": "Battlefield™ V"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1726160226",
+              "discount_percent": 90,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1237970_fddb6383c4fb.jpg",
+              "offer_id": "steam:1237970",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 96,
+              "selection_score": 382.75,
+              "source": "steam",
+              "title": "Titanfall® 2"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/394360/23155197fecebda734fae4bd073674b27a4e4a58/header_alt_assets_8_ukrainian.jpg?t=1773756061",
+              "discount_percent": 70,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_394360_70326e14d0f6.jpg",
+              "offer_id": "steam:394360",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:standout_title",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 90,
+              "selection_score": 360.83,
+              "source": "steam",
+              "title": "Hearts of Iron IV"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1158310/8a7e814d13f8e73c0d40471f585ece908f9be282/header.jpg?t=1773741822",
+              "discount_percent": 70,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1158310_ec1d38bd7ab4.jpg",
+              "offer_id": "steam:1158310",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:standout_title",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 91,
+              "selection_score": 354.94,
+              "source": "steam",
+              "title": "Crusader Kings III"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222680/header.jpg?t=1716831270",
+              "discount_percent": 95,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1222680_e27cd297395b.jpg",
+              "offer_id": "steam:1222680",
+              "rank": 4,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 84,
+              "selection_score": 351.21,
+              "source": "steam",
+              "title": "Need for Speed™ Heat"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238810/header.jpg?t=1772707365",
+              "discount_percent": 95,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1238810_092fae3609d0.jpg",
+              "offer_id": "steam:1238810",
+              "rank": 5,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 71,
+              "selection_score": 338.6,
+              "source": "steam",
+              "title": "Battlefield™ V"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:1237970",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1237970/header.jpg?t=1726160226",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1237970_fddb6383c4fb.jpg",
+        "slug": "roundup_roundup_01_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 5",
+          "brand_micro": "YOTO PICKS",
+          "composition_mode": "default",
+          "panel_kicker": "Big discounts",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 5",
+          "top_zone_badge_anchor": "top_right",
+          "top_zone_layout_mode": "default"
+        },
+        "title_lines": [
+          "Roundup: Big Discount",
+          "Highlights"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 90,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1237970",
+          "price_after_minor": 7900,
+          "price_line": "90% off to UAH 79",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 96,
+          "score": 296.85,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1237970/Titanfall_2/",
+          "summary_line": "90% off to UAH 79 | Hero discount | review 96/100",
+          "title": "Titanfall® 2"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:394360",
+          "price_after_minor": 40400,
+          "price_line": "70% off to UAH 404",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 90,
+          "score": 288.83,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/",
+          "summary_line": "70% off to UAH 404 | Hero discount | review 90/100",
+          "title": "Hearts of Iron IV"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1158310",
+          "price_after_minor": 40400,
+          "price_line": "70% off to UAH 404",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 91,
+          "score": 288.79,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1158310/Crusader_Kings_III/",
+          "summary_line": "70% off to UAH 404 | Hero discount | review 91/100",
+          "title": "Crusader Kings III"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 95,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1222680",
+          "price_after_minor": 9900,
+          "price_line": "95% off to UAH 99",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 84,
+          "score": 283.36,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1222680/Need_for_Speed_Heat/",
+          "summary_line": "95% off to UAH 99 | Hero discount | review 84/100",
+          "title": "Need for Speed™ Heat"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 95,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1238810",
+          "price_after_minor": 6400,
+          "price_line": "95% off to UAH 64",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 71,
+          "score": 278.7,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1238810/Battlefield_V/",
+          "summary_line": "95% off to UAH 64 | Hero discount | review 71/100",
+          "title": "Battlefield™ V"
+        }
+      ],
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/1237970/Titanfall_2/\"><b>Titanfall® 2</b></a> - 90% до 79 грн, критичний фаворит\n2. <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a> - 70% до 404 грн, знаковий хіт\n3. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> - 70% до 404 грн, знаковий хіт\n4. <a href=\"https://store.steampowered.com/app/1222680/Need_for_Speed_Heat/\"><b>Need for Speed™ Heat</b></a> - 95% до 99 грн, дуже популярна гра\n5. <a href=\"https://store.steampowered.com/app/1238810/Battlefield_V/\"><b>Battlefield™ V</b></a> - 95% до 64 грн, дуже популярна гра\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "closing_cta": "Якщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/1237970/Titanfall_2/\"><b>Titanfall® 2</b></a> - 90% до 79 грн, критичний фаворит",
+          "2. <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a> - 70% до 404 грн, знаковий хіт",
+          "3. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> - 70% до 404 грн, знаковий хіт",
+          "4. <a href=\"https://store.steampowered.com/app/1222680/Need_for_Speed_Heat/\"><b>Need for Speed™ Heat</b></a> - 95% до 99 грн, дуже популярна гра",
+          "5. <a href=\"https://store.steampowered.com/app/1238810/Battlefield_V/\"><b>Battlefield™ V</b></a> - 95% до 64 грн, дуже популярна гра"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260319T004935Z"
+}

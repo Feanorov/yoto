@@ -1,0 +1,5 @@
+card_family,hero_fallback_used,image_path,offer_id,placeholder_artwork_used,position,published_at,render_warnings,renderer_fallback_used,selected,template_id,title
+FREE_GAME,False,,epic:c367569acede446995c5a3663e993446,False,1,2026-03-19T01:17:59.290506,[],False,False,epic_free,Cozy Grove
+FREE_GAME,False,,epic:4889207626a44fed973f5e72ae79ce9d,False,1,2026-03-18T18:03:10.621952,[],False,False,epic_free,Isonzo
+FREE_GAME,False,,epic:68d9f0e261464ba284e10418d98532ea,False,1,2026-03-10T23:17:58.989615,[],False,False,epic_free,Turnip Boy Robs a Bank
+DISCOUNT,False,,epic:a9748abde1c94b66aae5250bb9fc5503,False,1,2026-03-10T16:44:17.882318,[],False,False,,

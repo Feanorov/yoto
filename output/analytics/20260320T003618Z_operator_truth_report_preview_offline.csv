@@ -1,0 +1,2 @@
+blocker_category,blocker_reason,deferred_total,eligible_candidates_total,mode,planned_total,publish_reason,reserve_total,scope,selected_offer_id,selected_title,telegram_verified,truth_ready
+queue_state,quiet_hours_reserve_hidden,12,0,preview_offline,0,,18,offline,,,False,False

@@ -1,0 +1,42 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2698940/ss_933b5c1de0571f4e0c26c39ca3a4f68a314b2e38.1920x1080.jpg?t=1772842855",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2698940/b1d30052e134b0c11ce3cf12ac1b81e89fee2394/header_alt_assets_1.jpg?t=1772842855"
+  },
+  "context": {
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T15:24:59.099789",
+  "hook_line": "Знижка 90% уже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:2698940",
+  "run_key": "20260311T152459Z",
+  "short_title": "The Crew Motorfest",
+  "summary_line": "The Crew Motorfest – це онлайн-перегони з відкритим світом, що відбуваються на острові Оаху Гавайського...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Ціна актуальна до 12 березня 2026, 17:00."
+}

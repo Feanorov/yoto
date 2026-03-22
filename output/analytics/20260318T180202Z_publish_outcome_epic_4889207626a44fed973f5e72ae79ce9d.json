@@ -1,0 +1,285 @@
+{
+  "created_at": "2026-03-18T18:02:02.946556",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+  "lane": "breaking_freebie",
+  "message_id": 164,
+  "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+  "publish_outcome": {
+    "message_id": 164,
+    "outbox_status": "published",
+    "published": true,
+    "reason": "published"
+  },
+  "published": true,
+  "reason": "published",
+  "render": {
+    "assets_used": [
+      "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46"
+    ],
+    "caption_debug": {
+      "cta": {},
+      "lane": "breaking_freebie",
+      "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+      "opening": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 4,
+        "line": "🎁 Йото вихопив роздачу.",
+        "pool_size": 3,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "selected": "🎁 Йото вихопив роздачу."
+      },
+      "presence": "direct",
+      "style": "freebie"
+    },
+    "caption_hash": "c0663ce27ace89d8f340cd39ce661effc2e2087b6e9771368c3624c4de089604",
+    "card_qa_summary": {
+      "artifact_type": "card_qa_summary",
+      "card_type_mix": {
+        "DISCOUNT": 1,
+        "FREE_GAME": 2
+      },
+      "csv_path": "D:\\Telegram\\output\\analytics\\20260318T180310Z_card_qa_summary_epic_4889207626a44fed973f5e72ae79ce9d.csv",
+      "hero_fallback_count": 0,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260318T180310Z_card_qa_summary_epic_4889207626a44fed973f5e72ae79ce9d.json",
+      "leading_card_family_streak": {
+        "card_family": "FREE_GAME",
+        "flagged": false,
+        "length": 2
+      },
+      "placeholder_artwork_count": 0,
+      "renderer_fallback_count": 0
+    },
+    "image_hash": "892eb997fccfdc4268ead7d1b8db288b9a614fd157e365be50ea6899f06e6f19",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+    "render_diagnostics": {
+      "asset_used": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": null,
+      "gameplay_candidates_count": 1,
+      "gameplay_count": 0,
+      "gameplay_rejected_ui_like": 1,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": true,
+          "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.712,
+          "score": -18.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.86,
+          "text_heavy": true,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 0,
+      "gameplay_selection": {
+        "candidates_evaluated": 1,
+        "reason": "hero_only_frame_available",
+        "score_summary": [
+          {
+            "aspect_mismatched": true,
+            "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.712,
+            "score": -18.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.86,
+            "text_heavy": true,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 0,
+        "selected_urls": [],
+        "ui_like_rejected": 1
+      },
+      "gameplay_selection_reason": "hero_only_frame_available",
+      "has_gameplay_strip": false,
+      "hero_asset_used": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+      "hero_candidates_count": 1,
+      "hero_capsule_rejected": false,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_only",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [],
+      "hero_score_summary": [
+        {
+          "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.464,
+          "entropy_score": 0.998,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 76.65,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.847,
+          "text_coverage_ratio": 0.86,
+          "ui_heavy": true
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 1,
+        "fallback_used": false,
+        "reason": "selected_gameplay_screenshot",
+        "rejected_capsules": [],
+        "score_summary": [
+          {
+            "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.464,
+            "entropy_score": 0.998,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 76.65,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "hero",
+              "header",
+              "screenshot",
+              "fallback"
+            ],
+            "subject_detection_score": 0.847,
+            "text_coverage_ratio": 0.86,
+            "ui_heavy": true
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "selected_gameplay_screenshot",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_free_game",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "epic_free",
+      "title_font_size": null,
+      "title_lines": [
+        "Isonzo"
+      ]
+    },
+    "template_id": "epic_free"
+  },
+  "run_key": "20260318T180202Z",
+  "selection": {
+    "decision_reasons": [
+      "breaking_freebie",
+      "freebie_high_signal",
+      "freebie_source:epic",
+      "freebie_ends_soon",
+      "freebie_meaningful_value",
+      "freebie_card_ready",
+      "editorial_importance:card_ready"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "editorial_adjustment": {
+      "base_total": 903.2,
+      "content_type": "freebie",
+      "final_total": 903.2,
+      "reasons": [
+        "freebie_over_filler_bonus",
+        "same_lane_repeat_penalty"
+      ],
+      "rule_deltas": {
+        "freebie_over_filler_bonus": 18.0,
+        "same_lane_repeat_penalty": -18.0
+      },
+      "total_delta": 0.0
+    },
+    "event_sale_influence": {},
+    "lane": "breaking_freebie",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "publish_priority": {
+      "bucket": "planned",
+      "decision_score": 206.2,
+      "lane": "breaking_freebie",
+      "lane_priority": 640.0,
+      "lane_repeat_penalty": 0.0,
+      "manual_override_bonus": 0.0,
+      "must_ship_bonus": 45.0,
+      "reserve_penalty": 0.0,
+      "total": 903.2,
+      "urgency_bonus": 12.0
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "recommended_post_mode": "solo_post",
+    "roundup_injection": {
+      "attempted": true,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260318T180202Z_roundup_snapshot_roundups.json",
+      "lookup_mode": "strict",
+      "queue_snapshot_at": "2026-03-18T18:02:02",
+      "reason": "controlled_reserve_release_held",
+      "release_status": "held",
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "roundup_run_key": "20260318T180202Z",
+      "status": "held",
+      "strict_rejection_reason": null
+    },
+    "score": 206.2,
+    "selection_outcome": "planned",
+    "template_id": "epic_free"
+  },
+  "title": "Isonzo"
+}

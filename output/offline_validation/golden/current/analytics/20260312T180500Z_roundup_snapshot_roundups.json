@@ -1,0 +1,343 @@
+{
+  "context": {
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-12T18:05:00",
+  "roundup_count": 4,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": null,
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 91,
+          "lane": "high_value_discount",
+          "offer_id": "steam:582660",
+          "price_line": "91% off to UAH 14",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 194.45,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "91% off to UAH 14 | Reserve candidate | review 74/100",
+          "title": "Black Desert"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 85,
+          "lane": "high_value_discount",
+          "offer_id": "steam:552520",
+          "price_line": "85% off to UAH 137",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 193.96,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "85% off to UAH 137 | Reserve candidate | review 81/100",
+          "title": "Far Cry® 5"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:588650",
+          "price_line": "60% off to UAH 131",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 186.05,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 131 | Reserve candidate | review 97/100",
+          "title": "Dead Cells"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:646570",
+          "price_line": "75% off to UAH 124",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 184.28,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 124 | Reserve candidate | review 98/100",
+          "title": "Slay the Spire"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 85,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1693980",
+          "price_line": "85% off to UAH 224",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 183.34,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "85% off to UAH 224 | Reserve candidate | review 91/100",
+          "title": "Dead Space"
+        }
+      ],
+      "roundup_id": "roundup_01_reserve_deals_watch",
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    },
+    {
+      "card_asset_path": null,
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 80,
+          "lane": "high_value_discount",
+          "offer_id": "steam:567640",
+          "price_line": "80% off to UAH 95",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 181.76,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "80% off to UAH 95 | Reserve candidate | review 83/100",
+          "title": "Danganronpa V3: Killing Harmony"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 70,
+          "lane": "high_value_discount",
+          "offer_id": "steam:312520",
+          "price_line": "70% off to UAH 154",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 180.14,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "70% off to UAH 154 | Reserve candidate | review 94/100",
+          "title": "Rain World"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 70,
+          "lane": "high_value_discount",
+          "offer_id": "steam:394360",
+          "price_line": "70% off to UAH 404",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 179.83,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "70% off to UAH 404 | Reserve candidate | review 90/100",
+          "title": "Hearts of Iron IV"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 70,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1158310",
+          "price_line": "70% off to UAH 404",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 179.79,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "70% off to UAH 404 | Reserve candidate | review 91/100",
+          "title": "Crusader Kings III"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:960090",
+          "price_line": "60% off to UAH 87",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 178.21,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 87 | Reserve candidate | review 97/100",
+          "title": "Bloons TD 6"
+        }
+      ],
+      "roundup_id": "roundup_02_reserve_deals_watch",
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    },
+    {
+      "card_asset_path": null,
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 67,
+          "lane": "high_value_discount",
+          "offer_id": "steam:780310",
+          "price_line": "67% off to UAH 198",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 177.12,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "67% off to UAH 198 | Reserve candidate | review 90/100",
+          "title": "The Riftbreaker"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:413410",
+          "price_line": "60% off to UAH 111",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 175.29,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 111 | Reserve candidate | review 96/100",
+          "title": "Danganronpa: Trigger Happy Havoc"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:699130",
+          "price_line": "75% off to UAH 187",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 174.98,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 187 | Reserve candidate | review 83/100",
+          "title": "World War Z"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1637320",
+          "price_line": "60% off to UAH 150",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 173.94,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 150 | Reserve candidate | review 92/100",
+          "title": "Dome Keeper"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:2186680",
+          "price_line": "60% off to UAH 319",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 172.83,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 319 | Reserve candidate | review 88/100",
+          "title": "Warhammer 40,000: Rogue Trader"
+        }
+      ],
+      "roundup_id": "roundup_03_reserve_deals_watch",
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    },
+    {
+      "card_asset_path": null,
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 3,
+      "items": [
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3472040",
+          "price_line": "75% off to UAH 574",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 168.74,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 574 | Reserve candidate | review 65/100",
+          "title": "NBA 2K26"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 50,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1669000",
+          "price_line": "50% off to UAH 674",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 160.88,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "50% off to UAH 674 | Reserve candidate | review 81/100",
+          "title": "Age of Wonders 4"
+        },
+        {
+          "callout": "Reserve candidate",
+          "discount_percent": 45,
+          "lane": "high_value_discount",
+          "offer_id": "steam:2849080",
+          "price_line": "45% off to UAH 228",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount"
+          ],
+          "score": 160.54,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "45% off to UAH 228 | Reserve candidate | review 88/100",
+          "title": "Kingdom Rush 5: Alliance TD"
+        }
+      ],
+      "roundup_id": "roundup_04_reserve_deals_watch",
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    }
+  ],
+  "run_key": "20260312T180500Z"
+}

@@ -1,0 +1,42 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/552520/ss_a52c732d62a26d20bcfb0525929178749392f4fc.1920x1080.jpg?t=1762190084",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/552520/header.jpg?t=1762190084"
+  },
+  "context": {
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T16:15:41.364064",
+  "hook_line": "Знижка 85% уже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:552520",
+  "run_key": "20260311T161541Z",
+  "short_title": "Far Cry® 5",
+  "summary_line": "Gold Edition The Gold Edition includes the game, the Digital Deluxe Pack & the Season Pass. Expand your...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Ціна актуальна до 12 березня 2026, 17:00."
+}

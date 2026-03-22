@@ -1,0 +1,228 @@
+{
+  "created_at": "2026-03-20T00:34:46.319481",
+  "diagnostics": {
+    "context": {
+      "active": false,
+      "active_event_offer_ids": [],
+      "ingest_sources": {
+        "epic": {
+          "offers": 0,
+          "reason": "All connection attempts failed",
+          "status": "degraded"
+        },
+        "events_auto": {
+          "offers": 0,
+          "reason": "Circuit is open for store.steampowered.com",
+          "status": "degraded"
+        },
+        "events_calendar": {
+          "offers": 0,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_deduped": {
+          "offers": 0,
+          "raw_offers": 0,
+          "reason": "deduped",
+          "status": "healthy"
+        },
+        "steam": {
+          "offers": 0,
+          "reason": "All connection attempts failed",
+          "status": "degraded"
+        }
+      },
+      "offline_snapshot_created_at": "2026-03-20T00:34:28.562672",
+      "offline_snapshot_role": "candidate",
+      "offline_snapshot_run_key": "20260320T003428Z",
+      "queue_snapshot_at": "2026-03-20T00:34:28",
+      "sale_event_mode": "auto",
+      "selection_summary": {
+        "capacity_hold": 0,
+        "hard_suppress": 0,
+        "roundup_candidate": 0,
+        "solo_post": 0
+      },
+      "source": "current_queue"
+    },
+    "created_at": "2026-03-20T00:34:46.319481",
+    "empty_window": false,
+    "fatal_ingest": true,
+    "ingest": {
+      "enriched_total": 0,
+      "ingested_total": 0,
+      "metrics_available": true
+    },
+    "metrics": {
+      "offers.enriched_total": 0,
+      "offers.ingested.source.epic": 0,
+      "offers.ingested.source.events_auto": 0,
+      "offers.ingested.source.events_calendar": 0,
+      "offers.ingested.source.events_deduped": 0,
+      "offers.ingested.source.steam": 0,
+      "offers.ingested_total": 0,
+      "queue.depth.planned": 0,
+      "queue.depth.reserve": 0,
+      "selection.accepted_total": 0,
+      "selection.capacity_hold": 0,
+      "selection.roundup_candidate": 0,
+      "selection.solo_post": 0
+    },
+    "pipeline_action": "evaluation_only",
+    "planner_window": {
+      "empty": false,
+      "planned_count": 0,
+      "reserve_count": 0
+    },
+    "publish": {},
+    "reasons": [
+      "no_offers_ingested"
+    ],
+    "run_key": "20260320T003446Z",
+    "should_stop_pipeline": true,
+    "status": "fatal_ingest"
+  },
+  "ingest_sources": {
+    "epic": {
+      "offers": 0,
+      "reason": "All connection attempts failed",
+      "status": "degraded"
+    },
+    "events_auto": {
+      "offers": 0,
+      "reason": "Circuit is open for store.steampowered.com",
+      "status": "degraded"
+    },
+    "events_calendar": {
+      "offers": 0,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_deduped": {
+      "offers": 0,
+      "raw_offers": 0,
+      "reason": "deduped",
+      "status": "healthy"
+    },
+    "steam": {
+      "offers": 0,
+      "reason": "All connection attempts failed",
+      "status": "degraded"
+    }
+  },
+  "mode": "preview_offline",
+  "offline_snapshot": {
+    "base_db_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T003428Z\\dealbot.sqlite3",
+    "manifest_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T003428Z\\snapshot_manifest.json",
+    "planned_count": 0,
+    "quality": {
+      "archive_posts_total": 7,
+      "artifact_rich": true,
+      "asset_localization_localized_total": 3,
+      "asset_localization_unresolved_remote": 0,
+      "blocking_reasons": [
+        "planned_queue_empty",
+        "planned_assets_not_localized"
+      ],
+      "captions_offline_ready": true,
+      "cards_offline_ready": true,
+      "golden_eligible": false,
+      "planned_rows_total": 0,
+      "planned_rows_with_local_assets": 0,
+      "planned_rows_without_local_assets": 0,
+      "publishable_planned_rows_total": 0,
+      "quality_version": 1,
+      "queue_rows_total": 0,
+      "reserve_rows_total": 0,
+      "reserve_rows_with_local_assets": 0,
+      "reserve_rows_without_local_assets": 0,
+      "roundup_snapshots_missing_local_cards": 10,
+      "roundup_snapshots_total": 16,
+      "roundup_snapshots_with_local_cards": 6,
+      "send_test_offline_ready": false,
+      "usable_for_send_test_offline": false,
+      "warnings": [
+        "roundup_card_assets_missing"
+      ]
+    },
+    "reserve_count": 0,
+    "run_key": "20260320T003428Z",
+    "snapshot_role": "candidate"
+  },
+  "queue": {
+    "buckets": {
+      "planned": {
+        "by_family": {},
+        "by_lane": {},
+        "by_source": {},
+        "rows": [],
+        "total": 0
+      },
+      "reserve": {
+        "by_family": {},
+        "by_lane": {},
+        "by_source": {},
+        "rows": [],
+        "total": 0
+      }
+    },
+    "deferred_total": 0
+  },
+  "run_key": "20260320T003446Z",
+  "scope": "offline",
+  "selection": {
+    "allow_reserve": false,
+    "blocked_candidates": [],
+    "blocked_candidates_total": 0,
+    "blocker_detail": "No planned or reserve rows exist.",
+    "blocker_reason": "queue_empty",
+    "eligible_candidates": [],
+    "eligible_candidates_total": 0,
+    "planned_total": 0,
+    "quiet_hours": true,
+    "reserve_release_reason": "no_protected_breakers",
+    "reserve_total": 0,
+    "roundup_injection": {
+      "attempted": false,
+      "json_path": null,
+      "lookup_mode": null,
+      "queue_snapshot_at": null,
+      "reason": "no_reserve_candidates",
+      "release_status": "not_applicable",
+      "roundup_id": null,
+      "roundup_run_key": null,
+      "status": "rejected",
+      "strict_rejection_reason": null
+    },
+    "selected_candidate": null,
+    "visible_reserve_total": 0
+  },
+  "send_test_target": {
+    "artifact": {},
+    "blocker_category": "queue_state",
+    "blocker_detail": "No planned or reserve rows exist.",
+    "blocker_reason": "queue_empty",
+    "candidate": {},
+    "outbox_message_id": null,
+    "outbox_status": null,
+    "truth_ready": false,
+    "would_send": false
+  },
+  "telegram": {
+    "channel": "@yotoua",
+    "configured": true,
+    "delivery_attempted": false,
+    "delivery_verified": false,
+    "outbox": null,
+    "publish_result": null
+  },
+  "verdict": {
+    "blocker_category": "ingest",
+    "blocker_detail": "fatal_ingest",
+    "blocker_reason": "no_offers_ingested",
+    "next_step": "Inspect ingest source statuses and degraded source reasons.",
+    "telegram_verified": false,
+    "truth_ready": false,
+    "verdict": "truthful_send_test_blocked"
+  }
+}

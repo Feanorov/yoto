@@ -1,0 +1,1 @@
+﻿"""Telegram deal bot package."""

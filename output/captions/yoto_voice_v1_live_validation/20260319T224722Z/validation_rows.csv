@@ -1,0 +1,14 @@
+section,entry_type,position,title,offer_id,roundup_id,source,offer_kind,bucket,lane,group_type,score,voice_presence,voice_style,direct_mode,caption_char_count,caption_limit_safe,origin,created_at
+current_live_planned_solos,offer,1,Cozy Grove,epic:c367569acede446995c5a3663e993446,,epic,freebie,planned,breaking_freebie,,203.2,direct,freebie,freebie,442,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,2,Titanfall® 2,steam:1237970,,steam,discount,planned,high_value_discount,,296.85,direct,recommend,recommend,527,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,3,Hearts of Iron IV,steam:394360,,steam,discount,planned,high_value_discount,,288.83,indirect,recommend,,629,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,4,Crusader Kings III,steam:1158310,,steam,discount,planned,high_value_discount,,288.79,indirect,recommend,,599,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,5,Need for Speed™ Heat,steam:1222680,,steam,discount,planned,high_value_discount,,283.36,indirect,recommend,,593,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,6,Satisfactory,steam:526870,,steam,discount,planned,high_value_discount,,240.17,indirect,recommend,,563,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,7,Battlefield™ V,steam:1238810,,steam,discount,planned,high_value_discount,,278.7,indirect,recommend,,518,True,live_queue,2026-03-18T21:52:38
+current_live_planned_solos,offer,8,Deep Rock Galactic,steam:548430,,steam,discount,planned,high_value_discount,,278.29,direct,recommend,recommend,590,True,live_queue,2026-03-18T21:52:38
+current_live_roundups,roundup,1,"Що взяти зі знижок просто зараз, частина 1",,roundup_01_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,986,True,live_reserve_roundup,
+current_live_roundups,roundup,2,"Що взяти зі знижок просто зараз, частина 2",,roundup_02_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,676,True,live_reserve_roundup,
+current_live_roundups,roundup,3,"Що ще варте уваги в резерві, частина 1",,roundup_03_reserve_deals_watch,,,,,mixed,,direct,roundup,roundup,989,True,live_reserve_roundup,
+recent_archive_addendum,offer,1,Turnip Boy Robs a Bank,epic:68d9f0e261464ba284e10418d98532ea,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,486,True,post_artifact,2026-03-10T23:17:58.343127
+recent_archive_addendum,offer,2,Isonzo,epic:4889207626a44fed973f5e72ae79ce9d,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,422,True,post_artifact,2026-03-18T18:03:08.233564

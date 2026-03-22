@@ -1,0 +1,78 @@
+{
+  "family": "DISCOUNT",
+  "manifest_hash": "d7e52a98d40d85ceee9f0137b03f00b55f7d6b75ebbfc5c3d367c61d8aa4df3b",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260320T063648Z_video_manifest_steam_952060.json",
+  "scene_count": 3,
+  "scenes": [
+    {
+      "duration_seconds": 2.0,
+      "end_seconds": 2.0,
+      "estimated_read_seconds": 1.92,
+      "narration_text": "Resident Evil 3: знижка 90%.",
+      "on_screen_text": {
+        "body": "Знижка 90% уже активна.",
+        "cta": null,
+        "headline": "Resident Evil 3"
+      },
+      "position": 1,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scenes\\scene_001.png",
+      "scene_id": "hook",
+      "start_seconds": 0.0,
+      "timing_warning": null,
+      "transition_note": "Без паузи відкрити з хука.",
+      "visual_role": "hero",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png",
+        "role": "source_artifact_image"
+      }
+    },
+    {
+      "duration_seconds": 5.0,
+      "end_seconds": 7.0,
+      "estimated_read_seconds": 2.31,
+      "narration_text": "Зараз 120 грн замість 1200 грн.",
+      "on_screen_text": {
+        "body": "Steam - Знижка",
+        "cta": null,
+        "headline": "Resident Evil 3"
+      },
+      "position": 2,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scenes\\scene_002.png",
+      "scene_id": "summary",
+      "start_seconds": 2.0,
+      "timing_warning": null,
+      "transition_note": "Швидкий жорсткий перехід в наступний біт.",
+      "visual_role": "support",
+      "visual_source": {
+        "path": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/header.jpg?t=1768956538",
+        "role": "game_image"
+      }
+    },
+    {
+      "duration_seconds": 3.0,
+      "end_seconds": 10.0,
+      "estimated_read_seconds": 2.69,
+      "narration_text": "Пропозиція активна просто зараз. Посилання в пості.",
+      "on_screen_text": {
+        "body": "Steam - Знижка",
+        "cta": "Перевір пропозицію зараз.",
+        "headline": "Пропозиція активна просто зараз."
+      },
+      "position": 3,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scenes\\scene_003.png",
+      "scene_id": "urgency",
+      "start_seconds": 7.0,
+      "timing_warning": null,
+      "transition_note": "Фінальний CTA, дати коротку утримку перед виходом.",
+      "visual_role": "cta",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png",
+        "role": "card_image"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "template_name": "deal_spotlight",
+  "title": "Resident Evil 3",
+  "total_duration_seconds": 10.0
+}

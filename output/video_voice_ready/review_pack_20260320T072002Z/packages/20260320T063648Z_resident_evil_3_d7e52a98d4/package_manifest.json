@@ -1,0 +1,26 @@
+{
+  "content_type": "discount",
+  "family": "DISCOUNT",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260320T063648Z_resident_evil_3_d7e52a98d4\\voice_script_timed.txt"
+  },
+  "hook": "Resident Evil 3: знижка 90%.",
+  "manifest_hash": "d7e52a98d40d85ceee9f0137b03f00b55f7d6b75ebbfc5c3d367c61d8aa4df3b",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260320T063648Z_video_manifest_steam_952060.json",
+  "package_id": "20260320T063648Z_resident_evil_3_d7e52a98d4",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260320T063648Z",
+  "schema_version": 1,
+  "template_name": "deal_spotlight",
+  "title": "Resident Evil 3",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

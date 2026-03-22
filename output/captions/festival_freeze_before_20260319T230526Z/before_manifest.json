@@ -1,0 +1,170 @@
+{
+  "generated_at": "2026-03-19T23:05:26.733269Z",
+  "output_root": "D:\\Telegram\\output\\captions\\festival_freeze_before_20260319T230526Z",
+  "entries": [
+    {
+      "slug": "strong_source",
+      "label": "Strong source case",
+      "title": "Steam Tower Defense Fest",
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/tower_defense\"><b>Steam Tower Defense Fest</b></a>\n\nЦе один із тих фестивалів, де зручно за один раз скласти короткий список.\n\nКлючова тема цього фестивалю — тауер-дефенс та стратегія: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nЦе зручне вікно, щоб за один прохід скласти собі короткий список.\n\n#steam #festival #gaming #strategy",
+      "caption_text": "🎉 Steam Tower Defense Fest\n\nЦе один із тих фестивалів, де зручно за один раз скласти короткий список.\n\nКлючова тема цього фестивалю — тауер-дефенс та стратегія: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nЦе зручне вікно, щоб за один прохід скласти собі короткий список.\n\n#steam #festival #gaming #strategy",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#strategy"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-strong-before",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "Це один із тих фестивалів, де зручно за один раз скласти короткий список.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "Це один із тих фестивалів, де зручно за один раз скласти короткий список."
+        },
+        "cta": {
+          "selected": "Це зручне вікно, щоб за один прохід скласти собі короткий список.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "Це один із тих фестивалів, де зручно за один раз скласти короткий список.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": true
+      }
+    },
+    {
+      "slug": "sparse_source",
+      "label": "Sparse source case",
+      "title": "Steam Next Fest",
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/sale/nextfest\"><b>Steam Next Fest</b></a>\n\nТематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.\n\nЦе той тип події, де кілька хвилин на сторінці можуть дати хороший список на потім.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nТакі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.\n\n#steam #festival #gaming",
+      "caption_text": "🎉 Steam Next Fest\n\nТематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.\n\nЦе той тип події, де кілька хвилин на сторінці можуть дати хороший список на потім.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nТакі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.\n\n#steam #festival #gaming",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-sparse-before",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину."
+        },
+        "cta": {
+          "selected": "Такі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": true
+      }
+    },
+    {
+      "slug": "edge_no_deadline",
+      "label": "Edge case / no deadline / English-only source",
+      "title": "Steam Automation Fest",
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/automation\"><b>Steam Automation Fest</b></a>\n\nУ Steam зараз є тематичне вікно, яке варте швидкого проходу.\n\nКлючова тема цього фестивалю — симулятор: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія вже триває, тож короткий список краще скласти без відкладань.\n\nПробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.\n\n#steam #festival #gaming #simulation",
+      "caption_text": "🎉 Steam Automation Fest\n\nУ Steam зараз є тематичне вікно, яке варте швидкого проходу.\n\nКлючова тема цього фестивалю — симулятор: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія вже триває, тож короткий список краще скласти без відкладань.\n\nПробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.\n\n#steam #festival #gaming #simulation",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#simulation"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-edge-before",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "У Steam зараз є тематичне вікно, яке варте швидкого проходу.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "У Steam зараз є тематичне вікно, яке варте швидкого проходу."
+        },
+        "cta": {
+          "selected": "Пробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "У Steam зараз є тематичне вікно, яке варте швидкого проходу.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": true
+      }
+    }
+  ]
+}

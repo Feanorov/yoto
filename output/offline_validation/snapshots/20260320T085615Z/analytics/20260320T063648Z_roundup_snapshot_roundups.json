@@ -1,0 +1,533 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "ingest_sources": {
+      "epic": {
+        "offers": 2,
+        "raw_offers": 12,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_auto": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_calendar": {
+        "offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_deduped": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "deduped",
+        "status": "healthy"
+      },
+      "steam": {
+        "details": {
+          "degraded_until": null,
+          "mode": "healthy",
+          "reason": "healthy",
+          "recent_429_count": 0,
+          "slowdown_multiplier": 1.0
+        },
+        "offers": 2000,
+        "reason": "healthy",
+        "status": "healthy"
+      }
+    },
+    "queue_snapshot_at": "2026-03-20T06:36:48",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 7,
+      "hard_suppress": 1971,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-20T06:36:48.964284",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085615Z\\assets\\roundup\\f33134b439f4c90099631801a89281e655859e871b3d2446bebc5e7eb834db6a.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg?t=1773426592",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Editorial picks",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "brand_wordmark": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_primary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_secondary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg?t=1773426592",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg?t=1773426592",
+            "discount_percent": 70,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_3405690_a241445dbf35.jpg",
+            "offer_id": "steam:3405690",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "strong_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 45,
+            "selection_score": 249.47,
+            "source": "steam",
+            "title": "EA SPORTS FC™ 26"
+          },
+          {
+            "artwork_url": "https://cdn1.epicgames.com/spt-assets/d0be4faac92a49ebae039c0e0d386e42/electrician-simulator-1j17y.jpg",
+            "discount_percent": 100,
+            "is_freebie": true,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_epic_b3d56c3e27fc4816bf6cc0cefecd4948_4de255283a53.jpg",
+            "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+            "rank": 2,
+            "reason_tags": [
+              "freebie_roundup_candidate",
+              "freebie_source:epic",
+              "freebie_meaningful_value",
+              "freebie_card_ready",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": null,
+            "selection_score": 221.75,
+            "source": "epic",
+            "title": "Electrician Simulator"
+          },
+          {
+            "artwork_url": "https://cdn1.epicgames.com/spt-assets/4eb4296fe40e4130a61adbf2d6b34586/world-of-warships-1ahdf.png",
+            "discount_percent": 100,
+            "is_freebie": true,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_epic_d3b29bd0dac74187970db0d79bf4b18e_75b682bbced5.png",
+            "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+            "rank": 3,
+            "reason_tags": [
+              "freebie_roundup_candidate",
+              "freebie_source:epic",
+              "freebie_meaningful_value",
+              "freebie_card_ready",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": null,
+            "selection_score": 215.75,
+            "source": "epic",
+            "title": "World of Warships — набір Tachibana до річниці в Epic"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2651280/header.jpg?t=1763569811",
+            "discount_percent": 33,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_2651280_df9f3d083185.jpg",
+            "offer_id": "steam:2651280",
+            "rank": 4,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 82,
+            "selection_score": 158.67,
+            "source": "steam",
+            "title": "Marvel's Spider-Man 2"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/949230/header.jpg?t=1773949108",
+            "discount_percent": 30,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_949230_a366b3e26b64.jpg",
+            "offer_id": "steam:949230",
+            "rank": 5,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 53,
+            "selection_score": 140.27,
+            "source": "steam",
+            "title": "Cities: Skylines II"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg?t=1773426592",
+              "discount_percent": 70,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_3405690_a241445dbf35.jpg",
+              "offer_id": "steam:3405690",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "strong_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 45,
+              "selection_score": 249.47,
+              "source": "steam",
+              "title": "EA SPORTS FC™ 26"
+            },
+            {
+              "artwork_url": "https://cdn1.epicgames.com/spt-assets/d0be4faac92a49ebae039c0e0d386e42/electrician-simulator-1j17y.jpg",
+              "discount_percent": 100,
+              "is_freebie": true,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_epic_b3d56c3e27fc4816bf6cc0cefecd4948_4de255283a53.jpg",
+              "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+              "rank": 2,
+              "reason_tags": [
+                "freebie_roundup_candidate",
+                "freebie_source:epic",
+                "freebie_meaningful_value",
+                "freebie_card_ready",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": null,
+              "selection_score": 221.75,
+              "source": "epic",
+              "title": "Electrician Simulator"
+            },
+            {
+              "artwork_url": "https://cdn1.epicgames.com/spt-assets/4eb4296fe40e4130a61adbf2d6b34586/world-of-warships-1ahdf.png",
+              "discount_percent": 100,
+              "is_freebie": true,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_epic_d3b29bd0dac74187970db0d79bf4b18e_75b682bbced5.png",
+              "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+              "rank": 3,
+              "reason_tags": [
+                "freebie_roundup_candidate",
+                "freebie_source:epic",
+                "freebie_meaningful_value",
+                "freebie_card_ready",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": null,
+              "selection_score": 215.75,
+              "source": "epic",
+              "title": "World of Warships — набір Tachibana до річниці в Epic"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2651280/header.jpg?t=1763569811",
+              "discount_percent": 33,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_2651280_df9f3d083185.jpg",
+              "offer_id": "steam:2651280",
+              "rank": 4,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 82,
+              "selection_score": 158.67,
+              "source": "steam",
+              "title": "Marvel's Spider-Man 2"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/949230/header.jpg?t=1773949108",
+              "discount_percent": 30,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_949230_a366b3e26b64.jpg",
+              "offer_id": "steam:949230",
+              "rank": 5,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 53,
+              "selection_score": 140.27,
+              "source": "steam",
+              "title": "Cities: Skylines II"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:3405690",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3405690/2d96aa1b06e453cd62dae9029d412f19e61932c3/header.jpg?t=1773426592",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "editorial_row",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_03_reserve_deals_watch.png",
+        "platform_badge_text": "MIXED TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_3405690_a241445dbf35.jpg",
+        "slug": "roundup_roundup_03_reserve_deals_watch",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 5",
+          "brand_micro": "YOTO PICKS",
+          "composition_mode": "top_list_system_clean_dark",
+          "finish_system": "premium_finish_v2",
+          "meta_primary_label": "TOP 5",
+          "meta_secondary_label": "Editorial picks",
+          "panel_kicker": "RESERVE DEALS WATCH",
+          "platform_badge": "MIXED TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 5",
+          "title_shelf": "enabled",
+          "top_zone_badge_anchor": "top_right",
+          "top_zone_layout_mode": "default",
+          "top_zone_scaffold_mode": "top_list_top_right",
+          "typography_system": "role_based_segoe_v2"
+        },
+        "title_lines": [
+          "Roundup: Reserve Deals Watch"
+        ],
+        "title_mode": "single_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3405690",
+          "price_after_minor": 50900,
+          "price_line": "70% off to UAH 509",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 45,
+          "score": 188.22,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/3405690/EA_SPORTS_FC_26/",
+          "summary_line": "70% off to UAH 509 | Strong secondary discount | review 45/100",
+          "title": "EA SPORTS FC™ 26"
+        },
+        {
+          "callout": "Freebie roundup candidate",
+          "discount_percent": 100,
+          "is_freebie": true,
+          "lane": "backlog_filler",
+          "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+          "price_after_minor": 0,
+          "price_line": "Free claim",
+          "rank": 2,
+          "reason_tags": [
+            "freebie_roundup_candidate",
+            "freebie_source:epic",
+            "freebie_meaningful_value",
+            "freebie_card_ready",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": null,
+          "score": 154.75,
+          "source": "epic",
+          "store": "Epic Games Store",
+          "store_url": "https://store.epicgames.com/uk/p/electrician-simulator-164e9f",
+          "summary_line": "Free claim | Freebie roundup candidate",
+          "title": "Electrician Simulator"
+        },
+        {
+          "callout": "Freebie roundup candidate",
+          "discount_percent": 100,
+          "is_freebie": true,
+          "lane": "backlog_filler",
+          "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+          "price_after_minor": 0,
+          "price_line": "Free claim",
+          "rank": 3,
+          "reason_tags": [
+            "freebie_roundup_candidate",
+            "freebie_source:epic",
+            "freebie_meaningful_value",
+            "freebie_card_ready",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": null,
+          "score": 154.75,
+          "source": "epic",
+          "store": "Epic Games Store",
+          "store_url": "https://store.epicgames.com/uk/p/world-of-warships",
+          "summary_line": "Free claim | Freebie roundup candidate",
+          "title": "World of Warships — набір Tachibana до річниці в Epic"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 33,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:2651280",
+          "price_after_minor": 113800,
+          "price_line": "33% off to UAH 1138",
+          "rank": 4,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 82,
+          "score": 122.82,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/",
+          "summary_line": "33% off to UAH 1138 | Backlog discount | review 82/100",
+          "title": "Marvel's Spider-Man 2"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 30,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:949230",
+          "price_after_minor": 94400,
+          "price_line": "30% off to UAH 944",
+          "rank": 5,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 53,
+          "score": 115.82,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/949230/Cities_Skylines_II/",
+          "summary_line": "30% off to UAH 944 | Backlog discount | review 53/100",
+          "title": "Cities: Skylines II"
+        }
+      ],
+      "roundup_id": "roundup_03_reserve_deals_watch",
+      "telegram_draft": {
+        "caption_html": "<b>Що ще варте швидкої перевірки</b>\n\n🐱 Йото зібрав верхівку з того, що справді варте окремого відкриття. Після головних слотів лишається ще кілька позицій, яким варто дати окремий короткий прохід.\n\n1. <a href=\"https://store.steampowered.com/app/3405690/EA_SPORTS_FC_26/\"><b>EA SPORTS FC™ 26</b></a> — 70% до 509 грн, помітний хіт у сильній ціні\n2. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варте швидкої звірки\n3. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варте швидкої звірки\n4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%\n5. <a href=\"https://store.steampowered.com/app/949230/Cities_Skylines_II/\"><b>Cities: Skylines II</b></a> — 30% до 944 грн, помітний хіт\n\nЦю добірку краще пройти зверху вниз і зупинитися тільки на своєму.\n\n#toplist #steamsale",
+        "closing_cta": "Цю добірку краще пройти зверху вниз і зупинитися тільки на своєму.",
+        "intro": "🐱 Йото зібрав верхівку з того, що справді варте окремого відкриття. Після головних слотів лишається ще кілька позицій, яким варто дати окремий короткий прохід.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/3405690/EA_SPORTS_FC_26/\"><b>EA SPORTS FC™ 26</b></a> — 70% до 509 грн, помітний хіт у сильній ціні",
+          "2. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варте швидкої звірки",
+          "3. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варте швидкої звірки",
+          "4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%",
+          "5. <a href=\"https://store.steampowered.com/app/949230/Cities_Skylines_II/\"><b>Cities: Skylines II</b></a> — 30% до 944 грн, помітний хіт"
+        ],
+        "title": "Що ще варте швидкої перевірки"
+      },
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    }
+  ],
+  "run_key": "20260320T063648Z"
+}

@@ -1,0 +1,1006 @@
+{
+  "created_at": "2026-03-20T00:36:18.129905",
+  "diagnostics": {
+    "context": {
+      "active": false,
+      "active_event_offer_ids": [],
+      "ingest_sources": {
+        "epic": {
+          "offers": 2,
+          "raw_offers": 12,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_auto": {
+          "offers": 0,
+          "raw_offers": 0,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_calendar": {
+          "offers": 0,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_deduped": {
+          "offers": 0,
+          "raw_offers": 0,
+          "reason": "deduped",
+          "status": "healthy"
+        },
+        "steam": {
+          "details": {
+            "degraded_until": null,
+            "mode": "healthy",
+            "reason": "healthy",
+            "recent_429_count": 0,
+            "slowdown_multiplier": 1.0
+          },
+          "offers": 2000,
+          "reason": "healthy",
+          "status": "healthy"
+        }
+      },
+      "offline_snapshot_created_at": "2026-03-20T00:35:16.360764",
+      "offline_snapshot_role": "candidate",
+      "offline_snapshot_run_key": "20260320T003516Z",
+      "queue_snapshot_at": "2026-03-20T00:35:16",
+      "sale_event_mode": "auto",
+      "selection_summary": {
+        "capacity_hold": 12,
+        "hard_suppress": 1972,
+        "roundup_candidate": 18,
+        "solo_post": 0
+      },
+      "source": "current_queue"
+    },
+    "created_at": "2026-03-20T00:36:18.129905",
+    "empty_window": false,
+    "fatal_ingest": false,
+    "ingest": {
+      "enriched_total": 2002,
+      "ingested_total": 2002,
+      "metrics_available": true
+    },
+    "metrics": {
+      "lane.candidate.backlog_filler": 8,
+      "lane.candidate.high_value_discount": 22,
+      "offers.enriched_total": 2002,
+      "offers.ingested.source.epic": 2,
+      "offers.ingested.source.events_auto": 0,
+      "offers.ingested.source.events_calendar": 0,
+      "offers.ingested.source.events_deduped": 0,
+      "offers.ingested.source.steam": 2000,
+      "offers.ingested_total": 2002,
+      "quality.reject.adult_content": 12,
+      "quality.reject.review_threshold_not_met": 1960,
+      "quality.reject_total": 1972,
+      "queue.depth.planned": 0,
+      "queue.depth.reserve": 18,
+      "selection.accepted_total": 30,
+      "selection.capacity_hold": 12,
+      "selection.hard_suppress": 1972,
+      "selection.roundup_candidate": 18,
+      "selection.solo_post": 0
+    },
+    "pipeline_action": "evaluation_only",
+    "planner_window": {
+      "empty": false,
+      "planned_count": 0,
+      "reserve_count": 18
+    },
+    "publish": {},
+    "reasons": [],
+    "run_key": "20260320T003618Z",
+    "should_stop_pipeline": false,
+    "status": "healthy"
+  },
+  "ingest_sources": {
+    "epic": {
+      "offers": 2,
+      "raw_offers": 12,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_auto": {
+      "offers": 0,
+      "raw_offers": 0,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_calendar": {
+      "offers": 0,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_deduped": {
+      "offers": 0,
+      "raw_offers": 0,
+      "reason": "deduped",
+      "status": "healthy"
+    },
+    "steam": {
+      "details": {
+        "degraded_until": null,
+        "mode": "healthy",
+        "reason": "healthy",
+        "recent_429_count": 0,
+        "slowdown_multiplier": 1.0
+      },
+      "offers": 2000,
+      "reason": "healthy",
+      "status": "healthy"
+    }
+  },
+  "mode": "preview_offline",
+  "offline_snapshot": {
+    "base_db_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T003516Z\\dealbot.sqlite3",
+    "manifest_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T003516Z\\snapshot_manifest.json",
+    "planned_count": 0,
+    "quality": {
+      "archive_posts_total": 7,
+      "artifact_rich": true,
+      "asset_localization_localized_total": 70,
+      "asset_localization_unresolved_remote": 0,
+      "blocking_reasons": [
+        "planned_queue_empty",
+        "planned_assets_not_localized"
+      ],
+      "captions_offline_ready": true,
+      "cards_offline_ready": true,
+      "golden_eligible": false,
+      "planned_rows_total": 0,
+      "planned_rows_with_local_assets": 0,
+      "planned_rows_without_local_assets": 0,
+      "publishable_planned_rows_total": 0,
+      "quality_version": 1,
+      "queue_rows_total": 18,
+      "reserve_rows_total": 18,
+      "reserve_rows_with_local_assets": 18,
+      "reserve_rows_without_local_assets": 0,
+      "roundup_snapshots_missing_local_cards": 10,
+      "roundup_snapshots_total": 17,
+      "roundup_snapshots_with_local_cards": 7,
+      "send_test_offline_ready": false,
+      "usable_for_send_test_offline": false,
+      "warnings": [
+        "roundup_card_assets_missing"
+      ]
+    },
+    "reserve_count": 18,
+    "run_key": "20260320T003516Z",
+    "snapshot_role": "candidate"
+  },
+  "queue": {
+    "buckets": {
+      "planned": {
+        "by_family": {},
+        "by_lane": {},
+        "by_source": {},
+        "rows": [],
+        "total": 0
+      },
+      "reserve": {
+        "by_family": {
+          "discount": 16,
+          "freebie": 2
+        },
+        "by_lane": {
+          "backlog_filler": 8,
+          "high_value_discount": 10
+        },
+        "by_source": {
+          "epic": 2,
+          "steam": 16
+        },
+        "rows": [
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:952060",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 279.86,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Resident Evil 3"
+          },
+          {
+            "content_family": "freebie",
+            "lane": "backlog_filler",
+            "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 154.75,
+            "source": "epic",
+            "template_id": "epic_free",
+            "title": "Electrician Simulator"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1158310",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 278.79,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Crusader Kings III"
+          },
+          {
+            "content_family": "freebie",
+            "lane": "backlog_filler",
+            "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 154.75,
+            "source": "epic",
+            "template_id": "epic_free",
+            "title": "World of Warships — набір Tachibana до річниці в Epic"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1174180",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 275.2,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Red Dead Redemption 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:227300",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 271.23,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Euro Truck Simulator 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:281990",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 255.91,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Stellaris"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:413150",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 268.55,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Stardew Valley"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1774580",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 253.76,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "STAR WARS Jedi: Survivor™"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:2651280",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 122.82,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Marvel's Spider-Man 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1326470",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 248.96,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Sons Of The Forest"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:1371980",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 125.05,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "No Rest for the Wicked"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1245620",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 245.51,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "ELDEN RING"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:686060",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 118.95,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Mewgenics"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:814380",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 245.42,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Sekiro™: Shadows Die Twice - GOTY Edition"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:949230",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 115.82,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Cities: Skylines II"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:2253100",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 101.53,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Everwind"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:3552140",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 109.1,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Retro Rewind - Video Store Simulator"
+          }
+        ],
+        "total": 18
+      }
+    },
+    "deferred_total": 12
+  },
+  "run_key": "20260320T003618Z",
+  "scope": "offline",
+  "selection": {
+    "allow_reserve": false,
+    "blocked_candidates": [
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:major_franchise",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:952060",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 635,
+        "score": 279.86,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/952060/Resident_Evil_3/",
+        "template_id": "steam_discount",
+        "title": "Resident Evil 3",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "freebie",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "freebie_roundup_candidate",
+          "freebie_source:epic",
+          "freebie_meaningful_value",
+          "freebie_card_ready",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+        "publish_priority": {},
+        "quality_reasons": [
+          "event_or_freebie"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 636,
+        "score": 154.75,
+        "selected": false,
+        "source": "epic",
+        "store_url": "https://store.epicgames.com/uk/p/electrician-simulator-164e9f",
+        "template_id": "epic_free",
+        "title": "Electrician Simulator",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1158310",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 637,
+        "score": 278.79,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1158310/Crusader_Kings_III/",
+        "template_id": "steam_discount",
+        "title": "Crusader Kings III",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "freebie",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "freebie_roundup_candidate",
+          "freebie_source:epic",
+          "freebie_meaningful_value",
+          "freebie_card_ready",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+        "publish_priority": {},
+        "quality_reasons": [
+          "event_or_freebie"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 638,
+        "score": 154.75,
+        "selected": false,
+        "source": "epic",
+        "store_url": "https://store.epicgames.com/uk/p/world-of-warships",
+        "template_id": "epic_free",
+        "title": "World of Warships — набір Tachibana до річниці в Epic",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1174180",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 639,
+        "score": 275.2,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/",
+        "template_id": "steam_discount",
+        "title": "Red Dead Redemption 2",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:227300",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 640,
+        "score": 271.23,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/",
+        "template_id": "steam_discount",
+        "title": "Euro Truck Simulator 2",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:281990",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 641,
+        "score": 255.91,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/281990/Stellaris/",
+        "template_id": "steam_discount",
+        "title": "Stellaris",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:413150",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 642,
+        "score": 268.55,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/413150/Stardew_Valley/",
+        "template_id": "steam_discount",
+        "title": "Stardew Valley",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:very_popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1774580",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 643,
+        "score": 253.76,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/",
+        "template_id": "steam_discount",
+        "title": "STAR WARS Jedi: Survivor™",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:2651280",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 644,
+        "score": 122.82,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/",
+        "template_id": "steam_discount",
+        "title": "Marvel's Spider-Man 2",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1326470",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 645,
+        "score": 248.96,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1326470/Sons_Of_The_Forest/",
+        "template_id": "steam_discount",
+        "title": "Sons Of The Forest",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:very_popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:1371980",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 646,
+        "score": 125.05,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/",
+        "template_id": "steam_discount",
+        "title": "No Rest for the Wicked",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1245620",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 647,
+        "score": 245.51,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1245620/ELDEN_RING/",
+        "template_id": "steam_discount",
+        "title": "ELDEN RING",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:686060",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 648,
+        "score": 118.95,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/686060/Mewgenics/",
+        "template_id": "steam_discount",
+        "title": "Mewgenics",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "high_value_discount",
+        "offer_id": "steam:814380",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 649,
+        "score": 245.42,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/814380/Sekiro_Shadows_Die_Twice__GOTY_Edition/",
+        "template_id": "steam_discount",
+        "title": "Sekiro™: Shadows Die Twice - GOTY Edition",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:very_popular",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:949230",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 650,
+        "score": 115.82,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/949230/Cities_Skylines_II/",
+        "template_id": "steam_discount",
+        "title": "Cities: Skylines II",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:2253100",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 651,
+        "score": 101.53,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2253100/Everwind/",
+        "template_id": "steam_discount",
+        "title": "Everwind",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "Reserve rows are hidden during quiet hours.",
+        "blocker_reason": "quiet_hours_reserve_hidden",
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T00:35:16",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:card_ready",
+          "quiet_hours_reserve"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "steam:3552140",
+        "publish_priority": {},
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 652,
+        "score": 109.1,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/3552140/Retro_Rewind__Video_Store_Simulator/",
+        "template_id": "steam_discount",
+        "title": "Retro Rewind - Video Store Simulator",
+        "total_priority": null
+      }
+    ],
+    "blocked_candidates_total": 18,
+    "blocker_detail": "Only reserve rows exist, and reserve is hidden during quiet hours.",
+    "blocker_reason": "quiet_hours_reserve_hidden",
+    "eligible_candidates": [],
+    "eligible_candidates_total": 0,
+    "planned_total": 0,
+    "quiet_hours": true,
+    "reserve_release_reason": null,
+    "reserve_total": 18,
+    "roundup_injection": {
+      "attempted": true,
+      "queue_snapshot_at": "2026-03-20T00:35:16",
+      "reason": "quiet_hours_reserve_hidden",
+      "release_status": "quiet_hours_hidden",
+      "status": "held"
+    },
+    "selected_candidate": null,
+    "visible_reserve_total": 0
+  },
+  "send_test_target": {
+    "artifact": {},
+    "blocker_category": "queue_state",
+    "blocker_detail": "Only reserve rows exist, and reserve is hidden during quiet hours.",
+    "blocker_reason": "quiet_hours_reserve_hidden",
+    "candidate": {},
+    "outbox_message_id": null,
+    "outbox_status": null,
+    "truth_ready": false,
+    "would_send": false
+  },
+  "telegram": {
+    "channel": "@yotoua",
+    "configured": true,
+    "delivery_attempted": false,
+    "delivery_verified": false,
+    "outbox": null,
+    "publish_result": null
+  },
+  "verdict": {
+    "blocker_category": "queue_state",
+    "blocker_detail": "Only reserve rows exist, and reserve is hidden during quiet hours.",
+    "blocker_reason": "quiet_hours_reserve_hidden",
+    "next_step": "Inspect queue bucket counts and blocked candidate reasons.",
+    "telegram_verified": false,
+    "truth_ready": false,
+    "verdict": "truthful_send_test_blocked"
+  }
+}

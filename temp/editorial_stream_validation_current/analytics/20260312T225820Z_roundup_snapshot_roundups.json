@@ -1,0 +1,159 @@
+{
+  "context": {
+    "queue_snapshot_at": "2026-03-12T22:58:20.860342",
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-12T22:58:20.860342",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\temp\\editorial_stream_validation_current\\cards\\yoto_card_roundup_roundup_03_reserve_deals_watch.png",
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 60,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1637320",
+          "price_after_minor": 15000,
+          "price_line": "60% off to UAH 150",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 92,
+          "score": 233.94,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1637320/Dome_Keeper/",
+          "summary_line": "60% off to UAH 150 | Hero discount | review 92/100",
+          "title": "Dome Keeper"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 30,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:526870",
+          "price_after_minor": 51800,
+          "price_line": "30% off to UAH 518",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 97,
+          "score": 230.17,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/526870/Satisfactory/",
+          "summary_line": "30% off to UAH 518 | Hero discount | review 97/100",
+          "title": "Satisfactory"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:529340",
+          "price_after_minor": 40400,
+          "price_line": "70% off to UAH 404",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 71,
+          "score": 199.73,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/529340/Victoria_3/",
+          "summary_line": "70% off to UAH 404 | Strong secondary discount | review 71/100",
+          "title": "Victoria 3"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 75,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3472040",
+          "price_after_minor": 57400,
+          "price_line": "75% off to UAH 574",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 65,
+          "score": 190.49,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/3472040/NBA_2K26/",
+          "summary_line": "75% off to UAH 574 | Strong secondary discount | review 65/100",
+          "title": "NBA 2K26"
+        },
+        {
+          "callout": "Freebie roundup candidate",
+          "discount_percent": 100,
+          "is_freebie": true,
+          "lane": "backlog_filler",
+          "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+          "price_after_minor": 0,
+          "price_line": "Free claim",
+          "rank": 5,
+          "reason_tags": [
+            "freebie_roundup_candidate",
+            "freebie_source:epic",
+            "freebie_meaningful_value",
+            "freebie_card_ready",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": null,
+          "score": 154.75,
+          "source": "epic",
+          "store": "Epic Games Store",
+          "store_url": "https://store.epicgames.com/uk/p/isonzo",
+          "summary_line": "Free claim | Freebie roundup candidate",
+          "title": "Isonzo"
+        }
+      ],
+      "roundup_id": "roundup_03_reserve_deals_watch",
+      "telegram_draft": {
+        "caption_html": "<b>Що ще варте уваги в резерві</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. <a href=\"https://store.steampowered.com/app/1637320/Dome_Keeper/\"><b>Dome Keeper</b></a> - 60% до 150 грн, перевірений хіт\n2. <a href=\"https://store.steampowered.com/app/526870/Satisfactory/\"><b>Satisfactory</b></a> - 30% до 518 грн, критичний фаворит\n3. <a href=\"https://store.steampowered.com/app/529340/Victoria_3/\"><b>Victoria 3</b></a> - 70% до 404 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/3472040/NBA_2K26/\"><b>NBA 2K26</b></a> - 75% до 574 грн, сильний франчайз\n5. <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a> - безкоштовно в Epic, варта уваги\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "closing_cta": "Якщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/1637320/Dome_Keeper/\"><b>Dome Keeper</b></a> - 60% до 150 грн, перевірений хіт",
+          "2. <a href=\"https://store.steampowered.com/app/526870/Satisfactory/\"><b>Satisfactory</b></a> - 30% до 518 грн, критичний фаворит",
+          "3. <a href=\"https://store.steampowered.com/app/529340/Victoria_3/\"><b>Victoria 3</b></a> - 70% до 404 грн, помітний хіт",
+          "4. <a href=\"https://store.steampowered.com/app/3472040/NBA_2K26/\"><b>NBA 2K26</b></a> - 75% до 574 грн, сильний франчайз",
+          "5. <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a> - безкоштовно в Epic, варта уваги"
+        ],
+        "title": "Що ще варте уваги в резерві"
+      },
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    }
+  ],
+  "run_key": "20260312T225820Z"
+}

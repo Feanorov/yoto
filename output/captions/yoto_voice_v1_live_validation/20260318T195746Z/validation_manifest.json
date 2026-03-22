@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-03-18T19:57:46.280744",
+  "queue_snapshot_at": "2026-03-18T18:02:02",
+  "notes": [
+    "The live queue was read from the current database state; refresh it with `python -m dealbot.main --preview` before rerunning if you want a newer stream.",
+    "Solo captions are generated only from the current planned queue, so reserve items are represented through rebuilt roundups instead of fake solo posts.",
+    "The recent archive addendum exists to expose real shipped voice behavior, including freebie cases that may be absent from the current live queue."
+  ],
+  "sections": [
+    {
+      "name": "current_live_planned_solos",
+      "label": "Current Live Planned Solo Posts",
+      "summary": {
+        "total": 2,
+        "presence_counts": {
+          "direct": 2
+        },
+        "style_counts": {
+          "freebie": 1,
+          "recommend": 1
+        },
+        "direct_mode_counts": {
+          "freebie": 1,
+          "recommend": 1
+        },
+        "lane_counts": {
+          "breaking_freebie": 1,
+          "high_value_discount": 1
+        },
+        "source_counts": {
+          "epic": 1,
+          "steam": 1
+        },
+        "average_caption_chars": 447.5,
+        "max_caption_chars": 482,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 1,
+          "origin": "live_queue",
+          "title": "Titanfall® 2",
+          "offer_id": "steam:1237970",
+          "source": "steam",
+          "offer_kind": "discount",
+          "bucket": "planned",
+          "lane": "high_value_discount",
+          "score": 296.85,
+          "created_at": "2026-03-18T18:02:02",
+          "template_id": "steam_discount",
+          "decision_reasons": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "recommend",
+          "direct_mode": "recommend",
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#steamsale"
+          ],
+          "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1237970/Titanfall_2/\"><b>Titanfall® 2</b></a>\n\nЙото радить придивитися.\n\nЦінник уже вартий перевірки, якщо вам заходять бойовики.\n\nЗараз <a href=\"https://store.steampowered.com/app/1237970/Titanfall_2/\"><b>79 грн</b></a> замість 799 грн; економія 720 грн.\n\nАктуально до 19 березня 2026, 17:00.\n\n96% позитивних із 274429 оцінок • 50 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_text": "🔥 Titanfall® 2\n\nЙото радить придивитися.\n\nЦінник уже вартий перевірки, якщо вам заходять бойовики.\n\nЗараз 79 грн замість 799 грн; економія 720 грн.\n\nАктуально до 19 березня 2026, 17:00.\n\n96% позитивних із 274429 оцінок • 50 досягнень • є картки\n\nЯкщо давно чекали приводу повернути цю гру на радар, він уже є.\n\n#steam #steamsale",
+          "caption_char_count": 482,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 2,
+          "origin": "live_queue",
+          "title": "Cozy Grove",
+          "offer_id": "epic:c367569acede446995c5a3663e993446",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "planned",
+          "lane": "breaking_freebie",
+          "score": 203.2,
+          "created_at": "2026-03-18T18:02:02",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie",
+            "freebie_high_signal",
+            "freebie_source:epic",
+            "freebie_ends_soon",
+            "freebie_card_ready",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/cozy-grove\"><b>Cozy Grove</b></a>\n\n🎁 Йото спіймав гру за 0 грн.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 229 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Cozy Grove\n\n🎁 Йото спіймав гру за 0 грн.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 229 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 413,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "current_live_roundups",
+      "label": "Current Live Roundups Rebuilt From Reserve",
+      "summary": {
+        "total": 1,
+        "presence_counts": {
+          "direct": 1
+        },
+        "style_counts": {
+          "roundup": 1
+        },
+        "direct_mode_counts": {
+          "roundup": 1
+        },
+        "lane_counts": {
+          "hero_discount": 1
+        },
+        "source_counts": {
+          "roundup": 1
+        },
+        "average_caption_chars": 1005.0,
+        "max_caption_chars": 1005,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 1,
+          "origin": "live_reserve_roundup",
+          "title": "Що взяти зі знижок просто зараз, частина 1",
+          "roundup_id": "roundup_01_big_discount_highlights",
+          "group_type": "hero_discount",
+          "theme_label": "Big Discount Highlights",
+          "item_count": 5,
+          "item_titles": [
+            "Deep Rock Galactic",
+            "Hogwarts Legacy",
+            "A Way Out",
+            "Battlefield™ 2042",
+            "Warhammer 40,000: Darktide"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 1</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/548430/Deep_Rock_Galactic/\"><b>Deep Rock Galactic</b></a> - 70% до 113 грн, критичний фаворит\n2. <a href=\"https://store.steampowered.com/app/990080/Hogwarts_Legacy/\"><b>Hogwarts Legacy</b></a> - 85% до 239 грн, дуже популярна гра\n3. <a href=\"https://store.steampowered.com/app/1222700/A_Way_Out/\"><b>A Way Out</b></a> - 90% до 79 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/1517290/Battlefield_2042/\"><b>Battlefield™ 2042</b></a> - 95% до 74 грн, дуже популярна гра\n5. <a href=\"https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/\"><b>Warhammer 40,000: Darktide</b></a> - 75% до 189 грн, сильний франчайз\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_text": "Що взяти зі знижок просто зараз, частина 1\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. Deep Rock Galactic - 70% до 113 грн, критичний фаворит\n2. Hogwarts Legacy - 85% до 239 грн, дуже популярна гра\n3. A Way Out - 90% до 79 грн, помітний хіт\n4. Battlefield™ 2042 - 95% до 74 грн, дуже популярна гра\n5. Warhammer 40,000: Darktide - 75% до 189 грн, сильний франчайз\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_char_count": 1005,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "recent_archive_addendum",
+      "label": "Recent Published Post Addendum",
+      "summary": {
+        "total": 1,
+        "presence_counts": {
+          "direct": 1
+        },
+        "style_counts": {
+          "freebie": 1
+        },
+        "direct_mode_counts": {
+          "freebie": 1
+        },
+        "lane_counts": {
+          "breaking_freebie": 1
+        },
+        "source_counts": {
+          "epic": 1
+        },
+        "average_caption_chars": 400.0,
+        "max_caption_chars": 400,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 1,
+          "origin": "post_artifact",
+          "title": "Isonzo",
+          "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-18T18:03:08.233564",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie",
+            "freebie_high_signal",
+            "freebie_source:epic",
+            "freebie_ends_soon",
+            "freebie_meaningful_value",
+            "freebie_card_ready",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a>\n\n🎁 Йото вихопив роздачу.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 429 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Isonzo\n\n🎁 Йото вихопив роздачу.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 429 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 400,
+          "caption_limit_safe": true
+        }
+      ]
+    }
+  ],
+  "live_stream_summary": {
+    "total": 3,
+    "presence_counts": {
+      "direct": 3
+    },
+    "style_counts": {
+      "freebie": 1,
+      "recommend": 1,
+      "roundup": 1
+    },
+    "direct_mode_counts": {
+      "freebie": 1,
+      "recommend": 1,
+      "roundup": 1
+    },
+    "lane_counts": {
+      "breaking_freebie": 1,
+      "hero_discount": 1,
+      "high_value_discount": 1
+    },
+    "source_counts": {
+      "epic": 1,
+      "roundup": 1,
+      "steam": 1
+    },
+    "average_caption_chars": 633.3,
+    "max_caption_chars": 1005,
+    "direct_rate": 1.0
+  },
+  "archive_summary": {
+    "total": 1,
+    "presence_counts": {
+      "direct": 1
+    },
+    "style_counts": {
+      "freebie": 1
+    },
+    "direct_mode_counts": {
+      "freebie": 1
+    },
+    "lane_counts": {
+      "breaking_freebie": 1
+    },
+    "source_counts": {
+      "epic": 1
+    },
+    "average_caption_chars": 400.0,
+    "max_caption_chars": 400,
+    "direct_rate": 1.0
+  }
+}

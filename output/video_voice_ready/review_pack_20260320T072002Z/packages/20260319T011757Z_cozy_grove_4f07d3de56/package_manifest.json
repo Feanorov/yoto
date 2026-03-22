@@ -1,0 +1,26 @@
+{
+  "content_type": "freebie",
+  "family": "FREE_GAME",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011757Z_cozy_grove_4f07d3de56\\voice_script_timed.txt"
+  },
+  "hook": "Cozy Grove безкоштовно в Epic.",
+  "manifest_hash": "4f07d3de560052686290c58ffe403f44da12c0e6c0f592e378298b11cad4e5c6",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260319T011757Z_video_manifest_epic_c367569acede446995c5a3663e993446.json",
+  "package_id": "20260319T011757Z_cozy_grove_4f07d3de56",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260319T011757Z",
+  "schema_version": 1,
+  "template_name": "freebie_flash",
+  "title": "Cozy Grove",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

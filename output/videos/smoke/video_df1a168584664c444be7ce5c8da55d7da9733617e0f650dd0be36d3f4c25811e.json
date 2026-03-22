@@ -1,0 +1,32 @@
+{
+  "artifact_path": "D:\\Telegram\\output\\videos\\smoke\\video_df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e.json",
+  "created_at": "2026-03-18T19:58:40.631552",
+  "details": {
+    "durations_seconds": [
+      2.0,
+      5.0,
+      3.0
+    ],
+    "output_filename": "video_df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e.mp4",
+    "scene_count": 3,
+    "scene_ids": [
+      "hook",
+      "summary",
+      "urgency"
+    ],
+    "warnings": [
+      "missing badge"
+    ]
+  },
+  "manifest_hash": "df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e",
+  "manifest_path": "D:\\Telegram\\video_generator\\smoke_test\\manifests\\20260311T003000Z_video_manifest_smoke_test.json",
+  "scene_paths": [
+    "D:\\Telegram\\temp\\video_smoke_scenes\\df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e\\scene_001.png",
+    "D:\\Telegram\\temp\\video_smoke_scenes\\df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e\\scene_002.png",
+    "D:\\Telegram\\temp\\video_smoke_scenes\\df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e\\scene_003.png"
+  ],
+  "schema_version": 1,
+  "status": "rendered",
+  "template_name": "deadline_push",
+  "video_path": "D:\\Telegram\\output\\videos\\smoke\\video_df1a168584664c444be7ce5c8da55d7da9733617e0f650dd0be36d3f4c25811e.mp4"
+}

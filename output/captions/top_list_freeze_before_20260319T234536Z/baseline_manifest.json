@@ -1,0 +1,427 @@
+{
+  "manifest_version": "top_list_freeze_before_v1",
+  "generated_at": "2026-03-19T23:45:36.876460Z",
+  "output_root": "D:\\Telegram\\output\\captions\\top_list_freeze_before_20260319T234536Z",
+  "entries": [
+    {
+      "slug": "hero_editorial_live",
+      "label": "strong roundup/editorial case",
+      "roundup": {
+        "roundup_id": "roundup_01_big_discount_highlights",
+        "title": "Roundup: Big Discount Highlights Part 1",
+        "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+        "group_type": "hero_discount",
+        "theme_label": "Big Discount Highlights",
+        "item_count": 5,
+        "items": [
+          {
+            "rank": 1,
+            "offer_id": "steam:952060",
+            "title": "Resident Evil 3",
+            "store_url": "https://store.steampowered.com/app/952060/Resident_Evil_3/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 279.86,
+            "discount_percent": 90,
+            "review_score": 82,
+            "is_freebie": false,
+            "price_after_minor": 12000,
+            "price_line": "90% off to UAH 120",
+            "callout": "Hero discount",
+            "summary_line": "90% off to UAH 120 | Hero discount | review 82/100",
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:major_franchise",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 2,
+            "offer_id": "steam:1158310",
+            "title": "Crusader Kings III",
+            "store_url": "https://store.steampowered.com/app/1158310/Crusader_Kings_III/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 278.79,
+            "discount_percent": 70,
+            "review_score": 91,
+            "is_freebie": false,
+            "price_after_minor": 40400,
+            "price_line": "70% off to UAH 404",
+            "callout": "Hero discount",
+            "summary_line": "70% off to UAH 404 | Hero discount | review 91/100",
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 3,
+            "offer_id": "steam:1174180",
+            "title": "Red Dead Redemption 2",
+            "store_url": "https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 275.2,
+            "discount_percent": 75,
+            "review_score": 92,
+            "is_freebie": false,
+            "price_after_minor": 64900,
+            "price_line": "75% off to UAH 649",
+            "callout": "Hero discount",
+            "summary_line": "75% off to UAH 649 | Hero discount | review 92/100",
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 4,
+            "offer_id": "steam:227300",
+            "title": "Euro Truck Simulator 2",
+            "store_url": "https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 271.23,
+            "discount_percent": 75,
+            "review_score": 97,
+            "is_freebie": false,
+            "price_after_minor": 10000,
+            "price_line": "75% off to UAH 100",
+            "callout": "Hero discount",
+            "summary_line": "75% off to UAH 100 | Hero discount | review 97/100",
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 5,
+            "offer_id": "steam:413150",
+            "title": "Stardew Valley",
+            "store_url": "https://store.steampowered.com/app/413150/Stardew_Valley/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 268.55,
+            "discount_percent": 50,
+            "review_score": 98,
+            "is_freebie": false,
+            "price_after_minor": 11400,
+            "price_line": "50% off to UAH 114",
+            "callout": "Hero discount",
+            "summary_line": "50% off to UAH 114 | Hero discount | review 98/100",
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          }
+        ],
+        "telegram_draft": {
+          "title": "Що взяти зі знижок просто зараз, частина 1",
+          "intro": "🐱 Йото витягнув кілька позицій, що не губляться на фоні решти. Тут не весь потік знижок, а верхівка тих позицій, які не губляться навіть на фоні великого сейлу.",
+          "item_lines": [
+            "1. <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>Resident Evil 3</b></a> — 90% до 120 грн, великий франчайз",
+            "2. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> — 70% до 404 грн, велике ім’я сейлу",
+            "3. <a href=\"https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/\"><b>Red Dead Redemption 2</b></a> — 75% до 649 грн, велике ім’я сейлу",
+            "4. <a href=\"https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/\"><b>Euro Truck Simulator 2</b></a> — 75% до 100 грн, критичний фаворит",
+            "5. <a href=\"https://store.steampowered.com/app/413150/Stardew_Valley/\"><b>Stardew Valley</b></a> — 50% до 114 грн, велике ім’я сейлу"
+          ],
+          "closing_cta": "Якщо берете щось одне, у цій добірці логічно йти зверху вниз.",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 1</b>\n\n🐱 Йото витягнув кілька позицій, що не губляться на фоні решти. Тут не весь потік знижок, а верхівка тих позицій, які не губляться навіть на фоні великого сейлу.\n\n1. <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>Resident Evil 3</b></a> — 90% до 120 грн, великий франчайз\n2. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> — 70% до 404 грн, велике ім’я сейлу\n3. <a href=\"https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/\"><b>Red Dead Redemption 2</b></a> — 75% до 649 грн, велике ім’я сейлу\n4. <a href=\"https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/\"><b>Euro Truck Simulator 2</b></a> — 75% до 100 грн, критичний фаворит\n5. <a href=\"https://store.steampowered.com/app/413150/Stardew_Valley/\"><b>Stardew Valley</b></a> — 50% до 114 грн, велике ім’я сейлу\n\nЯкщо берете щось одне, у цій добірці логічно йти зверху вниз.\n\n#toplist #steamsale #steam"
+        },
+        "card_asset_path": null,
+        "card_render_diagnostics": {}
+      },
+      "before_caption_html": "<b>Що взяти зі знижок просто зараз, частина 1</b>\n\n🐱 Йото витягнув кілька позицій, що не губляться на фоні решти. Тут не весь потік знижок, а верхівка тих позицій, які не губляться навіть на фоні великого сейлу.\n\n1. <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>Resident Evil 3</b></a> — 90% до 120 грн, великий франчайз\n2. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> — 70% до 404 грн, велике ім’я сейлу\n3. <a href=\"https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/\"><b>Red Dead Redemption 2</b></a> — 75% до 649 грн, велике ім’я сейлу\n4. <a href=\"https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/\"><b>Euro Truck Simulator 2</b></a> — 75% до 100 грн, критичний фаворит\n5. <a href=\"https://store.steampowered.com/app/413150/Stardew_Valley/\"><b>Stardew Valley</b></a> — 50% до 114 грн, велике ім’я сейлу\n\nЯкщо берете щось одне, у цій добірці логічно йти зверху вниз.\n\n#toplist #steamsale #steam",
+      "before_title": "Що взяти зі знижок просто зараз, частина 1",
+      "before_intro": "🐱 Йото витягнув кілька позицій, що не губляться на фоні решти. Тут не весь потік знижок, а верхівка тих позицій, які не губляться навіть на фоні великого сейлу.",
+      "before_item_lines": [
+        "1. <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>Resident Evil 3</b></a> — 90% до 120 грн, великий франчайз",
+        "2. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> — 70% до 404 грн, велике ім’я сейлу",
+        "3. <a href=\"https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/\"><b>Red Dead Redemption 2</b></a> — 75% до 649 грн, велике ім’я сейлу",
+        "4. <a href=\"https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/\"><b>Euro Truck Simulator 2</b></a> — 75% до 100 грн, критичний фаворит",
+        "5. <a href=\"https://store.steampowered.com/app/413150/Stardew_Valley/\"><b>Stardew Valley</b></a> — 50% до 114 грн, велике ім’я сейлу"
+      ],
+      "before_closing_cta": "Якщо берете щось одне, у цій добірці логічно йти зверху вниз."
+    },
+    {
+      "slug": "mixed_dense_live",
+      "label": "denser live roundup case",
+      "roundup": {
+        "roundup_id": "roundup_03_reserve_deals_watch",
+        "title": "Roundup: Reserve Deals Watch Part 1",
+        "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+        "group_type": "mixed",
+        "theme_label": "Reserve Deals Watch",
+        "item_count": 5,
+        "items": [
+          {
+            "rank": 1,
+            "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+            "title": "Electrician Simulator",
+            "store_url": "https://store.epicgames.com/uk/p/electrician-simulator-164e9f",
+            "store": "Epic Games Store",
+            "source": "epic",
+            "lane": "backlog_filler",
+            "score": 154.75,
+            "discount_percent": 100,
+            "review_score": null,
+            "is_freebie": true,
+            "price_after_minor": 0,
+            "price_line": "Free claim",
+            "callout": "Freebie roundup candidate",
+            "summary_line": "Free claim | Freebie roundup candidate",
+            "reason_tags": [
+              "freebie_roundup_candidate",
+              "freebie_source:epic",
+              "freebie_meaningful_value",
+              "freebie_card_ready",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 2,
+            "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+            "title": "World of Warships — набір Tachibana до річниці в Epic",
+            "store_url": "https://store.epicgames.com/uk/p/world-of-warships",
+            "store": "Epic Games Store",
+            "source": "epic",
+            "lane": "backlog_filler",
+            "score": 154.75,
+            "discount_percent": 100,
+            "review_score": null,
+            "is_freebie": true,
+            "price_after_minor": 0,
+            "price_line": "Free claim",
+            "callout": "Freebie roundup candidate",
+            "summary_line": "Free claim | Freebie roundup candidate",
+            "reason_tags": [
+              "freebie_roundup_candidate",
+              "freebie_source:epic",
+              "freebie_meaningful_value",
+              "freebie_card_ready",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 3,
+            "offer_id": "steam:1371980",
+            "title": "No Rest for the Wicked",
+            "store_url": "https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "backlog_filler",
+            "score": 125.05,
+            "discount_percent": 30,
+            "review_score": 80,
+            "is_freebie": false,
+            "price_after_minor": 55900,
+            "price_line": "30% off to UAH 559",
+            "callout": "Backlog discount",
+            "summary_line": "30% off to UAH 559 | Backlog discount | review 80/100",
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 4,
+            "offer_id": "steam:2651280",
+            "title": "Marvel's Spider-Man 2",
+            "store_url": "https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "backlog_filler",
+            "score": 122.82,
+            "discount_percent": 33,
+            "review_score": 82,
+            "is_freebie": false,
+            "price_after_minor": 113800,
+            "price_line": "33% off to UAH 1138",
+            "callout": "Backlog discount",
+            "summary_line": "33% off to UAH 1138 | Backlog discount | review 82/100",
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          },
+          {
+            "rank": 5,
+            "offer_id": "steam:686060",
+            "title": "Mewgenics",
+            "store_url": "https://store.steampowered.com/app/686060/Mewgenics/",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "backlog_filler",
+            "score": 118.95,
+            "discount_percent": 10,
+            "review_score": 92,
+            "is_freebie": false,
+            "price_after_minor": 54000,
+            "price_line": "10% off to UAH 540",
+            "callout": "Backlog discount",
+            "summary_line": "10% off to UAH 540 | Backlog discount | review 92/100",
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ]
+          }
+        ],
+        "telegram_draft": {
+          "title": "Що ще варте уваги в резерві, частина 1",
+          "intro": "🐱 Йото відфільтрував короткий список сильних пропозицій. Тут не весь резерв, а короткий список тайтлів, де вже видно нормальний привід для окремої перевірки.",
+          "item_lines": [
+            "1. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варто глянути",
+            "2. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варто глянути",
+            "3. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> — 30% до 559 грн, помітний хіт",
+            "4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%",
+            "5. <a href=\"https://store.steampowered.com/app/686060/Mewgenics/\"><b>Mewgenics</b></a> — 10% до 540 грн, сильний рейтинг"
+          ],
+          "closing_cta": "Цю добірку найзручніше пройти зверху вниз і відсікти своє без довгого скролу.",
+          "caption_html": "<b>Що ще варте уваги в резерві, частина 1</b>\n\n🐱 Йото відфільтрував короткий список сильних пропозицій. Тут не весь резерв, а короткий список тайтлів, де вже видно нормальний привід для окремої перевірки.\n\n1. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варто глянути\n2. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варто глянути\n3. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> — 30% до 559 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%\n5. <a href=\"https://store.steampowered.com/app/686060/Mewgenics/\"><b>Mewgenics</b></a> — 10% до 540 грн, сильний рейтинг\n\nЦю добірку найзручніше пройти зверху вниз і відсікти своє без довгого скролу.\n\n#toplist #steamsale"
+        },
+        "card_asset_path": null,
+        "card_render_diagnostics": {}
+      },
+      "before_caption_html": "<b>Що ще варте уваги в резерві, частина 1</b>\n\n🐱 Йото зібрав добірку, яку зручно пройти одним заходом. Тут не весь резерв, а короткий список тайтлів, де вже видно нормальний привід для окремої перевірки.\n\n1. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варто глянути\n2. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варто глянути\n3. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> — 30% до 559 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%\n5. <a href=\"https://store.steampowered.com/app/686060/Mewgenics/\"><b>Mewgenics</b></a> — 10% до 540 грн, сильний рейтинг\n\nЯкщо берете щось одне, верхівка списку тут не випадкова.\n\n#toplist #steamsale",
+      "before_title": "Що ще варте уваги в резерві, частина 1",
+      "before_intro": "🐱 Йото зібрав добірку, яку зручно пройти одним заходом. Тут не весь резерв, а короткий список тайтлів, де вже видно нормальний привід для окремої перевірки.",
+      "before_item_lines": [
+        "1. <a href=\"https://store.epicgames.com/uk/p/electrician-simulator-164e9f\"><b>Electrician Simulator</b></a> — безкоштовно в Epic, варто глянути",
+        "2. <a href=\"https://store.epicgames.com/uk/p/world-of-warships\"><b>World of Warships — набір Tachibana до річниці в Epic</b></a> — безкоштовно в Epic, варто глянути",
+        "3. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> — 30% до 559 грн, помітний хіт",
+        "4. <a href=\"https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/\"><b>Marvel&#x27;s Spider-Man 2</b></a> — 33% до 1138 грн, рейтинг 82%",
+        "5. <a href=\"https://store.steampowered.com/app/686060/Mewgenics/\"><b>Mewgenics</b></a> — 10% до 540 грн, сильний рейтинг"
+      ],
+      "before_closing_cta": "Якщо берете щось одне, верхівка списку тут не випадкова."
+    },
+    {
+      "slug": "tag_precision_edge",
+      "label": "edge case",
+      "roundup": {
+        "roundup_id": "fixture_tag_precision_stack",
+        "title": "Roundup: Co-op Precision Picks",
+        "intro": "fixture intro",
+        "group_type": "tag",
+        "theme_label": "Co-op",
+        "item_count": 3,
+        "items": [
+          {
+            "rank": 1,
+            "offer_id": "steam:553850",
+            "title": "Helldivers 2",
+            "store_url": "https://store.steampowered.com/app/553850",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 210.0,
+            "discount_percent": 20,
+            "review_score": 83,
+            "is_freebie": false,
+            "price_after_minor": 95900,
+            "price_line": "20% off to UAH 959",
+            "callout": "Roundup shortlist",
+            "summary_line": "co-op pick",
+            "reason_tags": [
+              "roundup_discount",
+              "editorial_importance:very_popular"
+            ]
+          },
+          {
+            "rank": 2,
+            "offer_id": "steam:548430",
+            "title": "Deep Rock Galactic",
+            "store_url": "https://store.steampowered.com/app/548430",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 205.0,
+            "discount_percent": 67,
+            "review_score": 97,
+            "is_freebie": false,
+            "price_after_minor": 14900,
+            "price_line": "67% off to UAH 149",
+            "callout": "Roundup shortlist",
+            "summary_line": "trusted co-op hit",
+            "reason_tags": [
+              "strong_discount",
+              "editorial_importance:trusted_hit"
+            ]
+          },
+          {
+            "rank": 3,
+            "offer_id": "steam:1144200",
+            "title": "Ready or Not",
+            "store_url": "https://store.steampowered.com/app/1144200",
+            "store": "Steam",
+            "source": "steam",
+            "lane": "high_value_discount",
+            "score": 198.0,
+            "discount_percent": 35,
+            "review_score": 88,
+            "is_freebie": false,
+            "price_after_minor": 58400,
+            "price_line": "35% off to UAH 584",
+            "callout": "Roundup shortlist",
+            "summary_line": "tactical squad edge case",
+            "reason_tags": [
+              "roundup_discount",
+              "editorial_importance:highly_rated"
+            ]
+          }
+        ],
+        "telegram_draft": null,
+        "card_asset_path": null,
+        "card_render_diagnostics": {}
+      },
+      "before_caption_html": "<b>Co-op: що варте уваги</b>\n\n🐱 Йото відфільтрував короткий список сильних пропозицій. Тема Co-op тут зведена в один список, щоб швидко глянути найробочіші варіанти.\n\n1. <a href=\"https://store.steampowered.com/app/553850\"><b>Helldivers 2</b></a> — 20% до 959 грн, помітний хіт\n2. <a href=\"https://store.steampowered.com/app/548430\"><b>Deep Rock Galactic</b></a> — 67% до 149 грн, перевірений хіт\n3. <a href=\"https://store.steampowered.com/app/1144200\"><b>Ready or Not</b></a> — 35% до 584 грн, сильний рейтинг\n\nЯкщо тема ваша, цей список зручно пройти одним заходом і відсіяти зайве.\n\n#toplist #steamsale #steam",
+      "before_title": "Co-op: що варте уваги",
+      "before_intro": "🐱 Йото відфільтрував короткий список сильних пропозицій. Тема Co-op тут зведена в один список, щоб швидко глянути найробочіші варіанти.",
+      "before_item_lines": [
+        "1. <a href=\"https://store.steampowered.com/app/553850\"><b>Helldivers 2</b></a> — 20% до 959 грн, помітний хіт",
+        "2. <a href=\"https://store.steampowered.com/app/548430\"><b>Deep Rock Galactic</b></a> — 67% до 149 грн, перевірений хіт",
+        "3. <a href=\"https://store.steampowered.com/app/1144200\"><b>Ready or Not</b></a> — 35% до 584 грн, сильний рейтинг"
+      ],
+      "before_closing_cta": "Якщо тема ваша, цей список зручно пройти одним заходом і відсіяти зайве."
+    }
+  ]
+}

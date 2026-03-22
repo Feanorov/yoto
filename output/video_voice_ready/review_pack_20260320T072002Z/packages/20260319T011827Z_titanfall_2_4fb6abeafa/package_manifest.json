@@ -1,0 +1,26 @@
+{
+  "content_type": "discount",
+  "family": "DISCOUNT",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\voice_script_timed.txt"
+  },
+  "hook": "Titanfall 2: знижка 90%.",
+  "manifest_hash": "4fb6abeafaf84dda52cb39c6dab0477e74a805039d011f9c83fd9fbe194851d5",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260319T011827Z_video_manifest_steam_1237970.json",
+  "package_id": "20260319T011827Z_titanfall_2_4fb6abeafa",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260319T011827Z",
+  "schema_version": 1,
+  "template_name": "deal_spotlight",
+  "title": "Titanfall 2",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

@@ -1,0 +1,334 @@
+{
+  "manifest_version": "festival_freeze_before_v1",
+  "generated_at": "2026-03-19T23:08:22.418388Z",
+  "output_root": "D:\\Telegram\\output\\captions\\festival_freeze_before_20260319T230822Z",
+  "entries": [
+    {
+      "slug": "strong_source",
+      "label": "Strong source case",
+      "title": "Steam Tower Defense Fest",
+      "offer_snapshot": {
+        "offer_id": "fixture:festival-strong",
+        "source": "event",
+        "source_ref": "fixture:festival-strong",
+        "offer_kind": "festival",
+        "game_id": "fixture:festival-strong",
+        "franchise_key": "fixture-festival-strong",
+        "title": "Steam Tower Defense Fest",
+        "store_url": "https://store.steampowered.com/category/tower_defense",
+        "price_before_minor": null,
+        "price_after_minor": null,
+        "currency": "UAH",
+        "discount_percent": 0,
+        "promo_start": null,
+        "promo_end": "2026-03-26T17:00:00",
+        "review_score": null,
+        "review_count": null,
+        "achievements_count": null,
+        "has_trading_cards": false,
+        "tags": [
+          "tower defense",
+          "strategy"
+        ],
+        "genres": [],
+        "assets": {
+          "hero": "https://example.com/hero.png",
+          "header": "https://example.com/header.png",
+          "screenshot": "https://example.com/screenshot.png",
+          "fallback": null
+        },
+        "confidence_levels": {
+          "price_confidence": 1.0,
+          "deadline_confidence": 0.5,
+          "asset_confidence": 0.8
+        },
+        "description": "Тематичний тиждень для тих, хто стежить за tower defense, базобудовою та щільними хвилями ворогів.",
+        "short_description": "Тематичний тиждень для тих, хто стежить за tower defense, базобудовою та щільними хвилями ворогів.",
+        "publisher_name": "Fixture Publisher",
+        "developer_name": null,
+        "metadata": {},
+        "adult_flag": false,
+        "is_dlc": false,
+        "is_soundtrack": false,
+        "is_demo": false
+      },
+      "decision_json": {
+        "lane": "event_festival",
+        "template_id": "festival_event",
+        "queue_bucket": "planned",
+        "decision_reasons": [
+          "event_festival"
+        ],
+        "is_final_push": false
+      },
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/tower_defense\"><b>Steam Tower Defense Fest</b></a>\n\nЦе один із тих фестивалів, де зручно за один раз скласти короткий список.\n\nТематичний тиждень для тих, хто стежить за tower defense, базобудовою та щільними хвилями ворогів.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nПробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.\n\n#steam #festival #gaming #strategy",
+      "caption_text": "🎉 Steam Tower Defense Fest\n\nЦе один із тих фестивалів, де зручно за один раз скласти короткий список.\n\nТематичний тиждень для тих, хто стежить за tower defense, базобудовою та щільними хвилями ворогів.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nПробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.\n\n#steam #festival #gaming #strategy",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#strategy"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-strong",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "Це один із тих фестивалів, де зручно за один раз скласти короткий список.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "Це один із тих фестивалів, де зручно за один раз скласти короткий список."
+        },
+        "cta": {
+          "selected": "Пробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "Це один із тих фестивалів, де зручно за один раз скласти короткий список.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": false
+      }
+    },
+    {
+      "slug": "sparse_source",
+      "label": "Sparse source case",
+      "title": "Steam Next Fest",
+      "offer_snapshot": {
+        "offer_id": "fixture:festival-sparse",
+        "source": "event",
+        "source_ref": "fixture:festival-sparse",
+        "offer_kind": "festival",
+        "game_id": "fixture:festival-sparse",
+        "franchise_key": "fixture-festival-sparse",
+        "title": "Steam Next Fest",
+        "store_url": "https://store.steampowered.com/sale/nextfest",
+        "price_before_minor": null,
+        "price_after_minor": null,
+        "currency": "UAH",
+        "discount_percent": 0,
+        "promo_start": null,
+        "promo_end": "2026-03-26T17:00:00",
+        "review_score": null,
+        "review_count": null,
+        "achievements_count": null,
+        "has_trading_cards": false,
+        "tags": [
+          "event"
+        ],
+        "genres": [],
+        "assets": {
+          "hero": "https://example.com/hero.png",
+          "header": "https://example.com/header.png",
+          "screenshot": "https://example.com/screenshot.png",
+          "fallback": null
+        },
+        "confidence_levels": {
+          "price_confidence": 1.0,
+          "deadline_confidence": 0.5,
+          "asset_confidence": 0.8
+        },
+        "description": "",
+        "short_description": "",
+        "publisher_name": "Fixture Publisher",
+        "developer_name": null,
+        "metadata": {},
+        "adult_flag": false,
+        "is_dlc": false,
+        "is_soundtrack": false,
+        "is_demo": false
+      },
+      "decision_json": {
+        "lane": "event_festival",
+        "template_id": "festival_event",
+        "queue_bucket": "planned",
+        "decision_reasons": [
+          "event_festival"
+        ],
+        "is_final_push": false
+      },
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/sale/nextfest\"><b>Steam Next Fest</b></a>\n\nТематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.\n\nФестиваль варто читати як коротке вікно для відбору свого, а не як чергову шумну вітрину.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nТакі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.\n\n#steam #festival #gaming",
+      "caption_text": "🎉 Steam Next Fest\n\nТематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.\n\nФестиваль варто читати як коротке вікно для відбору свого, а не як чергову шумну вітрину.\n\nПодія триватиме до 26 березня 2026, 17:00.\n\nТакі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.\n\n#steam #festival #gaming",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-sparse",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину."
+        },
+        "cta": {
+          "selected": "Такі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": true
+      }
+    },
+    {
+      "slug": "edge_no_deadline",
+      "label": "Edge case / no deadline / English-only source",
+      "title": "Steam Automation Fest",
+      "offer_snapshot": {
+        "offer_id": "fixture:festival-edge-before",
+        "source": "event",
+        "source_ref": "fixture:festival-edge-before",
+        "offer_kind": "festival",
+        "game_id": "fixture:festival-edge-before",
+        "franchise_key": "fixture-festival-edge-before",
+        "title": "Steam Automation Fest",
+        "store_url": "https://store.steampowered.com/category/automation",
+        "price_before_minor": null,
+        "price_after_minor": null,
+        "currency": "UAH",
+        "discount_percent": 0,
+        "promo_start": null,
+        "promo_end": null,
+        "review_score": null,
+        "review_count": null,
+        "achievements_count": null,
+        "has_trading_cards": false,
+        "tags": [
+          "automation",
+          "simulation",
+          "event",
+          "freegames"
+        ],
+        "genres": [],
+        "assets": {
+          "hero": "https://example.com/hero.png",
+          "header": "https://example.com/header.png",
+          "screenshot": "https://example.com/screenshot.png",
+          "fallback": null
+        },
+        "confidence_levels": {
+          "price_confidence": 1.0,
+          "deadline_confidence": 0.5,
+          "asset_confidence": 0.8
+        },
+        "description": "A themed event full of builder demos and discount experiments.",
+        "short_description": "A themed event full of builder demos and discount experiments.",
+        "publisher_name": "Fixture Publisher",
+        "developer_name": null,
+        "metadata": {},
+        "adult_flag": false,
+        "is_dlc": false,
+        "is_soundtrack": false,
+        "is_demo": false
+      },
+      "decision_json": {
+        "lane": "event_festival",
+        "template_id": "festival_event",
+        "queue_bucket": "planned",
+        "decision_reasons": [
+          "event_festival"
+        ],
+        "is_final_push": false
+      },
+      "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/automation\"><b>Steam Automation Fest</b></a>\n\nУ Steam зараз є тематичне вікно, яке варте швидкого проходу.\n\nКлючова тема цього фестивалю — симулятор: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія вже триває, тож короткий список краще скласти без відкладань.\n\nЦе зручне вікно, щоб за один прохід скласти собі короткий список.\n\n#steam #festival #gaming #simulation",
+      "caption_text": "🎉 Steam Automation Fest\n\nУ Steam зараз є тематичне вікно, яке варте швидкого проходу.\n\nКлючова тема цього фестивалю — симулятор: сторінку зручно пройти як короткий маршрут по демо та знижках.\n\nПодія вже триває, тож короткий список краще скласти без відкладань.\n\nЦе зручне вікно, щоб за один прохід скласти собі короткий список.\n\n#steam #festival #gaming #simulation",
+      "hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#simulation"
+      ],
+      "debug": {
+        "offer_id": "fixture:festival-edge-before",
+        "lane": "event_festival",
+        "presence": "indirect",
+        "style": "festival",
+        "opening": {
+          "selected": "У Steam зараз є тематичне вікно, яке варте швидкого проходу.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false,
+          "line": "У Steam зараз є тематичне вікно, яке варте швидкого проходу."
+        },
+        "cta": {
+          "selected": "Це зручне вікно, щоб за один прохід скласти собі короткий список.",
+          "pool_size": 3,
+          "anti_repeat_window": 4,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "anti_repeat_relaxed": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "repeat_risk": false,
+          "fallback_used": false
+        },
+        "selected_opener": "У Steam зараз є тематичне вікно, яке варте швидкого проходу.",
+        "normalization_applied": {
+          "removed_replacement_chars": false,
+          "removed_garbage_unicode": false,
+          "normalized_dashes": false,
+          "normalized_whitespace": false,
+          "normalized_punctuation_spacing": false
+        },
+        "weird_symbol_detected": false,
+        "repeat_risk": false,
+        "fallback_used": true
+      }
+    }
+  ]
+}

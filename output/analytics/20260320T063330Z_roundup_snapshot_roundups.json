@@ -1,0 +1,477 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "ingest_sources": {
+      "epic": {
+        "offers": 2,
+        "raw_offers": 12,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_auto": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_calendar": {
+        "offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_deduped": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "deduped",
+        "status": "healthy"
+      },
+      "steam": {
+        "details": {
+          "degraded_until": null,
+          "mode": "healthy",
+          "reason": "healthy",
+          "recent_429_count": 0,
+          "slowdown_multiplier": 1.0
+        },
+        "offers": 2000,
+        "reason": "healthy",
+        "status": "healthy"
+      }
+    },
+    "queue_snapshot_at": "2026-03-20T06:33:30",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 7,
+      "hard_suppress": 1971,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-20T06:33:30.718561",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_02_big_discount_highlights.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1765479644",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "brand_wordmark": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_primary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_secondary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1765479644",
+        "hero_candidates_count": 4,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1765479644",
+            "discount_percent": 50,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_3240220_6a071b882b1f.jpg",
+            "offer_id": "steam:3240220",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 81,
+            "selection_score": 308.38,
+            "source": "steam",
+            "title": "Grand Theft Auto V Enhanced"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2592160/header.jpg?t=1770854821",
+            "discount_percent": 20,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_2592160_327995dfcb62.jpg",
+            "offer_id": "steam:2592160",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:major_franchise",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 98,
+            "selection_score": 290.68,
+            "source": "steam",
+            "title": "Dispatch"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/header.jpg?t=1771871433",
+            "discount_percent": 50,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_252490_9adeb142941f.jpg",
+            "offer_id": "steam:252490",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 87,
+            "selection_score": 287.46,
+            "source": "steam",
+            "title": "Rust"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2001120/header.jpg?t=1763484567",
+            "discount_percent": 30,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_2001120_b1517b8325e6.jpg",
+            "offer_id": "steam:2001120",
+            "rank": 4,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 97,
+            "selection_score": 275.1,
+            "source": "steam",
+            "title": "Split Fiction"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 4,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1765479644",
+              "discount_percent": 50,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_3240220_6a071b882b1f.jpg",
+              "offer_id": "steam:3240220",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:standout_title",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 81,
+              "selection_score": 308.38,
+              "source": "steam",
+              "title": "Grand Theft Auto V Enhanced"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2592160/header.jpg?t=1770854821",
+              "discount_percent": 20,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_2592160_327995dfcb62.jpg",
+              "offer_id": "steam:2592160",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:major_franchise",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 98,
+              "selection_score": 290.68,
+              "source": "steam",
+              "title": "Dispatch"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/header.jpg?t=1771871433",
+              "discount_percent": 50,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_252490_9adeb142941f.jpg",
+              "offer_id": "steam:252490",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 87,
+              "selection_score": 287.46,
+              "source": "steam",
+              "title": "Rust"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2001120/header.jpg?t=1763484567",
+              "discount_percent": 30,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_2001120_b1517b8325e6.jpg",
+              "offer_id": "steam:2001120",
+              "rank": 4,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 97,
+              "selection_score": 275.1,
+              "source": "steam",
+              "title": "Split Fiction"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:3240220",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/header.jpg?t=1765479644",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "editorial_row",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_02_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_3240220_6a071b882b1f.jpg",
+        "slug": "roundup_roundup_02_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 4",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 4",
+          "brand_micro": "YOTO PICKS",
+          "composition_mode": "top_list_system_clean_balanced",
+          "finish_system": "premium_finish_v2",
+          "meta_primary_label": "TOP 4",
+          "meta_secondary_label": "Big discounts",
+          "panel_kicker": "BIG DISCOUNT HIGHLIGHTS",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 4",
+          "title_shelf": "enabled",
+          "top_zone_badge_anchor": "top_right",
+          "top_zone_layout_mode": "default",
+          "top_zone_scaffold_mode": "top_list_top_right",
+          "typography_system": "role_based_segoe_v2"
+        },
+        "title_lines": [
+          "Roundup: Big Discount Highlights"
+        ],
+        "title_mode": "single_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 4,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3240220",
+          "price_after_minor": 67400,
+          "price_line": "50% off to UAH 674",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 81,
+          "score": 244.73,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/",
+          "summary_line": "50% off to UAH 674 | Hero discount | review 81/100",
+          "title": "Grand Theft Auto V Enhanced"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 20,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:2592160",
+          "price_after_minor": 48000,
+          "price_line": "20% off to UAH 480",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 98,
+          "score": 240.98,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/2592160/Dispatch/",
+          "summary_line": "20% off to UAH 480 | Hero discount | review 98/100",
+          "title": "Dispatch"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:252490",
+          "price_after_minor": 34900,
+          "price_line": "50% off to UAH 349",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 87,
+          "score": 234.91,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/252490/Rust/",
+          "summary_line": "50% off to UAH 349 | Hero discount | review 87/100",
+          "title": "Rust"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 30,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:2001120",
+          "price_after_minor": 90900,
+          "price_line": "30% off to UAH 909",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 97,
+          "score": 234.05,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/2001120/Split_Fiction/",
+          "summary_line": "30% off to UAH 909 | Hero discount | review 97/100",
+          "title": "Split Fiction"
+        }
+      ],
+      "roundup_id": "roundup_02_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото відсіяв шум і залишив тільки те, що тягне на окремий список. Це короткий зріз по великих тайтлах, у яких цінник уже говорить голосніше за будь-який пітч.\n\n1. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> — 50% до 674 грн, велике ім’я добірки\n2. <a href=\"https://store.steampowered.com/app/2592160/Dispatch/\"><b>Dispatch</b></a> — 20% до 480 грн, сильний франчайз у цій ціні\n3. <a href=\"https://store.steampowered.com/app/252490/Rust/\"><b>Rust</b></a> — 50% до 349 грн, великий хіт\n4. <a href=\"https://store.steampowered.com/app/2001120/Split_Fiction/\"><b>Split Fiction</b></a> — 30% до 909 грн, критичний фаворит\n\nВерхні позиції тут уже відсіяні як головний маршрут по цій добірці.\n\n#toplist #steamsale #steam",
+        "closing_cta": "Верхні позиції тут уже відсіяні як головний маршрут по цій добірці.",
+        "intro": "🐱 Йото відсіяв шум і залишив тільки те, що тягне на окремий список. Це короткий зріз по великих тайтлах, у яких цінник уже говорить голосніше за будь-який пітч.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> — 50% до 674 грн, велике ім’я добірки",
+          "2. <a href=\"https://store.steampowered.com/app/2592160/Dispatch/\"><b>Dispatch</b></a> — 20% до 480 грн, сильний франчайз у цій ціні",
+          "3. <a href=\"https://store.steampowered.com/app/252490/Rust/\"><b>Rust</b></a> — 50% до 349 грн, великий хіт",
+          "4. <a href=\"https://store.steampowered.com/app/2001120/Split_Fiction/\"><b>Split Fiction</b></a> — 30% до 909 грн, критичний фаворит"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260320T063330Z"
+}

@@ -1,0 +1,28 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/582660/b784aa30aea23768ef2b793b9a064347d3609b6d/ss_b784aa30aea23768ef2b793b9a064347d3609b6d.1920x1080.jpg?t=1773080991",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/582660/4f0ea9284b5fae9464dadc528bb572c629666313/header_alt_assets_27.jpg?t=1773080991"
+  },
+  "context": {
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "plan_sale_context": {
+      "active": false,
+      "active_event_offer_ids": [],
+      "sale_event_mode": "auto"
+    },
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T16:16:20.567902",
+  "hook_line": "Знижка 91% уже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:582660",
+  "run_key": "20260311T161620Z",
+  "short_title": "Black Desert",
+  "summary_line": "Black Desert зараз доступна зі знижкою 91%. Це бойовики, пригоди та mmo, тож пропозиція добре підійде тим...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Ціна актуальна до 12 березня 2026, 18:00."
+}

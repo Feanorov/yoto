@@ -1,0 +1,40 @@
+{
+  "asset_refs": [
+    "https://cdn1.epicgames.com/spt-assets/12f0012342a94c95985afbaa7568b51b/turnip-boy-robs-a-bank-167pk.png"
+  ],
+  "context": {
+    "lane": "breaking_freebie",
+    "offer_kind": "freebie",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "epic"
+  },
+  "created_at": "2026-03-10T23:17:20.572346",
+  "hook_line": "Free to claim right now.",
+  "manifest_version": 1,
+  "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+  "run_key": "20260310T231720Z",
+  "short_title": "Turnip Boy Robs a Bank",
+  "summary_line": "freegames free claim on EPIC.",
+  "template_hint": "freebie-flash",
+  "urgency_line": "Ends 2026-03-12 15:00 UTC."
+}

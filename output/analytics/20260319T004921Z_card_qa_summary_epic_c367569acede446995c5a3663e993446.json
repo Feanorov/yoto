@@ -1,0 +1,32 @@
+{
+  "card_type_mix": {
+    "DISCOUNT": 1,
+    "FREE_GAME": 3
+  },
+  "created_at": "2026-03-19T00:49:21.552087",
+  "hero_fallback_count": 0,
+  "leading_card_family_streak": {
+    "card_family": "FREE_GAME",
+    "flagged": true,
+    "length": 3
+  },
+  "leading_template_streak": {
+    "flagged": true,
+    "length": 3,
+    "template_id": "epic_free"
+  },
+  "placeholder_artwork_count": 0,
+  "publish_reason": "publish_failed",
+  "published": false,
+  "qa_version": 1,
+  "renderer_fallback_count": 0,
+  "selected_lane": "breaking_freebie",
+  "selected_offer_id": "epic:c367569acede446995c5a3663e993446",
+  "selected_template_id": "epic_free",
+  "selected_title": "Cozy Grove",
+  "template_mix": {
+    "epic_free": 3,
+    "unknown": 1
+  },
+  "window_size": 4
+}

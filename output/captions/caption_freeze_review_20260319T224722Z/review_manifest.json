@@ -1,0 +1,384 @@
+{
+  "manifest_version": "yoto_caption_freeze_review_v1",
+  "generated_at": "2026-03-19T22:47:22.746797Z",
+  "baseline_manifest": "D:\\Telegram\\output\\captions\\caption_freeze_before_20260319T215821Z\\baseline_manifest.json",
+  "output_root": "D:\\Telegram\\output\\captions\\caption_freeze_review_20260319T224722Z",
+  "entries": [
+    {
+      "slug": "free_game_real_cozy_grove",
+      "label": "FREE_GAME / real freebie",
+      "family": "FREE_GAME",
+      "source_kind": "golden_snapshot",
+      "traits": [
+        "free_game",
+        "real_offer"
+      ],
+      "title": "Cozy Grove",
+      "before_signals": {
+        "keep_forever_mentions": 3,
+        "claim_verb_mentions": 2,
+        "claim_term_mentions": 1,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#epicgames",
+        "#freegame",
+        "#giveaway"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 1,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#epicgames",
+        "#freegame",
+        "#giveaway"
+      ],
+      "after_debug": {
+        "presence": "direct",
+        "style": "freebie",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "breaking_freebie"
+      }
+    },
+    {
+      "slug": "free_game_fallback_turnip_boy",
+      "label": "FREE_GAME / fallback archive case",
+      "family": "FREE_GAME",
+      "source_kind": "archive_post_artifact",
+      "traits": [
+        "free_game",
+        "fallback",
+        "archive_case"
+      ],
+      "title": "Turnip Boy Robs a Bank",
+      "before_signals": {
+        "keep_forever_mentions": 3,
+        "claim_verb_mentions": 2,
+        "claim_term_mentions": 1,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#epicgames",
+        "#freegame",
+        "#giveaway"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#epicgames",
+        "#freegame",
+        "#giveaway"
+      ],
+      "after_debug": {
+        "presence": "direct",
+        "style": "freebie",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "breaking_freebie"
+      }
+    },
+    {
+      "slug": "discount_high_titanfall_2",
+      "label": "DISCOUNT / high discount",
+      "family": "DISCOUNT",
+      "source_kind": "golden_snapshot",
+      "traits": [
+        "discount",
+        "high_discount"
+      ],
+      "title": "Titanfall® 2",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#steam",
+        "#steamsale"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#steamsale"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "recommend",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "high_value_discount"
+      }
+    },
+    {
+      "slug": "discount_long_black_desert",
+      "label": "DISCOUNT / long title",
+      "family": "DISCOUNT",
+      "source_kind": "fixture",
+      "traits": [
+        "discount",
+        "long_title"
+      ],
+      "title": "Black Desert Online: Land of the Morning Light Deluxe Founder Celebration Collection",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#steam",
+        "#steamsale",
+        "#openworld",
+        "#rpg",
+        "#action",
+        "#adventure"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#steamsale",
+        "#openworld",
+        "#rpg",
+        "#action",
+        "#adventure"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "recommend",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "high_value_discount"
+      }
+    },
+    {
+      "slug": "festival_strong_tower_defense",
+      "label": "FESTIVAL / strong source",
+      "family": "FESTIVAL",
+      "source_kind": "fixture",
+      "traits": [
+        "festival",
+        "strong_source"
+      ],
+      "title": "Steam Tower Defense Fest",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#strategy"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "fallback_used": false,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "event_festival"
+      }
+    },
+    {
+      "slug": "festival_sparse_next_fest",
+      "label": "FESTIVAL / sparse source",
+      "family": "FESTIVAL",
+      "source_kind": "fixture",
+      "traits": [
+        "festival",
+        "sparse_source"
+      ],
+      "title": "Steam Next Fest",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "event_festival"
+      }
+    },
+    {
+      "slug": "free_game_temporary_access",
+      "label": "FREE_GAME / temporary-access edge case",
+      "family": "FREE_GAME",
+      "source_kind": "fixture",
+      "traits": [
+        "free_game",
+        "temporary_access",
+        "edge_case"
+      ],
+      "title": "Space Raiders Free Weekend",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 1,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [
+        "#steam",
+        "#freegame",
+        "#shooter",
+        "#coop",
+        "#action"
+      ],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#freegame",
+        "#shooter",
+        "#coop",
+        "#action"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "temporary_freebie",
+        "fallback_used": true,
+        "repeat_risk": false,
+        "opening_repeat_risk": false,
+        "cta_repeat_risk": false,
+        "lane": "breaking_freebie"
+      }
+    },
+    {
+      "slug": "top_list_roundup_big_discount_highlights",
+      "label": "TOP_LIST / roundup editorial case",
+      "family": "TOP_LIST",
+      "source_kind": "roundup_snapshot",
+      "traits": [
+        "top_list",
+        "roundup",
+        "editorial_case"
+      ],
+      "title": "Що взяти зі знижок просто зараз",
+      "before_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 1,
+        "shortlist_mentions": 0
+      },
+      "before_hashtags": [],
+      "after_signals": {
+        "keep_forever_mentions": 0,
+        "claim_verb_mentions": 0,
+        "claim_term_mentions": 0,
+        "wishlist_mentions": 0,
+        "comment_bait_mentions": 0,
+        "shortlist_mentions": 0
+      },
+      "after_hashtags": [
+        "#toplist",
+        "#steamsale",
+        "#steam"
+      ],
+      "after_debug": {
+        "presence": "direct",
+        "style": "roundup",
+        "fallback_used": null,
+        "repeat_risk": null,
+        "opening_repeat_risk": null,
+        "cta_repeat_risk": null,
+        "lane": null
+      }
+    }
+  ]
+}

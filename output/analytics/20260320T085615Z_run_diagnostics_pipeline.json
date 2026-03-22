@@ -1,0 +1,103 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "ingest_sources": {
+      "epic": {
+        "offers": 2,
+        "raw_offers": 12,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_auto": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_calendar": {
+        "offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_deduped": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "deduped",
+        "status": "healthy"
+      },
+      "steam": {
+        "details": {
+          "degraded_until": null,
+          "mode": "healthy",
+          "reason": "healthy",
+          "recent_429_count": 0,
+          "slowdown_multiplier": 1.0
+        },
+        "offers": 2000,
+        "reason": "healthy",
+        "status": "healthy"
+      }
+    },
+    "queue_snapshot_at": "2026-03-20T08:56:15",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 6,
+      "hard_suppress": 1972,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-20T08:56:15.879992",
+  "empty_window": false,
+  "fatal_ingest": false,
+  "ingest": {
+    "enriched_total": 2002,
+    "ingested_total": 2002,
+    "metrics_available": true
+  },
+  "metrics": {
+    "dedup.reject.franchise_cooldown": 1,
+    "lane.candidate.backlog_filler": 6,
+    "lane.candidate.high_value_discount": 24,
+    "offers.enriched_total": 2002,
+    "offers.ingested.source.epic": 2,
+    "offers.ingested.source.events_auto": 0,
+    "offers.ingested.source.events_calendar": 0,
+    "offers.ingested.source.events_deduped": 0,
+    "offers.ingested.source.steam": 2000,
+    "offers.ingested_total": 2002,
+    "quality.reject.adult_content": 11,
+    "quality.reject.review_threshold_not_met": 1960,
+    "quality.reject_total": 1971,
+    "queue.depth.planned": 8,
+    "queue.depth.reserve": 16,
+    "selection.accepted_total": 30,
+    "selection.capacity_hold": 6,
+    "selection.hard_suppress": 1972,
+    "selection.hero_discount_bonus_slots": 2,
+    "selection.roundup_candidate": 16,
+    "selection.solo_post": 8
+  },
+  "pipeline_action": "publish_attempted",
+  "planner_window": {
+    "empty": false,
+    "planned_count": 8,
+    "reserve_count": 16
+  },
+  "publish": {
+    "attempted": true,
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+    "lane": "high_value_discount",
+    "message_id": 173,
+    "offer_id": "steam:1426210",
+    "published": true,
+    "reason": "published",
+    "title": "It Takes Two"
+  },
+  "reasons": [],
+  "run_key": "20260320T085615Z",
+  "should_stop_pipeline": false,
+  "status": "healthy"
+}

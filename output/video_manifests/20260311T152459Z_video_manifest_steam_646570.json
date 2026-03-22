@@ -1,0 +1,42 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646570/ss_c171816f7ecd35b5b46d2fa27532f4c5b8ca3cc5.1920x1080.jpg?t=1769094928",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/646570/header.jpg?t=1769094928"
+  },
+  "context": {
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T15:24:59.099789",
+  "hook_line": "Знижка 75% уже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:646570",
+  "run_key": "20260311T152459Z",
+  "short_title": "Slay the Spire",
+  "summary_line": "Ми поєднали карткові та мандрівні ігри, створивши найкращий однокористувацький складальник колоди, який ми...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Пропозиція активна просто зараз."
+}

@@ -1,0 +1,476 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "offline_snapshot_created_at": "2026-03-18T21:52:38.061075",
+    "offline_snapshot_role": "golden",
+    "offline_snapshot_run_key": "20260318T215238Z",
+    "queue_snapshot_at": "2026-03-18T21:52:38",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T22:09:51.220204",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+      "card_render_diagnostics": {
+        "asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+            "discount_percent": 85,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+            "offer_id": "steam:990080",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 90,
+            "selection_score": 361.23,
+            "source": "steam",
+            "title": "Hogwarts Legacy"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\97633c3a780830f384ffdaf799fedaee97c40daaf3ee2ba501d9bc84f9c638af.jpg",
+            "discount_percent": 90,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\97633c3a780830f384ffdaf799fedaee97c40daaf3ee2ba501d9bc84f9c638af.jpg",
+            "offer_id": "steam:1222700",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 88,
+            "selection_score": 352.57,
+            "source": "steam",
+            "title": "A Way Out"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\9653bc64955f6c446c276ab515dc8dfb46dbf4974e07bb4fc2eb3758837a5f7f.jpg",
+            "discount_percent": 95,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\9653bc64955f6c446c276ab515dc8dfb46dbf4974e07bb4fc2eb3758837a5f7f.jpg",
+            "offer_id": "steam:1517290",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 47,
+            "selection_score": 338.67,
+            "source": "steam",
+            "title": "Battlefield™ 2042"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\45097e06740dfdf64eef9136b2a08748237bcd6a82737902e9e8f7d7b91d1a60.jpg",
+            "discount_percent": 75,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\45097e06740dfdf64eef9136b2a08748237bcd6a82737902e9e8f7d7b91d1a60.jpg",
+            "offer_id": "steam:1361210",
+            "rank": 4,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:major_franchise",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 71,
+            "selection_score": 324.68,
+            "source": "steam",
+            "title": "Warhammer 40,000: Darktide"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5af223c552e7d40546191fad0b02bae50df2f0aa5475b8dcdd2eda4ee62dca46.jpg",
+            "discount_percent": 90,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5af223c552e7d40546191fad0b02bae50df2f0aa5475b8dcdd2eda4ee62dca46.jpg",
+            "offer_id": "steam:1774580",
+            "rank": 5,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 70,
+            "selection_score": 321.76,
+            "source": "steam",
+            "title": "STAR WARS Jedi: Survivor™"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+              "discount_percent": 85,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+              "offer_id": "steam:990080",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 90,
+              "selection_score": 361.23,
+              "source": "steam",
+              "title": "Hogwarts Legacy"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\97633c3a780830f384ffdaf799fedaee97c40daaf3ee2ba501d9bc84f9c638af.jpg",
+              "discount_percent": 90,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\97633c3a780830f384ffdaf799fedaee97c40daaf3ee2ba501d9bc84f9c638af.jpg",
+              "offer_id": "steam:1222700",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 88,
+              "selection_score": 352.57,
+              "source": "steam",
+              "title": "A Way Out"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\9653bc64955f6c446c276ab515dc8dfb46dbf4974e07bb4fc2eb3758837a5f7f.jpg",
+              "discount_percent": 95,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\9653bc64955f6c446c276ab515dc8dfb46dbf4974e07bb4fc2eb3758837a5f7f.jpg",
+              "offer_id": "steam:1517290",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 47,
+              "selection_score": 338.67,
+              "source": "steam",
+              "title": "Battlefield™ 2042"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\45097e06740dfdf64eef9136b2a08748237bcd6a82737902e9e8f7d7b91d1a60.jpg",
+              "discount_percent": 75,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\45097e06740dfdf64eef9136b2a08748237bcd6a82737902e9e8f7d7b91d1a60.jpg",
+              "offer_id": "steam:1361210",
+              "rank": 4,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:major_franchise",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 71,
+              "selection_score": 324.68,
+              "source": "steam",
+              "title": "Warhammer 40,000: Darktide"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5af223c552e7d40546191fad0b02bae50df2f0aa5475b8dcdd2eda4ee62dca46.jpg",
+              "discount_percent": 90,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5af223c552e7d40546191fad0b02bae50df2f0aa5475b8dcdd2eda4ee62dca46.jpg",
+              "offer_id": "steam:1774580",
+              "rank": 5,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 70,
+              "selection_score": 321.76,
+              "source": "steam",
+              "title": "STAR WARS Jedi: Survivor™"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:990080",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\b13879a282bee1b1fb64511c7689920eb2bcf7b0d62ee29af185e1efc1b0bef8.jpg",
+        "slug": "roundup_roundup_01_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 5",
+          "brand_micro": "YOTO PICKS",
+          "panel_kicker": "Big discounts",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 5"
+        },
+        "title_lines": [
+          "Roundup: Big Discount",
+          "Highlights"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 85,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:990080",
+          "price_after_minor": 23900,
+          "price_line": "85% off to UAH 239",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 90,
+          "score": 277.98,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/990080/Hogwarts_Legacy/",
+          "summary_line": "85% off to UAH 239 | Hero discount | review 90/100",
+          "title": "Hogwarts Legacy"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 90,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1222700",
+          "price_after_minor": 7900,
+          "price_line": "90% off to UAH 79",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 88,
+          "score": 273.87,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1222700/A_Way_Out/",
+          "summary_line": "90% off to UAH 79 | Hero discount | review 88/100",
+          "title": "A Way Out"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 95,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1517290",
+          "price_after_minor": 7400,
+          "price_line": "95% off to UAH 74",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 47,
+          "score": 270.37,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1517290/Battlefield_2042/",
+          "summary_line": "95% off to UAH 74 | Hero discount | review 47/100",
+          "title": "Battlefield™ 2042"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 75,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1361210",
+          "price_after_minor": 18900,
+          "price_line": "75% off to UAH 189",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 71,
+          "score": 265.78,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/",
+          "summary_line": "75% off to UAH 189 | Hero discount | review 71/100",
+          "title": "Warhammer 40,000: Darktide"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 90,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1774580",
+          "price_after_minor": 16900,
+          "price_line": "90% off to UAH 169",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 70,
+          "score": 263.76,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/",
+          "summary_line": "90% off to UAH 169 | Hero discount | review 70/100",
+          "title": "STAR WARS Jedi: Survivor™"
+        }
+      ],
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/990080/Hogwarts_Legacy/\"><b>Hogwarts Legacy</b></a> - 85% до 239 грн, дуже популярна гра\n2. <a href=\"https://store.steampowered.com/app/1222700/A_Way_Out/\"><b>A Way Out</b></a> - 90% до 79 грн, помітний хіт\n3. <a href=\"https://store.steampowered.com/app/1517290/Battlefield_2042/\"><b>Battlefield™ 2042</b></a> - 95% до 74 грн, дуже популярна гра\n4. <a href=\"https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/\"><b>Warhammer 40,000: Darktide</b></a> - 75% до 189 грн, сильний франчайз\n5. <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a> - 90% до 169 грн, помітний хіт\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "closing_cta": "Якщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/990080/Hogwarts_Legacy/\"><b>Hogwarts Legacy</b></a> - 85% до 239 грн, дуже популярна гра",
+          "2. <a href=\"https://store.steampowered.com/app/1222700/A_Way_Out/\"><b>A Way Out</b></a> - 90% до 79 грн, помітний хіт",
+          "3. <a href=\"https://store.steampowered.com/app/1517290/Battlefield_2042/\"><b>Battlefield™ 2042</b></a> - 95% до 74 грн, дуже популярна гра",
+          "4. <a href=\"https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/\"><b>Warhammer 40,000: Darktide</b></a> - 75% до 189 грн, сильний франчайз",
+          "5. <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a> - 90% до 169 грн, помітний хіт"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260318T220951Z"
+}

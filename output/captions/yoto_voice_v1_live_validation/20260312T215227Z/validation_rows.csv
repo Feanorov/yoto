@@ -1,0 +1,14 @@
+section,entry_type,position,title,offer_id,roundup_id,source,offer_kind,bucket,lane,group_type,score,voice_presence,voice_style,direct_mode,caption_char_count,caption_limit_safe,origin,created_at
+current_live_planned_solos,offer,1,Steam Tower Defense Fest is on now!,event:category:tower_defense,,event,festival,planned,event_festival,,120.75,neutral,neutral,,440,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,2,Slay the Spire,steam:646570,,steam,discount,planned,high_value_discount,,289.28,direct,recommend,recommend,682,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,3,Hearts of Iron IV,steam:394360,,steam,discount,planned,high_value_discount,,278.83,direct,recommend,recommend,410,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,4,Crusader Kings III,steam:1158310,,steam,discount,planned,high_value_discount,,278.79,indirect,recommend,,434,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,5,Dead Space,steam:1693980,,steam,discount,planned,high_value_discount,,270.34,indirect,recommend,,740,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,6,Bloons TD 6,steam:960090,,steam,discount,planned,high_value_discount,,261.21,indirect,recommend,,476,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,7,STAR WARS Jedi: Survivor™,steam:1774580,,steam,discount,planned,high_value_discount,,253.76,indirect,recommend,,583,True,live_queue,2026-03-12T21:41:16.179924
+current_live_planned_solos,offer,8,Satisfactory,steam:526870,,steam,discount,planned,high_value_discount,,230.17,indirect,recommend,,679,True,live_queue,2026-03-12T21:41:16.179924
+current_live_roundups,roundup,1,"Що взяти зі знижок просто зараз, частина 1",,roundup_01_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,971,True,live_reserve_roundup,
+current_live_roundups,roundup,2,"Що взяти зі знижок просто зараз, частина 2",,roundup_02_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,691,True,live_reserve_roundup,
+current_live_roundups,roundup,3,"Що ще варте уваги в резерві, частина 1",,roundup_03_reserve_deals_watch,,,,,mixed,,direct,roundup,roundup,867,True,live_reserve_roundup,
+recent_archive_addendum,offer,1,Idle Champions of the Forgotten Realms,epic:a9748abde1c94b66aae5250bb9fc5503,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,508,True,post_artifact,2026-03-10T16:44:16.867770
+recent_archive_addendum,offer,2,Turnip Boy Robs a Bank,epic:68d9f0e261464ba284e10418d98532ea,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,494,True,post_artifact,2026-03-10T23:17:58.343127

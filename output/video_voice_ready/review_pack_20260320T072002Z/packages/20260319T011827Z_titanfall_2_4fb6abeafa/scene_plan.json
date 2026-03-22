@@ -1,0 +1,78 @@
+{
+  "family": "DISCOUNT",
+  "manifest_hash": "4fb6abeafaf84dda52cb39c6dab0477e74a805039d011f9c83fd9fbe194851d5",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260319T011827Z_video_manifest_steam_1237970.json",
+  "scene_count": 3,
+  "scenes": [
+    {
+      "duration_seconds": 2.0,
+      "end_seconds": 2.0,
+      "estimated_read_seconds": 1.54,
+      "narration_text": "Titanfall 2: знижка 90%.",
+      "on_screen_text": {
+        "body": "Знижка 90% уже активна.",
+        "cta": null,
+        "headline": "Titanfall® 2"
+      },
+      "position": 1,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\scenes\\scene_001.png",
+      "scene_id": "hook",
+      "start_seconds": 0.0,
+      "timing_warning": null,
+      "transition_note": "Без паузи відкрити з хука.",
+      "visual_role": "hero",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1237970_titanfall_2.png",
+        "role": "source_artifact_image"
+      }
+    },
+    {
+      "duration_seconds": 5.0,
+      "end_seconds": 7.0,
+      "estimated_read_seconds": 2.31,
+      "narration_text": "Зараз 79 грн замість 799 грн.",
+      "on_screen_text": {
+        "body": "Steam - Знижка",
+        "cta": null,
+        "headline": "Titanfall® 2"
+      },
+      "position": 2,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\scenes\\scene_002.png",
+      "scene_id": "summary",
+      "start_seconds": 2.0,
+      "timing_warning": null,
+      "transition_note": "Швидкий жорсткий перехід в наступний біт.",
+      "visual_role": "support",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\a2ac8a200ace102660bf07cf10bf51db3b5c2ceda42c42019fcb7c7a43ea2e0b.jpg",
+        "role": "game_image"
+      }
+    },
+    {
+      "duration_seconds": 3.0,
+      "end_seconds": 10.0,
+      "estimated_read_seconds": 3.46,
+      "narration_text": "Ціна актуальна до 19 березня 2026. Посилання в пості.",
+      "on_screen_text": {
+        "body": "Steam - Знижка",
+        "cta": "Перевір пропозицію зараз.",
+        "headline": "Ціна актуальна до 19 березня 2026, 17:00."
+      },
+      "position": 3,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260319T011827Z_titanfall_2_4fb6abeafa\\scenes\\scene_003.png",
+      "scene_id": "urgency",
+      "start_seconds": 7.0,
+      "timing_warning": null,
+      "transition_note": "Фінальний CTA, дати коротку утримку перед виходом.",
+      "visual_role": "cta",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1237970_titanfall_2.png",
+        "role": "card_image"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "template_name": "deal_spotlight",
+  "title": "Titanfall 2",
+  "total_duration_seconds": 10.0
+}

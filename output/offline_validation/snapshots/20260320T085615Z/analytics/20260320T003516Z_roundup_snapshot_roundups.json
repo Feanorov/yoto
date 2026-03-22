@@ -1,0 +1,551 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "ingest_sources": {
+      "epic": {
+        "offers": 2,
+        "raw_offers": 12,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_auto": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_calendar": {
+        "offers": 0,
+        "reason": "healthy",
+        "status": "healthy"
+      },
+      "events_deduped": {
+        "offers": 0,
+        "raw_offers": 0,
+        "reason": "deduped",
+        "status": "healthy"
+      },
+      "steam": {
+        "details": {
+          "degraded_until": null,
+          "mode": "healthy",
+          "reason": "healthy",
+          "recent_429_count": 0,
+          "slowdown_multiplier": 1.0
+        },
+        "offers": 2000,
+        "reason": "healthy",
+        "status": "healthy"
+      }
+    },
+    "queue_snapshot_at": "2026-03-20T00:35:16",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 12,
+      "hard_suppress": 1972,
+      "roundup_candidate": 18,
+      "solo_post": 0
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-20T00:35:16.360764",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085615Z\\assets\\roundup\\29687e94c1c2a59b8f9f8a2ea3faca20f0a6353e01426b4122204350278e2b7d.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/281990/header.jpg?t=1773948616",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "brand_wordmark": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_primary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "meta_secondary": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeuib.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/281990/header.jpg?t=1773948616",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/281990/header.jpg?t=1773948616",
+            "discount_percent": 75,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_281990_68b2eda146c2.jpg",
+            "offer_id": "steam:281990",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 86,
+            "selection_score": 335.06,
+            "source": "steam",
+            "title": "Stellaris"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1774580/header.jpg?t=1748945254",
+            "discount_percent": 90,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1774580_52c5f9f1af85.jpg",
+            "offer_id": "steam:1774580",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 70,
+            "selection_score": 329.76,
+            "source": "steam",
+            "title": "STAR WARS Jedi: Survivor™"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/header.jpg?t=1708624856",
+            "discount_percent": 70,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1326470_f1e6dbef5076.jpg",
+            "offer_id": "steam:1326470",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 88,
+            "selection_score": 314.66,
+            "source": "steam",
+            "title": "Sons Of The Forest"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1767883716",
+            "discount_percent": 35,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1245620_eeb9acfcf13f.jpg",
+            "offer_id": "steam:1245620",
+            "rank": 4,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 93,
+            "selection_score": 293.71,
+            "source": "steam",
+            "title": "ELDEN RING"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg?t=1762888662",
+            "discount_percent": 50,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_814380_71251a69d9b8.jpg",
+            "offer_id": "steam:814380",
+            "rank": 5,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready",
+              "quiet_hours_reserve"
+            ],
+            "review_score": 95,
+            "selection_score": 293.17,
+            "source": "steam",
+            "title": "Sekiro™: Shadows Die Twice - GOTY Edition"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/281990/header.jpg?t=1773948616",
+              "discount_percent": 75,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_281990_68b2eda146c2.jpg",
+              "offer_id": "steam:281990",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 86,
+              "selection_score": 335.06,
+              "source": "steam",
+              "title": "Stellaris"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1774580/header.jpg?t=1748945254",
+              "discount_percent": 90,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1774580_52c5f9f1af85.jpg",
+              "offer_id": "steam:1774580",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 70,
+              "selection_score": 329.76,
+              "source": "steam",
+              "title": "STAR WARS Jedi: Survivor™"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1326470/header.jpg?t=1708624856",
+              "discount_percent": 70,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1326470_f1e6dbef5076.jpg",
+              "offer_id": "steam:1326470",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 88,
+              "selection_score": 314.66,
+              "source": "steam",
+              "title": "Sons Of The Forest"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1767883716",
+              "discount_percent": 35,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_1245620_eeb9acfcf13f.jpg",
+              "offer_id": "steam:1245620",
+              "rank": 4,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:standout_title",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 93,
+              "selection_score": 293.71,
+              "source": "steam",
+              "title": "ELDEN RING"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/814380/header.jpg?t=1762888662",
+              "discount_percent": 50,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_814380_71251a69d9b8.jpg",
+              "offer_id": "steam:814380",
+              "rank": 5,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready",
+                "quiet_hours_reserve"
+              ],
+              "review_score": 95,
+              "selection_score": 293.17,
+              "source": "steam",
+              "title": "Sekiro™: Shadows Die Twice - GOTY Edition"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:281990",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/281990/header.jpg?t=1773948616",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "editorial_row",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_02_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_02_big_discount_highlights_steam_281990_68b2eda146c2.jpg",
+        "slug": "roundup_roundup_02_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 5",
+          "brand_micro": "YOTO PICKS",
+          "composition_mode": "top_list_system_clean_balanced",
+          "finish_system": "premium_finish_v2",
+          "meta_primary_label": "TOP 5",
+          "meta_secondary_label": "Big discounts",
+          "panel_kicker": "BIG DISCOUNT HIGHLIGHTS",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 5",
+          "title_shelf": "enabled",
+          "top_zone_badge_anchor": "top_right",
+          "top_zone_layout_mode": "default",
+          "top_zone_scaffold_mode": "top_list_top_right",
+          "typography_system": "role_based_segoe_v2"
+        },
+        "title_lines": [
+          "Roundup: Big Discount Highlights"
+        ],
+        "title_mode": "single_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 75,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:281990",
+          "price_after_minor": 26900,
+          "price_line": "75% off to UAH 269",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 86,
+          "score": 255.91,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/281990/Stellaris/",
+          "summary_line": "75% off to UAH 269 | Hero discount | review 86/100",
+          "title": "Stellaris"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 90,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1774580",
+          "price_after_minor": 16900,
+          "price_line": "90% off to UAH 169",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 70,
+          "score": 253.76,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/",
+          "summary_line": "90% off to UAH 169 | Hero discount | review 70/100",
+          "title": "STAR WARS Jedi: Survivor™"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1326470",
+          "price_after_minor": 18000,
+          "price_line": "70% off to UAH 180",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 88,
+          "score": 248.96,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1326470/Sons_Of_The_Forest/",
+          "summary_line": "70% off to UAH 180 | Hero discount | review 88/100",
+          "title": "Sons Of The Forest"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 35,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1245620",
+          "price_after_minor": 116900,
+          "price_line": "35% off to UAH 1169",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 93,
+          "score": 245.51,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1245620/ELDEN_RING/",
+          "summary_line": "35% off to UAH 1169 | Hero discount | review 93/100",
+          "title": "ELDEN RING"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:814380",
+          "price_after_minor": 101700,
+          "price_line": "50% off to UAH 1017",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 95,
+          "score": 245.42,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/814380/Sekiro_Shadows_Die_Twice__GOTY_Edition/",
+          "summary_line": "50% off to UAH 1017 | Hero discount | review 95/100",
+          "title": "Sekiro™: Shadows Die Twice - GOTY Edition"
+        }
+      ],
+      "roundup_id": "roundup_02_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото зібрав короткий редакторський список без випадкових позицій. Це короткий зріз по великих тайтлах, у яких цінник уже говорить голосніше за будь-який пітч.\n\n1. <a href=\"https://store.steampowered.com/app/281990/Stellaris/\"><b>Stellaris</b></a> — 75% до 269 грн, великий хіт у сильній ціні\n2. <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a> — 90% до 169 грн, помітний хіт у сильній ціні\n3. <a href=\"https://store.steampowered.com/app/1326470/Sons_Of_The_Forest/\"><b>Sons Of The Forest</b></a> — 70% до 180 грн, великий хіт у сильній ціні\n4. <a href=\"https://store.steampowered.com/app/1245620/ELDEN_RING/\"><b>ELDEN RING</b></a> — 35% до 1169 грн, велике ім’я добірки\n5. <a href=\"https://store.steampowered.com/app/814380/Sekiro_Shadows_Die_Twice__GOTY_Edition/\"><b>Sekiro™: Shadows Die Twice - GOTY Edition</b></a> — 50% до 1017 грн, критичний фаворит\n\nВерхні позиції тут уже відсіяні як головний маршрут по цій добірці.\n\n#toplist #steamsale #steam",
+        "closing_cta": "Верхні позиції тут уже відсіяні як головний маршрут по цій добірці.",
+        "intro": "🐱 Йото зібрав короткий редакторський список без випадкових позицій. Це короткий зріз по великих тайтлах, у яких цінник уже говорить голосніше за будь-який пітч.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/281990/Stellaris/\"><b>Stellaris</b></a> — 75% до 269 грн, великий хіт у сильній ціні",
+          "2. <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a> — 90% до 169 грн, помітний хіт у сильній ціні",
+          "3. <a href=\"https://store.steampowered.com/app/1326470/Sons_Of_The_Forest/\"><b>Sons Of The Forest</b></a> — 70% до 180 грн, великий хіт у сильній ціні",
+          "4. <a href=\"https://store.steampowered.com/app/1245620/ELDEN_RING/\"><b>ELDEN RING</b></a> — 35% до 1169 грн, велике ім’я добірки",
+          "5. <a href=\"https://store.steampowered.com/app/814380/Sekiro_Shadows_Die_Twice__GOTY_Edition/\"><b>Sekiro™: Shadows Die Twice - GOTY Edition</b></a> — 50% до 1017 грн, критичний фаворит"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260320T003516Z"
+}

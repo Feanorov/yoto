@@ -1,0 +1,475 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T21:52:38",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T21:52:38.061075",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085615Z\\assets\\roundup\\f33134b439f4c90099631801a89281e655859e871b3d2446bebc5e7eb834db6a.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1331550/header.jpg?t=1773760924",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Editorial picks",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1331550/header.jpg?t=1773760924",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1331550/header.jpg?t=1773760924",
+            "discount_percent": 33,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1331550_e26ab93e3855.jpg",
+            "offer_id": "steam:1331550",
+            "rank": 1,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:trusted_hit",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 93,
+            "selection_score": 196.44,
+            "source": "steam",
+            "title": "Big Ambitions"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1466060/5660590ed7a97a0e2dddf20fd7a83379e23b7231/header.jpg?t=1773751272",
+            "discount_percent": 30,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1466060_87d25492ea6a.jpg",
+            "offer_id": "steam:1466060",
+            "rank": 2,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 88,
+            "selection_score": 187.08,
+            "source": "steam",
+            "title": "Tainted Grail: The Fall of Avalon"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1029780/651710543ebbdf59db9058fd53d767ad5a2ccb65/header_alt_assets_21.jpg?t=1773765316",
+            "discount_percent": 20,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1029780_ac4d5b126db9.jpg",
+            "offer_id": "steam:1029780",
+            "rank": 3,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:trusted_hit",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 90,
+            "selection_score": 175.22,
+            "source": "steam",
+            "title": "Going Medieval"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1371980/331de7e745f43867f0a220339153ac6019822ea4/header.jpg?t=1769237814",
+            "discount_percent": 30,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1371980_8f1e61f861c8.jpg",
+            "offer_id": "steam:1371980",
+            "rank": 4,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 80,
+            "selection_score": 169.55,
+            "source": "steam",
+            "title": "No Rest for the Wicked"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1062090/ed68cc73f09d9207012ff8278506edbde6076e44/header_alt_assets_15_ukrainian.jpg?t=1773663183",
+            "discount_percent": 20,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1062090_0083a231fed5.jpg",
+            "offer_id": "steam:1062090",
+            "rank": 5,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 96,
+            "selection_score": 154.24,
+            "source": "steam",
+            "title": "Timberborn"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1331550/header.jpg?t=1773760924",
+              "discount_percent": 33,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1331550_e26ab93e3855.jpg",
+              "offer_id": "steam:1331550",
+              "rank": 1,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:trusted_hit",
+                "editorial_importance:highly_rated",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 93,
+              "selection_score": 196.44,
+              "source": "steam",
+              "title": "Big Ambitions"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1466060/5660590ed7a97a0e2dddf20fd7a83379e23b7231/header.jpg?t=1773751272",
+              "discount_percent": 30,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1466060_87d25492ea6a.jpg",
+              "offer_id": "steam:1466060",
+              "rank": 2,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 88,
+              "selection_score": 187.08,
+              "source": "steam",
+              "title": "Tainted Grail: The Fall of Avalon"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1029780/651710543ebbdf59db9058fd53d767ad5a2ccb65/header_alt_assets_21.jpg?t=1773765316",
+              "discount_percent": 20,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1029780_ac4d5b126db9.jpg",
+              "offer_id": "steam:1029780",
+              "rank": 3,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:trusted_hit",
+                "editorial_importance:highly_rated",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 90,
+              "selection_score": 175.22,
+              "source": "steam",
+              "title": "Going Medieval"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1371980/331de7e745f43867f0a220339153ac6019822ea4/header.jpg?t=1769237814",
+              "discount_percent": 30,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1371980_8f1e61f861c8.jpg",
+              "offer_id": "steam:1371980",
+              "rank": 4,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 80,
+              "selection_score": 169.55,
+              "source": "steam",
+              "title": "No Rest for the Wicked"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1062090/ed68cc73f09d9207012ff8278506edbde6076e44/header_alt_assets_15_ukrainian.jpg?t=1773663183",
+              "discount_percent": 20,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1062090_0083a231fed5.jpg",
+              "offer_id": "steam:1062090",
+              "rank": 5,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 96,
+              "selection_score": 154.24,
+              "source": "steam",
+              "title": "Timberborn"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:1331550",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1331550/header.jpg?t=1773760924",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_03_reserve_deals_watch.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_03_reserve_deals_watch_steam_1331550_e26ab93e3855.jpg",
+        "slug": "roundup_roundup_03_reserve_deals_watch",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 5",
+          "brand_micro": "YOTO PICKS",
+          "panel_kicker": "Editorial picks",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 5"
+        },
+        "title_lines": [
+          "Roundup: Reserve Deals Watch"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 33,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:1331550",
+          "price_after_minor": 31700,
+          "price_line": "33% off to UAH 317",
+          "rank": 1,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 93,
+          "score": 140.94,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1331550/Big_Ambitions/",
+          "summary_line": "33% off to UAH 317 | Backlog discount | review 93/100",
+          "title": "Big Ambitions"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 30,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:1466060",
+          "price_after_minor": 58400,
+          "price_line": "30% off to UAH 584",
+          "rank": 2,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 88,
+          "score": 139.38,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/",
+          "summary_line": "30% off to UAH 584 | Backlog discount | review 88/100",
+          "title": "Tainted Grail: The Fall of Avalon"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 20,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:1029780",
+          "price_after_minor": 48000,
+          "price_line": "20% off to UAH 480",
+          "rank": 3,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 90,
+          "score": 136.72,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1029780/Going_Medieval/",
+          "summary_line": "20% off to UAH 480 | Backlog discount | review 90/100",
+          "title": "Going Medieval"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 30,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:1371980",
+          "price_after_minor": 55900,
+          "price_line": "30% off to UAH 559",
+          "rank": 4,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 80,
+          "score": 135.05,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/",
+          "summary_line": "30% off to UAH 559 | Backlog discount | review 80/100",
+          "title": "No Rest for the Wicked"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 20,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:1062090",
+          "price_after_minor": 56000,
+          "price_line": "20% off to UAH 560",
+          "rank": 5,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 96,
+          "score": 126.84,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1062090/Timberborn/",
+          "summary_line": "20% off to UAH 560 | Backlog discount | review 96/100",
+          "title": "Timberborn"
+        }
+      ],
+      "roundup_id": "roundup_03_reserve_deals_watch",
+      "telegram_draft": {
+        "caption_html": "<b>Що ще варте уваги в резерві</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. <a href=\"https://store.steampowered.com/app/1331550/Big_Ambitions/\"><b>Big Ambitions</b></a> - 33% до 317 грн, перевірений хіт\n2. <a href=\"https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/\"><b>Tainted Grail: The Fall of Avalon</b></a> - 30% до 584 грн, рейтинг 88%\n3. <a href=\"https://store.steampowered.com/app/1029780/Going_Medieval/\"><b>Going Medieval</b></a> - 20% до 480 грн, перевірений хіт\n4. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> - 30% до 559 грн, помітний хіт\n5. <a href=\"https://store.steampowered.com/app/1062090/Timberborn/\"><b>Timberborn</b></a> - 20% до 560 грн, критичний фаворит\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "closing_cta": "Якщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/1331550/Big_Ambitions/\"><b>Big Ambitions</b></a> - 33% до 317 грн, перевірений хіт",
+          "2. <a href=\"https://store.steampowered.com/app/1466060/Tainted_Grail_The_Fall_of_Avalon/\"><b>Tainted Grail: The Fall of Avalon</b></a> - 30% до 584 грн, рейтинг 88%",
+          "3. <a href=\"https://store.steampowered.com/app/1029780/Going_Medieval/\"><b>Going Medieval</b></a> - 20% до 480 грн, перевірений хіт",
+          "4. <a href=\"https://store.steampowered.com/app/1371980/No_Rest_for_the_Wicked/\"><b>No Rest for the Wicked</b></a> - 30% до 559 грн, помітний хіт",
+          "5. <a href=\"https://store.steampowered.com/app/1062090/Timberborn/\"><b>Timberborn</b></a> - 20% до 560 грн, критичний фаворит"
+        ],
+        "title": "Що ще варте уваги в резерві"
+      },
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    }
+  ],
+  "run_key": "20260318T215238Z"
+}

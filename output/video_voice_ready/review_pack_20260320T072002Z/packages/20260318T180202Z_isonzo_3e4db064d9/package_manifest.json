@@ -1,0 +1,26 @@
+{
+  "content_type": "freebie",
+  "family": "FREE_GAME",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\voice_script_timed.txt"
+  },
+  "hook": "Isonzo безкоштовно в Epic.",
+  "manifest_hash": "3e4db064d906be4ccfff970dbcc7bfe5f64e035ab7158f4f727d952308524003",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260318T180202Z_video_manifest_epic_4889207626a44fed973f5e72ae79ce9d.json",
+  "package_id": "20260318T180202Z_isonzo_3e4db064d9",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260318T180202Z",
+  "schema_version": 1,
+  "template_name": "freebie_flash",
+  "title": "Isonzo",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T18:02:02",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T18:02:02.946556",
+  "empty_window": false,
+  "fatal_ingest": false,
+  "ingest": {
+    "enriched_total": 2002,
+    "ingested_total": 2002,
+    "metrics_available": true
+  },
+  "metrics": {
+    "lane.candidate.backlog_filler": 11,
+    "lane.candidate.breaking_freebie": 2,
+    "lane.candidate.high_value_discount": 24,
+    "offers.enriched_total": 2002,
+    "offers.ingested_total": 2002,
+    "quality.reject.adult_content": 5,
+    "quality.reject.review_threshold_not_met": 1960,
+    "quality.reject_total": 1965,
+    "queue.depth.planned": 8,
+    "queue.depth.reserve": 16,
+    "selection.accepted_total": 37,
+    "selection.capacity_hold": 13,
+    "selection.hard_suppress": 1965,
+    "selection.hero_discount_bonus_slots": 2,
+    "selection.roundup_candidate": 16,
+    "selection.solo_post": 8
+  },
+  "pipeline_action": "publish_attempted",
+  "planner_window": {
+    "empty": false,
+    "planned_count": 8,
+    "reserve_count": 16
+  },
+  "publish": {
+    "attempted": true,
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+    "lane": "breaking_freebie",
+    "message_id": 164,
+    "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+    "published": true,
+    "reason": "published",
+    "title": "Isonzo"
+  },
+  "reasons": [],
+  "run_key": "20260318T180202Z",
+  "should_stop_pipeline": false,
+  "status": "healthy"
+}

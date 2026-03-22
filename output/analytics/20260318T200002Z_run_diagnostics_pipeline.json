@@ -1,0 +1,55 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T20:00:02",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 0,
+      "hard_suppress": 0,
+      "roundup_candidate": 0,
+      "solo_post": 0
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T20:00:02.460440",
+  "empty_window": false,
+  "fatal_ingest": true,
+  "ingest": {
+    "enriched_total": 0,
+    "ingested_total": 0,
+    "metrics_available": true
+  },
+  "metrics": {
+    "offers.enriched_total": 0,
+    "offers.ingested_total": 0,
+    "queue.depth.planned": 0,
+    "queue.depth.reserve": 0,
+    "selection.accepted_total": 0,
+    "selection.capacity_hold": 0,
+    "selection.roundup_candidate": 0,
+    "selection.solo_post": 0
+  },
+  "pipeline_action": "stopped_fatal_ingest",
+  "planner_window": {
+    "empty": false,
+    "planned_count": 0,
+    "reserve_count": 0
+  },
+  "publish": {
+    "attempted": false,
+    "image_path": null,
+    "lane": null,
+    "message_id": null,
+    "offer_id": null,
+    "published": false,
+    "reason": null,
+    "title": null
+  },
+  "reasons": [
+    "no_offers_ingested"
+  ],
+  "run_key": "20260318T200002Z",
+  "should_stop_pipeline": true,
+  "status": "fatal_ingest"
+}

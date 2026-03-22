@@ -1,0 +1,64 @@
+{
+  "command": "build-voice-package",
+  "latest_artifacts": {
+    "golden_snapshot_manifest": {
+      "modified_at": "2026-03-18T23:53:09",
+      "path": "D:\\Telegram\\output\\offline_validation\\golden\\current\\snapshot_manifest.json"
+    },
+    "latest_caption_review": {
+      "modified_at": "2026-03-20T01:23:31",
+      "path": "D:\\Telegram\\output\\captions\\festival_freeze_review_20260319T232331Z\\review.md"
+    },
+    "latest_card": {
+      "modified_at": "2026-03-20T08:37:31",
+      "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png"
+    },
+    "latest_operator_workflow": {
+      "modified_at": "2026-03-20T10:45:34",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T084534Z_operator_workflow_send-test.json"
+    },
+    "latest_snapshot_manifest": {
+      "modified_at": "2026-03-20T10:45:15",
+      "path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T084504Z\\snapshot_manifest.json"
+    },
+    "latest_video_manifest": {
+      "modified_at": "2026-03-20T08:37:34",
+      "path": "D:\\Telegram\\output\\video_manifests\\20260320T063648Z_video_manifest_steam_952060.json"
+    },
+    "latest_voice_package_manifest": {
+      "modified_at": "2026-03-20T10:45:51",
+      "path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\package_manifest.json"
+    },
+    "operator_truth_report": {
+      "modified_at": "2026-03-20T10:45:34",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T084522Z_operator_truth_report_send_test.json"
+    },
+    "planning_snapshot": {
+      "modified_at": "2026-03-20T08:37:35",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T063648Z_planning_snapshot_20260320T063648Z.json"
+    },
+    "publish_outcome": {
+      "modified_at": "2026-03-20T08:37:35",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T063648Z_publish_outcome_steam_952060.json"
+    },
+    "run_diagnostics": {
+      "modified_at": "2026-03-20T10:45:34",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T084522Z_run_diagnostics_pipeline.json"
+    }
+  },
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260320T063648Z_video_manifest_steam_952060.json",
+  "next_action": "Open review.md and voice_script.txt, then hand the package to Reaper dubbing.",
+  "package_dir": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4",
+  "package_manifest_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\package_manifest.json",
+  "preview_video_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\preview\\final_preview.mp4",
+  "ready_for_reaper": true,
+  "review_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\review.md",
+  "scene_plan_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\scene_plan.json",
+  "status": "ok",
+  "timed_script_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\voice_script_timed.txt",
+  "voice_script_path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\voice_script.txt",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

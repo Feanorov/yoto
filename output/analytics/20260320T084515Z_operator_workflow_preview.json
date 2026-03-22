@@ -1,0 +1,64 @@
+{
+  "blocker_category": "ingest",
+  "blocker_reason": "no_offers_ingested",
+  "caption_preview": null,
+  "card_path": null,
+  "command": "preview",
+  "exit_code": 0,
+  "latest_artifacts": {
+    "golden_snapshot_manifest": {
+      "modified_at": "2026-03-18T23:53:09",
+      "path": "D:\\Telegram\\output\\offline_validation\\golden\\current\\snapshot_manifest.json"
+    },
+    "latest_caption_review": {
+      "modified_at": "2026-03-20T01:23:31",
+      "path": "D:\\Telegram\\output\\captions\\festival_freeze_review_20260319T232331Z\\review.md"
+    },
+    "latest_card": {
+      "modified_at": "2026-03-20T08:37:31",
+      "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png"
+    },
+    "latest_operator_workflow": {
+      "modified_at": "2026-03-20T10:44:52",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T084452Z_operator_workflow_doctor.json"
+    },
+    "latest_snapshot_manifest": {
+      "modified_at": "2026-03-20T10:45:15",
+      "path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T084504Z\\snapshot_manifest.json"
+    },
+    "latest_video_manifest": {
+      "modified_at": "2026-03-20T08:37:34",
+      "path": "D:\\Telegram\\output\\video_manifests\\20260320T063648Z_video_manifest_steam_952060.json"
+    },
+    "latest_voice_package_manifest": {
+      "modified_at": "2026-03-20T09:20:27",
+      "path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\package_manifest.json"
+    },
+    "operator_truth_report": {
+      "modified_at": "2026-03-20T10:45:15",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T084504Z_operator_truth_report_preview.json"
+    },
+    "planning_snapshot": {
+      "modified_at": "2026-03-20T08:37:35",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T063648Z_planning_snapshot_20260320T063648Z.json"
+    },
+    "publish_outcome": {
+      "modified_at": "2026-03-20T08:37:35",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T063648Z_publish_outcome_steam_952060.json"
+    },
+    "run_diagnostics": {
+      "modified_at": "2026-03-20T08:37:35",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T063648Z_run_diagnostics_pipeline.json"
+    }
+  },
+  "message_id": null,
+  "next_action": "Fix the ingest source issue, then rerun yoto.bat preview.",
+  "published": false,
+  "report_path": "D:\\Telegram\\output\\analytics\\20260320T084504Z_operator_truth_report_preview.json",
+  "selected": null,
+  "status": "ok",
+  "telegram_verified": false,
+  "truth_ready": false,
+  "verdict": "truthful_send_test_blocked",
+  "would_send": false
+}

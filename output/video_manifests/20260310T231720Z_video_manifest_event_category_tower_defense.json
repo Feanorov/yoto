@@ -1,0 +1,40 @@
+{
+  "asset_refs": [
+    "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726"
+  ],
+  "context": {
+    "lane": "event_festival",
+    "offer_kind": "festival",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": true,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "event"
+  },
+  "created_at": "2026-03-10T23:17:20.572346",
+  "hook_line": "Steam Tower Defense Fest is on now! is live now.",
+  "manifest_version": 1,
+  "offer_id": "event:category:tower_defense",
+  "run_key": "20260310T231720Z",
+  "short_title": "Steam Tower Defense Fest is on now!",
+  "summary_line": "EVENT event window with discounts, demos, or highlights.",
+  "template_hint": "event-countdown",
+  "urgency_line": "Ends 2026-03-16 17:00 UTC."
+}

@@ -1,0 +1,301 @@
+{
+  "created_at": "2026-03-18T22:09:51.220204",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_c367569acede446995c5a3663e993446_cozy_grove.png",
+  "lane": "breaking_freebie",
+  "message_id": null,
+  "offer_id": "epic:c367569acede446995c5a3663e993446",
+  "publish_outcome": {
+    "message_id": null,
+    "outbox_status": "failed",
+    "published": false,
+    "reason": "publish_failed"
+  },
+  "published": false,
+  "reason": "publish_failed",
+  "render": {
+    "assets_used": [
+      "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg"
+    ],
+    "caption_debug": {
+      "cta": {},
+      "fallback_used": true,
+      "lane": "breaking_freebie",
+      "normalization_applied": {
+        "normalized_dashes": false,
+        "normalized_punctuation_spacing": false,
+        "normalized_whitespace": false,
+        "removed_garbage_unicode": false,
+        "removed_replacement_chars": false
+      },
+      "offer_id": "epic:c367569acede446995c5a3663e993446",
+      "opening": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 4,
+        "fallback_used": false,
+        "line": "🎁 Йото витягнув безкоштовну гру.",
+        "near_repeat_relaxed": false,
+        "near_repeat_window_hits": 0,
+        "pool_size": 3,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "repeat_risk": false,
+        "selected": "🎁 Йото витягнув безкоштовну гру."
+      },
+      "presence": "direct",
+      "repeat_risk": false,
+      "selected_opener": "🎁 Йото витягнув безкоштовну гру.",
+      "style": "freebie",
+      "weird_symbol_detected": false
+    },
+    "caption_hash": "6ee93c4070d9ea111f413df44a30fad62362b779ce5845b141137214ca2c55c3",
+    "card_qa_summary": {
+      "artifact_type": "card_qa_summary",
+      "card_type_mix": {
+        "DISCOUNT": 1,
+        "FREE_GAME": 3
+      },
+      "csv_path": "D:\\Telegram\\output\\analytics\\20260318T220952Z_card_qa_summary_epic_c367569acede446995c5a3663e993446.csv",
+      "hero_fallback_count": 0,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260318T220952Z_card_qa_summary_epic_c367569acede446995c5a3663e993446.json",
+      "leading_card_family_streak": {
+        "card_family": "FREE_GAME",
+        "flagged": true,
+        "length": 3
+      },
+      "placeholder_artwork_count": 0,
+      "renderer_fallback_count": 0
+    },
+    "image_hash": "4dc74ed929aa501e49e7e48ceb1d963b4b3613e6181e87b7cb748ba76f1165c2",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_c367569acede446995c5a3663e993446_cozy_grove.png",
+    "render_diagnostics": {
+      "asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": null,
+      "gameplay_candidates_count": 1,
+      "gameplay_count": 0,
+      "gameplay_rejected_ui_like": 0,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": false,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "scene_richness_score": 0.627,
+          "score": 90.0,
+          "selected": true,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.506,
+          "text_heavy": false,
+          "ui_like": false,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 1,
+      "gameplay_selection": {
+        "candidates_evaluated": 1,
+        "reason": "selected_primary_frame_fallback",
+        "score_summary": [
+          {
+            "aspect_mismatched": false,
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": false,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": true,
+            "promotional_layout": false,
+            "rejection_reason": null,
+            "scene_richness_score": 0.627,
+            "score": 90.0,
+            "selected": true,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.506,
+            "text_heavy": false,
+            "ui_like": false,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 1,
+        "selected_urls": [
+          "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg"
+        ],
+        "suppressed": true,
+        "suppression_reason": "logo_redundancy",
+        "ui_like_rejected": 0
+      },
+      "gameplay_selection_reason": "suppressed_logo_redundancy",
+      "has_gameplay_strip": false,
+      "hero_asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+      "hero_candidates_count": 1,
+      "hero_capsule_rejected": false,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_only",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [],
+      "hero_score_summary": [
+        {
+          "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.444,
+          "entropy_score": 1.0,
+          "horizontal_text_block": false,
+          "meets_hero_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "score": 145.99,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.804,
+          "text_coverage_ratio": 0.506,
+          "ui_heavy": false
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 1,
+        "fallback_used": false,
+        "reason": "selected_gameplay_screenshot",
+        "rejected_capsules": [],
+        "score_summary": [
+          {
+            "asset_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\f6031b53c752789f42542d067b339e7710937d6c6b09e115bb4d80e97b4e2a96.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.444,
+            "entropy_score": 1.0,
+            "horizontal_text_block": false,
+            "meets_hero_floor": true,
+            "promotional_layout": false,
+            "rejection_reason": null,
+            "score": 145.99,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "hero",
+              "header",
+              "screenshot",
+              "fallback"
+            ],
+            "subject_detection_score": 0.804,
+            "text_coverage_ratio": 0.506,
+            "ui_heavy": false
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "selected_gameplay_screenshot",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_free_game",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "epic_free",
+      "title_font_size": null,
+      "title_lines": [
+        "Cozy Grove"
+      ]
+    },
+    "template_id": "epic_free"
+  },
+  "run_key": "20260318T220951Z",
+  "selection": {
+    "decision_reasons": [
+      "breaking_freebie",
+      "freebie_high_signal",
+      "freebie_source:epic",
+      "freebie_ends_soon",
+      "freebie_card_ready",
+      "editorial_importance:card_ready"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "editorial_adjustment": {
+      "base_total": 900.2,
+      "content_type": "freebie",
+      "final_total": 864.2,
+      "reasons": [
+        "same_lane_repeat_penalty"
+      ],
+      "rule_deltas": {
+        "same_lane_repeat_penalty": -36.0
+      },
+      "total_delta": -36.0
+    },
+    "event_sale_influence": {},
+    "lane": "breaking_freebie",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "publish_priority": {
+      "bucket": "planned",
+      "decision_score": 203.2,
+      "lane": "breaking_freebie",
+      "lane_priority": 640.0,
+      "lane_repeat_penalty": 0.0,
+      "manual_override_bonus": 0.0,
+      "must_ship_bonus": 45.0,
+      "reserve_penalty": 0.0,
+      "total": 900.2,
+      "urgency_bonus": 12.0
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "recommended_post_mode": "solo_post",
+    "roundup_injection": {
+      "attempted": false,
+      "json_path": null,
+      "lookup_mode": null,
+      "queue_snapshot_at": null,
+      "reason": "no_reserve_candidates",
+      "release_status": "not_applicable",
+      "roundup_id": null,
+      "roundup_run_key": null,
+      "status": "rejected",
+      "strict_rejection_reason": null
+    },
+    "score": 203.2,
+    "selection_outcome": "planned",
+    "template_id": "epic_free"
+  },
+  "title": "Cozy Grove"
+}

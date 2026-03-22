@@ -1,0 +1,28 @@
+{
+  "content_type": null,
+  "family": "FESTIVAL",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8\\voice_script_timed.txt"
+  },
+  "hook": "Steam Tower Defense Fest стартув.",
+  "manifest_hash": "ba0672ecf84c73853fdeae8f37a39ba3d972203e6fe69fe1d82b36bc01c61460",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260312T183416Z_video_manifest_event_category_tower_defense.json",
+  "package_id": "20260312T183416Z_steam_tower_defense_fest_is_on_now_ba0672ecf8",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260312T183416Z",
+  "schema_version": 1,
+  "template_name": "event_countdown",
+  "title": "Steam Tower Defense Fest is on now!",
+  "warnings": [
+    "game_image:image_unreadable_or_too_small",
+    "background:image_unreadable_or_too_small",
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

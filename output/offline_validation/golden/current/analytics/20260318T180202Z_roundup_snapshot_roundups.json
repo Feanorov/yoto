@@ -1,0 +1,433 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T18:02:02",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T18:02:02.946556",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\roundup\\409bbcd341b54b02e1e4e97e4b8373e9db2c918687a26c7f887321c7b11ccc1d.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/header.jpg?t=1773067746",
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/header.jpg?t=1773067746",
+        "hero_candidates_count": 5,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/header.jpg?t=1773067746",
+            "discount_percent": 70,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_548430_150862e9e162.jpg",
+            "offer_id": "steam:548430",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 97,
+            "selection_score": 357.34,
+            "source": "steam",
+            "title": "Deep Rock Galactic"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/a3cdc6f40d97df8ac993679c2dd1edeb5222421e/header.jpg?t=1765473525",
+            "discount_percent": 85,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_990080_1700745f4a09.jpg",
+            "offer_id": "steam:990080",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 90,
+            "selection_score": 355.23,
+            "source": "steam",
+            "title": "Hogwarts Legacy"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222700/header.jpg?t=1730912036",
+            "discount_percent": 90,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1222700_8148e81c2902.jpg",
+            "offer_id": "steam:1222700",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:very_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 88,
+            "selection_score": 346.57,
+            "source": "steam",
+            "title": "A Way Out"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/header.jpg?t=1772707432",
+            "discount_percent": 95,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1517290_c8d3226fe693.jpg",
+            "offer_id": "steam:1517290",
+            "rank": 4,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 47,
+            "selection_score": 332.67,
+            "source": "steam",
+            "title": "Battlefield™ 2042"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1361210/fbb9cdcc74001f3988d56b70213041a2adb74206/header_alt_assets_19.jpg?t=1773826449",
+            "discount_percent": 75,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1361210_4f465c8d008a.jpg",
+            "offer_id": "steam:1361210",
+            "rank": 5,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:major_franchise",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 71,
+            "selection_score": 318.68,
+            "source": "steam",
+            "title": "Warhammer 40,000: Darktide"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 5,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/header.jpg?t=1773067746",
+              "discount_percent": 70,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_548430_150862e9e162.jpg",
+              "offer_id": "steam:548430",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 97,
+              "selection_score": 357.34,
+              "source": "steam",
+              "title": "Deep Rock Galactic"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/990080/a3cdc6f40d97df8ac993679c2dd1edeb5222421e/header.jpg?t=1765473525",
+              "discount_percent": 85,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_990080_1700745f4a09.jpg",
+              "offer_id": "steam:990080",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 90,
+              "selection_score": 355.23,
+              "source": "steam",
+              "title": "Hogwarts Legacy"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1222700/header.jpg?t=1730912036",
+              "discount_percent": 90,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1222700_8148e81c2902.jpg",
+              "offer_id": "steam:1222700",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:very_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 88,
+              "selection_score": 346.57,
+              "source": "steam",
+              "title": "A Way Out"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/header.jpg?t=1772707432",
+              "discount_percent": 95,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1517290_c8d3226fe693.jpg",
+              "offer_id": "steam:1517290",
+              "rank": 4,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 47,
+              "selection_score": 332.67,
+              "source": "steam",
+              "title": "Battlefield™ 2042"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1361210/fbb9cdcc74001f3988d56b70213041a2adb74206/header_alt_assets_19.jpg?t=1773826449",
+              "discount_percent": 75,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_1361210_4f465c8d008a.jpg",
+              "offer_id": "steam:1361210",
+              "rank": 5,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:major_franchise",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 71,
+              "selection_score": 318.68,
+              "source": "steam",
+              "title": "Warhammer 40,000: Darktide"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:548430",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/548430/header.jpg?t=1773067746",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_01_big_discount_highlights_steam_548430_150862e9e162.jpg",
+        "slug": "roundup_roundup_01_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 5",
+        "template_id": "roundup_digest",
+        "title_lines": [
+          "Roundup: Big Discount",
+          "Highlights"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:548430",
+          "price_after_minor": 11300,
+          "price_line": "70% off to UAH 113",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 97,
+          "score": 278.29,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/548430/Deep_Rock_Galactic/",
+          "summary_line": "70% off to UAH 113 | Hero discount | review 97/100",
+          "title": "Deep Rock Galactic"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 85,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:990080",
+          "price_after_minor": 23900,
+          "price_line": "85% off to UAH 239",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 90,
+          "score": 277.98,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/990080/Hogwarts_Legacy/",
+          "summary_line": "85% off to UAH 239 | Hero discount | review 90/100",
+          "title": "Hogwarts Legacy"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 90,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1222700",
+          "price_after_minor": 7900,
+          "price_line": "90% off to UAH 79",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 88,
+          "score": 273.87,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1222700/A_Way_Out/",
+          "summary_line": "90% off to UAH 79 | Hero discount | review 88/100",
+          "title": "A Way Out"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 95,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1517290",
+          "price_after_minor": 7400,
+          "price_line": "95% off to UAH 74",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 47,
+          "score": 270.37,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1517290/Battlefield_2042/",
+          "summary_line": "95% off to UAH 74 | Hero discount | review 47/100",
+          "title": "Battlefield™ 2042"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 75,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1361210",
+          "price_after_minor": 18900,
+          "price_line": "75% off to UAH 189",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 71,
+          "score": 265.78,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/",
+          "summary_line": "75% off to UAH 189 | Hero discount | review 71/100",
+          "title": "Warhammer 40,000: Darktide"
+        }
+      ],
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/548430/Deep_Rock_Galactic/\"><b>Deep Rock Galactic</b></a> - 70% до 113 грн, критичний фаворит\n2. <a href=\"https://store.steampowered.com/app/990080/Hogwarts_Legacy/\"><b>Hogwarts Legacy</b></a> - 85% до 239 грн, дуже популярна гра\n3. <a href=\"https://store.steampowered.com/app/1222700/A_Way_Out/\"><b>A Way Out</b></a> - 90% до 79 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/1517290/Battlefield_2042/\"><b>Battlefield™ 2042</b></a> - 95% до 74 грн, дуже популярна гра\n5. <a href=\"https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/\"><b>Warhammer 40,000: Darktide</b></a> - 75% до 189 грн, сильний франчайз\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "closing_cta": "Якщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/548430/Deep_Rock_Galactic/\"><b>Deep Rock Galactic</b></a> - 70% до 113 грн, критичний фаворит",
+          "2. <a href=\"https://store.steampowered.com/app/990080/Hogwarts_Legacy/\"><b>Hogwarts Legacy</b></a> - 85% до 239 грн, дуже популярна гра",
+          "3. <a href=\"https://store.steampowered.com/app/1222700/A_Way_Out/\"><b>A Way Out</b></a> - 90% до 79 грн, помітний хіт",
+          "4. <a href=\"https://store.steampowered.com/app/1517290/Battlefield_2042/\"><b>Battlefield™ 2042</b></a> - 95% до 74 грн, дуже популярна гра",
+          "5. <a href=\"https://store.steampowered.com/app/1361210/Warhammer_40000_Darktide/\"><b>Warhammer 40,000: Darktide</b></a> - 75% до 189 грн, сильний франчайз"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260318T180202Z"
+}

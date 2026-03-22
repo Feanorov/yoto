@@ -1,0 +1,307 @@
+{
+  "generated_at": "2026-03-12T22:58:25.623185",
+  "queue_snapshot_at": "2026-03-12T22:58:20.863406",
+  "notes": [
+    "The live queue was read from the current database state; refresh it with `python -m dealbot.main --preview` before rerunning if you want a newer stream.",
+    "Solo captions are generated only from the current planned queue, so reserve items are represented through rebuilt roundups instead of fake solo posts.",
+    "The recent archive addendum exists to expose real shipped voice behavior, including freebie cases that may be absent from the current live queue."
+  ],
+  "sections": [
+    {
+      "name": "current_live_planned_solos",
+      "label": "Current Live Planned Solo Posts",
+      "summary": {
+        "total": 1,
+        "presence_counts": {
+          "neutral": 1
+        },
+        "style_counts": {
+          "neutral": 1
+        },
+        "direct_mode_counts": {},
+        "lane_counts": {
+          "event_festival": 1
+        },
+        "source_counts": {
+          "event": 1
+        },
+        "average_caption_chars": 440.0,
+        "max_caption_chars": 440,
+        "direct_rate": 0.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "current_live_planned_solos",
+          "position": 1,
+          "origin": "live_queue",
+          "title": "Steam Tower Defense Fest is on now!",
+          "offer_id": "event:category:tower_defense",
+          "source": "event",
+          "offer_kind": "festival",
+          "bucket": "planned",
+          "lane": "event_festival",
+          "score": 120.75,
+          "created_at": "2026-03-12T22:58:20.860342",
+          "template_id": "festival_event",
+          "decision_reasons": [
+            "event_festival",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "neutral",
+          "voice_style": "neutral",
+          "direct_mode": null,
+          "access_type": null,
+          "hashtags": [
+            "#steam",
+            "#festival",
+            "#gaming"
+          ],
+          "caption_html": "🎉 <a href=\"https://store.steampowered.com/category/tower_defense\"><b>Steam Tower Defense Fest is on now!</b></a>\n\nSteam Tower Defense Fest is on now! збирає знижки, демо та жанрові знахідки в одному місці.\n\nТематична подія зі знижками, демоверсіями та тематичними добірками, тож це хороший момент пройтися по фестивалю.\n\nФестиваль триває до 16 березня 2026, 17:00.\n\nПерегляньте фестиваль зараз, поки він у розпалі.\n\n#steam #festival #gaming",
+          "caption_text": "🎉 Steam Tower Defense Fest is on now!\n\nSteam Tower Defense Fest is on now! збирає знижки, демо та жанрові знахідки в одному місці.\n\nТематична подія зі знижками, демоверсіями та тематичними добірками, тож це хороший момент пройтися по фестивалю.\n\nФестиваль триває до 16 березня 2026, 17:00.\n\nПерегляньте фестиваль зараз, поки він у розпалі.\n\n#steam #festival #gaming",
+          "caption_char_count": 440,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "current_live_roundups",
+      "label": "Current Live Roundups Rebuilt From Reserve",
+      "summary": {
+        "total": 3,
+        "presence_counts": {
+          "direct": 3
+        },
+        "style_counts": {
+          "roundup": 3
+        },
+        "direct_mode_counts": {
+          "roundup": 3
+        },
+        "lane_counts": {
+          "hero_discount": 2,
+          "mixed": 1
+        },
+        "source_counts": {
+          "roundup": 3
+        },
+        "average_caption_chars": 939.3,
+        "max_caption_chars": 990,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 1,
+          "origin": "live_reserve_roundup",
+          "title": "Що взяти зі знижок просто зараз, частина 1",
+          "roundup_id": "roundup_01_big_discount_highlights",
+          "group_type": "hero_discount",
+          "theme_label": "Big Discount Highlights",
+          "item_count": 5,
+          "item_titles": [
+            "Slay the Spire",
+            "Hearts of Iron IV",
+            "Crusader Kings III",
+            "Dead Space",
+            "Bloons TD 6"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 1</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/646570/Slay_the_Spire/\"><b>Slay the Spire</b></a> - 75% до 124 грн, знаковий хіт\n2. <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a> - 70% до 404 грн, знаковий хіт\n3. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> - 70% до 404 грн, знаковий хіт\n4. <a href=\"https://store.steampowered.com/app/1693980/Dead_Space/\"><b>Dead Space</b></a> - 85% до 224 грн, сильний франчайз\n5. <a href=\"https://store.steampowered.com/app/960090/Bloons_TD_6/\"><b>Bloons TD 6</b></a> - 60% до 87 грн, критичний фаворит\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_text": "Що взяти зі знижок просто зараз, частина 1\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. Slay the Spire - 75% до 124 грн, знаковий хіт\n2. Hearts of Iron IV - 70% до 404 грн, знаковий хіт\n3. Crusader Kings III - 70% до 404 грн, знаковий хіт\n4. Dead Space - 85% до 224 грн, сильний франчайз\n5. Bloons TD 6 - 60% до 87 грн, критичний фаворит\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_char_count": 966,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 2,
+          "origin": "live_reserve_roundup",
+          "title": "Що взяти зі знижок просто зараз, частина 2",
+          "roundup_id": "roundup_02_big_discount_highlights",
+          "group_type": "hero_discount",
+          "theme_label": "Big Discount Highlights",
+          "item_count": 5,
+          "item_titles": [
+            "STAR WARS Jedi: Survivor™",
+            "Grand Theft Auto V Enhanced",
+            "Trailmakers",
+            "Teardown",
+            "The Riftbreaker"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що взяти зі знижок просто зараз, частина 2</b>\n\n🐱 Йото зібрав добірку сильних знижок. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/\"><b>STAR WARS Jedi: Survivor™</b></a> - 90% до 169 грн, помітний хіт\n2. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> - 56% до 879 грн, знаковий хіт\n3. <a href=\"https://store.steampowered.com/app/585420/Trailmakers/\"><b>Trailmakers</b></a> - 75% до 82 грн, високий рейтинг\n4. <a href=\"https://store.steampowered.com/app/1167630/Teardown/\"><b>Teardown</b></a> - 50% до 324 грн, критичний фаворит\n5. <a href=\"https://store.steampowered.com/app/780310/The_Riftbreaker/\"><b>The Riftbreaker</b></a> - 67% до 198 грн, високий рейтинг\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_text": "Що взяти зі знижок просто зараз, частина 2\n\n🐱 Йото зібрав добірку сильних знижок. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. STAR WARS Jedi: Survivor™ - 90% до 169 грн, помітний хіт\n2. Grand Theft Auto V Enhanced - 56% до 879 грн, знаковий хіт\n3. Trailmakers - 75% до 82 грн, високий рейтинг\n4. Teardown - 50% до 324 грн, критичний фаворит\n5. The Riftbreaker - 67% до 198 грн, високий рейтинг\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+          "caption_char_count": 990,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "roundup",
+          "section_name": "current_live_roundups",
+          "position": 3,
+          "origin": "live_reserve_roundup",
+          "title": "Що ще варте уваги в резерві, частина 1",
+          "roundup_id": "roundup_03_reserve_deals_watch",
+          "group_type": "mixed",
+          "theme_label": "Reserve Deals Watch",
+          "item_count": 5,
+          "item_titles": [
+            "Dome Keeper",
+            "Satisfactory",
+            "Victoria 3",
+            "NBA 2K26",
+            "Isonzo"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "roundup",
+          "direct_mode": "roundup",
+          "caption_html": "<b>Що ще варте уваги в резерві, частина 1</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. <a href=\"https://store.steampowered.com/app/1637320/Dome_Keeper/\"><b>Dome Keeper</b></a> - 60% до 150 грн, перевірений хіт\n2. <a href=\"https://store.steampowered.com/app/526870/Satisfactory/\"><b>Satisfactory</b></a> - 30% до 518 грн, критичний фаворит\n3. <a href=\"https://store.steampowered.com/app/529340/Victoria_3/\"><b>Victoria 3</b></a> - 70% до 404 грн, помітний хіт\n4. <a href=\"https://store.steampowered.com/app/3472040/NBA_2K26/\"><b>NBA 2K26</b></a> - 75% до 574 грн, сильний франчайз\n5. <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a> - безкоштовно в Epic, варта уваги\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+          "caption_text": "Що ще варте уваги в резерві, частина 1\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. Dome Keeper - 60% до 150 грн, перевірений хіт\n2. Satisfactory - 30% до 518 грн, критичний фаворит\n3. Victoria 3 - 70% до 404 грн, помітний хіт\n4. NBA 2K26 - 75% до 574 грн, сильний франчайз\n5. Isonzo - безкоштовно в Epic, варта уваги\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+          "caption_char_count": 862,
+          "caption_limit_safe": true
+        }
+      ]
+    },
+    {
+      "name": "recent_archive_addendum",
+      "label": "Recent Published Post Addendum",
+      "summary": {
+        "total": 2,
+        "presence_counts": {
+          "direct": 2
+        },
+        "style_counts": {
+          "freebie": 2
+        },
+        "direct_mode_counts": {
+          "freebie": 2
+        },
+        "lane_counts": {
+          "breaking_freebie": 2
+        },
+        "source_counts": {
+          "epic": 2
+        },
+        "average_caption_chars": 468.0,
+        "max_caption_chars": 475,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 1,
+          "origin": "post_artifact",
+          "title": "Idle Champions of the Forgotten Realms",
+          "offer_id": "epic:a9748abde1c94b66aae5250bb9fc5503",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-10T16:44:16.867770",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/idle-champions-of-the-forgotten-realms\"><b>Idle Champions of the Forgotten Realms</b></a>\n\n🎁 Йото вихопив роздачу.\n\nЦе гра, яку можна спокійно додати до бібліотеки й повернутися до неї пізніше.\n\nЗамість 0 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Idle Champions of the Forgotten Realms\n\n🎁 Йото вихопив роздачу.\n\nЦе гра, яку можна спокійно додати до бібліотеки й повернутися до неї пізніше.\n\nЗамість 0 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 475,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 2,
+          "origin": "post_artifact",
+          "title": "Turnip Boy Robs a Bank",
+          "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-10T23:17:58.343127",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/turnip-boy-robs-a-bank-3fae0e\"><b>Turnip Boy Robs a Bank</b></a>\n\n🎁 Йото витягнув безкоштовну гру.\n\nЦе гра, яку можна спокійно додати до бібліотеки й повернутися до неї пізніше.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Turnip Boy Robs a Bank\n\n🎁 Йото витягнув безкоштовну гру.\n\nЦе гра, яку можна спокійно додати до бібліотеки й повернутися до неї пізніше.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 461,
+          "caption_limit_safe": true
+        }
+      ]
+    }
+  ],
+  "live_stream_summary": {
+    "total": 4,
+    "presence_counts": {
+      "direct": 3,
+      "neutral": 1
+    },
+    "style_counts": {
+      "neutral": 1,
+      "roundup": 3
+    },
+    "direct_mode_counts": {
+      "roundup": 3
+    },
+    "lane_counts": {
+      "event_festival": 1,
+      "hero_discount": 2,
+      "mixed": 1
+    },
+    "source_counts": {
+      "event": 1,
+      "roundup": 3
+    },
+    "average_caption_chars": 814.5,
+    "max_caption_chars": 990,
+    "direct_rate": 0.75
+  },
+  "archive_summary": {
+    "total": 2,
+    "presence_counts": {
+      "direct": 2
+    },
+    "style_counts": {
+      "freebie": 2
+    },
+    "direct_mode_counts": {
+      "freebie": 2
+    },
+    "lane_counts": {
+      "breaking_freebie": 2
+    },
+    "source_counts": {
+      "epic": 2
+    },
+    "average_caption_chars": 468.0,
+    "max_caption_chars": 475,
+    "direct_rate": 1.0
+  }
+}

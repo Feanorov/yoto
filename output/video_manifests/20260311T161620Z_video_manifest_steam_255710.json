@@ -1,0 +1,28 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/255710/ss_0754001c88ad4dbfff92faf9a97e8d87cf3f8840.1920x1080.jpg?t=1773157607",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/255710/71a181a42e7bc1f10185b54085c213d28ef817c7/header_alt_assets_8_ukrainian.jpg?t=1773157607"
+  },
+  "context": {
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "plan_sale_context": {
+      "active": false,
+      "active_event_offer_ids": [],
+      "sale_event_mode": "auto"
+    },
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T16:16:20.567902",
+  "hook_line": "Знижка 90% уже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:255710",
+  "run_key": "20260311T161620Z",
+  "short_title": "Cities: Skylines",
+  "summary_line": "Starter Deluxe Edition Set up your city building experience for success with the Starter Deluxe Edition ....",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Ціна актуальна до 12 березня 2026, 17:00."
+}

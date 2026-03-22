@@ -1,0 +1,34 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "offline_snapshot_created_at": "2026-03-18T21:04:00.928711",
+    "offline_snapshot_role": "candidate",
+    "offline_snapshot_run_key": "20260318T210400Z",
+    "queue_snapshot_at": "2026-03-18T21:04:00",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 0,
+      "hard_suppress": 0,
+      "roundup_candidate": 0,
+      "solo_post": 0
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T21:04:28.734949",
+  "metrics": {
+    "offers.enriched_total": 0,
+    "offers.ingested_total": 0,
+    "queue.depth.planned": 0,
+    "queue.depth.reserve": 0,
+    "selection.accepted_total": 0,
+    "selection.capacity_hold": 0,
+    "selection.roundup_candidate": 0,
+    "selection.solo_post": 0
+  },
+  "planned": [],
+  "planned_count": 0,
+  "reserve": [],
+  "reserve_count": 0,
+  "run_key": "20260318T210428Z"
+}

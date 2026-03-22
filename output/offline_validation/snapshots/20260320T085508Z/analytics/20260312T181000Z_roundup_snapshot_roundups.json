@@ -1,0 +1,319 @@
+{
+  "context": {
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-12T18:10:00",
+  "roundup_count": 3,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": null,
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 56,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3240220",
+          "price_line": "56% off to UAH 879",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "score": 248.03,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "56% off to UAH 879 | Hero discount | review 81/100",
+          "title": "Grand Theft Auto V Enhanced"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:585420",
+          "price_line": "75% off to UAH 82",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "score": 247.06,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 82 | Hero discount | review 92/100",
+          "title": "Trailmakers"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1167630",
+          "price_line": "50% off to UAH 324",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "score": 245.73,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "50% off to UAH 324 | Hero discount | review 96/100",
+          "title": "Teardown"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "lane": "high_value_discount",
+          "offer_id": "steam:312520",
+          "price_line": "70% off to UAH 154",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "score": 245.14,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "70% off to UAH 154 | Hero discount | review 94/100",
+          "title": "Rain World"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "lane": "high_value_discount",
+          "offer_id": "steam:892970",
+          "price_line": "50% off to UAH 269",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "score": 238.9,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "50% off to UAH 269 | Hero discount | review 94/100",
+          "title": "Valheim"
+        }
+      ],
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    },
+    {
+      "card_asset_path": null,
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 4,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 67,
+          "lane": "high_value_discount",
+          "offer_id": "steam:780310",
+          "price_line": "67% off to UAH 198",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "score": 238.12,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "67% off to UAH 198 | Hero discount | review 90/100",
+          "title": "The Riftbreaker"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 60,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1637320",
+          "price_line": "60% off to UAH 150",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "score": 233.94,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "60% off to UAH 150 | Hero discount | review 92/100",
+          "title": "Dome Keeper"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 30,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3241660",
+          "price_line": "30% off to UAH 135",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "score": 231.6,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "30% off to UAH 135 | Hero discount | review 96/100",
+          "title": "R.E.P.O."
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 30,
+          "lane": "high_value_discount",
+          "offer_id": "steam:526870",
+          "price_line": "30% off to UAH 518",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "score": 230.17,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "30% off to UAH 518 | Hero discount | review 97/100",
+          "title": "Satisfactory"
+        }
+      ],
+      "roundup_id": "roundup_02_big_discount_highlights",
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    },
+    {
+      "card_asset_path": null,
+      "group_type": "strong_discount",
+      "intro": "Solid secondary discounts that work better together than as separate solo posts right now.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 80,
+          "lane": "high_value_discount",
+          "offer_id": "steam:567640",
+          "price_line": "80% off to UAH 95",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:popular",
+            "editorial_importance:card_ready"
+          ],
+          "score": 211.01,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "80% off to UAH 95 | Strong secondary discount | review 83/100",
+          "title": "Danganronpa V3: Killing Harmony"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1096530",
+          "price_line": "75% off to UAH 150",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:popular",
+            "editorial_importance:card_ready"
+          ],
+          "score": 202.11,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 150 | Strong secondary discount | review 87/100",
+          "title": "Solasta: Crown of the Magister"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 70,
+          "lane": "high_value_discount",
+          "offer_id": "steam:529340",
+          "price_line": "70% off to UAH 404",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:card_ready"
+          ],
+          "score": 199.73,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "70% off to UAH 404 | Strong secondary discount | review 71/100",
+          "title": "Victoria 3"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 75,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3472040",
+          "price_line": "75% off to UAH 574",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready"
+          ],
+          "score": 190.49,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "75% off to UAH 574 | Strong secondary discount | review 65/100",
+          "title": "NBA 2K26"
+        },
+        {
+          "callout": "Strong secondary discount",
+          "discount_percent": 45,
+          "lane": "high_value_discount",
+          "offer_id": "steam:2849080",
+          "price_line": "45% off to UAH 228",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "strong_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:card_ready"
+          ],
+          "score": 171.29,
+          "source": "steam",
+          "store": "Steam",
+          "summary_line": "45% off to UAH 228 | Strong secondary discount | review 88/100",
+          "title": "Kingdom Rush 5: Alliance TD"
+        }
+      ],
+      "roundup_id": "roundup_03_strong_discount_picks",
+      "theme_label": "Strong Discount Picks",
+      "title": "Roundup: Strong Discount Picks"
+    }
+  ],
+  "run_key": "20260312T181000Z"
+}

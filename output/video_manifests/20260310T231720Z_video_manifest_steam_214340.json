@@ -1,0 +1,40 @@
+{
+  "asset_refs": [
+    "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228"
+  ],
+  "context": {
+    "lane": "breaking_freebie",
+    "offer_kind": "freebie",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "steam"
+  },
+  "created_at": "2026-03-10T23:17:20.572346",
+  "hook_line": "Free to claim right now.",
+  "manifest_version": 1,
+  "offer_id": "steam:214340",
+  "run_key": "20260310T231720Z",
+  "short_title": "Deponia",
+  "summary_line": "STEAM free claim on STEAM.",
+  "template_hint": "freebie-flash",
+  "urgency_line": "No fixed end captured."
+}

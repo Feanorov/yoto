@@ -1,0 +1,100 @@
+{
+  "family": "TOP_LIST",
+  "manifest_hash": "d7381cfcab263fd7e3a4d360ab25b2f0dc2e0ef885cae3d667798bb748187278",
+  "manifest_path": "D:\\Telegram\\temp\\yoto_video_validation_batch_recheck_20260318T191422Z\\manifests\\20260314T004209Z_video_manifest_roundup_roundup_01_big_discount_highlights.json",
+  "scene_count": 4,
+  "scenes": [
+    {
+      "duration_seconds": 2.0,
+      "end_seconds": 2.0,
+      "estimated_read_seconds": 1.54,
+      "narration_text": "Коротка добірка сильних знижок.",
+      "on_screen_text": {
+        "body": "Roundup: Big Discount Highlights",
+        "cta": null,
+        "headline": "Roundup: Big Discount Highlights"
+      },
+      "position": 1,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scenes\\scene_001.png",
+      "scene_id": "hook",
+      "start_seconds": 0.0,
+      "timing_warning": null,
+      "transition_note": "Без паузи відкрити з хука.",
+      "visual_role": "hero",
+      "visual_source": {
+        "path": "D:\\Telegram\\temp\\editorial_stream_validation_nonquiet_relaxed_20260314T100000Z\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "role": "source_artifact_image"
+      }
+    },
+    {
+      "duration_seconds": 3.0,
+      "end_seconds": 5.0,
+      "estimated_read_seconds": 1.92,
+      "narration_text": "Battlefield V з мінус 95%.",
+      "on_screen_text": {
+        "body": "1. -95% Battlefield™ V\n2. -90% A Way Out",
+        "cta": null,
+        "headline": "Що в добірці"
+      },
+      "position": 2,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scenes\\scene_002.png",
+      "scene_id": "roundup_page_one",
+      "start_seconds": 2.0,
+      "timing_warning": null,
+      "transition_note": "Швидкий жорсткий перехід в наступний біт.",
+      "visual_role": "roundup_page",
+      "visual_source": {
+        "path": "D:\\Telegram\\temp\\editorial_stream_validation_nonquiet_relaxed_20260314T100000Z\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "role": "game_image"
+      }
+    },
+    {
+      "duration_seconds": 3.0,
+      "end_seconds": 8.0,
+      "estimated_read_seconds": 1.92,
+      "narration_text": "Battlefield 2042 з мінус 95%.",
+      "on_screen_text": {
+        "body": "3. -95% Battlefield™ 2042\n4. -90% STAR WARS Jedi",
+        "cta": null,
+        "headline": "Ще кілька позицій"
+      },
+      "position": 3,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scenes\\scene_003.png",
+      "scene_id": "roundup_page_two",
+      "start_seconds": 5.0,
+      "timing_warning": null,
+      "transition_note": "Швидкий жорсткий перехід в наступний біт.",
+      "visual_role": "roundup_page",
+      "visual_source": {
+        "path": "D:\\Telegram\\temp\\editorial_stream_validation_nonquiet_relaxed_20260314T100000Z\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "role": "game_image"
+      }
+    },
+    {
+      "duration_seconds": 2.0,
+      "end_seconds": 10.0,
+      "estimated_read_seconds": 1.92,
+      "narration_text": "Переглянь добірку. Посилання в пості.",
+      "on_screen_text": {
+        "body": "Battlefield™ V · A Way Out · Battlefield™ 2042",
+        "cta": "Переглянь добірку зараз.",
+        "headline": "Переглянь добірку, поки ці пропозиції ще активні."
+      },
+      "position": 4,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scenes\\scene_004.png",
+      "scene_id": "urgency",
+      "start_seconds": 8.0,
+      "timing_warning": null,
+      "transition_note": "Фінальний CTA, дати коротку утримку перед виходом.",
+      "visual_role": "cta",
+      "visual_source": {
+        "path": "D:\\Telegram\\temp\\editorial_stream_validation_nonquiet_relaxed_20260314T100000Z\\output\\cards\\yoto_card_roundup_roundup_01_big_discount_highlights.png",
+        "role": "card_image"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "template_name": "roundup_digest",
+  "title": "Roundup: Big Discount Highlights",
+  "total_duration_seconds": 10.0
+}

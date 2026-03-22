@@ -1,0 +1,211 @@
+{
+  "created_at": "2026-03-12T06:50:52.151661",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_a9748abde1c94b66aae5250bb9fc5503_idle_champions_of_the_forgotten_realms.png",
+  "lane": "breaking_freebie",
+  "message_id": 162,
+  "offer_id": "epic:a9748abde1c94b66aae5250bb9fc5503",
+  "publish_outcome": {
+    "message_id": 162,
+    "outbox_status": "published",
+    "published": false,
+    "reason": "already_published"
+  },
+  "published": false,
+  "reason": "already_published",
+  "render": {
+    "assets_used": [
+      "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg"
+    ],
+    "caption_hash": "28eea09828574fa9b65ad327c26153659a5b870ea86cc58530c0a00b58d39e2b",
+    "image_hash": "66a640a749eb90bb659efccdf06dba23290d6d4d6189a137d919f0e4ba9aa3d3",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_a9748abde1c94b66aae5250bb9fc5503_idle_champions_of_the_forgotten_realms.png",
+    "render_diagnostics": {
+      "asset_used": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": "Strategy classic",
+      "gameplay_candidates_count": 1,
+      "gameplay_count": 0,
+      "gameplay_rejected_ui_like": 1,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.685,
+          "score": 34.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.73,
+          "text_heavy": false,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 0,
+      "gameplay_selection": {
+        "candidates_evaluated": 1,
+        "reason": "hero_only_frame_available",
+        "score_summary": [
+          {
+            "aspect_mismatched": false,
+            "asset_url": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.685,
+            "score": 34.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.73,
+            "text_heavy": false,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 0,
+        "selected_urls": [],
+        "ui_like_rejected": 1
+      },
+      "gameplay_selection_reason": "hero_only_frame_available",
+      "has_gameplay_strip": false,
+      "hero_asset_used": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+      "hero_candidates_count": 1,
+      "hero_capsule_rejected": false,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_only",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [],
+      "hero_score_summary": [
+        {
+          "asset_url": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.376,
+          "entropy_score": 0.951,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 87.57,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.818,
+          "text_coverage_ratio": 0.73,
+          "ui_heavy": true
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 1,
+        "fallback_used": false,
+        "reason": "selected_gameplay_screenshot",
+        "rejected_capsules": [],
+        "score_summary": [
+          {
+            "asset_url": "https://cdn1.epicgames.com/spt-assets/a53f91e55c6840018cb5de0b204f1ad9/idle-champions-of-the-forgotten-realms-1n34h.jpg",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.376,
+            "entropy_score": 0.951,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 87.57,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "hero",
+              "header",
+              "screenshot",
+              "fallback"
+            ],
+            "subject_detection_score": 0.818,
+            "text_coverage_ratio": 0.73,
+            "ui_heavy": true
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "selected_gameplay_screenshot",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_free_game",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "epic_free",
+      "title_font_size": null,
+      "title_lines": [
+        "Idle Champions of the",
+        "Forgotten Realms"
+      ]
+    },
+    "template_id": "epic_free"
+  },
+  "run_key": "20260312T065052Z",
+  "selection": {
+    "decision_reasons": [
+      "breaking_freebie"
+    ],
+    "dedup_reason": "final_push",
+    "diversity_constraints": [],
+    "event_sale_influence": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "lane": "breaking_freebie",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "score": 194.0,
+    "template_id": "epic_free"
+  },
+  "title": "Idle Champions of the Forgotten Realms"
+}

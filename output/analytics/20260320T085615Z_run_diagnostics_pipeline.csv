@@ -1,0 +1,2 @@
+empty_window,enriched_total,fatal_ingest,ingested_total,pipeline_action,planned_count,publish_attempted,publish_reason,published,reasons,reserve_count,run_key,should_stop_pipeline,status
+False,2002,False,2002,publish_attempted,8,True,published,True,[],16,20260320T085615Z,False,healthy

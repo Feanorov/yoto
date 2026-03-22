@@ -1,0 +1,72 @@
+{
+  "blocker_category": null,
+  "blocker_reason": null,
+  "caption_preview": "🔥 <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>It Takes Two</b></a> Йото радить не проходити повз. Тут жанровий акцент чіткий: бойовики та пригоди, а цінник уже дає привід повернутися. Зараз <...",
+  "card_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+  "command": "send-test",
+  "exit_code": 0,
+  "latest_artifacts": {
+    "golden_snapshot_manifest": {
+      "modified_at": "2026-03-18T23:53:09",
+      "path": "D:\\Telegram\\output\\offline_validation\\golden\\current\\snapshot_manifest.json"
+    },
+    "latest_caption_review": {
+      "modified_at": "2026-03-20T01:23:31",
+      "path": "D:\\Telegram\\output\\captions\\festival_freeze_review_20260319T232331Z\\review.md"
+    },
+    "latest_card": {
+      "modified_at": "2026-03-20T10:56:52",
+      "path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png"
+    },
+    "latest_operator_workflow": {
+      "modified_at": "2026-03-20T10:55:47",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T085547Z_operator_workflow_daily_check_latest_artifacts.json"
+    },
+    "latest_snapshot_manifest": {
+      "modified_at": "2026-03-20T10:56:51",
+      "path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085615Z\\snapshot_manifest.json"
+    },
+    "latest_video_manifest": {
+      "modified_at": "2026-03-20T10:56:53",
+      "path": "D:\\Telegram\\output\\video_manifests\\20260320T085615Z_video_manifest_steam_1426210.json"
+    },
+    "latest_voice_package_manifest": {
+      "modified_at": "2026-03-20T10:45:51",
+      "path": "D:\\Telegram\\output\\video_voice_ready\\20260320T063648Z_resident_evil_3_d7e52a98d4\\package_manifest.json"
+    },
+    "operator_truth_report": {
+      "modified_at": "2026-03-20T10:56:53",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T085615Z_operator_truth_report_send_test.json"
+    },
+    "planning_snapshot": {
+      "modified_at": "2026-03-20T10:56:53",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T085615Z_planning_snapshot_20260320T085615Z.json"
+    },
+    "publish_outcome": {
+      "modified_at": "2026-03-20T10:56:53",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T085615Z_publish_outcome_steam_1426210.json"
+    },
+    "run_diagnostics": {
+      "modified_at": "2026-03-20T10:56:53",
+      "path": "D:\\Telegram\\output\\analytics\\20260320T085615Z_run_diagnostics_pipeline.json"
+    }
+  },
+  "message_id": 173,
+  "next_action": "Review the Telegram post, then run yoto.bat build-voice-package for the newest manifest.",
+  "published": true,
+  "report_path": "D:\\Telegram\\output\\analytics\\20260320T085615Z_operator_truth_report_send_test.json",
+  "selected": {
+    "bucket": "planned",
+    "content_family": "discount",
+    "lane": "high_value_discount",
+    "offer_id": "steam:1426210",
+    "row_id": 707,
+    "source": "steam",
+    "title": "It Takes Two"
+  },
+  "status": "ok",
+  "telegram_verified": true,
+  "truth_ready": true,
+  "verdict": "telegram_proof_verified",
+  "would_send": true
+}

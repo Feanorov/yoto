@@ -1,0 +1,14 @@
+{
+  "context": {
+    "offline_snapshot_created_at": "2026-03-18T20:29:29.673973",
+    "offline_snapshot_run_key": "20260318T202929Z",
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T20:30:01.407213",
+  "metrics": {},
+  "planned": [],
+  "planned_count": 0,
+  "reserve": [],
+  "reserve_count": 0,
+  "run_key": "20260318T203001Z"
+}

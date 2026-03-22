@@ -1,0 +1,226 @@
+{
+  "created_at": "2026-03-12T18:34:16.344569",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_festival_event_event_category_tower_defense_steam_tower_defense_fest_is_on_now.png",
+  "lane": "event_festival",
+  "message_id": null,
+  "offer_id": "event:category:tower_defense",
+  "publish_outcome": {
+    "message_id": null,
+    "outbox_status": null,
+    "published": false,
+    "reason": "dry_run"
+  },
+  "published": false,
+  "reason": "dry_run",
+  "render": {
+    "assets_used": [
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726"
+    ],
+    "caption_hash": "1d8d3ed654cfbadd9c3b2a9edb2374ed227ec2e9c63df6b49fed208fdfd6372c",
+    "image_hash": "b9a42f5f1cd99957c1b93f1c311c93277f77cc227616e112871ab7b8adc3bde2",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_festival_event_event_category_tower_defense_steam_tower_defense_fest_is_on_now.png",
+    "render_diagnostics": {
+      "asset_used": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": null,
+      "gameplay_candidates_count": 1,
+      "gameplay_count": 0,
+      "gameplay_rejected_ui_like": 0,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": true,
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": false,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": false,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.726,
+          "score": 2.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.414,
+          "text_heavy": false,
+          "ui_like": false,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 0,
+      "gameplay_selection": {
+        "candidates_evaluated": 1,
+        "reason": "hero_only_frame_available",
+        "score_summary": [
+          {
+            "aspect_mismatched": true,
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": false,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": false,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.726,
+            "score": 2.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.414,
+            "text_heavy": false,
+            "ui_like": false,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 0,
+        "selected_urls": [],
+        "ui_like_rejected": 0
+      },
+      "gameplay_selection_reason": "hero_only_frame_available",
+      "has_gameplay_strip": false,
+      "hero_asset_used": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+      "hero_candidates_count": 1,
+      "hero_capsule_rejected": false,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_only",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [],
+      "hero_score_summary": [
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.653,
+          "entropy_score": 0.673,
+          "horizontal_text_block": false,
+          "meets_hero_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "score": 45.11,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.744,
+          "text_coverage_ratio": 0.414,
+          "ui_heavy": false
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 1,
+        "fallback_used": false,
+        "reason": "selected_gameplay_screenshot",
+        "rejected_capsules": [],
+        "score_summary": [
+          {
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/593110/capsule_184x69.jpg?t=1646874726",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.653,
+            "entropy_score": 0.673,
+            "horizontal_text_block": false,
+            "meets_hero_floor": true,
+            "promotional_layout": false,
+            "rejection_reason": null,
+            "score": 45.11,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "hero",
+              "header",
+              "screenshot",
+              "fallback"
+            ],
+            "subject_detection_score": 0.744,
+            "text_coverage_ratio": 0.414,
+            "ui_heavy": false
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "selected_gameplay_screenshot",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_festival",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "festival_event",
+      "title_font_size": null,
+      "title_lines": [
+        "Steam Tower Defense Fest is on",
+        "now!"
+      ]
+    },
+    "template_id": "festival_event"
+  },
+  "run_key": "20260312T183416Z",
+  "selection": {
+    "decision_reasons": [
+      "event_festival",
+      "editorial_importance:card_ready"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "event_sale_influence": {
+      "active": true,
+      "linked": false,
+      "mode": "auto"
+    },
+    "lane": "event_festival",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "publish_priority": {
+      "bucket": "planned",
+      "decision_score": 120.75,
+      "lane": "event_festival",
+      "lane_priority": 560.0,
+      "lane_repeat_penalty": 0.0,
+      "manual_override_bonus": 0.0,
+      "must_ship_bonus": 45.0,
+      "reserve_penalty": 0.0,
+      "total": 725.75,
+      "urgency_bonus": 0.0
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "recommended_post_mode": "solo_post",
+    "score": 120.75,
+    "selection_outcome": "planned",
+    "template_id": "festival_event"
+  },
+  "title": "Steam Tower Defense Fest is on now!"
+}

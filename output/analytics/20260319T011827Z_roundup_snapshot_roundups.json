@@ -1,0 +1,358 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "offline_snapshot_created_at": "2026-03-18T21:52:38.061075",
+    "offline_snapshot_role": "review_working_copy",
+    "offline_snapshot_run_key": "20260318T215238Z",
+    "queue_snapshot_at": "2026-03-18T21:52:38",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-19T01:18:27.869669",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_02_big_discount_highlights.png",
+      "card_render_diagnostics": {
+        "asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Big discounts",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+        "hero_candidates_count": 3,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+            "discount_percent": 50,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+            "offer_id": "steam:1167630",
+            "rank": 1,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:critical_favorite",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 96,
+            "selection_score": 315.63,
+            "source": "steam",
+            "title": "Teardown"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5082b0fcfc3d57868a0ac359d6a69f817b96808948ce802798fbdb7428777e1e.jpg",
+            "discount_percent": 50,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5082b0fcfc3d57868a0ac359d6a69f817b96808948ce802798fbdb7428777e1e.jpg",
+            "offer_id": "steam:892970",
+            "rank": 2,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:highly_rated",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 94,
+            "selection_score": 302.5,
+            "source": "steam",
+            "title": "Valheim"
+          },
+          {
+            "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\41c1cb9e2e8719a8eb64d984b09e108f8810bd79b4571eb0cbc3704a3d0d80d6.jpg",
+            "discount_percent": 56,
+            "is_freebie": false,
+            "materialization_status": "existing_local_path",
+            "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\41c1cb9e2e8719a8eb64d984b09e108f8810bd79b4571eb0cbc3704a3d0d80d6.jpg",
+            "offer_id": "steam:3240220",
+            "rank": 3,
+            "reason_tags": [
+              "high_value_discount",
+              "hero_discount",
+              "editorial_importance:mega_popular",
+              "editorial_importance:standout_title",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 81,
+            "selection_score": 295.78,
+            "source": "steam",
+            "title": "Grand Theft Auto V Enhanced"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 3,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+              "discount_percent": 50,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+              "offer_id": "steam:1167630",
+              "rank": 1,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:critical_favorite",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 96,
+              "selection_score": 315.63,
+              "source": "steam",
+              "title": "Teardown"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5082b0fcfc3d57868a0ac359d6a69f817b96808948ce802798fbdb7428777e1e.jpg",
+              "discount_percent": 50,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\5082b0fcfc3d57868a0ac359d6a69f817b96808948ce802798fbdb7428777e1e.jpg",
+              "offer_id": "steam:892970",
+              "rank": 2,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:highly_rated",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 94,
+              "selection_score": 302.5,
+              "source": "steam",
+              "title": "Valheim"
+            },
+            {
+              "artwork_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\41c1cb9e2e8719a8eb64d984b09e108f8810bd79b4571eb0cbc3704a3d0d80d6.jpg",
+              "discount_percent": 56,
+              "is_freebie": false,
+              "materialization_status": "existing_local_path",
+              "materialized_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\41c1cb9e2e8719a8eb64d984b09e108f8810bd79b4571eb0cbc3704a3d0d80d6.jpg",
+              "offer_id": "steam:3240220",
+              "rank": 3,
+              "reason_tags": [
+                "high_value_discount",
+                "hero_discount",
+                "editorial_importance:mega_popular",
+                "editorial_importance:standout_title",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 81,
+              "selection_score": 295.78,
+              "source": "steam",
+              "title": "Grand Theft Auto V Enhanced"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:1167630",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_02_big_discount_highlights.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260318T215238Z\\assets\\queue\\1f06b93c8eaaaac8e976584127367dcdb4a7659b083d5573cc4534be2d037f06.jpg",
+        "slug": "roundup_roundup_02_big_discount_highlights",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 3",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 3",
+          "brand_micro": "YOTO PICKS",
+          "composition_mode": "default",
+          "panel_kicker": "Big discounts",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 3",
+          "top_zone_badge_anchor": "top_right",
+          "top_zone_layout_mode": "default"
+        },
+        "title_lines": [
+          "Roundup: Big Discount",
+          "Highlights"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 3,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1167630",
+          "price_after_minor": 32400,
+          "price_line": "50% off to UAH 324",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 96,
+          "score": 255.73,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1167630/Teardown/",
+          "summary_line": "50% off to UAH 324 | Hero discount | review 96/100",
+          "title": "Teardown"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 50,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:892970",
+          "price_after_minor": 26900,
+          "price_line": "50% off to UAH 269",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 94,
+          "score": 248.9,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/892970/Valheim/",
+          "summary_line": "50% off to UAH 269 | Hero discount | review 94/100",
+          "title": "Valheim"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 56,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:3240220",
+          "price_after_minor": 87900,
+          "price_line": "56% off to UAH 879",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 81,
+          "score": 248.03,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/",
+          "summary_line": "56% off to UAH 879 | Hero discount | review 81/100",
+          "title": "Grand Theft Auto V Enhanced"
+        }
+      ],
+      "roundup_id": "roundup_02_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/1167630/Teardown/\"><b>Teardown</b></a> - 50% до 324 грн, критичний фаворит\n2. <a href=\"https://store.steampowered.com/app/892970/Valheim/\"><b>Valheim</b></a> - 50% до 269 грн, дуже популярна гра\n3. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> - 56% до 879 грн, знаковий хіт\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "closing_cta": "Якщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/1167630/Teardown/\"><b>Teardown</b></a> - 50% до 324 грн, критичний фаворит",
+          "2. <a href=\"https://store.steampowered.com/app/892970/Valheim/\"><b>Valheim</b></a> - 50% до 269 грн, дуже популярна гра",
+          "3. <a href=\"https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/\"><b>Grand Theft Auto V Enhanced</b></a> - 56% до 879 грн, знаковий хіт"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260319T011827Z"
+}

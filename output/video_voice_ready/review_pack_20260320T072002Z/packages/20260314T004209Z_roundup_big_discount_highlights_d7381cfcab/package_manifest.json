@@ -1,0 +1,26 @@
+{
+  "content_type": "roundup",
+  "family": "TOP_LIST",
+  "files": {
+    "preview_video": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\preview\\final_preview.mp4",
+    "review_markdown": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\review.md",
+    "scene_plan": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scene_plan.json",
+    "scenes_dir": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\scenes",
+    "voice_script": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\voice_script.txt",
+    "voice_script_timed": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260314T004209Z_roundup_big_discount_highlights_d7381cfcab\\voice_script_timed.txt"
+  },
+  "hook": "Коротка добірка сильних знижок.",
+  "manifest_hash": "d7381cfcab263fd7e3a4d360ab25b2f0dc2e0ef885cae3d667798bb748187278",
+  "manifest_path": "D:\\Telegram\\temp\\yoto_video_validation_batch_recheck_20260318T191422Z\\manifests\\20260314T004209Z_video_manifest_roundup_roundup_01_big_discount_highlights.json",
+  "package_id": "20260314T004209Z_roundup_big_discount_highlights_d7381cfcab",
+  "package_kind": "voice_ready_video_package",
+  "preview_video_rendered": true,
+  "run_key": "20260314T004209Z",
+  "schema_version": 1,
+  "template_name": "roundup_digest",
+  "title": "Roundup: Big Discount Highlights",
+  "warnings": [
+    "missing badge",
+    "voice_facts_missing_used_manifest_fallbacks"
+  ]
+}

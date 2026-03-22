@@ -1,0 +1,238 @@
+{
+  "asset_refs": {
+    "background": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+    "card_image": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_c367569acede446995c5a3663e993446_cozy_grove.png",
+    "game_image": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+    "lead_artwork": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg"
+  },
+  "caption_debug": {
+    "cta": {},
+    "fallback_used": true,
+    "lane": "breaking_freebie",
+    "normalization_applied": {
+      "normalized_dashes": false,
+      "normalized_punctuation_spacing": false,
+      "normalized_whitespace": false,
+      "removed_garbage_unicode": false,
+      "removed_replacement_chars": false
+    },
+    "offer_id": "epic:c367569acede446995c5a3663e993446",
+    "opening": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "fallback_used": false,
+      "line": "🎁 Йото витягнув безкоштовну гру.",
+      "near_repeat_relaxed": false,
+      "near_repeat_window_hits": 0,
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "repeat_risk": false,
+      "selected": "🎁 Йото витягнув безкоштовну гру."
+    },
+    "presence": "direct",
+    "repeat_risk": false,
+    "selected_opener": "🎁 Йото витягнув безкоштовну гру.",
+    "style": "freebie",
+    "weird_symbol_detected": false
+  },
+  "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/cozy-grove\"><b>Cozy Grove</b></a>\n\n🎁 Йото витягнув безкоштовну гру.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 229 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+  "content_id": "61ecf1b9c29c8286fb13d1d15db58e950620d04c56e99735eb41c834ba9695c0",
+  "content_type": "freebie",
+  "context": {
+    "idempotency_key": "61ecf1b9c29c8286fb13d1d15db58e950620d04c56e99735eb41c834ba9695c0",
+    "lane": "breaking_freebie",
+    "offer_kind": "freebie",
+    "published": true,
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "epic",
+    "store": "Epic Games Store",
+    "template_id": "epic_free",
+    "voice_mode": null
+  },
+  "created_at": "2026-03-18T21:53:16.831764",
+  "cta_line": "Забрати можна до 19 березня 2026, 15:00.",
+  "hashtags": [
+    "#epicgames",
+    "#freegame",
+    "#giveaway"
+  ],
+  "hook_line": "Безкоштовна роздача в Epic вже активна.",
+  "manifest_version": 2,
+  "offer_id": "epic:c367569acede446995c5a3663e993446",
+  "render_diagnostics": {
+    "asset_used": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+    "badge_rect": null,
+    "clipped_fields": [],
+    "editorial_phrase": null,
+    "gameplay_candidates_count": 1,
+    "gameplay_count": 1,
+    "gameplay_rejected_ui_like": 0,
+    "gameplay_score_summary": [
+      {
+        "aspect_mismatched": false,
+        "asset_url": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+        "available": true,
+        "banner_like": false,
+        "horizontal_text_block": false,
+        "index": 0,
+        "low_info": false,
+        "meets_gameplay_floor": true,
+        "promotional_layout": false,
+        "rejection_reason": null,
+        "scene_richness_score": 0.627,
+        "score": 90.0,
+        "selected": true,
+        "similar_scene": false,
+        "source_type": "screenshot",
+        "source_types": [
+          "primary_screenshot"
+        ],
+        "steam_ui_like": false,
+        "text_coverage_ratio": 0.506,
+        "text_heavy": false,
+        "ui_like": false,
+        "ui_relaxed_candidate": false
+      }
+    ],
+    "gameplay_selected_count": 1,
+    "gameplay_selection": {
+      "candidates_evaluated": 1,
+      "reason": "selected_primary_frame_fallback",
+      "score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": false,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "scene_richness_score": 0.627,
+          "score": 90.0,
+          "selected": true,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.506,
+          "text_heavy": false,
+          "ui_like": false,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "selected_count": 1,
+      "selected_urls": [
+        "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg"
+      ],
+      "ui_like_rejected": 0
+    },
+    "gameplay_selection_reason": "selected_primary_frame_fallback",
+    "has_gameplay_strip": true,
+    "hero_asset_used": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+    "hero_candidates_count": 1,
+    "hero_capsule_rejected": false,
+    "hero_fallback_used": false,
+    "hero_mode": "hero_with_gameplay_strip",
+    "hero_rect": [
+      0,
+      0,
+      1280,
+      468
+    ],
+    "hero_rejected_capsules": [],
+    "hero_score_summary": [
+      {
+        "asset_url": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.444,
+        "entropy_score": 1.0,
+        "horizontal_text_block": false,
+        "meets_hero_floor": true,
+        "promotional_layout": false,
+        "rejection_reason": null,
+        "score": 145.99,
+        "selected": true,
+        "source_type": "screenshot",
+        "source_types": [
+          "hero",
+          "header",
+          "screenshot",
+          "fallback"
+        ],
+        "subject_detection_score": 0.804,
+        "text_coverage_ratio": 0.506,
+        "ui_heavy": false
+      }
+    ],
+    "hero_selection": {
+      "candidates_evaluated": 1,
+      "fallback_used": false,
+      "reason": "selected_gameplay_screenshot",
+      "rejected_capsules": [],
+      "score_summary": [
+        {
+          "asset_url": "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.444,
+          "entropy_score": 1.0,
+          "horizontal_text_block": false,
+          "meets_hero_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "score": 145.99,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.804,
+          "text_coverage_ratio": 0.506,
+          "ui_heavy": false
+        }
+      ],
+      "selected_source": "screenshot"
+    },
+    "hero_selection_reason": "selected_gameplay_screenshot",
+    "hero_source_type": "screenshot",
+    "info_rect": [
+      0,
+      462,
+      1280,
+      720
+    ],
+    "layout_variant": "yoto_v4_free_game",
+    "render_warnings": [],
+    "renderer_fallback_used": false,
+    "renderer_family": "yoto_v4",
+    "renderer_requested": "yoto_v4",
+    "renderer_selected": "yoto_v4",
+    "template_id": "epic_free",
+    "title_font_size": null,
+    "title_lines": [
+      "Cozy Grove"
+    ]
+  },
+  "run_key": "20260318T215316Z",
+  "short_title": "Cozy Grove",
+  "source_artifact": {
+    "assets_used": [
+      "https://cdn1.epicgames.com/768ec2d3b5114ac4a800631b12ee3f31/offer/CG-2560x1440-570add3e55ecf729bd4f3a221ca7927a.jpg"
+    ],
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_c367569acede446995c5a3663e993446_cozy_grove.png"
+  },
+  "summary_line": "Cozy Grove зараз можна безкоштовно забрати в Epic Games Store. Це гра, яку можна спокійно додати до...",
+  "template_hint": "freebie-flash",
+  "urgency_line": "Забрати можна до 19 березня 2026, 15:00."
+}

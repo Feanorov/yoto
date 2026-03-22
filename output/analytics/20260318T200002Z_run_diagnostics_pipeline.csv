@@ -1,0 +1,2 @@
+empty_window,enriched_total,fatal_ingest,ingested_total,pipeline_action,planned_count,publish_attempted,publish_reason,published,reasons,reserve_count,run_key,should_stop_pipeline,status
+False,0,True,0,stopped_fatal_ingest,0,False,,False,"[""no_offers_ingested""]",0,20260318T200002Z,True,fatal_ingest

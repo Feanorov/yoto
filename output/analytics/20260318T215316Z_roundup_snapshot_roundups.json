@@ -1,0 +1,336 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T21:53:16",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T21:53:16.831764",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "card_asset_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_04_reserve_deals_watch.png",
+      "card_render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/825cac843c69f16866fdf3bb649eb4d7e666cb2b/header_alt_assets_0.jpg?t=1773306445",
+        "badge_footer_text": null,
+        "card_type": "TOP_LIST",
+        "editorial_phrase": "Editorial picks",
+        "font_selection": {
+          "badge_header": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "badge_main": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "brand_micro": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "segoeui.ttf"
+          },
+          "panel_kicker": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "platform_badge": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          },
+          "title": {
+            "cyrillic_text": false,
+            "fallback_used": false,
+            "font_family": "arialbd.ttf"
+          }
+        },
+        "gameplay_candidates_count": 0,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 0,
+        "gameplay_score_summary": [],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 0,
+          "reason": "no_candidates_available",
+          "score_summary": [],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 0
+        },
+        "gameplay_selection_reason": "no_candidates_available",
+        "glyph_fallback_used": false,
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/825cac843c69f16866fdf3bb649eb4d7e666cb2b/header_alt_assets_0.jpg?t=1773306445",
+        "hero_candidates_count": 3,
+        "hero_fallback_used": false,
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [],
+        "hero_score_summary": [
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/825cac843c69f16866fdf3bb649eb4d7e666cb2b/header_alt_assets_0.jpg?t=1773306445",
+            "discount_percent": 25,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_2827200_c3cc70cad76a.jpg",
+            "offer_id": "steam:2827200",
+            "rank": 1,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:trusted_hit",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 85,
+            "selection_score": 158.73,
+            "source": "steam",
+            "title": "MIMESIS"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778610/06019e08c5e52abbfd39bddcfaef1202770b8b96/header_alt_assets_0.jpg?t=1773250254",
+            "discount_percent": 15,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_2778610_8060e4bcb112.jpg",
+            "offer_id": "steam:2778610",
+            "rank": 2,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 88,
+            "selection_score": 142.97,
+            "source": "steam",
+            "title": "Over The Top: WWI"
+          },
+          {
+            "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3552140/5be699540829c76a0d5f7ac5db4bbaf23fa76013/header.jpg?t=1773774771",
+            "discount_percent": 20,
+            "is_freebie": false,
+            "materialization_status": "materialized_remote",
+            "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_3552140_c198baca734f.jpg",
+            "offer_id": "steam:3552140",
+            "rank": 3,
+            "reason_tags": [
+              "backlog_filler",
+              "mid_discount",
+              "editorial_importance:card_ready"
+            ],
+            "review_score": 97,
+            "selection_score": 136.16,
+            "source": "steam",
+            "title": "Retro Rewind - Video Store Simulator"
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 3,
+          "fallback_used": false,
+          "reason": "highest_weighted_roundup_item_artwork",
+          "rejected_capsules": [],
+          "score_summary": [
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/825cac843c69f16866fdf3bb649eb4d7e666cb2b/header_alt_assets_0.jpg?t=1773306445",
+              "discount_percent": 25,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_2827200_c3cc70cad76a.jpg",
+              "offer_id": "steam:2827200",
+              "rank": 1,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:trusted_hit",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 85,
+              "selection_score": 158.73,
+              "source": "steam",
+              "title": "MIMESIS"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2778610/06019e08c5e52abbfd39bddcfaef1202770b8b96/header_alt_assets_0.jpg?t=1773250254",
+              "discount_percent": 15,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_2778610_8060e4bcb112.jpg",
+              "offer_id": "steam:2778610",
+              "rank": 2,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 88,
+              "selection_score": 142.97,
+              "source": "steam",
+              "title": "Over The Top: WWI"
+            },
+            {
+              "artwork_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3552140/5be699540829c76a0d5f7ac5db4bbaf23fa76013/header.jpg?t=1773774771",
+              "discount_percent": 20,
+              "is_freebie": false,
+              "materialization_status": "materialized_remote",
+              "materialized_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_3552140_c198baca734f.jpg",
+              "offer_id": "steam:3552140",
+              "rank": 3,
+              "reason_tags": [
+                "backlog_filler",
+                "mid_discount",
+                "editorial_importance:card_ready"
+              ],
+              "review_score": 97,
+              "selection_score": 136.16,
+              "source": "steam",
+              "title": "Retro Rewind - Video Store Simulator"
+            }
+          ],
+          "selected_source": "roundup_item_artwork"
+        },
+        "hero_selection_reason": "highest_weighted_roundup_item_artwork",
+        "hero_source_type": "roundup_item_artwork",
+        "layout_variant": "yoto_v4_top_list",
+        "lead_artwork_selected_offer_id": "steam:2827200",
+        "lead_artwork_selected_rank": 1,
+        "lead_artwork_selected_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2827200/825cac843c69f16866fdf3bb649eb4d7e666cb2b/header_alt_assets_0.jpg?t=1773306445",
+        "lead_artwork_selection_reason": "highest_weighted_roundup_item_artwork",
+        "lower_third_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "meta_alignment": "hidden",
+        "output_path": "D:\\Telegram\\output\\cards\\yoto_card_roundup_roundup_04_reserve_deals_watch.png",
+        "platform_badge_text": "STEAM TOP",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "selected_asset_path": "D:\\Telegram\\output\\cards\\_roundup_cache\\roundup_04_reserve_deals_watch_steam_2827200_c3cc70cad76a.jpg",
+        "slug": "roundup_roundup_04_reserve_deals_watch",
+        "source": "roundup_top_list_adapter",
+        "sticker_header": "TOP LIST",
+        "sticker_text": "Top 3",
+        "template_id": "roundup_digest",
+        "text_payload": {
+          "badge_footer": null,
+          "badge_main": "Top 3",
+          "brand_micro": "YOTO PICKS",
+          "panel_kicker": "Editorial picks",
+          "platform_badge": "STEAM TOP",
+          "sticker_header": "TOP LIST",
+          "sticker_text": "Top 3"
+        },
+        "title_lines": [
+          "Roundup: Reserve Deals Watch"
+        ],
+        "title_mode": "two_line",
+        "used_placeholder_artwork": false
+      },
+      "group_type": "mixed",
+      "intro": "A mixed reserve bundle built from the strongest remaining roundup candidates in this window.",
+      "item_count": 3,
+      "items": [
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 25,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:2827200",
+          "price_after_minor": 16800,
+          "price_line": "25% off to UAH 168",
+          "rank": 1,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:trusted_hit",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 85,
+          "score": 119.23,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/2827200/MIMESIS/",
+          "summary_line": "25% off to UAH 168 | Backlog discount | review 85/100",
+          "title": "MIMESIS"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 15,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:2778610",
+          "price_after_minor": 39700,
+          "price_line": "15% off to UAH 397",
+          "rank": 2,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 88,
+          "score": 112.52,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/2778610/Over_The_Top_WWI/",
+          "summary_line": "15% off to UAH 397 | Backlog discount | review 88/100",
+          "title": "Over The Top: WWI"
+        },
+        {
+          "callout": "Backlog discount",
+          "discount_percent": 20,
+          "is_freebie": false,
+          "lane": "backlog_filler",
+          "offer_id": "steam:3552140",
+          "price_after_minor": 31200,
+          "price_line": "20% off to UAH 312",
+          "rank": 3,
+          "reason_tags": [
+            "backlog_filler",
+            "mid_discount",
+            "editorial_importance:card_ready"
+          ],
+          "review_score": 97,
+          "score": 108.61,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/3552140/Retro_Rewind__Video_Store_Simulator/",
+          "summary_line": "20% off to UAH 312 | Backlog discount | review 97/100",
+          "title": "Retro Rewind - Video Store Simulator"
+        }
+      ],
+      "roundup_id": "roundup_04_reserve_deals_watch",
+      "telegram_draft": {
+        "caption_html": "<b>Що ще варте уваги в резерві</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.\n\n1. <a href=\"https://store.steampowered.com/app/2827200/MIMESIS/\"><b>MIMESIS</b></a> - 25% до 168 грн, перевірений хіт\n2. <a href=\"https://store.steampowered.com/app/2778610/Over_The_Top_WWI/\"><b>Over The Top: WWI</b></a> - 15% до 397 грн, рейтинг 88%\n3. <a href=\"https://store.steampowered.com/app/3552140/Retro_Rewind__Video_Store_Simulator/\"><b>Retro Rewind - Video Store Simulator</b></a> - 20% до 312 грн, рейтинг 97%\n\nЯкщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "closing_cta": "Якщо треба, з цього резерву можна окремо розібрати ще одну добірку під інший настрій.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найкращі резервні пропозиції поточного вікна в один компактний roundup.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/2827200/MIMESIS/\"><b>MIMESIS</b></a> - 25% до 168 грн, перевірений хіт",
+          "2. <a href=\"https://store.steampowered.com/app/2778610/Over_The_Top_WWI/\"><b>Over The Top: WWI</b></a> - 15% до 397 грн, рейтинг 88%",
+          "3. <a href=\"https://store.steampowered.com/app/3552140/Retro_Rewind__Video_Store_Simulator/\"><b>Retro Rewind - Video Store Simulator</b></a> - 20% до 312 грн, рейтинг 97%"
+        ],
+        "title": "Що ще варте уваги в резерві"
+      },
+      "theme_label": "Reserve Deals Watch",
+      "title": "Roundup: Reserve Deals Watch"
+    }
+  ],
+  "run_key": "20260318T215316Z"
+}

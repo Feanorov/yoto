@@ -1,0 +1,170 @@
+{
+  "generated_at": "2026-03-18T20:29:41.727378",
+  "queue_snapshot_at": null,
+  "notes": [
+    "The live queue was read from the current database state; refresh it with `python -m dealbot.main --preview` before rerunning if you want a newer stream.",
+    "Solo captions are generated only from the current planned queue, so reserve items are represented through rebuilt roundups instead of fake solo posts.",
+    "The recent archive addendum exists to expose real shipped voice behavior, including freebie cases that may be absent from the current live queue."
+  ],
+  "sections": [
+    {
+      "name": "current_live_planned_solos",
+      "label": "Current Live Planned Solo Posts",
+      "summary": {
+        "total": 0,
+        "presence_counts": {},
+        "style_counts": {},
+        "direct_mode_counts": {},
+        "lane_counts": {},
+        "source_counts": {},
+        "average_caption_chars": 0.0,
+        "max_caption_chars": 0,
+        "direct_rate": 0.0
+      },
+      "entries": []
+    },
+    {
+      "name": "current_live_roundups",
+      "label": "Current Live Roundups Rebuilt From Reserve",
+      "summary": {
+        "total": 0,
+        "presence_counts": {},
+        "style_counts": {},
+        "direct_mode_counts": {},
+        "lane_counts": {},
+        "source_counts": {},
+        "average_caption_chars": 0.0,
+        "max_caption_chars": 0,
+        "direct_rate": 0.0
+      },
+      "entries": []
+    },
+    {
+      "name": "recent_archive_addendum",
+      "label": "Recent Published Post Addendum",
+      "summary": {
+        "total": 2,
+        "presence_counts": {
+          "direct": 2
+        },
+        "style_counts": {
+          "freebie": 2
+        },
+        "direct_mode_counts": {
+          "freebie": 2
+        },
+        "lane_counts": {
+          "breaking_freebie": 2
+        },
+        "source_counts": {
+          "epic": 2
+        },
+        "average_caption_chars": 426.5,
+        "max_caption_chars": 448,
+        "direct_rate": 1.0
+      },
+      "entries": [
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 1,
+          "origin": "post_artifact",
+          "title": "Turnip Boy Robs a Bank",
+          "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-10T23:17:58.343127",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/turnip-boy-robs-a-bank-3fae0e\"><b>Turnip Boy Robs a Bank</b></a>\n\n🎁 Йото витягнув безкоштовну гру.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Turnip Boy Robs a Bank\n\n🎁 Йото витягнув безкоштовну гру.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 275 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 12 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 448,
+          "caption_limit_safe": true
+        },
+        {
+          "entry_type": "offer",
+          "section_name": "recent_archive_addendum",
+          "position": 2,
+          "origin": "post_artifact",
+          "title": "Isonzo",
+          "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+          "source": "epic",
+          "offer_kind": "freebie",
+          "bucket": "published",
+          "lane": "breaking_freebie",
+          "score": null,
+          "created_at": "2026-03-18T18:03:08.233564",
+          "template_id": "epic_free",
+          "decision_reasons": [
+            "breaking_freebie",
+            "freebie_high_signal",
+            "freebie_source:epic",
+            "freebie_ends_soon",
+            "freebie_meaningful_value",
+            "freebie_card_ready",
+            "editorial_importance:card_ready"
+          ],
+          "voice_presence": "direct",
+          "voice_style": "freebie",
+          "direct_mode": "freebie",
+          "access_type": "keep_forever",
+          "hashtags": [
+            "#epicgames",
+            "#freegame",
+            "#giveaway"
+          ],
+          "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a>\n\n🎁 Йото спіймав гру за 0 грн.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 429 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_text": "🎁 Isonzo\n\n🎁 Йото спіймав гру за 0 грн.\n\nТакий клейм зручно забрати зараз і лишити в бібліотеці на потім.\n\nЗамість 429 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+          "caption_char_count": 405,
+          "caption_limit_safe": true
+        }
+      ]
+    }
+  ],
+  "live_stream_summary": {
+    "total": 0,
+    "presence_counts": {},
+    "style_counts": {},
+    "direct_mode_counts": {},
+    "lane_counts": {},
+    "source_counts": {},
+    "average_caption_chars": 0.0,
+    "max_caption_chars": 0,
+    "direct_rate": 0.0
+  },
+  "archive_summary": {
+    "total": 2,
+    "presence_counts": {
+      "direct": 2
+    },
+    "style_counts": {
+      "freebie": 2
+    },
+    "direct_mode_counts": {
+      "freebie": 2
+    },
+    "lane_counts": {
+      "breaking_freebie": 2
+    },
+    "source_counts": {
+      "epic": 2
+    },
+    "average_caption_chars": 426.5,
+    "max_caption_chars": 448,
+    "direct_rate": 1.0
+  }
+}

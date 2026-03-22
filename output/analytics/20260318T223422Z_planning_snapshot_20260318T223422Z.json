@@ -1,0 +1,800 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "offline_snapshot_created_at": "2026-03-18T21:52:38.061075",
+    "offline_snapshot_role": "golden",
+    "offline_snapshot_run_key": "20260318T215238Z",
+    "queue_snapshot_at": "2026-03-18T21:52:38",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T22:34:22.558410",
+  "metrics": {
+    "dedup.reject.franchise_cooldown": 1,
+    "lane.candidate.backlog_filler": 11,
+    "lane.candidate.breaking_freebie": 1,
+    "lane.candidate.high_value_discount": 25,
+    "offers.enriched_total": 2002,
+    "offers.ingested_total": 2002,
+    "quality.reject.adult_content": 4,
+    "quality.reject.review_threshold_not_met": 1960,
+    "quality.reject_total": 1964,
+    "queue.depth.planned": 8,
+    "queue.depth.reserve": 16,
+    "selection.accepted_total": 37,
+    "selection.capacity_hold": 13,
+    "selection.hard_suppress": 1965,
+    "selection.hero_discount_bonus_slots": 2,
+    "selection.roundup_candidate": 16,
+    "selection.solo_post": 8
+  },
+  "planned": [
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "breaking_freebie",
+        "freebie_high_signal",
+        "freebie_source:epic",
+        "freebie_ends_soon",
+        "freebie_card_ready",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "breaking_freebie",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": true,
+      "offer_id": "epic:c367569acede446995c5a3663e993446",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 203.2,
+      "selection_outcome": "planned",
+      "source": "epic",
+      "title": "Cozy Grove"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_alternation",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1237970",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 296.85,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Titanfall® 2"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:highly_rated",
+        "editorial_importance:standout_title",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:394360",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 288.83,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Hearts of Iron IV"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:highly_rated",
+        "editorial_importance:standout_title",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1158310",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 288.79,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Crusader Kings III"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1222680",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 283.36,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Need for Speed™ Heat"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:526870",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 240.17,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Satisfactory"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1238810",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 278.7,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Battlefield™ V"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:548430",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 278.29,
+      "selection_outcome": "planned",
+      "source": "steam",
+      "title": "Deep Rock Galactic"
+    }
+  ],
+  "planned_count": 8,
+  "reserve": [
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:highly_rated",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:990080",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 277.98,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Hogwarts Legacy"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:2778610",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 112.52,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Over The Top: WWI"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:very_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1222700",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 273.87,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "A Way Out"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:trusted_hit",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:2827200",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 119.23,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "MIMESIS"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1517290",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 270.37,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Battlefield™ 2042"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:very_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1371980",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 135.05,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "No Rest for the Wicked"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:major_franchise",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1361210",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 265.78,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Warhammer 40,000: Darktide"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1466060",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 139.38,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Tainted Grail: The Fall of Avalon"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:very_popular",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1774580",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 263.76,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "STAR WARS Jedi: Survivor™"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:trusted_hit",
+        "editorial_importance:highly_rated",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1331550",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 140.94,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Big Ambitions"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1167630",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 255.73,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Teardown"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:trusted_hit",
+        "editorial_importance:highly_rated",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1029780",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 136.72,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Going Medieval"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:highly_rated",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:892970",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 248.9,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Valheim"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1062090",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 126.84,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Timberborn"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:standout_title",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:3240220",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 248.03,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Grand Theft Auto V Enhanced"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "backlog_filler",
+        "mid_discount",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {},
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:3552140",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 108.61,
+      "selection_outcome": "reserve",
+      "source": "steam",
+      "title": "Retro Rewind - Video Store Simulator"
+    }
+  ],
+  "reserve_count": 16,
+  "run_key": "20260318T223422Z"
+}

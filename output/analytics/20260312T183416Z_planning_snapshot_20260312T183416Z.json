@@ -1,0 +1,144 @@
+{
+  "context": {
+    "active": true,
+    "active_event_offer_ids": [
+      "event:category:tower_defense"
+    ],
+    "phrase_tokens": [
+      "steam_tower_defense_fest_is_on_now",
+      "tower_defense"
+    ],
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 0,
+      "hard_suppress": 0,
+      "roundup_candidate": 2,
+      "solo_post": 1
+    },
+    "word_tokens": [
+      "defense",
+      "tower"
+    ]
+  },
+  "created_at": "2026-03-12T18:34:16.344569",
+  "metrics": {
+    "lane.candidate.backlog_filler": 2,
+    "lane.candidate.event_festival": 1,
+    "offers.enriched_total": 3,
+    "offers.ingested_total": 3,
+    "queue.depth.planned": 1,
+    "queue.depth.reserve": 2,
+    "sale_event.active_events": 1,
+    "sale_event.context_active": 1,
+    "selection.accepted_total": 3,
+    "selection.capacity_hold": 0,
+    "selection.roundup_candidate": 2,
+    "selection.solo_post": 1
+  },
+  "planned": [
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "event_festival",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {
+        "active": true,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "event_festival",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": true,
+      "offer_id": "event:category:tower_defense",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "planned",
+      "recommended_post_mode": "solo_post",
+      "score": 120.75,
+      "selection_outcome": "planned",
+      "source": "event",
+      "title": "Steam Tower Defense Fest is on now!"
+    }
+  ],
+  "planned_count": 1,
+  "reserve": [
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "freebie_roundup_candidate",
+        "freebie_source:epic",
+        "freebie_meaningful_value",
+        "freebie_card_ready",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 154.75,
+      "selection_outcome": "reserve",
+      "source": "epic",
+      "title": "Isonzo"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "freebie_roundup_candidate",
+        "freebie_source:epic",
+        "freebie_card_ready",
+        "editorial_importance:card_ready"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_repeat_no_alternative",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "backlog_filler",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "epic:c367569acede446995c5a3663e993446",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "reserve",
+      "recommended_post_mode": "roundup_candidate",
+      "score": 151.75,
+      "selection_outcome": "reserve",
+      "source": "epic",
+      "title": "Cozy Grove"
+    }
+  ],
+  "reserve_count": 2,
+  "run_key": "20260312T183416Z"
+}

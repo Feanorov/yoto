@@ -1,0 +1,7 @@
+section,entry_type,position,title,offer_id,roundup_id,source,offer_kind,bucket,lane,group_type,score,voice_presence,voice_style,direct_mode,caption_char_count,caption_limit_safe,origin,created_at
+current_live_planned_solos,offer,1,Steam Tower Defense Fest is on now!,event:category:tower_defense,,event,festival,planned,event_festival,,120.75,neutral,neutral,,440,True,live_queue,2026-03-12T22:58:20.860342
+current_live_roundups,roundup,1,"Що взяти зі знижок просто зараз, частина 1",,roundup_01_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,966,True,live_reserve_roundup,
+current_live_roundups,roundup,2,"Що взяти зі знижок просто зараз, частина 2",,roundup_02_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,990,True,live_reserve_roundup,
+current_live_roundups,roundup,3,"Що ще варте уваги в резерві, частина 1",,roundup_03_reserve_deals_watch,,,,,mixed,,direct,roundup,roundup,862,True,live_reserve_roundup,
+recent_archive_addendum,offer,1,Idle Champions of the Forgotten Realms,epic:a9748abde1c94b66aae5250bb9fc5503,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,475,True,post_artifact,2026-03-10T16:44:16.867770
+recent_archive_addendum,offer,2,Turnip Boy Robs a Bank,epic:68d9f0e261464ba284e10418d98532ea,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,461,True,post_artifact,2026-03-10T23:17:58.343127

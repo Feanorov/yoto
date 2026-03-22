@@ -1,0 +1,82 @@
+{
+  "asset_localization": {
+    "copied_local": 2,
+    "downloaded_remote": 93,
+    "localized_total": 95,
+    "reused_localized": 3,
+    "roundup_assets_copied": 2,
+    "roundup_assets_missing": 0,
+    "unresolved_remote": 0,
+    "unsupported_reference": 0
+  },
+  "base_db_path": "D:\\Telegram\\output\\offline_validation\\review\\live_family_review_20260319T011730Z\\dealbot.sqlite3",
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T21:52:38",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 1965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T21:52:38.061075",
+  "golden_promoted_at": "2026-03-18T21:53:09.937809",
+  "golden_source_run_key": "20260318T215238Z",
+  "live_db_path": "D:\\Telegram\\data\\dealbot.sqlite3",
+  "manifest_version": 1,
+  "metrics": {
+    "dedup.reject.franchise_cooldown": 1,
+    "lane.candidate.backlog_filler": 11,
+    "lane.candidate.breaking_freebie": 1,
+    "lane.candidate.high_value_discount": 25,
+    "offers.enriched_total": 2002,
+    "offers.ingested_total": 2002,
+    "quality.reject.adult_content": 4,
+    "quality.reject.review_threshold_not_met": 1960,
+    "quality.reject_total": 1964,
+    "queue.depth.planned": 8,
+    "queue.depth.reserve": 16,
+    "selection.accepted_total": 37,
+    "selection.capacity_hold": 13,
+    "selection.hard_suppress": 1965,
+    "selection.hero_discount_bonus_slots": 2,
+    "selection.roundup_candidate": 16,
+    "selection.solo_post": 8
+  },
+  "planned_count": 8,
+  "quality": {
+    "archive_posts_total": 6,
+    "artifact_rich": true,
+    "asset_localization_localized_total": 95,
+    "asset_localization_unresolved_remote": 0,
+    "blocking_reasons": [],
+    "captions_offline_ready": true,
+    "cards_offline_ready": true,
+    "golden_eligible": true,
+    "planned_rows_total": 8,
+    "planned_rows_with_local_assets": 8,
+    "planned_rows_without_local_assets": 0,
+    "publishable_planned_rows_total": 8,
+    "quality_version": 1,
+    "queue_rows_total": 24,
+    "reserve_rows_total": 16,
+    "reserve_rows_with_local_assets": 16,
+    "reserve_rows_without_local_assets": 0,
+    "roundup_snapshots_missing_local_cards": 10,
+    "roundup_snapshots_total": 12,
+    "roundup_snapshots_with_local_cards": 2,
+    "send_test_offline_ready": true,
+    "usable_for_send_test_offline": true,
+    "warnings": [
+      "roundup_card_assets_missing"
+    ]
+  },
+  "reserve_count": 16,
+  "review_source": "D:\\Telegram\\output\\offline_validation\\golden\\current",
+  "run_key": "20260318T215238Z",
+  "snapshot_role": "review_working_copy"
+}

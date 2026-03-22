@@ -1,0 +1,42 @@
+{
+  "asset_refs": {
+    "background": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228",
+    "game_image": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228"
+  },
+  "context": {
+    "lane": "breaking_freebie",
+    "offer_kind": "freebie",
+    "plan_sale_context": {
+      "active": true,
+      "active_event_offer_ids": [
+        "event:category:tower_defense"
+      ],
+      "phrase_tokens": [
+        "steam_tower_defense_fest_is_on_now",
+        "tower_defense"
+      ],
+      "sale_event_mode": "auto",
+      "word_tokens": [
+        "defense",
+        "tower"
+      ]
+    },
+    "queue_bucket": "planned",
+    "sale_event": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "source": "steam",
+    "store": "Steam"
+  },
+  "created_at": "2026-03-11T15:40:42.797115",
+  "hook_line": "Безкоштовна роздача в Steam вже активна.",
+  "manifest_version": 1,
+  "offer_id": "steam:214340",
+  "run_key": "20260311T154042Z",
+  "short_title": "Deponia",
+  "summary_line": "Deponia зараз можна безкоштовно забрати в Steam. Навіть якщо не планували брати гру саме сьогодні, це...",
+  "template_hint": "freebie-flash",
+  "urgency_line": "Роздача в Steam активна просто зараз."
+}

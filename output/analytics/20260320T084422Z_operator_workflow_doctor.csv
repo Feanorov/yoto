@@ -1,0 +1,2 @@
+blocker_reason,command,next_action,ready_for_reaper,status,telegram_verified,truth_ready,verdict
+,doctor,You already have Telegram proof; review the latest post and artifacts.,,ok,True,True,telegram_proof_verified

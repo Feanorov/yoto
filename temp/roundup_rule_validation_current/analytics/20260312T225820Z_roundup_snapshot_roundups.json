@@ -1,0 +1,166 @@
+{
+  "context": {
+    "queue_item_count": 19,
+    "queue_snapshot_at": "2026-03-12T22:58:20.863406",
+    "reserve_count": 18,
+    "source": "live_db_queue_snapshot"
+  },
+  "created_at": "2026-03-12T22:58:20.863406",
+  "roundup_count": 1,
+  "roundup_version": 1,
+  "roundups": [
+    {
+      "group_type": "hero_discount",
+      "intro": "Top reserve discounts with enough editorial weight to carry one combined roundup post.",
+      "item_count": 5,
+      "items": [
+        {
+          "callout": "Hero discount",
+          "discount_percent": 75,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:646570",
+          "price_after_minor": 12400,
+          "price_line": "75% off to UAH 124",
+          "rank": 1,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 98,
+          "score": 289.28,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/646570/Slay_the_Spire/",
+          "summary_line": "75% off to UAH 124 | Hero discount | review 98/100",
+          "title": "Slay the Spire"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:394360",
+          "price_after_minor": 40400,
+          "price_line": "70% off to UAH 404",
+          "rank": 2,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 90,
+          "score": 278.83,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/",
+          "summary_line": "70% off to UAH 404 | Hero discount | review 90/100",
+          "title": "Hearts of Iron IV"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 70,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1158310",
+          "price_after_minor": 40400,
+          "price_line": "70% off to UAH 404",
+          "rank": 3,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:standout_title",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 91,
+          "score": 278.79,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1158310/Crusader_Kings_III/",
+          "summary_line": "70% off to UAH 404 | Hero discount | review 91/100",
+          "title": "Crusader Kings III"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 85,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:1693980",
+          "price_after_minor": 22400,
+          "price_line": "85% off to UAH 224",
+          "rank": 4,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:very_popular",
+            "editorial_importance:highly_rated",
+            "editorial_importance:major_franchise",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 91,
+          "score": 270.34,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/1693980/Dead_Space/",
+          "summary_line": "85% off to UAH 224 | Hero discount | review 91/100",
+          "title": "Dead Space"
+        },
+        {
+          "callout": "Hero discount",
+          "discount_percent": 60,
+          "is_freebie": false,
+          "lane": "high_value_discount",
+          "offer_id": "steam:960090",
+          "price_after_minor": 8700,
+          "price_line": "60% off to UAH 87",
+          "rank": 5,
+          "reason_tags": [
+            "high_value_discount",
+            "hero_discount",
+            "editorial_importance:mega_popular",
+            "editorial_importance:critical_favorite",
+            "editorial_importance:card_ready",
+            "quiet_hours_reserve"
+          ],
+          "review_score": 97,
+          "score": 261.21,
+          "source": "steam",
+          "store": "Steam",
+          "store_url": "https://store.steampowered.com/app/960090/Bloons_TD_6/",
+          "summary_line": "60% off to UAH 87 | Hero discount | review 97/100",
+          "title": "Bloons TD 6"
+        }
+      ],
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "telegram_draft": {
+        "caption_html": "<b>Що взяти зі знижок просто зараз</b>\n\n🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.\n\n1. <a href=\"https://store.steampowered.com/app/646570/Slay_the_Spire/\"><b>Slay the Spire</b></a> - 75% до 124 грн, знаковий хіт\n2. <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a> - 70% до 404 грн, знаковий хіт\n3. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> - 70% до 404 грн, знаковий хіт\n4. <a href=\"https://store.steampowered.com/app/1693980/Dead_Space/\"><b>Dead Space</b></a> - 85% до 224 грн, сильний франчайз\n5. <a href=\"https://store.steampowered.com/app/960090/Bloons_TD_6/\"><b>Bloons TD 6</b></a> - 60% до 87 грн, критичний фаворит\n\nЯкщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "closing_cta": "Якщо з цієї добірки брати щось першим, пишіть у коментарях, що забрали б одразу.",
+        "intro": "🐱 Йото витягнув ще кілька помітних пропозицій. Зібрали найсильніші резервні знижки цього вікна: тут є і великі імена, і справді сильні пропозиції, які не хочеться втрачати у резерві.",
+        "item_lines": [
+          "1. <a href=\"https://store.steampowered.com/app/646570/Slay_the_Spire/\"><b>Slay the Spire</b></a> - 75% до 124 грн, знаковий хіт",
+          "2. <a href=\"https://store.steampowered.com/app/394360/Hearts_of_Iron_IV/\"><b>Hearts of Iron IV</b></a> - 70% до 404 грн, знаковий хіт",
+          "3. <a href=\"https://store.steampowered.com/app/1158310/Crusader_Kings_III/\"><b>Crusader Kings III</b></a> - 70% до 404 грн, знаковий хіт",
+          "4. <a href=\"https://store.steampowered.com/app/1693980/Dead_Space/\"><b>Dead Space</b></a> - 85% до 224 грн, сильний франчайз",
+          "5. <a href=\"https://store.steampowered.com/app/960090/Bloons_TD_6/\"><b>Bloons TD 6</b></a> - 60% до 87 грн, критичний фаворит"
+        ],
+        "title": "Що взяти зі знижок просто зараз"
+      },
+      "theme_label": "Big Discount Highlights",
+      "title": "Roundup: Big Discount Highlights"
+    }
+  ],
+  "run_key": "20260312T225820Z"
+}

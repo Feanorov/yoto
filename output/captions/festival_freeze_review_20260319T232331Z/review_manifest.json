@@ -1,0 +1,141 @@
+{
+  "manifest_version": "festival_caption_freeze_review_v1",
+  "generated_at": "2026-03-19T23:23:31.542374Z",
+  "before_manifest": "D:\\Telegram\\output\\captions\\festival_freeze_before_20260319T230822Z\\before_manifest.json",
+  "output_root": "D:\\Telegram\\output\\captions\\festival_freeze_review_20260319T232331Z",
+  "entries": [
+    {
+      "slug": "strong_source",
+      "label": "Strong source case",
+      "title": "Steam Tower Defense Fest",
+      "before_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#strategy"
+      ],
+      "before_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "Це один із тих фестивалів, де зручно за один раз скласти короткий список.",
+        "selected_cta": "Пробігтися сторінкою варто хоча б заради демо й кількох можливих попадань у список бажаного.",
+        "repeat_risk": false,
+        "fallback_used": false
+      },
+      "before_signals": {
+        "generic_window_mentions": 1,
+        "shortlist_mentions": 1,
+        "wishlist_mentions": 1,
+        "focused_scan_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#strategy"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "Тут сенс не в тому, щоб дивитися все підряд, а в тому, щоб швидко знайти кілька точних попадань.",
+        "selected_cta": "Зайдіть хоча б на основні секції фестивалю: за кілька хвилин стане ясно, чи є тут ваші тайтли.",
+        "repeat_risk": false,
+        "fallback_used": false
+      },
+      "after_signals": {
+        "generic_window_mentions": 0,
+        "shortlist_mentions": 0,
+        "wishlist_mentions": 0,
+        "focused_scan_mentions": 0
+      }
+    },
+    {
+      "slug": "sparse_source",
+      "label": "Sparse source case",
+      "title": "Steam Next Fest",
+      "before_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "before_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "Тематичний фестиваль, який краще дивитися як добірку, а не як шумну вітрину.",
+        "selected_cta": "Такі фестивалі найкраще працюють, коли швидко відсікаєте своє прямо зі сторінки.",
+        "repeat_risk": false,
+        "fallback_used": true
+      },
+      "before_signals": {
+        "generic_window_mentions": 1,
+        "shortlist_mentions": 0,
+        "wishlist_mentions": 0,
+        "focused_scan_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "Цей фестиваль краще читати як коротку добірку по темі, а не як ще одну довгу вітрину.",
+        "selected_cta": "Почніть із верхівки сторінки та тематичних секцій: цього вже вистачить, щоб швидко відмітити своє.",
+        "repeat_risk": false,
+        "fallback_used": true
+      },
+      "after_signals": {
+        "generic_window_mentions": 0,
+        "shortlist_mentions": 0,
+        "wishlist_mentions": 0,
+        "focused_scan_mentions": 0
+      }
+    },
+    {
+      "slug": "edge_no_deadline",
+      "label": "Edge case / no deadline / English-only source",
+      "title": "Steam Automation Fest",
+      "before_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#simulation"
+      ],
+      "before_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "У Steam зараз є тематичне вікно, яке варте швидкого проходу.",
+        "selected_cta": "Це зручне вікно, щоб за один прохід скласти собі короткий список.",
+        "repeat_risk": false,
+        "fallback_used": true
+      },
+      "before_signals": {
+        "generic_window_mentions": 0,
+        "shortlist_mentions": 2,
+        "wishlist_mentions": 0,
+        "focused_scan_mentions": 0
+      },
+      "after_hashtags": [
+        "#steam",
+        "#festival",
+        "#gaming",
+        "#simulation"
+      ],
+      "after_debug": {
+        "presence": "indirect",
+        "style": "festival",
+        "selected_opening": "У Steam відкрилося тематичне вікно, яке зручніше проходити точково, ніж суцільним скролом.",
+        "selected_cta": "Найкращий хід тут простий: відкласти кілька точних попадань і не тонути в решті каталогу.",
+        "repeat_risk": false,
+        "fallback_used": true
+      },
+      "after_signals": {
+        "generic_window_mentions": 0,
+        "shortlist_mentions": 0,
+        "wishlist_mentions": 0,
+        "focused_scan_mentions": 1
+      }
+    }
+  ]
+}

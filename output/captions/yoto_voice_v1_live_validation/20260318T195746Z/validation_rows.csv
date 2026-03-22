@@ -1,0 +1,5 @@
+section,entry_type,position,title,offer_id,roundup_id,source,offer_kind,bucket,lane,group_type,score,voice_presence,voice_style,direct_mode,caption_char_count,caption_limit_safe,origin,created_at
+current_live_planned_solos,offer,1,Titanfall® 2,steam:1237970,,steam,discount,planned,high_value_discount,,296.85,direct,recommend,recommend,482,True,live_queue,2026-03-18T18:02:02
+current_live_planned_solos,offer,2,Cozy Grove,epic:c367569acede446995c5a3663e993446,,epic,freebie,planned,breaking_freebie,,203.2,direct,freebie,freebie,413,True,live_queue,2026-03-18T18:02:02
+current_live_roundups,roundup,1,"Що взяти зі знижок просто зараз, частина 1",,roundup_01_big_discount_highlights,,,,,hero_discount,,direct,roundup,roundup,1005,True,live_reserve_roundup,
+recent_archive_addendum,offer,1,Isonzo,epic:4889207626a44fed973f5e72ae79ce9d,,epic,freebie,published,breaking_freebie,,,direct,freebie,freebie,400,True,post_artifact,2026-03-18T18:03:08.233564

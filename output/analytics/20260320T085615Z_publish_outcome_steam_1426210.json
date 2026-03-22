@@ -1,0 +1,505 @@
+{
+  "created_at": "2026-03-20T08:56:15.879992",
+  "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+  "lane": "high_value_discount",
+  "message_id": 173,
+  "offer_id": "steam:1426210",
+  "publish_outcome": {
+    "failure_detail": null,
+    "message_id": 173,
+    "outbox_status": "published",
+    "published": true,
+    "reason": "published"
+  },
+  "published": true,
+  "reason": "published",
+  "render": {
+    "assets_used": [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491"
+    ],
+    "caption_debug": {
+      "cta": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 4,
+        "fallback_used": false,
+        "near_repeat_relaxed": false,
+        "near_repeat_window_hits": 0,
+        "pool_size": 3,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "repeat_risk": false,
+        "selected": "Якщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим."
+      },
+      "fallback_used": true,
+      "lane": "high_value_discount",
+      "normalization_applied": {
+        "normalized_dashes": false,
+        "normalized_punctuation_spacing": false,
+        "normalized_whitespace": false,
+        "removed_garbage_unicode": false,
+        "removed_replacement_chars": false
+      },
+      "offer_id": "steam:1426210",
+      "opening": {
+        "anti_repeat_relaxed": false,
+        "anti_repeat_window": 4,
+        "fallback_used": true,
+        "line": "Йото радить звернути увагу.",
+        "near_repeat_relaxed": true,
+        "near_repeat_window_hits": 1,
+        "pool_size": 3,
+        "recent_repeat_count": 0,
+        "recent_window_repeat_count": 0,
+        "repeat_risk": true,
+        "selected": "Йото радить звернути увагу."
+      },
+      "presence": "direct",
+      "repeat_risk": true,
+      "selected_opener": "Йото радить звернути увагу.",
+      "style": "recommend",
+      "weird_symbol_detected": false
+    },
+    "caption_hash": "c4c868018412d23a39e1c1d32a8b1d5737c60ab38bab866982f7fb376148989d",
+    "card_qa_summary": {
+      "artifact_type": "card_qa_summary",
+      "card_type_mix": {
+        "DISCOUNT": 3,
+        "FREE_GAME": 3
+      },
+      "csv_path": "D:\\Telegram\\output\\analytics\\20260320T085653Z_card_qa_summary_steam_1426210.csv",
+      "hero_fallback_count": 0,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260320T085653Z_card_qa_summary_steam_1426210.json",
+      "leading_card_family_streak": {
+        "card_family": "DISCOUNT",
+        "flagged": false,
+        "length": 2
+      },
+      "placeholder_artwork_count": 0,
+      "renderer_fallback_count": 0
+    },
+    "image_hash": "2ba736a4d2b8d714fec4b151054d3a7cf1bd741f34cb256712846180dcb30d09",
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+    "render_diagnostics": {
+      "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+      "badge_rect": null,
+      "clipped_fields": [],
+      "editorial_phrase": "Co-op favorite",
+      "gameplay_candidates_count": 2,
+      "gameplay_count": 0,
+      "gameplay_rejected_ui_like": 2,
+      "gameplay_score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.715,
+          "score": 52.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.735,
+          "text_heavy": false,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        },
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 1,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "marketing_frame",
+          "scene_richness_score": 0.834,
+          "score": 22.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "gameplay_media",
+          "source_types": [
+            "media_still"
+          ],
+          "steam_ui_like": true,
+          "text_coverage_ratio": 0.826,
+          "text_heavy": true,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "gameplay_selected_count": 0,
+      "gameplay_selection": {
+        "candidates_evaluated": 2,
+        "reason": "hero_only_frame_available",
+        "score_summary": [
+          {
+            "aspect_mismatched": false,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.715,
+            "score": 52.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.735,
+            "text_heavy": false,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          },
+          {
+            "aspect_mismatched": false,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 1,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "marketing_frame",
+            "scene_richness_score": 0.834,
+            "score": 22.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "gameplay_media",
+            "source_types": [
+              "media_still"
+            ],
+            "steam_ui_like": true,
+            "text_coverage_ratio": 0.826,
+            "text_heavy": true,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "selected_count": 0,
+        "selected_urls": [],
+        "ui_like_rejected": 2
+      },
+      "gameplay_selection_reason": "hero_only_frame_available",
+      "has_gameplay_strip": false,
+      "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+      "hero_candidates_count": 4,
+      "hero_capsule_rejected": true,
+      "hero_fallback_used": false,
+      "hero_mode": "hero_only",
+      "hero_rect": [
+        0,
+        0,
+        1280,
+        468
+      ],
+      "hero_rejected_capsules": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -50.67,
+          "source_type": "header"
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -76.8,
+          "source_type": "fallback"
+        }
+      ],
+      "hero_score_summary": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.949,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 30.21,
+          "selected": false,
+          "source_type": "hero",
+          "source_types": [
+            "hero"
+          ],
+          "subject_detection_score": 0.908,
+          "text_coverage_ratio": 0.903,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.837,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -50.67,
+          "selected": false,
+          "source_type": "header",
+          "source_types": [
+            "header"
+          ],
+          "subject_detection_score": 0.82,
+          "text_coverage_ratio": 0.859,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.62,
+          "entropy_score": 0.988,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 106.55,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "screenshot"
+          ],
+          "subject_detection_score": 0.643,
+          "text_coverage_ratio": 0.735,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.834,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -76.8,
+          "selected": false,
+          "source_type": "fallback",
+          "source_types": [
+            "fallback"
+          ],
+          "subject_detection_score": 0.884,
+          "text_coverage_ratio": 0.904,
+          "ui_heavy": true
+        }
+      ],
+      "hero_selection": {
+        "candidates_evaluated": 4,
+        "fallback_used": false,
+        "reason": "capsule_rejected_text_heavy",
+        "rejected_capsules": [
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+            "reason": "capsule_rejected_text_heavy",
+            "score": -50.67,
+            "source_type": "header"
+          },
+          {
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+            "reason": "capsule_rejected_text_heavy",
+            "score": -76.8,
+            "source_type": "fallback"
+          }
+        ],
+        "score_summary": [
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.949,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 30.21,
+            "selected": false,
+            "source_type": "hero",
+            "source_types": [
+              "hero"
+            ],
+            "subject_detection_score": 0.908,
+            "text_coverage_ratio": 0.903,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.837,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "capsule_rejected_text_heavy",
+            "score": -50.67,
+            "selected": false,
+            "source_type": "header",
+            "source_types": [
+              "header"
+            ],
+            "subject_detection_score": 0.82,
+            "text_coverage_ratio": 0.859,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.62,
+            "entropy_score": 0.988,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 106.55,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "screenshot"
+            ],
+            "subject_detection_score": 0.643,
+            "text_coverage_ratio": 0.735,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.834,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "capsule_rejected_text_heavy",
+            "score": -76.8,
+            "selected": false,
+            "source_type": "fallback",
+            "source_types": [
+              "fallback"
+            ],
+            "subject_detection_score": 0.884,
+            "text_coverage_ratio": 0.904,
+            "ui_heavy": true
+          }
+        ],
+        "selected_source": "screenshot"
+      },
+      "hero_selection_reason": "capsule_rejected_text_heavy",
+      "hero_source_type": "screenshot",
+      "info_rect": [
+        0,
+        462,
+        1280,
+        720
+      ],
+      "layout_variant": "yoto_v4_discount",
+      "render_warnings": [],
+      "renderer_fallback_used": false,
+      "renderer_family": "yoto_v4",
+      "renderer_requested": "yoto_v4",
+      "renderer_selected": "yoto_v4",
+      "template_id": "steam_discount",
+      "title_font_size": null,
+      "title_lines": [
+        "It Takes Two"
+      ]
+    },
+    "template_id": "steam_discount"
+  },
+  "run_key": "20260320T085615Z",
+  "selection": {
+    "content_family": "discount",
+    "decision_reasons": [
+      "high_value_discount",
+      "hero_discount",
+      "editorial_importance:mega_popular",
+      "editorial_importance:critical_favorite",
+      "editorial_importance:card_ready"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "editorial_adjustment": {
+      "base_total": 592.85,
+      "content_type": "discount",
+      "final_total": 574.85,
+      "reasons": [
+        "same_lane_repeat_penalty"
+      ],
+      "rule_deltas": {
+        "same_lane_repeat_penalty": -18.0
+      },
+      "total_delta": -18.0
+    },
+    "event_sale_influence": {},
+    "lane": "high_value_discount",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "publish_priority": {
+      "bucket": "planned",
+      "decision_score": 276.85,
+      "lane": "high_value_discount",
+      "lane_priority": 340.0,
+      "lane_repeat_penalty": 24.0,
+      "manual_override_bonus": 0.0,
+      "must_ship_bonus": 0.0,
+      "reserve_penalty": 0.0,
+      "total": 592.85,
+      "urgency_bonus": 0.0
+    },
+    "quality_reasons": [
+      "review_threshold"
+    ],
+    "queue_bucket": "planned",
+    "recommended_post_mode": "solo_post",
+    "roundup_injection": {
+      "attempted": true,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260320T085508Z_roundup_snapshot_roundups.json",
+      "lookup_mode": "strict",
+      "queue_snapshot_at": "2026-03-20T08:56:15",
+      "reason": "snapshot_queue_window_mismatch",
+      "release_status": "not_applicable",
+      "roundup_id": null,
+      "roundup_run_key": "20260320T085508Z",
+      "status": "rejected",
+      "strict_rejection_reason": "snapshot_queue_window_mismatch"
+    },
+    "row_id": 707,
+    "score": 276.85,
+    "selection_outcome": "planned",
+    "store_url": "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+    "template_id": "steam_discount"
+  },
+  "title": "It Takes Two"
+}

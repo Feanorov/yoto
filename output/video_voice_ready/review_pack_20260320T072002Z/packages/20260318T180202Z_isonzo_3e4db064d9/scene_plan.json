@@ -1,0 +1,78 @@
+{
+  "family": "FREE_GAME",
+  "manifest_hash": "3e4db064d906be4ccfff970dbcc7bfe5f64e035ab7158f4f727d952308524003",
+  "manifest_path": "D:\\Telegram\\output\\video_manifests\\20260318T180202Z_video_manifest_epic_4889207626a44fed973f5e72ae79ce9d.json",
+  "scene_count": 3,
+  "scenes": [
+    {
+      "duration_seconds": 2.0,
+      "end_seconds": 2.0,
+      "estimated_read_seconds": 1.54,
+      "narration_text": "Isonzo безкоштовно в Epic.",
+      "on_screen_text": {
+        "body": "Безкоштовна роздача в Epic вже активна.",
+        "cta": null,
+        "headline": "Isonzo"
+      },
+      "position": 1,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\scenes\\scene_001.png",
+      "scene_id": "hook",
+      "start_seconds": 0.0,
+      "timing_warning": null,
+      "transition_note": "Без паузи відкрити з хука.",
+      "visual_role": "hero",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+        "role": "source_artifact_image"
+      }
+    },
+    {
+      "duration_seconds": 5.0,
+      "end_seconds": 7.0,
+      "estimated_read_seconds": 3.46,
+      "narration_text": "Додаєш на акаунт без оплати, і гра лишається назавжди.",
+      "on_screen_text": {
+        "body": "Epic Games Store - Безкоштовна гра",
+        "cta": null,
+        "headline": "Isonzo"
+      },
+      "position": 2,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\scenes\\scene_002.png",
+      "scene_id": "summary",
+      "start_seconds": 2.0,
+      "timing_warning": null,
+      "transition_note": "Швидкий жорсткий перехід в наступний біт.",
+      "visual_role": "support",
+      "visual_source": {
+        "path": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+        "role": "game_image"
+      }
+    },
+    {
+      "duration_seconds": 3.0,
+      "end_seconds": 10.0,
+      "estimated_read_seconds": 3.46,
+      "narration_text": "Забрати можна до 19 березня 2026. Посилання в пості.",
+      "on_screen_text": {
+        "body": "Epic Games Store - Безкоштовна гра",
+        "cta": "Додай гру зараз, поки роздача активна.",
+        "headline": "Забрати можна до 19 березня 2026, 15:00."
+      },
+      "position": 3,
+      "preview_image_path": "D:\\Telegram\\output\\video_voice_ready\\review_pack_20260320T072002Z\\packages\\20260318T180202Z_isonzo_3e4db064d9\\scenes\\scene_003.png",
+      "scene_id": "urgency",
+      "start_seconds": 7.0,
+      "timing_warning": null,
+      "transition_note": "Фінальний CTA, дати коротку утримку перед виходом.",
+      "visual_role": "cta",
+      "visual_source": {
+        "path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+        "role": "card_image"
+      }
+    }
+  ],
+  "schema_version": 1,
+  "template_name": "freebie_flash",
+  "title": "Isonzo",
+  "total_duration_seconds": 10.0
+}

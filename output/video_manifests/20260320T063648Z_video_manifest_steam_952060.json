@@ -1,0 +1,391 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+    "card_image": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/header.jpg?t=1768956538",
+    "lead_artwork": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538"
+  },
+  "caption_debug": {
+    "cta": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "fallback_used": false,
+      "near_repeat_relaxed": false,
+      "near_repeat_window_hits": 0,
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "repeat_risk": false,
+      "selected": "Якщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим."
+    },
+    "fallback_used": true,
+    "lane": "high_value_discount",
+    "normalization_applied": {
+      "normalized_dashes": false,
+      "normalized_punctuation_spacing": false,
+      "normalized_whitespace": false,
+      "removed_garbage_unicode": false,
+      "removed_replacement_chars": false
+    },
+    "offer_id": "steam:952060",
+    "opening": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "fallback_used": true,
+      "line": "Йото радить придивитися.",
+      "near_repeat_relaxed": true,
+      "near_repeat_window_hits": 1,
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "repeat_risk": true,
+      "selected": "Йото радить придивитися."
+    },
+    "presence": "direct",
+    "repeat_risk": true,
+    "selected_opener": "Йото радить придивитися.",
+    "style": "recommend",
+    "weird_symbol_detected": false
+  },
+  "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>Resident Evil 3</b></a>\n\nЙото радить придивитися.\n\nТут жанровий акцент чіткий: бойовики, а цінник уже дає привід повернутися.\n\nЗараз <a href=\"https://store.steampowered.com/app/952060/Resident_Evil_3/\"><b>120 грн</b></a> замість 1200 грн; економія 1080 грн.\n\nПропозиція активна просто зараз.\n\n82% позитивних із 103182 оцінок • 32 досягнення • є картки\n\nЯкщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим.\n\n#steam #steamsale",
+  "content_id": "47a46e649f2f330b9feca5e8b5f83fe2df9de4ee2027b4b5c2912951f1eb554a",
+  "content_type": "discount",
+  "context": {
+    "idempotency_key": "47a46e649f2f330b9feca5e8b5f83fe2df9de4ee2027b4b5c2912951f1eb554a",
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "published": true,
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "steam",
+    "store": "Steam",
+    "template_id": "steam_discount",
+    "voice_mode": null
+  },
+  "created_at": "2026-03-20T06:36:48.964284",
+  "cta_line": "Пропозиція активна просто зараз.",
+  "hashtags": [
+    "#steam",
+    "#steamsale"
+  ],
+  "hook_line": "Знижка 90% уже активна.",
+  "manifest_version": 2,
+  "offer_id": "steam:952060",
+  "render_diagnostics": {
+    "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+    "badge_rect": null,
+    "clipped_fields": [],
+    "editorial_phrase": "Trending hit",
+    "gameplay_candidates_count": 1,
+    "gameplay_count": 1,
+    "gameplay_rejected_ui_like": 0,
+    "gameplay_score_summary": [
+      {
+        "aspect_mismatched": false,
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+        "available": true,
+        "banner_like": false,
+        "horizontal_text_block": false,
+        "index": 0,
+        "low_info": true,
+        "meets_gameplay_floor": true,
+        "promotional_layout": false,
+        "rejection_reason": null,
+        "scene_richness_score": 0.35,
+        "score": 72.0,
+        "selected": true,
+        "similar_scene": false,
+        "source_type": "screenshot",
+        "source_types": [
+          "primary_screenshot"
+        ],
+        "steam_ui_like": false,
+        "text_coverage_ratio": 0.171,
+        "text_heavy": false,
+        "ui_like": false,
+        "ui_relaxed_candidate": false
+      }
+    ],
+    "gameplay_selected_count": 1,
+    "gameplay_selection": {
+      "candidates_evaluated": 1,
+      "reason": "selected_primary_frame_fallback",
+      "score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": false,
+          "index": 0,
+          "low_info": true,
+          "meets_gameplay_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "scene_richness_score": 0.35,
+          "score": 72.0,
+          "selected": true,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.171,
+          "text_heavy": false,
+          "ui_like": false,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "selected_count": 1,
+      "selected_urls": [
+        "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538"
+      ],
+      "ui_like_rejected": 0
+    },
+    "gameplay_selection_reason": "selected_primary_frame_fallback",
+    "has_gameplay_strip": true,
+    "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+    "hero_candidates_count": 4,
+    "hero_capsule_rejected": true,
+    "hero_fallback_used": false,
+    "hero_mode": "hero_with_gameplay_strip",
+    "hero_rect": [
+      0,
+      0,
+      1280,
+      468
+    ],
+    "hero_rejected_capsules": [
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/capsule_184x69.jpg?t=1768956538",
+        "reason": "capsule_rejected_text_heavy",
+        "score": -86.18,
+        "source_type": "header"
+      },
+      {
+        "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/952060/capsule_231x87.jpg?t=1768956538",
+        "reason": "capsule_rejected_text_heavy",
+        "score": -113.09,
+        "source_type": "fallback"
+      }
+    ],
+    "hero_score_summary": [
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/header.jpg?t=1768956538",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.302,
+        "entropy_score": 0.903,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": null,
+        "score": -7.73,
+        "selected": false,
+        "source_type": "hero",
+        "source_types": [
+          "hero"
+        ],
+        "subject_detection_score": 0.873,
+        "text_coverage_ratio": 0.679,
+        "ui_heavy": true
+      },
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/capsule_184x69.jpg?t=1768956538",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.266,
+        "entropy_score": 0.932,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "capsule_rejected_text_heavy",
+        "score": -86.18,
+        "selected": false,
+        "source_type": "header",
+        "source_types": [
+          "header"
+        ],
+        "subject_detection_score": 0.806,
+        "text_coverage_ratio": 0.661,
+        "ui_heavy": true
+      },
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.04,
+        "entropy_score": 0.777,
+        "horizontal_text_block": false,
+        "meets_hero_floor": true,
+        "promotional_layout": false,
+        "rejection_reason": null,
+        "score": 123.39,
+        "selected": true,
+        "source_type": "screenshot",
+        "source_types": [
+          "screenshot"
+        ],
+        "subject_detection_score": 0.561,
+        "text_coverage_ratio": 0.171,
+        "ui_heavy": false
+      },
+      {
+        "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/952060/capsule_231x87.jpg?t=1768956538",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.265,
+        "entropy_score": 0.921,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "capsule_rejected_text_heavy",
+        "score": -113.09,
+        "selected": false,
+        "source_type": "fallback",
+        "source_types": [
+          "fallback"
+        ],
+        "subject_detection_score": 0.847,
+        "text_coverage_ratio": 0.729,
+        "ui_heavy": true
+      }
+    ],
+    "hero_selection": {
+      "candidates_evaluated": 4,
+      "fallback_used": false,
+      "reason": "capsule_rejected_text_heavy",
+      "rejected_capsules": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/capsule_184x69.jpg?t=1768956538",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -86.18,
+          "source_type": "header"
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/952060/capsule_231x87.jpg?t=1768956538",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -113.09,
+          "source_type": "fallback"
+        }
+      ],
+      "score_summary": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/header.jpg?t=1768956538",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.302,
+          "entropy_score": 0.903,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": -7.73,
+          "selected": false,
+          "source_type": "hero",
+          "source_types": [
+            "hero"
+          ],
+          "subject_detection_score": 0.873,
+          "text_coverage_ratio": 0.679,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/capsule_184x69.jpg?t=1768956538",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.266,
+          "entropy_score": 0.932,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -86.18,
+          "selected": false,
+          "source_type": "header",
+          "source_types": [
+            "header"
+          ],
+          "subject_detection_score": 0.806,
+          "text_coverage_ratio": 0.661,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.04,
+          "entropy_score": 0.777,
+          "horizontal_text_block": false,
+          "meets_hero_floor": true,
+          "promotional_layout": false,
+          "rejection_reason": null,
+          "score": 123.39,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "screenshot"
+          ],
+          "subject_detection_score": 0.561,
+          "text_coverage_ratio": 0.171,
+          "ui_heavy": false
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/952060/capsule_231x87.jpg?t=1768956538",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.265,
+          "entropy_score": 0.921,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -113.09,
+          "selected": false,
+          "source_type": "fallback",
+          "source_types": [
+            "fallback"
+          ],
+          "subject_detection_score": 0.847,
+          "text_coverage_ratio": 0.729,
+          "ui_heavy": true
+        }
+      ],
+      "selected_source": "screenshot"
+    },
+    "hero_selection_reason": "capsule_rejected_text_heavy",
+    "hero_source_type": "screenshot",
+    "info_rect": [
+      0,
+      462,
+      1280,
+      720
+    ],
+    "layout_variant": "yoto_v4_discount",
+    "render_warnings": [],
+    "renderer_fallback_used": false,
+    "renderer_family": "yoto_v4",
+    "renderer_requested": "yoto_v4",
+    "renderer_selected": "yoto_v4",
+    "template_id": "steam_discount",
+    "title_font_size": null,
+    "title_lines": [
+      "Resident Evil 3"
+    ]
+  },
+  "run_key": "20260320T063648Z",
+  "short_title": "Resident Evil 3",
+  "source_artifact": {
+    "assets_used": [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/header.jpg?t=1768956538",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/capsule_184x69.jpg?t=1768956538",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/952060/ss_77eda710487b89293f109cf7dcf96b4ffab0d1a1.1920x1080.jpg?t=1768956538",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/952060/capsule_231x87.jpg?t=1768956538"
+    ],
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_952060_resident_evil_3.png"
+  },
+  "summary_line": "Resident Evil 3 зараз доступна зі знижкою 90%. Ціна вже виглядає достатньо привабливою, щоб придивитися...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Пропозиція активна просто зараз."
+}

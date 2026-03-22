@@ -1,0 +1,701 @@
+{
+  "context": {
+    "active": true,
+    "active_event_offer_ids": [
+      "event:category:tower_defense"
+    ],
+    "phrase_tokens": [
+      "steam_tower_defense_fest_is_on_now",
+      "tower_defense"
+    ],
+    "sale_event_mode": "auto",
+    "word_tokens": [
+      "defense",
+      "tower"
+    ]
+  },
+  "created_at": "2026-03-10T23:17:20.572346",
+  "metrics": {
+    "dedup.reject.franchise_cooldown": 1,
+    "lane.candidate.backlog_filler": 4,
+    "lane.candidate.breaking_freebie": 2,
+    "lane.candidate.event_festival": 1,
+    "lane.candidate.high_value_discount": 34,
+    "offers.enriched_total": 2003,
+    "offers.ingested_total": 2003,
+    "quality.reject.adult_content": 2,
+    "quality.reject.review_threshold_not_met": 1959,
+    "quality.reject_total": 1961,
+    "queue.depth.planned": 3,
+    "queue.depth.reserve": 18,
+    "sale_event.active_events": 1,
+    "sale_event.context_active": 1,
+    "sale_event.linked_candidates": 1
+  },
+  "planned": [
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "breaking_freebie"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "breaking_freebie",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": true,
+      "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "planned",
+      "score": 189.0,
+      "source": "epic",
+      "title": "Turnip Boy Robs a Bank"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "freebie_backlog"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "breaking_freebie",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:214340",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "planned",
+      "score": 170.0,
+      "source": "steam",
+      "title": "Deponia"
+    },
+    {
+      "bucket": "planned",
+      "decision_reasons": [
+        "event_festival"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": true,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "event_festival",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": true,
+      "offer_id": "event:category:tower_defense",
+      "quality_reasons": [
+        "event_or_freebie"
+      ],
+      "queue_bucket": "planned",
+      "score": 120.0,
+      "source": "event",
+      "title": "Steam Tower Defense Fest is on now!"
+    }
+  ],
+  "planned_count": 3,
+  "reserve": [
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:255710",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 196.23,
+      "source": "steam",
+      "title": "Cities: Skylines"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:413420",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 191.84,
+      "source": "steam",
+      "title": "Danganronpa 2: Goodbye Despair"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:582660",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 189.45,
+      "source": "steam",
+      "title": "Black Desert"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:2698940",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 186.55,
+      "source": "steam",
+      "title": "The Crew Motorfest"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:552520",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 188.96,
+      "source": "steam",
+      "title": "Far Cry® 5"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:646570",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 184.28,
+      "source": "steam",
+      "title": "Slay the Spire"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:47780",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 185.4,
+      "source": "steam",
+      "title": "Dead Space™ 2"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:567640",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 181.76,
+      "source": "steam",
+      "title": "Danganronpa V3: Killing Harmony"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1693980",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 183.34,
+      "source": "steam",
+      "title": "Dead Space"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:394360",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 179.83,
+      "source": "steam",
+      "title": "Hearts of Iron IV"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:548430",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 181.29,
+      "source": "steam",
+      "title": "Deep Rock Galactic"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": true,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:960090",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 178.21,
+      "source": "steam",
+      "title": "Bloons TD 6"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:588650",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 181.05,
+      "source": "steam",
+      "title": "Dead Cells"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:413410",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 175.29,
+      "source": "steam",
+      "title": "Danganronpa: Trigger Happy Havoc"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:312520",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 180.14,
+      "source": "steam",
+      "title": "Rain World"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:3472040",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 168.74,
+      "source": "steam",
+      "title": "NBA 2K26"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1238060",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 178.34,
+      "source": "steam",
+      "title": "Dead Space™ 3"
+    },
+    {
+      "bucket": "reserve",
+      "decision_reasons": [
+        "high_value_discount",
+        "quiet_hours_reserve"
+      ],
+      "dedup_reason": "new_offer",
+      "diversity_constraints": [
+        "source_repeat_no_alternative",
+        "genre_alternation",
+        "franchise_alternation"
+      ],
+      "event_sale_influence": {
+        "active": false,
+        "linked": false,
+        "mode": "auto"
+      },
+      "lane": "high_value_discount",
+      "manual_override": {
+        "forced": false,
+        "reasons": []
+      },
+      "must_ship": false,
+      "offer_id": "steam:1669000",
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "queue_bucket": "reserve",
+      "score": 160.88,
+      "source": "steam",
+      "title": "Age of Wonders 4"
+    }
+  ],
+  "reserve_count": 18,
+  "run_key": "20260310T231720Z"
+}

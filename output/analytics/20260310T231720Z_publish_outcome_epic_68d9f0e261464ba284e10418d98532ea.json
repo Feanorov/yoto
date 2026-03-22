@@ -1,0 +1,62 @@
+{
+  "created_at": "2026-03-10T23:17:20.572346",
+  "image_path": "D:\\Telegram\\output\\cards\\epic_free_epic_68d9f0e261464ba284e10418d98532ea_Turnip_Boy_Robs_a_Bank.png",
+  "lane": "breaking_freebie",
+  "message_id": 163,
+  "offer_id": "epic:68d9f0e261464ba284e10418d98532ea",
+  "publish_outcome": {
+    "message_id": 163,
+    "outbox_status": "published",
+    "published": true,
+    "reason": "published"
+  },
+  "published": true,
+  "reason": "published",
+  "render": {
+    "assets_used": [
+      "https://cdn1.epicgames.com/spt-assets/12f0012342a94c95985afbaa7568b51b/turnip-boy-robs-a-bank-167pk.png",
+      "https://cdn1.epicgames.com/spt-assets/12f0012342a94c95985afbaa7568b51b/turnip-boy-robs-a-bank-167pk.png"
+    ],
+    "caption_hash": "45ebb9e8f3ca030c020d351a1f8fc37d45cd8c2593c3df5f0af2e85292fa58cd",
+    "image_hash": "1236b34d2593bac09129425e1dbd3c2ebdbedb7326e7ab5c9dc0373b46a3949e",
+    "image_path": "D:\\Telegram\\output\\cards\\epic_free_epic_68d9f0e261464ba284e10418d98532ea_Turnip_Boy_Robs_a_Bank.png",
+    "render_diagnostics": {
+      "asset_used": "https://cdn1.epicgames.com/spt-assets/12f0012342a94c95985afbaa7568b51b/turnip-boy-robs-a-bank-167pk.png",
+      "clipped_fields": [
+        "title"
+      ],
+      "render_warnings": [],
+      "template_id": "epic_free",
+      "title_lines": [
+        "Turnip Boy Robs a",
+        "Bank..."
+      ]
+    },
+    "template_id": "epic_free"
+  },
+  "run_key": "20260310T231720Z",
+  "selection": {
+    "decision_reasons": [
+      "breaking_freebie"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "event_sale_influence": {
+      "active": false,
+      "linked": false,
+      "mode": "auto"
+    },
+    "lane": "breaking_freebie",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "score": 189.0,
+    "template_id": "epic_free"
+  },
+  "title": "Turnip Boy Robs a Bank"
+}

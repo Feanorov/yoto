@@ -1,0 +1,74 @@
+{
+  "manifest_version": "top_list_freeze_review_v1",
+  "generated_at": "2026-03-19T23:59:27.672275Z",
+  "baseline_manifest": "D:\\Telegram\\output\\captions\\top_list_freeze_before_20260319T234536Z\\baseline_manifest.json",
+  "output_root": "D:\\Telegram\\output\\captions\\top_list_freeze_review_20260319T235927Z",
+  "entries": [
+    {
+      "slug": "hero_editorial_live",
+      "label": "strong roundup/editorial case",
+      "roundup_id": "roundup_01_big_discount_highlights",
+      "group_type": "hero_discount",
+      "before_signals": {
+        "reserve_mentions": 0,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 1
+      },
+      "after_signals": {
+        "reserve_mentions": 0,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 8
+      },
+      "before_title": "Що взяти зі знижок просто зараз, частина 1",
+      "after_title": "Що взяти зі знижок просто зараз, частина 1",
+      "before_intro": "🐱 Йото витягнув кілька позицій, що не губляться на фоні решти. Тут не весь потік знижок, а верхівка тих позицій, які не губляться навіть на фоні великого сейлу.",
+      "after_intro": "🐱 Йото виніс у добірку тільки ті пропозиції, що тримаються самі по собі. Цю верхівку зібрано як редакторський маршрут по сильних входах у великий сейл.",
+      "before_closing_cta": "Якщо берете щось одне, у цій добірці логічно йти зверху вниз.",
+      "after_closing_cta": "Верхні позиції тут уже відсіяні як головний маршрут по цій добірці."
+    },
+    {
+      "slug": "mixed_dense_live",
+      "label": "denser live roundup case",
+      "roundup_id": "roundup_03_reserve_deals_watch",
+      "group_type": "mixed",
+      "before_signals": {
+        "reserve_mentions": 2,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 2
+      },
+      "after_signals": {
+        "reserve_mentions": 0,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 0
+      },
+      "before_title": "Що ще варте уваги в резерві, частина 1",
+      "after_title": "Що ще варте швидкої перевірки, частина 1",
+      "before_intro": "🐱 Йото зібрав добірку, яку зручно пройти одним заходом. Тут не весь резерв, а короткий список тайтлів, де вже видно нормальний привід для окремої перевірки.",
+      "after_intro": "🐱 Йото склав швидкий список із тих тайтлів, де вибір уже виглядає предметно. Після головних слотів лишається ще кілька позицій, яким варто дати окремий короткий прохід.",
+      "before_closing_cta": "Якщо берете щось одне, верхівка списку тут не випадкова.",
+      "after_closing_cta": "Якщо часу мало, відкрийте перші позиції, а далі вже відсікайте точково."
+    },
+    {
+      "slug": "tag_precision_edge",
+      "label": "edge case",
+      "roundup_id": "fixture_tag_precision_stack",
+      "group_type": "tag",
+      "before_signals": {
+        "reserve_mentions": 0,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 0
+      },
+      "after_signals": {
+        "reserve_mentions": 0,
+        "comment_bait_mentions": 0,
+        "editorial_markers": 4
+      },
+      "before_title": "Co-op: що варте уваги",
+      "after_title": "Co-op: короткий редакторський список",
+      "before_intro": "🐱 Йото відфільтрував короткий список сильних пропозицій. Тема Co-op тут зведена в один список, щоб швидко глянути найробочіші варіанти.",
+      "after_intro": "🐱 Йото зібрав верхівку з того, що справді варте окремого відкриття. Це редакторська добірка по Co-op, яку зручно пройти одним заходом і швидко відсікти своє.",
+      "before_closing_cta": "Якщо тема ваша, цей список зручно пройти одним заходом і відсіяти зайве.",
+      "after_closing_cta": "Якщо тема ваша, йдіть зверху вниз і лишайте тільки ті сторінки, що реально потрапляють у смак."
+    }
+  ]
+}

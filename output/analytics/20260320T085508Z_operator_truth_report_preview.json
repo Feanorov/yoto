@@ -1,0 +1,2253 @@
+{
+  "created_at": "2026-03-20T08:55:08.126787",
+  "diagnostics": {
+    "context": {
+      "active": false,
+      "active_event_offer_ids": [],
+      "ingest_sources": {
+        "epic": {
+          "offers": 2,
+          "raw_offers": 12,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_auto": {
+          "offers": 0,
+          "raw_offers": 0,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_calendar": {
+          "offers": 0,
+          "reason": "healthy",
+          "status": "healthy"
+        },
+        "events_deduped": {
+          "offers": 0,
+          "raw_offers": 0,
+          "reason": "deduped",
+          "status": "healthy"
+        },
+        "steam": {
+          "details": {
+            "degraded_until": null,
+            "mode": "healthy",
+            "reason": "healthy",
+            "recent_429_count": 0,
+            "slowdown_multiplier": 1.0
+          },
+          "offers": 2000,
+          "reason": "healthy",
+          "status": "healthy"
+        }
+      },
+      "queue_snapshot_at": "2026-03-20T08:55:08",
+      "sale_event_mode": "auto",
+      "selection_summary": {
+        "capacity_hold": 6,
+        "hard_suppress": 1972,
+        "roundup_candidate": 16,
+        "solo_post": 8
+      },
+      "source": "current_queue"
+    },
+    "created_at": "2026-03-20T08:55:08.126787",
+    "empty_window": false,
+    "fatal_ingest": false,
+    "ingest": {
+      "enriched_total": 2002,
+      "ingested_total": 2002,
+      "metrics_available": true
+    },
+    "metrics": {
+      "dedup.reject.franchise_cooldown": 1,
+      "lane.candidate.backlog_filler": 6,
+      "lane.candidate.high_value_discount": 24,
+      "offers.enriched_total": 2002,
+      "offers.ingested.source.epic": 2,
+      "offers.ingested.source.events_auto": 0,
+      "offers.ingested.source.events_calendar": 0,
+      "offers.ingested.source.events_deduped": 0,
+      "offers.ingested.source.steam": 2000,
+      "offers.ingested_total": 2002,
+      "quality.reject.adult_content": 11,
+      "quality.reject.review_threshold_not_met": 1960,
+      "quality.reject_total": 1971,
+      "queue.depth.planned": 8,
+      "queue.depth.reserve": 16,
+      "selection.accepted_total": 30,
+      "selection.capacity_hold": 6,
+      "selection.hard_suppress": 1972,
+      "selection.hero_discount_bonus_slots": 2,
+      "selection.roundup_candidate": 16,
+      "selection.solo_post": 8
+    },
+    "pipeline_action": "evaluation_only",
+    "planner_window": {
+      "empty": false,
+      "planned_count": 8,
+      "reserve_count": 16
+    },
+    "publish": {},
+    "reasons": [],
+    "run_key": "20260320T085508Z",
+    "should_stop_pipeline": false,
+    "status": "healthy"
+  },
+  "ingest_sources": {
+    "epic": {
+      "offers": 2,
+      "raw_offers": 12,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_auto": {
+      "offers": 0,
+      "raw_offers": 0,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_calendar": {
+      "offers": 0,
+      "reason": "healthy",
+      "status": "healthy"
+    },
+    "events_deduped": {
+      "offers": 0,
+      "raw_offers": 0,
+      "reason": "deduped",
+      "status": "healthy"
+    },
+    "steam": {
+      "details": {
+        "degraded_until": null,
+        "mode": "healthy",
+        "reason": "healthy",
+        "recent_429_count": 0,
+        "slowdown_multiplier": 1.0
+      },
+      "offers": 2000,
+      "reason": "healthy",
+      "status": "healthy"
+    }
+  },
+  "mode": "preview",
+  "offline_snapshot": {
+    "base_db_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085508Z\\dealbot.sqlite3",
+    "manifest_path": "D:\\Telegram\\output\\offline_validation\\snapshots\\20260320T085508Z\\snapshot_manifest.json",
+    "planned_count": 8,
+    "quality": {
+      "archive_posts_total": 8,
+      "artifact_rich": true,
+      "asset_localization_localized_total": 94,
+      "asset_localization_unresolved_remote": 0,
+      "blocking_reasons": [],
+      "captions_offline_ready": true,
+      "cards_offline_ready": true,
+      "golden_eligible": true,
+      "planned_rows_total": 8,
+      "planned_rows_with_local_assets": 8,
+      "planned_rows_without_local_assets": 0,
+      "publishable_planned_rows_total": 8,
+      "quality_version": 1,
+      "queue_rows_total": 24,
+      "reserve_rows_total": 16,
+      "reserve_rows_with_local_assets": 16,
+      "reserve_rows_without_local_assets": 0,
+      "roundup_snapshots_missing_local_cards": 10,
+      "roundup_snapshots_total": 20,
+      "roundup_snapshots_with_local_cards": 10,
+      "send_test_offline_ready": true,
+      "usable_for_send_test_offline": true,
+      "warnings": [
+        "roundup_card_assets_missing"
+      ]
+    },
+    "reserve_count": 16,
+    "run_key": "20260320T085508Z",
+    "snapshot_role": "candidate"
+  },
+  "queue": {
+    "buckets": {
+      "planned": {
+        "by_family": {
+          "discount": 8
+        },
+        "by_lane": {
+          "high_value_discount": 8
+        },
+        "by_source": {
+          "steam": 8
+        },
+        "rows": [
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1426210",
+            "recommended_post_mode": "solo_post",
+            "score": 276.85,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "It Takes Two"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:227300",
+            "recommended_post_mode": "solo_post",
+            "score": 271.23,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Euro Truck Simulator 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1174180",
+            "recommended_post_mode": "solo_post",
+            "score": 275.2,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Red Dead Redemption 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:413150",
+            "recommended_post_mode": "solo_post",
+            "score": 268.55,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Stardew Valley"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:105600",
+            "recommended_post_mode": "solo_post",
+            "score": 268.63,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Terraria"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:281990",
+            "recommended_post_mode": "solo_post",
+            "score": 255.91,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Stellaris"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1774580",
+            "recommended_post_mode": "solo_post",
+            "score": 253.76,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "STAR WARS Jedi: Survivor™"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:108600",
+            "recommended_post_mode": "solo_post",
+            "score": 230.55,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Project Zomboid"
+          }
+        ],
+        "total": 8
+      },
+      "reserve": {
+        "by_family": {
+          "discount": 14,
+          "freebie": 2
+        },
+        "by_lane": {
+          "backlog_filler": 6,
+          "high_value_discount": 10
+        },
+        "by_source": {
+          "epic": 2,
+          "steam": 14
+        },
+        "rows": [
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1326470",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 248.96,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Sons Of The Forest"
+          },
+          {
+            "content_family": "freebie",
+            "lane": "backlog_filler",
+            "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 154.75,
+            "source": "epic",
+            "template_id": "epic_free",
+            "title": "Electrician Simulator"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1245620",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 245.51,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "ELDEN RING"
+          },
+          {
+            "content_family": "freebie",
+            "lane": "backlog_filler",
+            "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 154.75,
+            "source": "epic",
+            "template_id": "epic_free",
+            "title": "World of Warships — набір Tachibana до річниці в Epic"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:814380",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 245.42,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Sekiro™: Shadows Die Twice - GOTY Edition"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:648800",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 226.72,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Raft"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:3240220",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 244.73,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Grand Theft Auto V Enhanced"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:3472040",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 192.49,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "NBA 2K26"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:2592160",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 240.98,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Dispatch"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:2253100",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 101.53,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Everwind"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:252490",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 234.91,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Rust"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:2651280",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 122.82,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Marvel's Spider-Man 2"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:2001120",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 234.05,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Split Fiction"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:949230",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 115.82,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Cities: Skylines II"
+          },
+          {
+            "content_family": "discount",
+            "lane": "high_value_discount",
+            "offer_id": "steam:1551360",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 233.97,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Forza Horizon 5"
+          },
+          {
+            "content_family": "discount",
+            "lane": "backlog_filler",
+            "offer_id": "steam:3552140",
+            "recommended_post_mode": "roundup_candidate",
+            "score": 109.1,
+            "source": "steam",
+            "template_id": "steam_discount",
+            "title": "Retro Rewind - Video Store Simulator"
+          }
+        ],
+        "total": 16
+      }
+    },
+    "deferred_total": 6
+  },
+  "run_key": "20260320T085508Z",
+  "scope": "live",
+  "selection": {
+    "allow_reserve": true,
+    "blocked_candidates": [
+      {
+        "blocker_detail": "held_healthy",
+        "blocker_reason": "controlled_reserve_release_held",
+        "bucket": "reserve",
+        "content_family": "freebie",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "freebie_roundup_candidate",
+          "freebie_source:epic",
+          "freebie_meaningful_value",
+          "freebie_card_ready",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "epic:b3d56c3e27fc4816bf6cc0cefecd4948",
+        "publish_priority": {},
+        "quality_reasons": [
+          "event_or_freebie"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 692,
+        "score": 154.75,
+        "selected": false,
+        "source": "epic",
+        "store_url": "https://store.epicgames.com/uk/p/electrician-simulator-164e9f",
+        "template_id": "epic_free",
+        "title": "Electrician Simulator",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "held_healthy",
+        "blocker_reason": "controlled_reserve_release_held",
+        "bucket": "reserve",
+        "content_family": "freebie",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "freebie_roundup_candidate",
+          "freebie_source:epic",
+          "freebie_meaningful_value",
+          "freebie_card_ready",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "backlog_filler",
+        "offer_id": "epic:d3b29bd0dac74187970db0d79bf4b18e",
+        "publish_priority": {},
+        "quality_reasons": [
+          "event_or_freebie"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 694,
+        "score": 154.75,
+        "selected": false,
+        "source": "epic",
+        "store_url": "https://store.epicgames.com/uk/p/world-of-warships",
+        "template_id": "epic_free",
+        "title": "World of Warships — набір Tachibana до річниці в Epic",
+        "total_priority": null
+      },
+      {
+        "blocker_detail": "held_healthy",
+        "blocker_reason": "controlled_reserve_release_held",
+        "bucket": "reserve",
+        "content_family": "roundup",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "roundup_digest",
+          "roundup_publish_candidate"
+        ],
+        "editorial_adjustment": {},
+        "eligible": false,
+        "lane": "roundup_digest",
+        "offer_id": "roundup:roundup_02_big_discount_highlights",
+        "publish_priority": {},
+        "quality_reasons": [
+          "roundup_artifact_ready"
+        ],
+        "recommended_post_mode": "roundup",
+        "row_id": 707,
+        "score": 234.91,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/252490/Rust/",
+        "template_id": "roundup_digest",
+        "title": "Roundup: Big Discount Highlights",
+        "total_priority": null
+      }
+    ],
+    "blocked_candidates_total": 3,
+    "blocker_detail": null,
+    "blocker_reason": null,
+    "eligible_candidates": [
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 592.85,
+          "content_type": "discount",
+          "final_total": 574.85,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1426210",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 276.85,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 592.85,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 683,
+        "score": 276.85,
+        "selected": true,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+        "template_id": "steam_discount",
+        "title": "It Takes Two",
+        "total_priority": 574.85
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 591.2,
+          "content_type": "discount",
+          "final_total": 573.2,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1174180",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 275.2,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 591.2,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 685,
+        "score": 275.2,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1174180/Red_Dead_Redemption_2/",
+        "template_id": "steam_discount",
+        "title": "Red Dead Redemption 2",
+        "total_priority": 573.2
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 587.23,
+          "content_type": "discount",
+          "final_total": 569.23,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:227300",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 271.23,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 587.23,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 684,
+        "score": 271.23,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/",
+        "template_id": "steam_discount",
+        "title": "Euro Truck Simulator 2",
+        "total_priority": 569.23
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 584.63,
+          "content_type": "discount",
+          "final_total": 566.63,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:105600",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 268.63,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 584.63,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 687,
+        "score": 268.63,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/105600/Terraria/",
+        "template_id": "steam_discount",
+        "title": "Terraria",
+        "total_priority": 566.63
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 584.55,
+          "content_type": "discount",
+          "final_total": 566.55,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:413150",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 268.55,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 584.55,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 686,
+        "score": 268.55,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/413150/Stardew_Valley/",
+        "template_id": "steam_discount",
+        "title": "Stardew Valley",
+        "total_priority": 566.55
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 571.91,
+          "content_type": "discount",
+          "final_total": 553.91,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:281990",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 255.91,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 571.91,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 688,
+        "score": 255.91,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/281990/Stellaris/",
+        "template_id": "steam_discount",
+        "title": "Stellaris",
+        "total_priority": 553.91
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:very_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 569.76,
+          "content_type": "discount",
+          "final_total": 551.76,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1774580",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 253.76,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 569.76,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 689,
+        "score": 253.76,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1774580/STAR_WARS_Jedi_Survivor/",
+        "template_id": "steam_discount",
+        "title": "STAR WARS Jedi: Survivor™",
+        "total_priority": 551.76
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "planned",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 546.55,
+          "content_type": "discount",
+          "final_total": 528.55,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:108600",
+        "publish_priority": {
+          "bucket": "planned",
+          "decision_score": 230.55,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 0.0,
+          "total": 546.55,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "solo_post",
+        "row_id": 690,
+        "score": 230.55,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/108600/Project_Zomboid/",
+        "template_id": "steam_discount",
+        "title": "Project Zomboid",
+        "total_priority": 528.55
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 534.96,
+          "content_type": "discount",
+          "final_total": 516.96,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1326470",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 248.96,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 534.96,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 691,
+        "score": 248.96,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1326470/Sons_Of_The_Forest/",
+        "template_id": "steam_discount",
+        "title": "Sons Of The Forest",
+        "total_priority": 516.96
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 531.51,
+          "content_type": "discount",
+          "final_total": 513.51,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1245620",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 245.51,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 531.51,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 693,
+        "score": 245.51,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1245620/ELDEN_RING/",
+        "template_id": "steam_discount",
+        "title": "ELDEN RING",
+        "total_priority": 513.51
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 531.42,
+          "content_type": "discount",
+          "final_total": 513.42,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:814380",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 245.42,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 531.42,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 695,
+        "score": 245.42,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/814380/Sekiro_Shadows_Die_Twice__GOTY_Edition/",
+        "template_id": "steam_discount",
+        "title": "Sekiro™: Shadows Die Twice - GOTY Edition",
+        "total_priority": 513.42
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:standout_title",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 530.73,
+          "content_type": "discount",
+          "final_total": 512.73,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:3240220",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 244.73,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 530.73,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 697,
+        "score": 244.73,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/3240220/Grand_Theft_Auto_V_Enhanced/",
+        "template_id": "steam_discount",
+        "title": "Grand Theft Auto V Enhanced",
+        "total_priority": 512.73
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:major_franchise",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 526.98,
+          "content_type": "discount",
+          "final_total": 508.98,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:2592160",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 240.98,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 526.98,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 699,
+        "score": 240.98,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2592160/Dispatch/",
+        "template_id": "steam_discount",
+        "title": "Dispatch",
+        "total_priority": 508.98
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 520.91,
+          "content_type": "discount",
+          "final_total": 502.91,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:252490",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 234.91,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 520.91,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 701,
+        "score": 234.91,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/252490/Rust/",
+        "template_id": "steam_discount",
+        "title": "Rust",
+        "total_priority": 502.91
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:critical_favorite",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 520.05,
+          "content_type": "discount",
+          "final_total": 502.05,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:2001120",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 234.05,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 520.05,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 703,
+        "score": 234.05,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2001120/Split_Fiction/",
+        "template_id": "steam_discount",
+        "title": "Split Fiction",
+        "total_priority": 502.05
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 519.97,
+          "content_type": "discount",
+          "final_total": 501.97,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:1551360",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 233.97,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 519.97,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 705,
+        "score": 233.97,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/1551360/Forza_Horizon_5/",
+        "template_id": "steam_discount",
+        "title": "Forza Horizon 5",
+        "total_priority": 501.97
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "hero_discount",
+          "editorial_importance:mega_popular",
+          "editorial_importance:highly_rated",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 512.72,
+          "content_type": "discount",
+          "final_total": 494.72,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:648800",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 226.72,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 512.72,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 696,
+        "score": 226.72,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/648800/Raft/",
+        "template_id": "steam_discount",
+        "title": "Raft",
+        "total_priority": 494.72
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "high_value_discount",
+          "strong_discount",
+          "editorial_importance:major_franchise",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 478.49,
+          "content_type": "discount",
+          "final_total": 460.49,
+          "reasons": [
+            "same_lane_repeat_penalty"
+          ],
+          "rule_deltas": {
+            "same_lane_repeat_penalty": -18.0
+          },
+          "total_delta": -18.0
+        },
+        "eligible": true,
+        "lane": "high_value_discount",
+        "offer_id": "steam:3472040",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 192.49,
+          "lane": "high_value_discount",
+          "lane_priority": 340.0,
+          "lane_repeat_penalty": 24.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 478.49,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 698,
+        "score": 192.49,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/3472040/NBA_2K26/",
+        "template_id": "steam_discount",
+        "title": "NBA 2K26",
+        "total_priority": 460.49
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 332.82,
+          "content_type": "discount",
+          "final_total": 332.82,
+          "reasons": [],
+          "rule_deltas": {},
+          "total_delta": 0.0
+        },
+        "eligible": true,
+        "lane": "backlog_filler",
+        "offer_id": "steam:2651280",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 122.82,
+          "lane": "backlog_filler",
+          "lane_priority": 240.0,
+          "lane_repeat_penalty": 0.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 332.82,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 702,
+        "score": 122.82,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2651280/Marvels_SpiderMan_2/",
+        "template_id": "steam_discount",
+        "title": "Marvel's Spider-Man 2",
+        "total_priority": 332.82
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:very_popular",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 325.82,
+          "content_type": "discount",
+          "final_total": 325.82,
+          "reasons": [],
+          "rule_deltas": {},
+          "total_delta": 0.0
+        },
+        "eligible": true,
+        "lane": "backlog_filler",
+        "offer_id": "steam:949230",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 115.82,
+          "lane": "backlog_filler",
+          "lane_priority": 240.0,
+          "lane_repeat_penalty": 0.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 325.82,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 704,
+        "score": 115.82,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/949230/Cities_Skylines_II/",
+        "template_id": "steam_discount",
+        "title": "Cities: Skylines II",
+        "total_priority": 325.82
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 319.1,
+          "content_type": "discount",
+          "final_total": 319.1,
+          "reasons": [],
+          "rule_deltas": {},
+          "total_delta": 0.0
+        },
+        "eligible": true,
+        "lane": "backlog_filler",
+        "offer_id": "steam:3552140",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 109.1,
+          "lane": "backlog_filler",
+          "lane_priority": 240.0,
+          "lane_repeat_penalty": 0.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 319.1,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 706,
+        "score": 109.1,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/3552140/Retro_Rewind__Video_Store_Simulator/",
+        "template_id": "steam_discount",
+        "title": "Retro Rewind - Video Store Simulator",
+        "total_priority": 319.1
+      },
+      {
+        "blocker_detail": null,
+        "blocker_reason": null,
+        "bucket": "reserve",
+        "content_family": "discount",
+        "created_at": "2026-03-20T08:55:08",
+        "decision_reasons": [
+          "backlog_filler",
+          "mid_discount",
+          "editorial_importance:card_ready"
+        ],
+        "editorial_adjustment": {
+          "base_total": 311.53,
+          "content_type": "discount",
+          "final_total": 311.53,
+          "reasons": [],
+          "rule_deltas": {},
+          "total_delta": 0.0
+        },
+        "eligible": true,
+        "lane": "backlog_filler",
+        "offer_id": "steam:2253100",
+        "publish_priority": {
+          "bucket": "reserve",
+          "decision_score": 101.53,
+          "lane": "backlog_filler",
+          "lane_priority": 240.0,
+          "lane_repeat_penalty": 0.0,
+          "manual_override_bonus": 0.0,
+          "must_ship_bonus": 0.0,
+          "reserve_penalty": 30.0,
+          "total": 311.53,
+          "urgency_bonus": 0.0
+        },
+        "quality_reasons": [
+          "review_threshold"
+        ],
+        "recommended_post_mode": "roundup_candidate",
+        "row_id": 700,
+        "score": 101.53,
+        "selected": false,
+        "source": "steam",
+        "store_url": "https://store.steampowered.com/app/2253100/Everwind/",
+        "template_id": "steam_discount",
+        "title": "Everwind",
+        "total_priority": 311.53
+      }
+    ],
+    "eligible_candidates_total": 22,
+    "planned_total": 8,
+    "quiet_hours": false,
+    "reserve_release_reason": "held_healthy",
+    "reserve_total": 16,
+    "roundup_injection": {
+      "attempted": true,
+      "json_path": "D:\\Telegram\\output\\analytics\\20260320T085508Z_roundup_snapshot_roundups.json",
+      "lookup_mode": "strict",
+      "queue_snapshot_at": "2026-03-20T08:55:08",
+      "reason": "controlled_reserve_release_held",
+      "release_status": "held",
+      "roundup_id": "roundup_02_big_discount_highlights",
+      "roundup_run_key": "20260320T085508Z",
+      "status": "held",
+      "strict_rejection_reason": null
+    },
+    "selected_candidate": {
+      "blocker_detail": null,
+      "blocker_reason": null,
+      "bucket": "planned",
+      "content_family": "discount",
+      "created_at": "2026-03-20T08:55:08",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "editorial_adjustment": {
+        "base_total": 592.85,
+        "content_type": "discount",
+        "final_total": 574.85,
+        "reasons": [
+          "same_lane_repeat_penalty"
+        ],
+        "rule_deltas": {
+          "same_lane_repeat_penalty": -18.0
+        },
+        "total_delta": -18.0
+      },
+      "eligible": true,
+      "lane": "high_value_discount",
+      "offer_id": "steam:1426210",
+      "publish_priority": {
+        "bucket": "planned",
+        "decision_score": 276.85,
+        "lane": "high_value_discount",
+        "lane_priority": 340.0,
+        "lane_repeat_penalty": 24.0,
+        "manual_override_bonus": 0.0,
+        "must_ship_bonus": 0.0,
+        "reserve_penalty": 0.0,
+        "total": 592.85,
+        "urgency_bonus": 0.0
+      },
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "recommended_post_mode": "solo_post",
+      "row_id": 683,
+      "score": 276.85,
+      "selected": true,
+      "source": "steam",
+      "store_url": "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+      "template_id": "steam_discount",
+      "title": "It Takes Two",
+      "total_priority": 574.85
+    },
+    "visible_reserve_total": 14
+  },
+  "send_test_target": {
+    "artifact": {
+      "assets_used": [
+        "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+        "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+        "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+        "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+        "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491"
+      ],
+      "caption_debug": {
+        "cta": {
+          "anti_repeat_relaxed": false,
+          "anti_repeat_window": 4,
+          "fallback_used": false,
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "pool_size": 3,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "repeat_risk": false,
+          "selected": "Це вже схоже на той цінник, після якого рішення стає помітно простішим."
+        },
+        "fallback_used": true,
+        "lane": "high_value_discount",
+        "normalization_applied": {
+          "normalized_dashes": false,
+          "normalized_punctuation_spacing": false,
+          "normalized_whitespace": false,
+          "removed_garbage_unicode": false,
+          "removed_replacement_chars": false
+        },
+        "offer_id": "steam:1426210",
+        "opening": {
+          "anti_repeat_relaxed": false,
+          "anti_repeat_window": 4,
+          "fallback_used": false,
+          "line": "Йото радить не проходити повз.",
+          "near_repeat_relaxed": false,
+          "near_repeat_window_hits": 0,
+          "pool_size": 3,
+          "recent_repeat_count": 0,
+          "recent_window_repeat_count": 0,
+          "repeat_risk": false,
+          "selected": "Йото радить не проходити повз."
+        },
+        "presence": "direct",
+        "repeat_risk": false,
+        "selected_opener": "Йото радить не проходити повз.",
+        "style": "recommend",
+        "weird_symbol_detected": false
+      },
+      "caption_hash": "8a450c657a6fe688f3719b7e69feb5742203d32a55a91799becf716ab0e42024",
+      "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>It Takes Two</b></a>\n\nЙото радить не проходити повз.\n\nТут жанровий акцент чіткий: бойовики та пригоди, а цінник уже дає привід повернутися.\n\nЗараз <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>199 грн</b></a> замість 999 грн; економія 800 грн.\n\nПропозиція активна просто зараз.\n\n95% позитивних із 254622 оцінок • 20 досягнень • є картки\n\nЦе вже схоже на той цінник, після якого рішення стає помітно простішим.\n\n#steam #steamsale",
+      "caption_length": 524,
+      "caption_preview": "🔥 <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>It Takes Two</b></a> Йото радить не проходити повз. Тут жанровий акцент чіткий: бойовики та пригоди, а цінник уже дає привід повернутися. Зараз <...",
+      "card_family": "DISCOUNT",
+      "idempotency_key": "17eceabac0b6c62a922e6f690a6a156d4f3f1217875832319f4a6a273537d13e",
+      "image_hash": "2ba736a4d2b8d714fec4b151054d3a7cf1bd741f34cb256712846180dcb30d09",
+      "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+      "offer_id": "steam:1426210",
+      "render_diagnostics": {
+        "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+        "badge_rect": null,
+        "clipped_fields": [],
+        "editorial_phrase": "Co-op favorite",
+        "gameplay_candidates_count": 2,
+        "gameplay_count": 0,
+        "gameplay_rejected_ui_like": 2,
+        "gameplay_score_summary": [
+          {
+            "aspect_mismatched": false,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 0,
+            "low_info": false,
+            "meets_gameplay_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": "primary_hero_excluded",
+            "scene_richness_score": 0.715,
+            "score": 52.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "screenshot",
+            "source_types": [
+              "primary_screenshot"
+            ],
+            "steam_ui_like": false,
+            "text_coverage_ratio": 0.735,
+            "text_heavy": false,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          },
+          {
+            "aspect_mismatched": false,
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "horizontal_text_block": true,
+            "index": 1,
+            "low_info": false,
+            "meets_gameplay_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "marketing_frame",
+            "scene_richness_score": 0.834,
+            "score": 22.0,
+            "selected": false,
+            "similar_scene": false,
+            "source_type": "gameplay_media",
+            "source_types": [
+              "media_still"
+            ],
+            "steam_ui_like": true,
+            "text_coverage_ratio": 0.826,
+            "text_heavy": true,
+            "ui_like": true,
+            "ui_relaxed_candidate": false
+          }
+        ],
+        "gameplay_selected_count": 0,
+        "gameplay_selection": {
+          "candidates_evaluated": 2,
+          "reason": "hero_only_frame_available",
+          "score_summary": [
+            {
+              "aspect_mismatched": false,
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "horizontal_text_block": true,
+              "index": 0,
+              "low_info": false,
+              "meets_gameplay_floor": true,
+              "promotional_layout": true,
+              "rejection_reason": "primary_hero_excluded",
+              "scene_richness_score": 0.715,
+              "score": 52.0,
+              "selected": false,
+              "similar_scene": false,
+              "source_type": "screenshot",
+              "source_types": [
+                "primary_screenshot"
+              ],
+              "steam_ui_like": false,
+              "text_coverage_ratio": 0.735,
+              "text_heavy": false,
+              "ui_like": true,
+              "ui_relaxed_candidate": false
+            },
+            {
+              "aspect_mismatched": false,
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "horizontal_text_block": true,
+              "index": 1,
+              "low_info": false,
+              "meets_gameplay_floor": false,
+              "promotional_layout": true,
+              "rejection_reason": "marketing_frame",
+              "scene_richness_score": 0.834,
+              "score": 22.0,
+              "selected": false,
+              "similar_scene": false,
+              "source_type": "gameplay_media",
+              "source_types": [
+                "media_still"
+              ],
+              "steam_ui_like": true,
+              "text_coverage_ratio": 0.826,
+              "text_heavy": true,
+              "ui_like": true,
+              "ui_relaxed_candidate": false
+            }
+          ],
+          "selected_count": 0,
+          "selected_urls": [],
+          "ui_like_rejected": 2
+        },
+        "gameplay_selection_reason": "hero_only_frame_available",
+        "has_gameplay_strip": false,
+        "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+        "hero_candidates_count": 4,
+        "hero_capsule_rejected": true,
+        "hero_fallback_used": false,
+        "hero_mode": "hero_only",
+        "hero_rect": [
+          0,
+          0,
+          1280,
+          468
+        ],
+        "hero_rejected_capsules": [
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+            "reason": "capsule_rejected_text_heavy",
+            "score": -50.67,
+            "source_type": "header"
+          },
+          {
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+            "reason": "capsule_rejected_text_heavy",
+            "score": -76.8,
+            "source_type": "fallback"
+          }
+        ],
+        "hero_score_summary": [
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.949,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 30.21,
+            "selected": false,
+            "source_type": "hero",
+            "source_types": [
+              "hero"
+            ],
+            "subject_detection_score": 0.908,
+            "text_coverage_ratio": 0.903,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.837,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "capsule_rejected_text_heavy",
+            "score": -50.67,
+            "selected": false,
+            "source_type": "header",
+            "source_types": [
+              "header"
+            ],
+            "subject_detection_score": 0.82,
+            "text_coverage_ratio": 0.859,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.62,
+            "entropy_score": 0.988,
+            "horizontal_text_block": true,
+            "meets_hero_floor": true,
+            "promotional_layout": true,
+            "rejection_reason": null,
+            "score": 106.55,
+            "selected": true,
+            "source_type": "screenshot",
+            "source_types": [
+              "screenshot"
+            ],
+            "subject_detection_score": 0.643,
+            "text_coverage_ratio": 0.735,
+            "ui_heavy": true
+          },
+          {
+            "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+            "available": true,
+            "banner_like": false,
+            "brightness_score": 0.834,
+            "entropy_score": 1.0,
+            "horizontal_text_block": true,
+            "meets_hero_floor": false,
+            "promotional_layout": true,
+            "rejection_reason": "capsule_rejected_text_heavy",
+            "score": -76.8,
+            "selected": false,
+            "source_type": "fallback",
+            "source_types": [
+              "fallback"
+            ],
+            "subject_detection_score": 0.884,
+            "text_coverage_ratio": 0.904,
+            "ui_heavy": true
+          }
+        ],
+        "hero_selection": {
+          "candidates_evaluated": 4,
+          "fallback_used": false,
+          "reason": "capsule_rejected_text_heavy",
+          "rejected_capsules": [
+            {
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+              "reason": "capsule_rejected_text_heavy",
+              "score": -50.67,
+              "source_type": "header"
+            },
+            {
+              "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+              "reason": "capsule_rejected_text_heavy",
+              "score": -76.8,
+              "source_type": "fallback"
+            }
+          ],
+          "score_summary": [
+            {
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "brightness_score": 0.949,
+              "entropy_score": 1.0,
+              "horizontal_text_block": true,
+              "meets_hero_floor": false,
+              "promotional_layout": true,
+              "rejection_reason": null,
+              "score": 30.21,
+              "selected": false,
+              "source_type": "hero",
+              "source_types": [
+                "hero"
+              ],
+              "subject_detection_score": 0.908,
+              "text_coverage_ratio": 0.903,
+              "ui_heavy": true
+            },
+            {
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "brightness_score": 0.837,
+              "entropy_score": 1.0,
+              "horizontal_text_block": true,
+              "meets_hero_floor": false,
+              "promotional_layout": true,
+              "rejection_reason": "capsule_rejected_text_heavy",
+              "score": -50.67,
+              "selected": false,
+              "source_type": "header",
+              "source_types": [
+                "header"
+              ],
+              "subject_detection_score": 0.82,
+              "text_coverage_ratio": 0.859,
+              "ui_heavy": true
+            },
+            {
+              "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "brightness_score": 0.62,
+              "entropy_score": 0.988,
+              "horizontal_text_block": true,
+              "meets_hero_floor": true,
+              "promotional_layout": true,
+              "rejection_reason": null,
+              "score": 106.55,
+              "selected": true,
+              "source_type": "screenshot",
+              "source_types": [
+                "screenshot"
+              ],
+              "subject_detection_score": 0.643,
+              "text_coverage_ratio": 0.735,
+              "ui_heavy": true
+            },
+            {
+              "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+              "available": true,
+              "banner_like": false,
+              "brightness_score": 0.834,
+              "entropy_score": 1.0,
+              "horizontal_text_block": true,
+              "meets_hero_floor": false,
+              "promotional_layout": true,
+              "rejection_reason": "capsule_rejected_text_heavy",
+              "score": -76.8,
+              "selected": false,
+              "source_type": "fallback",
+              "source_types": [
+                "fallback"
+              ],
+              "subject_detection_score": 0.884,
+              "text_coverage_ratio": 0.904,
+              "ui_heavy": true
+            }
+          ],
+          "selected_source": "screenshot"
+        },
+        "hero_selection_reason": "capsule_rejected_text_heavy",
+        "hero_source_type": "screenshot",
+        "info_rect": [
+          0,
+          462,
+          1280,
+          720
+        ],
+        "layout_variant": "yoto_v4_discount",
+        "render_warnings": [],
+        "renderer_fallback_used": false,
+        "renderer_family": "yoto_v4",
+        "renderer_requested": "yoto_v4",
+        "renderer_selected": "yoto_v4",
+        "template_id": "steam_discount",
+        "title_font_size": null,
+        "title_lines": [
+          "It Takes Two"
+        ]
+      },
+      "template_id": "steam_discount"
+    },
+    "blocker_category": null,
+    "blocker_detail": null,
+    "blocker_reason": null,
+    "candidate": {
+      "blocker_detail": null,
+      "blocker_reason": null,
+      "bucket": "planned",
+      "content_family": "discount",
+      "created_at": "2026-03-20T08:55:08",
+      "decision_reasons": [
+        "high_value_discount",
+        "hero_discount",
+        "editorial_importance:mega_popular",
+        "editorial_importance:critical_favorite",
+        "editorial_importance:card_ready"
+      ],
+      "editorial_adjustment": {
+        "base_total": 592.85,
+        "content_type": "discount",
+        "final_total": 574.85,
+        "reasons": [
+          "same_lane_repeat_penalty"
+        ],
+        "rule_deltas": {
+          "same_lane_repeat_penalty": -18.0
+        },
+        "total_delta": -18.0
+      },
+      "eligible": true,
+      "lane": "high_value_discount",
+      "offer_id": "steam:1426210",
+      "publish_priority": {
+        "bucket": "planned",
+        "decision_score": 276.85,
+        "lane": "high_value_discount",
+        "lane_priority": 340.0,
+        "lane_repeat_penalty": 24.0,
+        "manual_override_bonus": 0.0,
+        "must_ship_bonus": 0.0,
+        "reserve_penalty": 0.0,
+        "total": 592.85,
+        "urgency_bonus": 0.0
+      },
+      "quality_reasons": [
+        "review_threshold"
+      ],
+      "recommended_post_mode": "solo_post",
+      "row_id": 683,
+      "score": 276.85,
+      "selected": true,
+      "source": "steam",
+      "store_url": "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+      "template_id": "steam_discount",
+      "title": "It Takes Two",
+      "total_priority": 574.85
+    },
+    "outbox_message_id": null,
+    "outbox_status": null,
+    "truth_ready": true,
+    "would_send": true
+  },
+  "telegram": {
+    "channel": "@yotoua",
+    "configured": true,
+    "delivery_attempted": false,
+    "delivery_verified": false,
+    "outbox": null,
+    "publish_result": null
+  },
+  "verdict": {
+    "blocker_category": null,
+    "blocker_detail": null,
+    "blocker_reason": null,
+    "next_step": "Inspect the operator truth report JSON and recent analytics artifacts.",
+    "telegram_verified": false,
+    "truth_ready": true,
+    "verdict": "truthful_send_test_ready"
+  }
+}

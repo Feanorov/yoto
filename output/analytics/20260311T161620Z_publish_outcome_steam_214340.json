@@ -1,0 +1,55 @@
+{
+  "created_at": "2026-03-11T16:16:20.567902",
+  "image_path": "D:\\Telegram\\output\\cards\\steam_free_steam_214340_Deponia.png",
+  "lane": "breaking_freebie",
+  "message_id": null,
+  "offer_id": "steam:214340",
+  "publish_outcome": {
+    "message_id": null,
+    "outbox_status": null,
+    "published": false,
+    "reason": "dry_run"
+  },
+  "published": false,
+  "reason": "dry_run",
+  "render": {
+    "assets_used": [
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228"
+    ],
+    "caption_hash": "6db523f9c5460cd92c76a34e683227d81b63c63157407915980f5615b5479028",
+    "image_hash": "4455cad5cb337e9ada5ef54863acf278bc4c3ac392e7de859c94aa83aa469050",
+    "image_path": "D:\\Telegram\\output\\cards\\steam_free_steam_214340_Deponia.png",
+    "render_diagnostics": {
+      "asset_used": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/214340/capsule_231x87.jpg?t=1772651228",
+      "clipped_fields": [],
+      "render_warnings": [],
+      "template_id": "steam_free",
+      "title_lines": [
+        "Deponia"
+      ]
+    },
+    "template_id": "steam_free"
+  },
+  "run_key": "20260311T161620Z",
+  "selection": {
+    "decision_reasons": [
+      "freebie_backlog"
+    ],
+    "dedup_reason": "new_offer",
+    "diversity_constraints": [],
+    "event_sale_influence": {},
+    "lane": "breaking_freebie",
+    "manual_override": {
+      "forced": false,
+      "reasons": []
+    },
+    "quality_reasons": [
+      "event_or_freebie"
+    ],
+    "queue_bucket": "planned",
+    "score": 170.0,
+    "template_id": "steam_free"
+  },
+  "title": "Deponia"
+}

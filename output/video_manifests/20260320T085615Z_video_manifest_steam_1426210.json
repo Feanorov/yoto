@@ -1,0 +1,466 @@
+{
+  "asset_refs": {
+    "background": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+    "card_image": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png",
+    "game_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+    "lead_artwork": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491"
+  },
+  "caption_debug": {
+    "cta": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "fallback_used": false,
+      "near_repeat_relaxed": false,
+      "near_repeat_window_hits": 0,
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "repeat_risk": false,
+      "selected": "Якщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим."
+    },
+    "fallback_used": true,
+    "lane": "high_value_discount",
+    "normalization_applied": {
+      "normalized_dashes": false,
+      "normalized_punctuation_spacing": false,
+      "normalized_whitespace": false,
+      "removed_garbage_unicode": false,
+      "removed_replacement_chars": false
+    },
+    "offer_id": "steam:1426210",
+    "opening": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "fallback_used": true,
+      "line": "Йото радить звернути увагу.",
+      "near_repeat_relaxed": true,
+      "near_repeat_window_hits": 1,
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "repeat_risk": true,
+      "selected": "Йото радить звернути увагу."
+    },
+    "presence": "direct",
+    "repeat_risk": true,
+    "selected_opener": "Йото радить звернути увагу.",
+    "style": "recommend",
+    "weird_symbol_detected": false
+  },
+  "caption_html": "🔥 <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>It Takes Two</b></a>\n\nЙото радить звернути увагу.\n\nТут жанровий акцент чіткий: бойовики та пригоди, а цінник уже дає привід повернутися.\n\nЗараз <a href=\"https://store.steampowered.com/app/1426210/It_Takes_Two/\"><b>199 грн</b></a> замість 999 грн; економія 800 грн.\n\nПропозиція активна просто зараз.\n\n95% позитивних із 254622 оцінок • 20 досягнень • є картки\n\nЯкщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим.\n\n#steam #steamsale",
+  "content_id": "17eceabac0b6c62a922e6f690a6a156d4f3f1217875832319f4a6a273537d13e",
+  "content_type": "discount",
+  "context": {
+    "content_type": "discount",
+    "idempotency_key": "17eceabac0b6c62a922e6f690a6a156d4f3f1217875832319f4a6a273537d13e",
+    "lane": "high_value_discount",
+    "offer_kind": "discount",
+    "published": true,
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "steam",
+    "store": "Steam",
+    "template_id": "steam_discount",
+    "voice_mode": null
+  },
+  "created_at": "2026-03-20T08:56:15.879992",
+  "cta_line": "Пропозиція активна просто зараз.",
+  "hashtags": [
+    "#steam",
+    "#steamsale"
+  ],
+  "hook_line": "Знижка 80% уже активна.",
+  "manifest_version": 2,
+  "offer_id": "steam:1426210",
+  "render_diagnostics": {
+    "asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+    "badge_rect": null,
+    "clipped_fields": [],
+    "editorial_phrase": "Co-op favorite",
+    "gameplay_candidates_count": 2,
+    "gameplay_count": 0,
+    "gameplay_rejected_ui_like": 2,
+    "gameplay_score_summary": [
+      {
+        "aspect_mismatched": false,
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "horizontal_text_block": true,
+        "index": 0,
+        "low_info": false,
+        "meets_gameplay_floor": true,
+        "promotional_layout": true,
+        "rejection_reason": "primary_hero_excluded",
+        "scene_richness_score": 0.715,
+        "score": 52.0,
+        "selected": false,
+        "similar_scene": false,
+        "source_type": "screenshot",
+        "source_types": [
+          "primary_screenshot"
+        ],
+        "steam_ui_like": false,
+        "text_coverage_ratio": 0.735,
+        "text_heavy": false,
+        "ui_like": true,
+        "ui_relaxed_candidate": false
+      },
+      {
+        "aspect_mismatched": false,
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "horizontal_text_block": true,
+        "index": 1,
+        "low_info": false,
+        "meets_gameplay_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "marketing_frame",
+        "scene_richness_score": 0.834,
+        "score": 22.0,
+        "selected": false,
+        "similar_scene": false,
+        "source_type": "gameplay_media",
+        "source_types": [
+          "media_still"
+        ],
+        "steam_ui_like": true,
+        "text_coverage_ratio": 0.826,
+        "text_heavy": true,
+        "ui_like": true,
+        "ui_relaxed_candidate": false
+      }
+    ],
+    "gameplay_selected_count": 0,
+    "gameplay_selection": {
+      "candidates_evaluated": 2,
+      "reason": "hero_only_frame_available",
+      "score_summary": [
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.715,
+          "score": 52.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.735,
+          "text_heavy": false,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        },
+        {
+          "aspect_mismatched": false,
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 1,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "marketing_frame",
+          "scene_richness_score": 0.834,
+          "score": 22.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "gameplay_media",
+          "source_types": [
+            "media_still"
+          ],
+          "steam_ui_like": true,
+          "text_coverage_ratio": 0.826,
+          "text_heavy": true,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "selected_count": 0,
+      "selected_urls": [],
+      "ui_like_rejected": 2
+    },
+    "gameplay_selection_reason": "hero_only_frame_available",
+    "has_gameplay_strip": false,
+    "hero_asset_used": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+    "hero_candidates_count": 4,
+    "hero_capsule_rejected": true,
+    "hero_fallback_used": false,
+    "hero_mode": "hero_only",
+    "hero_rect": [
+      0,
+      0,
+      1280,
+      468
+    ],
+    "hero_rejected_capsules": [
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+        "reason": "capsule_rejected_text_heavy",
+        "score": -50.67,
+        "source_type": "header"
+      },
+      {
+        "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+        "reason": "capsule_rejected_text_heavy",
+        "score": -76.8,
+        "source_type": "fallback"
+      }
+    ],
+    "hero_score_summary": [
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.949,
+        "entropy_score": 1.0,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": null,
+        "score": 30.21,
+        "selected": false,
+        "source_type": "hero",
+        "source_types": [
+          "hero"
+        ],
+        "subject_detection_score": 0.908,
+        "text_coverage_ratio": 0.903,
+        "ui_heavy": true
+      },
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.837,
+        "entropy_score": 1.0,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "capsule_rejected_text_heavy",
+        "score": -50.67,
+        "selected": false,
+        "source_type": "header",
+        "source_types": [
+          "header"
+        ],
+        "subject_detection_score": 0.82,
+        "text_coverage_ratio": 0.859,
+        "ui_heavy": true
+      },
+      {
+        "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.62,
+        "entropy_score": 0.988,
+        "horizontal_text_block": true,
+        "meets_hero_floor": true,
+        "promotional_layout": true,
+        "rejection_reason": null,
+        "score": 106.55,
+        "selected": true,
+        "source_type": "screenshot",
+        "source_types": [
+          "screenshot"
+        ],
+        "subject_detection_score": 0.643,
+        "text_coverage_ratio": 0.735,
+        "ui_heavy": true
+      },
+      {
+        "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.834,
+        "entropy_score": 1.0,
+        "horizontal_text_block": true,
+        "meets_hero_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "capsule_rejected_text_heavy",
+        "score": -76.8,
+        "selected": false,
+        "source_type": "fallback",
+        "source_types": [
+          "fallback"
+        ],
+        "subject_detection_score": 0.884,
+        "text_coverage_ratio": 0.904,
+        "ui_heavy": true
+      }
+    ],
+    "hero_selection": {
+      "candidates_evaluated": 4,
+      "fallback_used": false,
+      "reason": "capsule_rejected_text_heavy",
+      "rejected_capsules": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -50.67,
+          "source_type": "header"
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+          "reason": "capsule_rejected_text_heavy",
+          "score": -76.8,
+          "source_type": "fallback"
+        }
+      ],
+      "score_summary": [
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.949,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 30.21,
+          "selected": false,
+          "source_type": "hero",
+          "source_types": [
+            "hero"
+          ],
+          "subject_detection_score": 0.908,
+          "text_coverage_ratio": 0.903,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.837,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -50.67,
+          "selected": false,
+          "source_type": "header",
+          "source_types": [
+            "header"
+          ],
+          "subject_detection_score": 0.82,
+          "text_coverage_ratio": 0.859,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.62,
+          "entropy_score": 0.988,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 106.55,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "screenshot"
+          ],
+          "subject_detection_score": 0.643,
+          "text_coverage_ratio": 0.735,
+          "ui_heavy": true
+        },
+        {
+          "asset_url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.834,
+          "entropy_score": 1.0,
+          "horizontal_text_block": true,
+          "meets_hero_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "capsule_rejected_text_heavy",
+          "score": -76.8,
+          "selected": false,
+          "source_type": "fallback",
+          "source_types": [
+            "fallback"
+          ],
+          "subject_detection_score": 0.884,
+          "text_coverage_ratio": 0.904,
+          "ui_heavy": true
+        }
+      ],
+      "selected_source": "screenshot"
+    },
+    "hero_selection_reason": "capsule_rejected_text_heavy",
+    "hero_source_type": "screenshot",
+    "info_rect": [
+      0,
+      462,
+      1280,
+      720
+    ],
+    "layout_variant": "yoto_v4_discount",
+    "render_warnings": [],
+    "renderer_fallback_used": false,
+    "renderer_family": "yoto_v4",
+    "renderer_requested": "yoto_v4",
+    "renderer_selected": "yoto_v4",
+    "template_id": "steam_discount",
+    "title_font_size": null,
+    "title_lines": [
+      "It Takes Two"
+    ]
+  },
+  "run_key": "20260320T085615Z",
+  "short_title": "It Takes Two",
+  "source_artifact": {
+    "assets_used": [
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/header.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_184x69.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/ss_3e59753eefaba9a7704a18e902b48e8d38e95e0b.1920x1080.jpg?t=1763484491",
+      "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1426210/capsule_231x87.jpg?t=1763484491",
+      "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491"
+    ],
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_steam_discount_steam_1426210_it_takes_two.png"
+  },
+  "summary_line": "It Takes Two зараз доступна зі знижкою 80%. Ціна вже виглядає достатньо привабливою, щоб придивитися, якщо...",
+  "template_hint": "deal-spotlight",
+  "urgency_line": "Пропозиція активна просто зараз.",
+  "voice_facts": {
+    "achievements_count": 20,
+    "currency": "UAH",
+    "description": "Embark on the craziest journey of your life in It Takes Two, a genre-bending platform adventure created purely for co-op. Invite a friend to join for free with Friend’s Pass and work together across a huge variety of gleefully disruptive gameplay challenges. Play as the clashing couple Cody and May, two humans turned into dolls by a magic spell. Together, trapped in a fantastical world where the unpredictable hides around every corner, they are reluctantly challenged with saving their fractured relationship. <br><br>Master unique and connected character abilities in every new level. Help each other across an abundance of unexpected obstacles and laugh-out-loud moments. Kick gangster squirrels’ furry tails, pilot a pair of underpants, DJ a buzzing night club, and bobsleigh through a magical snow globe. Embrace a heartfelt and hilarious story where narrative and gameplay weave into a uniquely metaphorical experience.    <br><br>It Takes Two is developed by the award-winning studio Hazelight, the industry leader of cooperative play. They’re about to take you on a wild and wondrous ride where only one thing is for certain: we’re better together.<h2 class=\"bb_tag\" ><strong>KEY FEATURES</strong></h2><br><ul class=\"bb_ul\"><li><strong>Pure co-op perfection</strong> — Invite a friend to join for free with Remote Play Together**, and experience a thrilling adventure built purely for two. Choose from couch or online co-op with split-screen play, and face ever-changing challenges where working together is the only way forward.<br><br></li><li><strong>Gleefully disruptive gameplay</strong> — From rampaging vacuum cleaners to suave love gurus, you never know what you’ll be up against next. Filled with genre-bending challenges and new character abilities to master in every level, experience a metaphorical merging of gameplay and narrative that pushes the boundaries of interactive storytelling. <br><br></li><li><strong>A universal tale of relationships</strong> — Discover a touching and heartfelt story of the challenges in getting along. Help Cody and May learn how to overcome their differences. Meet a diverse cast of strange and endearing characters. Join forces and go on an adventure you’ll treasure — together!</li></ul><br><span class=\"bb_img_ctn\"><video class=\"bb_img\" autoplay muted loop playsinline poster=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.poster.avif?t=1763484491\" width=610 height=342 ><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.webm?t=1763484491\" type=\"video/webm; codecs=vp9\"><source src=\"https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1426210/extras/e1515de7ad4b1a8cbf28df3cbb5dc716.mp4?t=1763484491\" type=\"video/mp4\"></video></span><h2 class=\"bb_tag\" ><strong>ABOUT HAZELIGHT</strong></h2>Hazelight is an award-winning independent game development studio based in Stockholm, Sweden. Founded in 2014 by Josef Fares (film director and creator of the award-winning game Brothers: A Tale of Two Sons), Hazelight is committed to pushing the creative boundaries of what is possible in games. In 2018, Hazelight released the BAFTA award-winning A Way Out — the first-ever co-op only, third-person action-adventure — as part of the EA Originals program.<h2 class=\"bb_tag\" ><strong>ABOUT EA ORIGINALS</strong></h2>EA Originals helps shine a light on some of the most passionate, independent, and talented game studios across the globe. Discover innovative and unforgettable gaming experiences from highly creative game makers who love to enchant and inspire.",
+    "discount_percent": 80,
+    "free_access_type": null,
+    "genres": [
+      "Бойовики",
+      "Пригоди"
+    ],
+    "has_trading_cards": true,
+    "price_after_minor": 19900,
+    "price_before_minor": 99900,
+    "promo_end": null,
+    "promo_start": null,
+    "review_count": 254622,
+    "review_score": 95,
+    "short_description": "Embark on the craziest journey of your life in It Takes Two. Invite a friend to join for free with Friend’s Pass and work together across a huge variety of gleefully disruptive gameplay challenges. Winner of GAME OF THE YEAR at the Game Awards 2021.",
+    "store_url": "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+    "tags": [
+      "Бойовики",
+      "Пригоди"
+    ],
+    "title": "It Takes Two"
+  }
+}

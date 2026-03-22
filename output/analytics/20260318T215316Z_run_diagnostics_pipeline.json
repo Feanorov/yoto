@@ -1,0 +1,62 @@
+{
+  "context": {
+    "active": false,
+    "active_event_offer_ids": [],
+    "queue_snapshot_at": "2026-03-18T21:53:16",
+    "sale_event_mode": "auto",
+    "selection_summary": {
+      "capacity_hold": 13,
+      "hard_suppress": 965,
+      "roundup_candidate": 16,
+      "solo_post": 8
+    },
+    "source": "current_queue"
+  },
+  "created_at": "2026-03-18T21:53:16.831764",
+  "empty_window": false,
+  "fatal_ingest": false,
+  "ingest": {
+    "enriched_total": 1002,
+    "ingested_total": 1002,
+    "metrics_available": true
+  },
+  "metrics": {
+    "dedup.reject.franchise_cooldown": 1,
+    "lane.candidate.backlog_filler": 11,
+    "lane.candidate.breaking_freebie": 1,
+    "lane.candidate.high_value_discount": 25,
+    "offers.enriched_total": 1002,
+    "offers.ingested_total": 1002,
+    "quality.reject.adult_content": 4,
+    "quality.reject.review_threshold_not_met": 960,
+    "quality.reject_total": 964,
+    "queue.depth.planned": 8,
+    "queue.depth.reserve": 16,
+    "selection.accepted_total": 37,
+    "selection.capacity_hold": 13,
+    "selection.hard_suppress": 965,
+    "selection.hero_discount_bonus_slots": 2,
+    "selection.roundup_candidate": 16,
+    "selection.solo_post": 8
+  },
+  "pipeline_action": "publish_attempted",
+  "planner_window": {
+    "empty": false,
+    "planned_count": 8,
+    "reserve_count": 16
+  },
+  "publish": {
+    "attempted": true,
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_c367569acede446995c5a3663e993446_cozy_grove.png",
+    "lane": "breaking_freebie",
+    "message_id": 165,
+    "offer_id": "epic:c367569acede446995c5a3663e993446",
+    "published": true,
+    "reason": "published",
+    "title": "Cozy Grove"
+  },
+  "reasons": [],
+  "run_key": "20260318T215316Z",
+  "should_stop_pipeline": false,
+  "status": "healthy"
+}

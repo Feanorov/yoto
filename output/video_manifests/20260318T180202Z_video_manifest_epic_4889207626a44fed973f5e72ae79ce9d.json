@@ -1,0 +1,221 @@
+{
+  "asset_refs": {
+    "background": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+    "card_image": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png",
+    "game_image": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+    "lead_artwork": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46"
+  },
+  "caption_debug": {
+    "cta": {},
+    "lane": "breaking_freebie",
+    "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+    "opening": {
+      "anti_repeat_relaxed": false,
+      "anti_repeat_window": 4,
+      "line": "🎁 Йото вихопив роздачу.",
+      "pool_size": 3,
+      "recent_repeat_count": 0,
+      "recent_window_repeat_count": 0,
+      "selected": "🎁 Йото вихопив роздачу."
+    },
+    "presence": "direct",
+    "style": "freebie"
+  },
+  "caption_html": "🎁 <a href=\"https://store.epicgames.com/uk/p/isonzo\"><b>Isonzo</b></a>\n\n🎁 Йото вихопив роздачу.\n\nЦе гра, яку можна спокійно додати до бібліотеки й повернутися до неї пізніше.\n\nЗамість 429 грн гру можна спокійно додати на акаунт без оплати й залишити назавжди.\n\nЗабрати назавжди варто до 19 березня 2026, 15:00.\n\nЗабирайте на акаунт зараз, поки роздача відкрита й додається назавжди.\n\n#epicgames #freegame #giveaway",
+  "content_id": "f59188a29e05f5f292d003f888a030efbbf459e3a3a35e54325db3ed4ed297c8",
+  "content_type": "freebie",
+  "context": {
+    "idempotency_key": "f59188a29e05f5f292d003f888a030efbbf459e3a3a35e54325db3ed4ed297c8",
+    "lane": "breaking_freebie",
+    "offer_kind": "freebie",
+    "published": true,
+    "queue_bucket": "planned",
+    "sale_event": {},
+    "source": "epic",
+    "store": "Epic Games Store",
+    "template_id": "epic_free",
+    "voice_mode": null
+  },
+  "created_at": "2026-03-18T18:02:02.946556",
+  "cta_line": "Забрати можна до 19 березня 2026, 15:00.",
+  "hashtags": [
+    "#epicgames",
+    "#freegame",
+    "#giveaway"
+  ],
+  "hook_line": "Безкоштовна роздача в Epic вже активна.",
+  "manifest_version": 2,
+  "offer_id": "epic:4889207626a44fed973f5e72ae79ce9d",
+  "render_diagnostics": {
+    "asset_used": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+    "badge_rect": null,
+    "clipped_fields": [],
+    "editorial_phrase": null,
+    "gameplay_candidates_count": 1,
+    "gameplay_count": 0,
+    "gameplay_rejected_ui_like": 1,
+    "gameplay_score_summary": [
+      {
+        "aspect_mismatched": true,
+        "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+        "available": true,
+        "banner_like": false,
+        "horizontal_text_block": true,
+        "index": 0,
+        "low_info": false,
+        "meets_gameplay_floor": false,
+        "promotional_layout": true,
+        "rejection_reason": "primary_hero_excluded",
+        "scene_richness_score": 0.712,
+        "score": -18.0,
+        "selected": false,
+        "similar_scene": false,
+        "source_type": "screenshot",
+        "source_types": [
+          "primary_screenshot"
+        ],
+        "steam_ui_like": false,
+        "text_coverage_ratio": 0.86,
+        "text_heavy": true,
+        "ui_like": true,
+        "ui_relaxed_candidate": false
+      }
+    ],
+    "gameplay_selected_count": 0,
+    "gameplay_selection": {
+      "candidates_evaluated": 1,
+      "reason": "hero_only_frame_available",
+      "score_summary": [
+        {
+          "aspect_mismatched": true,
+          "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+          "available": true,
+          "banner_like": false,
+          "horizontal_text_block": true,
+          "index": 0,
+          "low_info": false,
+          "meets_gameplay_floor": false,
+          "promotional_layout": true,
+          "rejection_reason": "primary_hero_excluded",
+          "scene_richness_score": 0.712,
+          "score": -18.0,
+          "selected": false,
+          "similar_scene": false,
+          "source_type": "screenshot",
+          "source_types": [
+            "primary_screenshot"
+          ],
+          "steam_ui_like": false,
+          "text_coverage_ratio": 0.86,
+          "text_heavy": true,
+          "ui_like": true,
+          "ui_relaxed_candidate": false
+        }
+      ],
+      "selected_count": 0,
+      "selected_urls": [],
+      "ui_like_rejected": 1
+    },
+    "gameplay_selection_reason": "hero_only_frame_available",
+    "has_gameplay_strip": false,
+    "hero_asset_used": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+    "hero_candidates_count": 1,
+    "hero_capsule_rejected": false,
+    "hero_fallback_used": false,
+    "hero_mode": "hero_only",
+    "hero_rect": [
+      0,
+      0,
+      1280,
+      468
+    ],
+    "hero_rejected_capsules": [],
+    "hero_score_summary": [
+      {
+        "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+        "available": true,
+        "banner_like": false,
+        "brightness_score": 0.464,
+        "entropy_score": 0.998,
+        "horizontal_text_block": true,
+        "meets_hero_floor": true,
+        "promotional_layout": true,
+        "rejection_reason": null,
+        "score": 76.65,
+        "selected": true,
+        "source_type": "screenshot",
+        "source_types": [
+          "hero",
+          "header",
+          "screenshot",
+          "fallback"
+        ],
+        "subject_detection_score": 0.847,
+        "text_coverage_ratio": 0.86,
+        "ui_heavy": true
+      }
+    ],
+    "hero_selection": {
+      "candidates_evaluated": 1,
+      "fallback_used": false,
+      "reason": "selected_gameplay_screenshot",
+      "rejected_capsules": [],
+      "score_summary": [
+        {
+          "asset_url": "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46",
+          "available": true,
+          "banner_like": false,
+          "brightness_score": 0.464,
+          "entropy_score": 0.998,
+          "horizontal_text_block": true,
+          "meets_hero_floor": true,
+          "promotional_layout": true,
+          "rejection_reason": null,
+          "score": 76.65,
+          "selected": true,
+          "source_type": "screenshot",
+          "source_types": [
+            "hero",
+            "header",
+            "screenshot",
+            "fallback"
+          ],
+          "subject_detection_score": 0.847,
+          "text_coverage_ratio": 0.86,
+          "ui_heavy": true
+        }
+      ],
+      "selected_source": "screenshot"
+    },
+    "hero_selection_reason": "selected_gameplay_screenshot",
+    "hero_source_type": "screenshot",
+    "info_rect": [
+      0,
+      462,
+      1280,
+      720
+    ],
+    "layout_variant": "yoto_v4_free_game",
+    "render_warnings": [],
+    "renderer_fallback_used": false,
+    "renderer_family": "yoto_v4",
+    "renderer_requested": "yoto_v4",
+    "renderer_selected": "yoto_v4",
+    "template_id": "epic_free",
+    "title_font_size": null,
+    "title_lines": [
+      "Isonzo"
+    ]
+  },
+  "run_key": "20260318T180202Z",
+  "short_title": "Isonzo",
+  "source_artifact": {
+    "assets_used": [
+      "https://cdn1.epicgames.com/offer/30de69013f3b41b0ba594a8ef3b693ba/EGS_Isonzo_BlackMillGames_S2_1200x1600-1225b5b75f29ea6723fcb23b2f3fae46"
+    ],
+    "image_path": "D:\\Telegram\\output\\cards\\yoto_card_epic_free_epic_4889207626a44fed973f5e72ae79ce9d_isonzo.png"
+  },
+  "summary_line": "Isonzo зараз можна безкоштовно забрати в Epic Games Store. Це гра, яку можна спокійно додати до бібліотеки й...",
+  "template_hint": "freebie-flash",
+  "urgency_line": "Забрати можна до 19 березня 2026, 15:00."
+}
