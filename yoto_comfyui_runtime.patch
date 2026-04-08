@@ -1,0 +1,189 @@
+diff --git a/infrastructure/render/cards/image_providers/comfyui_provider.py b/infrastructure/render/cards/image_providers/comfyui_provider.py
+new file mode 100644
+index 0000000..d450d75
+--- /dev/null
++++ b/infrastructure/render/cards/image_providers/comfyui_provider.py
+@@ -0,0 +1,183 @@
++from __future__ import annotations
++
++import io
++import json
++import time
++import urllib.error
++import urllib.parse
++import urllib.request
++from typing import Any
++
++from PIL import Image
++
++from .base import ImageResolutionRequest, ResolvedImage
++
++
++class ComfyUIImageProvider:
++    provider_name = 'ai'
++
++    def __init__(
++        self,
++        *,
++        enabled: bool = False,
++        base_url: str = 'http://127.0.0.1:8188',
++        poll_interval_seconds: float = 0.5,
++        timeout_seconds: float = 20.0,
++    ) -> None:
++        self.enabled = bool(enabled)
++        self.base_url = str(base_url or 'http://127.0.0.1:8188').rstrip('/')
++        self.poll_interval_seconds = max(0.1, float(poll_interval_seconds))
++        self.timeout_seconds = max(0.5, float(timeout_seconds))
++
++    def resolve(self, request: ImageResolutionRequest) -> ResolvedImage | None:
++        if not self.enabled:
++            return None
++        try:
++            payload = {'prompt': self._workflow(request)}
++            prompt_response = self._post_json('/prompt', payload)
++            prompt_id = str(prompt_response.get('prompt_id') or '').strip()
++            if not prompt_id:
++                return None
++            history = self._poll_history(prompt_id)
++            if not history:
++                return None
++            image_ref = self._extract_image_reference(history)
++            if not image_ref:
++                return None
++            image_bytes = self._fetch_image_bytes(image_ref)
++            if not image_bytes:
++                return None
++            image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
++            return ResolvedImage(
++                image=image,
++                metadata={
++                    'selected_source': 'ai',
++                    'provider_name': self.provider_name,
++                    'prompt_id': prompt_id,
++                    'comfyui_output': dict(image_ref),
++                },
++            )
++        except (OSError, ValueError, urllib.error.URLError, TimeoutError):
++            return None
++
++    def _workflow(self, request: ImageResolutionRequest) -> dict[str, Any]:
++        width = max(64, int(request.image_size[0]))
++        height = max(64, int(request.image_size[1]))
++        return {
++            '3': {
++                'class_type': 'KSampler',
++                'inputs': {
++                    'seed': 42424242,
++                    'steps': 20,
++                    'cfg': 7,
++                    'sampler_name': 'euler',
++                    'scheduler': 'normal',
++                    'denoise': 1,
++                    'model': ['4', 0],
++                    'positive': ['6', 0],
++                    'negative': ['7', 0],
++                    'latent_image': ['5', 0],
++                },
++            },
++            '4': {
++                'class_type': 'CheckpointLoaderSimple',
++                'inputs': {'ckpt_name': 'v1-5-pruned-emaonly-fp16.safetensors'},
++            },
++            '5': {
++                'class_type': 'EmptyLatentImage',
++                'inputs': {'width': width, 'height': height, 'batch_size': 1},
++            },
++            '6': {
++                'class_type': 'CLIPTextEncode',
++                'inputs': {
++                    'text': 'cinematic video game key art, premium marketing illustration, dramatic lighting, clean composition',
++                    'clip': ['4', 1],
++                },
++            },
++            '7': {
++                'class_type': 'CLIPTextEncode',
++                'inputs': {
++                    'text': 'watermark, text, logo, low quality, blurry, deformed, cropped',
++                    'clip': ['4', 1],
++                },
++            },
++            '8': {
++                'class_type': 'VAEDecode',
++                'inputs': {'samples': ['3', 0], 'vae': ['4', 2]},
++            },
++            '9': {
++                'class_type': 'SaveImage',
++                'inputs': {'images': ['8', 0], 'filename_prefix': 'yoto_ai_v1'},
++            },
++        }
++
++    def _poll_history(self, prompt_id: str) -> dict[str, Any] | None:
++        deadline = time.monotonic() + self.timeout_seconds
++        path = f'/history/{urllib.parse.quote(prompt_id, safe="")}'
++        while time.monotonic() < deadline:
++            payload = self._get_json(path)
++            if isinstance(payload, dict):
++                item = payload.get(prompt_id)
++                if isinstance(item, dict) and item.get('outputs'):
++                    return item
++            time.sleep(self.poll_interval_seconds)
++        return None
++
++    def _extract_image_reference(self, history_payload: dict[str, Any]) -> dict[str, str] | None:
++        outputs = history_payload.get('outputs')
++        if not isinstance(outputs, dict):
++            return None
++        for node_output in outputs.values():
++            if not isinstance(node_output, dict):
++                continue
++            images = node_output.get('images')
++            if not isinstance(images, list):
++                continue
++            for image_ref in images:
++                if not isinstance(image_ref, dict):
++                    continue
++                filename = str(image_ref.get('filename') or '').strip()
++                if not filename:
++                    continue
++                return {
++                    'filename': filename,
++                    'subfolder': str(image_ref.get('subfolder') or ''),
++                    'type': str(image_ref.get('type') or 'output'),
++                }
++        return None
++
++    def _fetch_image_bytes(self, image_ref: dict[str, str]) -> bytes | None:
++        query = urllib.parse.urlencode(
++            {
++                'filename': image_ref.get('filename', ''),
++                'subfolder': image_ref.get('subfolder', ''),
++                'type': image_ref.get('type', 'output'),
++            }
++        )
++        request = urllib.request.Request(f'{self.base_url}/view?{query}', method='GET')
++        with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
++            data = response.read()
++        return data or None
++
++    def _post_json(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
++        request = urllib.request.Request(
++            f'{self.base_url}{path}',
++            data=json.dumps(payload).encode('utf-8'),
++            headers={'Content-Type': 'application/json'},
++            method='POST',
++        )
++        with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
++            body = response.read().decode('utf-8')
++        data = json.loads(body or '{}')
++        if not isinstance(data, dict):
++            raise ValueError('ComfyUI response is not a JSON object.')
++        return data
++
++    def _get_json(self, path: str) -> dict[str, Any]:
++        request = urllib.request.Request(f'{self.base_url}{path}', method='GET')
++        with urllib.request.urlopen(request, timeout=self.timeout_seconds) as response:
++            body = response.read().decode('utf-8')
++        data = json.loads(body or '{}')
++        if not isinstance(data, dict):
++            raise ValueError('ComfyUI response is not a JSON object.')
++        return data
