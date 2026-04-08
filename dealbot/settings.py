@@ -71,6 +71,10 @@ class OperationalConfig:
 class RenderingConfig:
     card_renderer: str
     fallback_to_legacy: bool
+    image_provider_mode: str
+    image_pipeline_version: str
+    comfyui_enabled: bool = False
+    comfyui_url: str = 'http://127.0.0.1:8188'
 
 
 @dataclass(frozen=True, slots=True)
@@ -162,6 +166,10 @@ class AppSettings:
             rendering=RenderingConfig(
                 card_renderer=os.getenv('CARD_RENDERER_MODE', 'yoto_v4').strip().lower() or 'yoto_v4',
                 fallback_to_legacy=os.getenv('CARD_RENDERER_FALLBACK_TO_LEGACY', '1').strip() != '0',
+                image_provider_mode=os.getenv('IMAGE_PROVIDER_MODE', 'artwork_only').strip().lower() or 'artwork_only',
+                image_pipeline_version=os.getenv('IMAGE_PIPELINE_VERSION', 'v1').strip() or 'v1',
+                comfyui_enabled=os.getenv('COMFYUI_ENABLED', '0').strip() == '1',
+                comfyui_url=os.getenv('COMFYUI_URL', 'http://127.0.0.1:8188').strip() or 'http://127.0.0.1:8188',
             ),
         )
 

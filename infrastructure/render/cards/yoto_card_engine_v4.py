@@ -7,10 +7,19 @@ import hashlib
 import re
 import unicodedata
 from typing import Any, Mapping, Sequence
+import os
 
 from PIL import Image, ImageChops, ImageColor, ImageDraw, ImageFilter, ImageFont, ImageOps, ImageStat
 
 from dealbot.utils.ua import contains_cyrillic, format_deadline
+from infrastructure.render.cards.image_providers import (
+    ArtworkImageProvider,
+    ComfyUIImageProvider,
+    IMAGE_PIPELINE_VERSION,
+    ImageResolutionRequest,
+    PlaceholderImageProvider,
+    YotoImageResolver,
+)
 
 
 CARD_SIZE = (1280, 720)
@@ -378,6 +387,7 @@ class YotoCardData:
     gameplay_selection: YotoGameplaySelectionDiagnostics | Mapping[str, Any] | None = None
     badge_rotation: float = -6.0
     hero_selection: YotoHeroSelectionDiagnostics | Mapping[str, Any] | None = None
+    lane: str | None = None
 
     def normalized_type(self) -> YotoCardType:
         return self.type if isinstance(self.type, YotoCardType) else YotoCardType(str(self.type))
@@ -408,6 +418,7 @@ class YotoCardData:
             gameplay_selection=YotoGameplaySelectionDiagnostics.from_mapping(payload.get('gameplay_selection')) if payload.get('gameplay_selection') else None,
             badge_rotation=float(payload.get('badge_rotation') or -6.0),
             hero_selection=YotoHeroSelectionDiagnostics.from_mapping(payload.get('hero_selection')) if payload.get('hero_selection') else None,
+            lane=str(payload['lane']) if payload.get('lane') is not None else None,
         )
 
     @classmethod
@@ -442,6 +453,7 @@ class YotoCardData:
             old_price=old_price,
             artwork_path=artwork,
             slug=slug or str(getattr(offer, 'title', '')),
+            lane=str(getattr(offer, 'lane', '') or getattr(getattr(offer, 'metadata', {}), 'get', lambda *_: None)('lane') or '') or None,
         )
 
 
@@ -478,6 +490,13 @@ class YotoCardDiagnostics:
     hero_score_summary: list[dict[str, Any]] = field(default_factory=list)
     hero_fallback_used: bool = False
     hero_selection: dict[str, Any] = field(default_factory=dict)
+    selected_source: str = 'placeholder'
+    decision_reason: str = 'placeholder_missing_artwork'
+    image_provider_mode: str = 'artwork_only'
+    image_priority: str = 'NORMAL'
+    image_pipeline_version: str = IMAGE_PIPELINE_VERSION
+    ai_attempted: bool = False
+    ai_succeeded: bool = False
     output_path: Path | None = None
 
 
@@ -488,7 +507,7 @@ class YotoCardRenderResult:
 
 
 class YotoCardEngineV4:
-    def __init__(self, output_dir: Path | None = None) -> None:
+    def __init__(self, output_dir: Path | None = None, *, image_provider_mode: str | None = None) -> None:
         self.repo_root = Path(__file__).resolve().parents[3]
         self.output_dir = output_dir or self.repo_root / 'output' / 'cards'
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -504,6 +523,15 @@ class YotoCardEngineV4:
         self._sticker_cache: dict[tuple[str, str, str, str, float], Image.Image] = {}
         self._gameplay_strip_cache: dict[tuple[str, ...], Image.Image] = {}
         self._artwork_cache: dict[str, Image.Image] = {}
+        self.image_provider_mode = str(image_provider_mode or os.getenv('IMAGE_PROVIDER_MODE', 'artwork_only')).strip().lower() or 'artwork_only'
+        self.comfyui_enabled = os.getenv('COMFYUI_ENABLED', '0').strip() == '1'
+        self.comfyui_url = str(os.getenv('COMFYUI_URL', 'http://127.0.0.1:8188')).strip() or 'http://127.0.0.1:8188'
+        self.image_resolver = YotoImageResolver(
+            artwork_provider=ArtworkImageProvider(),
+            ai_provider=ComfyUIImageProvider(enabled=self.comfyui_enabled, base_url=self.comfyui_url),
+            placeholder_provider=PlaceholderImageProvider(self),
+            mode=self.image_provider_mode,
+        )
 
     def render_card(self, game_data: YotoCardData | Mapping[str, Any]) -> YotoCardRenderResult:
         data = game_data if isinstance(game_data, YotoCardData) else YotoCardData.from_mapping(game_data)
@@ -536,12 +564,48 @@ class YotoCardEngineV4:
         diagnostics.gameplay_score_summary = [dict(item) for item in gameplay_selection.score_summary]
         diagnostics.gameplay_selection = gameplay_selection.to_snapshot()
 
-        artwork, used_placeholder = self.load_artwork(data.artwork_path, data=data, card_type=card_type, diagnostics=diagnostics)
-        diagnostics.used_placeholder_artwork = used_placeholder
+        resolved_image = self.image_resolver.resolve(
+            ImageResolutionRequest(
+                artwork_path=data.artwork_path,
+                title=data.title,
+                platform=data.platform,
+                slug=slug,
+                card_type=card_type.value,
+                lane=data.lane,
+                mode=self.image_provider_mode,
+                priority=self.image_resolver.derive_priority(data.lane),
+                image_size=CARD_SIZE,
+                deadline=data.deadline,
+                old_price=data.old_price,
+                current_price=data.current_price,
+                platform_badge=data.platform_badge,
+                brand_micro_label=data.brand_micro_label,
+            )
+        )
+        artwork = resolved_image.image
+        diagnostics.selected_source = str(resolved_image.metadata.get('selected_source') or 'placeholder')
+        diagnostics.decision_reason = str(resolved_image.metadata.get('decision_reason') or 'placeholder_missing_artwork')
+        diagnostics.image_provider_mode = str(resolved_image.metadata.get('mode') or self.image_provider_mode)
+        diagnostics.image_priority = str(resolved_image.metadata.get('priority') or 'NORMAL')
+        diagnostics.image_pipeline_version = str(resolved_image.metadata.get('pipeline_version') or IMAGE_PIPELINE_VERSION)
+        diagnostics.ai_attempted = bool(resolved_image.metadata.get('ai_attempted', False))
+        diagnostics.ai_succeeded = bool(resolved_image.metadata.get('ai_succeeded', False))
+        diagnostics.used_placeholder_artwork = diagnostics.selected_source == 'placeholder'
+        diagnostics.text_payload.update({
+            'selected_source': diagnostics.selected_source,
+            'decision_reason': diagnostics.decision_reason,
+            'image_provider_mode': diagnostics.image_provider_mode,
+            'image_priority': diagnostics.image_priority,
+            'image_pipeline_version': diagnostics.image_pipeline_version,
+            'ai_attempted': diagnostics.ai_attempted,
+            'ai_succeeded': diagnostics.ai_succeeded,
+        })
+        if diagnostics.used_placeholder_artwork:
+            diagnostics.text_payload['placeholder_caption_mode'] = 'headline_only'
         hero_selection = self._resolve_hero_selection(
             data.hero_selection,
             artwork_path=data.artwork_path,
-            used_placeholder=used_placeholder,
+            used_placeholder=diagnostics.used_placeholder_artwork,
         )
         diagnostics.hero_source_type = hero_selection.selected_source
         diagnostics.hero_selection_reason = hero_selection.reason
@@ -733,6 +797,19 @@ class YotoCardEngineV4:
             selection.reason = 'selected_primary_hero'
         return selection
 
+    def _coerce_card_type(self, value: YotoCardType | str | None) -> YotoCardType:
+        if isinstance(value, YotoCardType):
+            return value
+        return YotoCardType(str(value or YotoCardType.FREE_GAME.value))
+
+    @staticmethod
+    def _rgba(color: str, alpha: int) -> tuple[int, int, int, int]:
+        return rgba(color, alpha)
+
+    @staticmethod
+    def _default_brand_micro_label(card_type: YotoCardType) -> str:
+        return BRAND_MICRO_LABELS.get(card_type.value, 'YOTO')
+
     def load_artwork(
         self,
         artwork_path: str | Path | None,
@@ -741,10 +818,39 @@ class YotoCardEngineV4:
         card_type: YotoCardType | None = None,
         diagnostics: YotoCardDiagnostics | None = None,
     ) -> tuple[Image.Image, bool]:
-        image, _ = self._load_optional_asset(artwork_path)
-        if image is not None:
-            return image, False
-        return self._placeholder(CARD_SIZE, data=data, card_type=card_type, diagnostics=diagnostics), True
+        normalized_card_type = self._coerce_card_type(card_type or (data.normalized_type() if data is not None else YotoCardType.FREE_GAME))
+        slug = data.normalized_slug() if data is not None else 'card'
+        resolved = self.image_resolver.resolve(
+            ImageResolutionRequest(
+                artwork_path=artwork_path,
+                title=getattr(data, 'title', '') if data is not None else '',
+                platform=getattr(data, 'platform', '') if data is not None else '',
+                slug=slug,
+                card_type=normalized_card_type.value,
+                lane=getattr(data, 'lane', None) if data is not None else None,
+                mode=self.image_provider_mode,
+                priority=self.image_resolver.derive_priority(getattr(data, 'lane', None) if data is not None else None),
+                image_size=CARD_SIZE,
+                deadline=data.deadline,
+                old_price=data.old_price,
+                current_price=data.current_price,
+                platform_badge=data.platform_badge,
+                brand_micro_label=data.brand_micro_label,
+            )
+        )
+        if diagnostics is not None:
+            diagnostics.selected_source = str(resolved.metadata.get('selected_source') or diagnostics.selected_source)
+            diagnostics.decision_reason = str(resolved.metadata.get('decision_reason') or diagnostics.decision_reason)
+            diagnostics.image_provider_mode = str(resolved.metadata.get('mode') or diagnostics.image_provider_mode)
+            diagnostics.image_priority = str(resolved.metadata.get('priority') or diagnostics.image_priority)
+            diagnostics.image_pipeline_version = str(resolved.metadata.get('pipeline_version') or diagnostics.image_pipeline_version)
+            diagnostics.ai_attempted = bool(resolved.metadata.get('ai_attempted', diagnostics.ai_attempted))
+            diagnostics.ai_succeeded = bool(resolved.metadata.get('ai_succeeded', diagnostics.ai_succeeded))
+            diagnostics.text_payload['ai_attempted'] = diagnostics.ai_attempted
+            diagnostics.text_payload['ai_succeeded'] = diagnostics.ai_succeeded
+            if diagnostics.selected_source == 'placeholder':
+                diagnostics.text_payload['placeholder_caption_mode'] = 'headline_only'
+        return resolved.image, str(resolved.metadata.get('selected_source') or '') == 'placeholder'
 
     def apply_background_treatment(self, artwork: Image.Image, card_type: YotoCardType) -> Image.Image:
         palette = self._palette(card_type)
@@ -4789,164 +4895,6 @@ class YotoCardEngineV4:
         best_style['total_height'] = len(best_layout.lines) * best_layout.line_height + max(0, len(best_layout.lines) - 1) * int(best_style['line_gap'])
         best_style['max_width'] = max(220, int(best_style['max_width']))
         return best_layout, best_style
-
-    def _placeholder(
-        self,
-        size: tuple[int, int],
-        *,
-        data: YotoCardData | None = None,
-        card_type: YotoCardType | None = None,
-        diagnostics: YotoCardDiagnostics | None = None,
-    ) -> Image.Image:
-        normalized_type = card_type or (data.normalized_type() if isinstance(data, YotoCardData) else YotoCardType.FREE_GAME)
-        palette = self._palette(normalized_type)
-        title = self._normalize_display_text(getattr(data, 'title', '') or 'YOTO')
-        platform = self._normalize_display_text(getattr(data, 'platform', '') or '')
-        badge_text = self._normalize_display_text(getattr(data, 'platform_badge', '') or '')
-        brand_label = self._normalize_display_text(getattr(data, 'brand_micro_label', '') or BRAND_MICRO_LABELS.get(normalized_type.value, 'YOTO'))
-        deadline = self._normalize_display_text(getattr(data, 'deadline', '') or '')
-        old_price = self._normalize_display_text(getattr(data, 'old_price', '') or '')
-        current_price = self._normalize_display_text(getattr(data, 'current_price', '') or '')
-        slug = self._normalize_display_text(getattr(data, 'slug', '') or title.lower())
-        seed_source = '|'.join((normalized_type.value, platform, badge_text, slug, title, deadline, old_price, current_price))
-        digest = hashlib.sha1(seed_source.encode('utf-8')).digest()
-        seed = digest * 4
-        cache_key = (digest.hex(), size[0], size[1])
-        cached = self._placeholder_cache.get(cache_key)
-        if cached is not None:
-            if diagnostics is not None:
-                diagnostics.text_payload['placeholder_caption_mode'] = 'headline_only'
-            return cached.copy()
-
-        image = Image.new('RGB', size, palette.panel_top)
-        draw = ImageDraw.Draw(image)
-        top_rgb = ImageColor.getrgb(palette.panel_top)
-        bottom_rgb = ImageColor.getrgb(palette.panel_bottom)
-        glow_rgb = ImageColor.getrgb(palette.glow)
-        for y in range(size[1]):
-            ratio = y / max(size[1] - 1, 1)
-            base = tuple(int(top_rgb[idx] + (bottom_rgb[idx] - top_rgb[idx]) * ratio) for idx in range(3))
-            lift = int((1.0 - min(ratio, 0.84)) * (glow_rgb[1] / 22))
-            color = tuple(min(255, base[idx] + lift) for idx in range(3))
-            draw.line((0, y, size[0], y), fill=color)
-
-        overlay = Image.new('RGBA', size, (0, 0, 0, 0))
-        accent_orbs = Image.new('RGBA', size, (0, 0, 0, 0))
-        orb_draw = ImageDraw.Draw(accent_orbs)
-        accent_colors = (palette.accent, palette.accent_secondary, palette.glow)
-        for index, color in enumerate(accent_colors):
-            x0 = int(size[0] * 0.56) + (seed[index] % 220) - 70 + index * 28
-            y0 = -70 + (seed[index + 3] % 180) + index * 52
-            width = 260 + seed[index + 6] % 250
-            height = 200 + seed[index + 9] % 220
-            orb_draw.ellipse((x0, y0, x0 + width, y0 + height), fill=rgba(color, 58 - index * 10))
-        accent_orbs = accent_orbs.filter(ImageFilter.GaussianBlur(radius=34))
-        overlay = Image.alpha_composite(overlay, accent_orbs)
-
-        beams = Image.new('RGBA', size, (0, 0, 0, 0))
-        beam_draw = ImageDraw.Draw(beams)
-        for index, color in enumerate((palette.accent, palette.accent_secondary, palette.glow)):
-            shift = (seed[12 + index] % 180) - 90
-            top = 52 + index * 92 + (seed[15 + index] % 34)
-            width = 320 + seed[18 + index] % 220
-            height = 44 + seed[21 + index] % 26
-            beam_draw.polygon(
-                [
-                    (-170 + shift, top),
-                    (width + shift, top),
-                    (width + 170 + shift, top + height),
-                    (30 + shift, top + height),
-                ],
-                fill=rgba(color, 34 if index == 0 else 22),
-            )
-        beams = beams.filter(ImageFilter.GaussianBlur(radius=5))
-        overlay = Image.alpha_composite(overlay, beams)
-
-        probable_long_title = len(title) >= 18 or len(title.split()) >= 4
-        panel_left = 104
-        panel_top = (82 if probable_long_title else 92) + seed[24] % (12 if probable_long_title else 16)
-        panel_width = min(size[0] - 470, (582 if probable_long_title else 556) + seed[25] % (42 if probable_long_title else 46))
-        panel_height = 184 if probable_long_title else 162
-        panel_rect = (panel_left, panel_top, panel_left + panel_width, panel_top + panel_height)
-
-        panel_haze = Image.new('RGBA', size, (0, 0, 0, 0))
-        panel_haze_draw = ImageDraw.Draw(panel_haze)
-        panel_haze_draw.rounded_rectangle(
-            (panel_rect[0] + 6, panel_rect[1] + 10, panel_rect[2] + 6, panel_rect[3] + 18),
-            radius=32,
-            fill=(0, 0, 0, 42),
-        )
-        panel_haze = panel_haze.filter(ImageFilter.GaussianBlur(radius=18))
-        overlay = Image.alpha_composite(overlay, panel_haze)
-
-        o_draw = ImageDraw.Draw(overlay)
-        o_draw.rounded_rectangle(panel_rect, radius=30, fill=(5, 10, 16, 42), outline=rgba(WHITE, 18), width=1)
-        o_draw.line((panel_left + 26, panel_top + 24, panel_left + 158, panel_top + 24), fill=rgba(palette.accent, 172), width=4)
-        o_draw.line((panel_left + 26, panel_top + 38, panel_rect[2] - 28, panel_top + 38), fill=(255, 255, 255, 18), width=1)
-
-        micro_role = self._typography_role('placeholder_micro')
-        micro_source = f'YOTO / {brand_label}' if brand_label else 'YOTO'
-        micro_font = self._load_font_for_text(18, micro_role.candidates, micro_source, layer='placeholder_micro')
-        micro_spacing = self._letter_spacing_px(micro_font, micro_role.tracking_em)
-        micro_text = self._ellipsize(o_draw, self._role_text(micro_source, 'placeholder_micro'), micro_font, panel_width - 64, letter_spacing=micro_spacing)
-        self._draw_role_text(o_draw, (panel_left + 30, panel_top + 48), micro_text, micro_font, (236, 245, 255, 198), role='placeholder_micro', shadow_layers=())
-
-        title_layout, title_style = self._resolve_placeholder_title_layout(
-            o_draw,
-            title,
-            panel_width=panel_width,
-            panel_height=panel_height,
-        )
-        title_gap = int(title_style['line_gap'])
-        title_y = panel_top + int(title_style['title_y_offset']) + 6
-        for index, line in enumerate(title_layout.lines):
-            y = title_y + index * (title_layout.line_height + title_gap)
-            self._draw_role_text(
-                o_draw,
-                (panel_left + 30, y),
-                line,
-                title_layout.font,
-                (248, 251, 255, min(232, int(title_style['text_alpha']))),
-                role='placeholder_title',
-                shadow_layers=((2, 3, max(54, int(title_style['shadow_alpha']) - 10)),),
-            )
-
-        initials = self._placeholder_initials(title)
-        monogram_font = self._load_font_for_text(236 if len(initials) == 1 else 220, ROLE_DISPLAY_BOLD_FONT_CANDIDATES, initials, layer='placeholder_monogram')
-        mono_bbox = o_draw.textbbox((0, 0), initials, font=monogram_font)
-        mono_width = mono_bbox[2] - mono_bbox[0]
-        mono_x = size[0] - mono_width - 132 - (seed[26] % 68)
-        mono_y = 92 + (seed[27] % 100)
-        self._draw_role_text(o_draw, (mono_x + 10, mono_y + 10), initials, monogram_font, rgba(palette.accent, 20), role='brand_wordmark', shadow_layers=())
-        self._draw_role_text(o_draw, (mono_x, mono_y), initials, monogram_font, (255, 255, 255, 26), role='brand_wordmark', shadow_layers=())
-
-        rail_left = size[0] - 354
-        rail_top = 112 + seed[28] % 38
-        for index in range(3):
-            tile_width = 184 + seed[29 + index] % 26
-            tile_height = 76 + seed[32 + index] % 18
-            tile_x = rail_left + (seed[35 + index] % 28) - 10
-            tile_y = rail_top + index * 88 + (seed[38 + index] % 16) - 5
-            tile_rect = (tile_x, tile_y, tile_x + tile_width, tile_y + tile_height)
-            outline = palette.accent if index != 1 else palette.accent_secondary
-            o_draw.rounded_rectangle(tile_rect, radius=20, fill=(8, 13, 20, 78 if index == 0 else 52), outline=rgba(outline, 64 if index == 0 else 46), width=1)
-            o_draw.line((tile_x + 16, tile_y + 14, tile_x + tile_width - 18, tile_y + 14), fill=rgba(outline, 104 if index == 0 else 62), width=2)
-            o_draw.line((tile_x + 16, tile_y + tile_height - 16, tile_x + tile_width - 18, tile_y + tile_height - 16), fill=(255, 255, 255, 16), width=1)
-
-        frame = Image.new('RGBA', size, (0, 0, 0, 0))
-        frame_draw = ImageDraw.Draw(frame)
-        frame_draw.rounded_rectangle((84, 78, size[0] - 84, size[1] - 98), radius=34, outline=rgba(WHITE, 20), width=1)
-        frame_draw.rounded_rectangle((112, 112, size[0] - 112, size[1] - 130), radius=26, outline=rgba(palette.accent, 38), width=1)
-        frame_draw.arc((size[0] - 404, 36, size[0] - 64, 316), start=196, end=344, fill=rgba(palette.glow, 72), width=3)
-        frame_draw.arc((size[0] - 356, 82, size[0] - 112, 284), start=188, end=338, fill=rgba(WHITE, 20), width=1)
-
-        branded = Image.alpha_composite(image.convert('RGBA'), overlay)
-        branded = Image.alpha_composite(branded, frame.filter(ImageFilter.GaussianBlur(radius=1)))
-        branded = branded.convert('RGB')
-        self._placeholder_cache[cache_key] = branded
-        if diagnostics is not None:
-            diagnostics.text_payload['placeholder_caption_mode'] = 'headline_only'
-        return branded.copy()
 
     def _load_named_font(self, name: str, size: int) -> ImageFont.FreeTypeFont | None:
         key = (name, size)

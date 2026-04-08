@@ -157,6 +157,7 @@ class YotoCardRendererV42Adapter:
             gameplay_images=gameplay_paths or None,
             gameplay_selection=gameplay_selection,
             hero_selection=hero_selection,
+            lane=str((offer.metadata or {}).get('lane') or '') or None,
         )
         result = self.engine.render_card(data)
         if self.debug_hero_selection:

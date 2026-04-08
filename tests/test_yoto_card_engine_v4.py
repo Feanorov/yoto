@@ -4,6 +4,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from infrastructure.render.cards.image_providers.base import ImageResolutionRequest, ResolvedImage
+from infrastructure.render.cards.image_providers.resolver import YotoImageResolver
 from infrastructure.render.cards.yoto_card_engine_v4 import BOLD_FONT_CANDIDATES, YotoCardData, YotoCardDiagnostics, YotoCardEngineV4, YotoCardType
 
 
@@ -1142,3 +1144,130 @@ def test_yoto_card_engine_v4_preserves_gameplay_selection_diagnostics_payload(tm
     assert result.diagnostics.gameplay_rejected_ui_like == 2
     assert result.diagnostics.gameplay_selection['selected_urls'] == [str(item) for item in gameplay_paths]
     assert result.diagnostics.gameplay_score_summary[0]['rejection_reason'] == 'ui_like_frame'
+
+
+def test_yoto_card_engine_v4_resolver_metadata_prefers_artwork_when_available(tmp_path: Path) -> None:
+    artwork_path = tmp_path / 'resolver_artwork.png'
+    _make_art(artwork_path)
+    engine = YotoCardEngineV4(tmp_path)
+
+    result = engine.render_card(
+        {
+            'title': 'Resolver Artwork Path',
+            'platform': 'STEAM',
+            'type': YotoCardType.DISCOUNT,
+            'artwork_path': artwork_path,
+            'slug': 'resolver_artwork_path',
+            'lane': 'high_value_discount',
+        }
+    )
+
+    assert result.diagnostics.selected_source == 'artwork'
+    assert result.diagnostics.used_placeholder_artwork is False
+    assert result.diagnostics.decision_reason == 'artwork_available_mode_artwork_only'
+    assert result.diagnostics.image_provider_mode == 'artwork_only'
+    assert result.diagnostics.image_priority == 'HIGH'
+    assert result.diagnostics.image_pipeline_version == 'v1'
+    assert result.diagnostics.text_payload['selected_source'] == 'artwork'
+
+
+
+def test_yoto_card_engine_v4_resolver_metadata_falls_back_to_placeholder(tmp_path: Path) -> None:
+    engine = YotoCardEngineV4(tmp_path)
+
+    result = engine.render_card(
+        {
+            'title': 'Resolver Placeholder Path',
+            'platform': 'EPIC',
+            'type': YotoCardType.FREE_GAME,
+            'artwork_path': tmp_path / 'missing_resolver_artwork.png',
+            'slug': 'resolver_placeholder_path',
+            'lane': 'backlog_filler',
+        }
+    )
+
+    assert result.diagnostics.selected_source == 'placeholder'
+    assert result.diagnostics.used_placeholder_artwork is True
+    assert result.diagnostics.decision_reason == 'placeholder_missing_artwork'
+    assert result.diagnostics.image_priority == 'LOW'
+    assert result.diagnostics.image_pipeline_version == 'v1'
+    assert result.diagnostics.text_payload['placeholder_caption_mode'] == 'headline_only'
+
+
+class _FakeProvider:
+    def __init__(self, result: ResolvedImage | None, *, enabled: bool = True) -> None:
+        self.result = result
+        self.enabled = enabled
+        self.calls = 0
+
+    def resolve(self, request: ImageResolutionRequest) -> ResolvedImage | None:
+        self.calls += 1
+        return self.result
+
+
+def _request(*, artwork_path: Path | None, mode: str = 'artwork_then_ai', lane: str | None = None) -> ImageResolutionRequest:
+    return ImageResolutionRequest(
+        artwork_path=artwork_path,
+        title='AI Resolver Test',
+        platform='STEAM',
+        slug='ai_resolver_test',
+        card_type=YotoCardType.DISCOUNT.value,
+        lane=lane,
+        mode=mode,
+        priority='',
+        image_size=CARD_SIZE,
+    )
+
+
+def test_yoto_image_resolver_uses_ai_when_artwork_missing_and_ai_enabled() -> None:
+    ai_image = Image.new('RGB', CARD_SIZE, '#33aa55')
+    resolver = YotoImageResolver(
+        artwork_provider=_FakeProvider(None),
+        ai_provider=_FakeProvider(ResolvedImage(image=ai_image, metadata={'selected_source': 'ai', 'provider_name': 'ai'})),
+        placeholder_provider=_FakeProvider(ResolvedImage(image=Image.new('RGB', CARD_SIZE, '#111111'), metadata={'selected_source': 'placeholder'})),
+        mode='artwork_then_ai',
+    )
+
+    result = resolver.resolve(_request(artwork_path=None, lane='breaking_freebie'))
+
+    assert result.metadata['selected_source'] == 'ai'
+    assert result.metadata['decision_reason'] == 'ai_generated_missing_artwork'
+    assert result.metadata['priority'] == 'HIGH'
+    assert result.metadata['ai_attempted'] is True
+    assert result.metadata['ai_succeeded'] is True
+
+
+def test_yoto_image_resolver_falls_back_to_placeholder_when_ai_fails() -> None:
+    placeholder = Image.new('RGB', CARD_SIZE, '#111111')
+    resolver = YotoImageResolver(
+        artwork_provider=_FakeProvider(None),
+        ai_provider=_FakeProvider(None),
+        placeholder_provider=_FakeProvider(ResolvedImage(image=placeholder, metadata={'selected_source': 'placeholder'})),
+        mode='ai_first',
+    )
+
+    result = resolver.resolve(_request(artwork_path=None, mode='ai_first', lane='backlog_filler'))
+
+    assert result.metadata['selected_source'] == 'placeholder'
+    assert result.metadata['decision_reason'] == 'placeholder_ai_failed'
+    assert result.metadata['priority'] == 'LOW'
+    assert result.metadata['ai_attempted'] is True
+    assert result.metadata['ai_succeeded'] is False
+
+
+def test_yoto_image_resolver_skips_ai_in_artwork_only_mode() -> None:
+    ai_provider = _FakeProvider(ResolvedImage(image=Image.new('RGB', CARD_SIZE, '#22aa22'), metadata={'selected_source': 'ai'}))
+    resolver = YotoImageResolver(
+        artwork_provider=_FakeProvider(None),
+        ai_provider=ai_provider,
+        placeholder_provider=_FakeProvider(ResolvedImage(image=Image.new('RGB', CARD_SIZE, '#111111'), metadata={'selected_source': 'placeholder'})),
+        mode='artwork_only',
+    )
+
+    result = resolver.resolve(_request(artwork_path=None, mode='artwork_only'))
+
+    assert result.metadata['selected_source'] == 'placeholder'
+    assert result.metadata['decision_reason'] == 'placeholder_missing_artwork'
+    assert result.metadata['ai_attempted'] is False
+    assert result.metadata['ai_succeeded'] is False
+    assert ai_provider.calls == 0
