@@ -7,6 +7,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from infrastructure.render.cards.asset_source import resolve_existing_asset_path
 from infrastructure.render.cards.asset_sources.asset_cache import (
@@ -179,7 +180,7 @@ def _evaluate_local_cache(value: str | None) -> tuple[str | None, str]:
 
 
 def _cache_extension(remote_url: str, fallback: str = '.jpg') -> str:
-    name = Path(remote_url).name
+    name = Path(urlparse(remote_url).path or remote_url).name
     suffix = Path(name).suffix
     return suffix or fallback
 
@@ -399,27 +400,38 @@ def _resolve_candidate_contract(
     path_or_url = explicit_path_or_url
     if not remote_url and _is_http_url(path_or_url):
         remote_url = path_or_url
-    local_candidate = _normalize_local_path(explicit_cache_path or path_or_url)
+    remote_cache_candidate = None
+    if remote_url:
+        explicit_remote_cache = _safe_text(explicit_cache_path)
+        if explicit_remote_cache and explicit_remote_cache != path_or_url:
+            remote_cache_candidate = _normalize_local_path(explicit_remote_cache)
+        else:
+            remote_cache_candidate = _normalize_local_path(
+                _deterministic_cache_path(
+                    namespace=cache_namespace,
+                    identifier=cache_identifier,
+                    source_type=source_type,
+                    remote_url=remote_url,
+                    index=index,
+                )
+            )
+        remote_cache_path, remote_cache_status = _evaluate_local_cache(remote_cache_candidate)
+        if remote_cache_status == 'cached':
+            return remote_cache_path or remote_url, remote_url, remote_cache_path, remote_cache_status
+
+    local_candidate = _normalize_local_path(path_or_url)
     if local_candidate is not None:
-        cache_path, cache_status = _evaluate_local_cache(local_candidate)
-        if cache_status == 'cached':
-            return cache_path or local_candidate, remote_url or None, cache_path, cache_status
-        return path_or_url or local_candidate, remote_url or None, cache_path, cache_status
+        local_path, local_status = _evaluate_local_cache(local_candidate)
+        if local_status == 'cached':
+            if remote_url and remote_cache_candidate is not None:
+                return local_path or local_candidate, remote_url, remote_cache_path, 'not_requested'
+            return local_path or local_candidate, remote_url or None, local_path, local_status
+        if remote_url and remote_cache_candidate is not None:
+            return remote_url, remote_url, remote_cache_path, 'not_requested'
+        return path_or_url or local_candidate, remote_url or None, local_path, local_status
 
     if remote_url:
-        deterministic_cache_path = _normalize_local_path(
-            explicit_cache_path or _deterministic_cache_path(
-                namespace=cache_namespace,
-                identifier=cache_identifier,
-                source_type=source_type,
-                remote_url=remote_url,
-                index=index,
-            )
-        )
-        cache_path, cache_status = _evaluate_local_cache(deterministic_cache_path)
-        if cache_status == 'cached':
-            return cache_path or remote_url, remote_url, cache_path, cache_status
-        return remote_url, remote_url, cache_path, 'not_requested'
+        return remote_url, remote_url, remote_cache_path, 'not_requested'
 
     if path_or_url:
         return path_or_url, None, None, 'missing'

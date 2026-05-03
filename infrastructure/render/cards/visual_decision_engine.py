@@ -111,79 +111,105 @@ OFFICIAL_LIKE_SOURCE_TYPES = frozenset(
 
 VISUAL_SOURCE_PREFERENCE: dict[str, dict[str, float]] = {
     'character': {
-        'steam_library_capsule': 1.0,
-        'steam_main_capsule': 0.98,
-        'official_press_key_art': 0.96,
-        'steam_library_hero': 0.88,
-        'steam_header_capsule': 0.84,
-        'epic_offer_image': 0.82,
-        'epic_library_landscape': 0.74,
-        'steam_screenshot': 0.58,
-        'official_trailer_frame': 0.55,
+        'official_press_key_art': 1.0,
+        'steam_library_hero': 0.96,
+        'steam_main_capsule': 0.9,
+        'epic_offer_image': 0.86,
+        'epic_library_landscape': 0.8,
+        'steam_screenshot': 0.76,
+        'official_trailer_frame': 0.74,
+        'steam_header_capsule': 0.68,
+        'steam_library_capsule': 0.64,
         AI_SOURCE_TYPE: 0.78,
     },
     'scene': {
         'steam_library_hero': 1.0,
         'epic_library_landscape': 0.96,
-        'steam_header_capsule': 0.93,
-        'official_press_key_art': 0.92,
-        'official_trailer_frame': 0.89,
-        'steam_screenshot': 0.86,
-        'epic_offer_image': 0.8,
-        'steam_main_capsule': 0.72,
-        'steam_library_capsule': 0.68,
+        'official_trailer_frame': 0.91,
+        'steam_screenshot': 0.9,
+        'official_press_key_art': 0.86,
+        'epic_offer_image': 0.78,
+        'steam_header_capsule': 0.66,
+        'steam_main_capsule': 0.6,
+        'steam_library_capsule': 0.56,
         AI_SOURCE_TYPE: 0.8,
     },
     'gameplay': {
         'steam_screenshot': 1.0,
         'official_trailer_frame': 0.94,
-        'steam_library_hero': 0.82,
-        'epic_library_landscape': 0.78,
-        'steam_header_capsule': 0.7,
-        'official_press_key_art': 0.64,
-        'epic_offer_image': 0.6,
-        'steam_main_capsule': 0.56,
-        'steam_library_capsule': 0.52,
+        'steam_library_hero': 0.86,
+        'epic_library_landscape': 0.82,
+        'official_press_key_art': 0.66,
+        'epic_offer_image': 0.62,
+        'steam_header_capsule': 0.56,
+        'steam_main_capsule': 0.5,
+        'steam_library_capsule': 0.46,
         AI_SOURCE_TYPE: 0.76,
     },
     'collage': {
-        'steam_library_capsule': 0.96,
-        'steam_main_capsule': 0.94,
-        'official_press_key_art': 0.9,
-        'epic_offer_image': 0.88,
-        'steam_header_capsule': 0.84,
-        'steam_library_hero': 0.82,
-        'steam_screenshot': 0.76,
-        'epic_library_landscape': 0.76,
-        'official_trailer_frame': 0.72,
+        'steam_screenshot': 0.96,
+        'steam_library_hero': 0.94,
+        'official_trailer_frame': 0.9,
+        'epic_library_landscape': 0.88,
+        'official_press_key_art': 0.82,
+        'epic_offer_image': 0.74,
+        'steam_main_capsule': 0.62,
+        'steam_header_capsule': 0.58,
+        'steam_library_capsule': 0.54,
         AI_SOURCE_TYPE: 0.72,
     },
     'poster_art': {
         'official_press_key_art': 1.0,
-        'steam_main_capsule': 0.95,
-        'steam_library_capsule': 0.94,
-        'epic_offer_image': 0.9,
-        'steam_library_hero': 0.78,
-        'steam_header_capsule': 0.76,
-        'epic_library_landscape': 0.74,
-        'steam_screenshot': 0.54,
-        'official_trailer_frame': 0.52,
+        'steam_library_hero': 0.92,
+        'steam_main_capsule': 0.86,
+        'epic_offer_image': 0.84,
+        'epic_library_landscape': 0.78,
+        'steam_screenshot': 0.72,
+        'official_trailer_frame': 0.7,
+        'steam_header_capsule': 0.64,
+        'steam_library_capsule': 0.6,
         AI_SOURCE_TYPE: 0.8,
     },
 }
 
 SOURCE_STRENGTH_MAP: dict[str, float] = {
-    'official_press_key_art': 1.0,
-    'steam_library_capsule': 0.96,
-    'steam_main_capsule': 0.92,
-    'epic_offer_image': 0.9,
-    'steam_screenshot': 0.76,
-    'official_trailer_frame': 0.72,
-    'steam_library_hero': 0.64,
-    'epic_library_landscape': 0.62,
-    'steam_header_capsule': 0.56,
+    'steam_library_hero': 0.98,
+    'steam_screenshot': 0.96,
+    'official_trailer_frame': 0.92,
+    'epic_library_landscape': 0.9,
+    'official_press_key_art': 0.88,
+    'epic_offer_image': 0.78,
+    'steam_main_capsule': 0.64,
+    'steam_header_capsule': 0.58,
+    'steam_library_capsule': 0.54,
     AI_SOURCE_TYPE: 0.46,
 }
+
+ASSET_TYPE_PRIORITY: dict[str, int] = {
+    'steam_library_hero': 400,
+    'steam_screenshot': 390,
+    'epic_screenshot': 390,
+    'gameplay': 390,
+    'hero': 380,
+    'action': 380,
+    'official_trailer_frame': 360,
+    'epic_library_landscape': 350,
+    'official_press_key_art': 330,
+    'key_art': 320,
+    'cover_art': 310,
+    'character': 300,
+    'vehicle': 300,
+    'artwork': 280,
+    'epic_offer_image': 240,
+    'steam_main_capsule': 160,
+    'steam_library_capsule': 140,
+    'steam_header_capsule': 120,
+    'capsule': 100,
+    'banner': 80,
+    'logo': 40,
+    'title': 30,
+}
+REJECT_ASSET_TYPES = frozenset({'collage', 'ui', 'invalid'})
 
 HERO_HINT_KEYWORDS = (
     'character',
@@ -210,13 +236,17 @@ GAMEPLAY_HINT_KEYWORDS = (
     'builder',
     'city',
     'combat',
+    'drift',
     'factory',
     'gameplay',
     'harpoon',
     'hud',
     'map',
+    'racing',
+    'speed',
     'strategy',
     'trailer',
+    'vehicle',
     'world map',
 )
 SCENE_HINT_KEYWORDS = (
@@ -257,6 +287,22 @@ GROUP_HINT_KEYWORDS = (
     'multiple characters',
     'series',
     'team',
+)
+MAIN_OBJECT_HINT_KEYWORDS = (
+    'character',
+    'close-up',
+    'closeup',
+    'face',
+    'foreground',
+    'foreground_action',
+    'hero',
+    'leader',
+    'portrait',
+    'readable_subject',
+    'subject',
+    'subject focus',
+    'subject_focus',
+    'vehicle_focus',
 )
 LARGE_SUBJECT_HINT_KEYWORDS = (
     'close-up',
@@ -316,6 +362,87 @@ CLUTTER_DENSITY_HINT_KEYWORDS = (
     'multiple characters',
     'team',
     'world map',
+)
+TEXT_HEAVY_HINT_KEYWORDS = (
+    'callout',
+    'caption',
+    'deluxe edition',
+    'download now',
+    'headline',
+    'logo dominant',
+    'logo_dominant',
+    'marketing_copy',
+    'marketing message',
+    'out now',
+    'price tag',
+    'promo copy',
+    'promo_text',
+    'promotional text',
+    'sale badge',
+    'text heavy',
+    'text overlay',
+    'text_heavy',
+    'wishlist',
+)
+ATMOSPHERE_COMPOSITION_HINT_KEYWORDS = (
+    'atmosphere',
+    'atmospheric',
+    'contrast',
+    'depth',
+    'foreground',
+    'landmark',
+    'landmarks',
+    'lighting',
+    'scene_focus',
+    'silhouette',
+    'vista',
+)
+ABSTRACT_CONTEXTLESS_HINT_KEYWORDS = (
+    'abstract',
+    'abstract_art',
+    'emblem',
+    'icon',
+    'monument',
+    'statue',
+    'symbolic',
+    'symbolic_art',
+)
+UI_HEAVY_SCREENSHOT_HINT_KEYWORDS = (
+    'button',
+    'buttons',
+    'hud',
+    'interface',
+    'menu',
+    'overview',
+    'panel',
+    'report',
+    'text',
+    'ui',
+)
+MENU_LIKE_UI_HINT_KEYWORDS = (
+    'button',
+    'buttons',
+    'interface',
+    'menu',
+    'overview',
+    'panel',
+    'report',
+    'ui',
+)
+CLICKABLE_SOURCE_TYPES = frozenset(
+    {
+        'epic_offer_image',
+        'steam_library_capsule',
+        'steam_main_capsule',
+    }
+)
+HERO_FOCUS_FALLBACK_SOURCE_TYPES = frozenset(
+    {
+        'epic_offer_image',
+        'official_press_key_art',
+        'steam_library_capsule',
+        'steam_main_capsule',
+    }
 )
 
 READABILITY_ENRICHMENT_HEADROOM_WEIGHT = 0.65
@@ -902,17 +1029,23 @@ class VisualDecisionEngine:
         genre_cluster: str,
     ) -> ScoredAsset:
         enrichment = self._enrich_asset(candidate)
+        small_asset_penalty = self._small_asset_penalty(candidate)
+        small_size_readability_relief = self._small_size_readability_relief(
+            candidate,
+            enrichment=enrichment,
+            visual_type=visual_type,
+        )
+        effective_small_asset_penalty = max(0.0, small_asset_penalty - small_size_readability_relief)
         size_score = self._size_score(candidate)
         aspect_fit = self._aspect_fit(candidate, visual_type=visual_type)
         metadata_confidence = self._metadata_confidence(candidate)
         weak_metadata_penalty = 0.08 if metadata_confidence < 0.55 else 0.0
-        small_asset_penalty = self._small_asset_penalty(candidate)
         base_readability_score = _clamp(
             0.10
             + (0.45 * size_score)
             + (0.20 * aspect_fit)
             + (0.25 * metadata_confidence)
-            - small_asset_penalty
+            - effective_small_asset_penalty
             - weak_metadata_penalty
         )
         (
@@ -943,7 +1076,7 @@ class VisualDecisionEngine:
             + (0.20 * metadata_focus)
             + (0.10 * metadata_confidence)
             + cluster_bonus
-            - small_asset_penalty
+            - effective_small_asset_penalty
             - weak_metadata_penalty
         )
         focus_enrichment_delta, focus_reasons = self._focus_enrichment_delta(
@@ -952,16 +1085,27 @@ class VisualDecisionEngine:
             visual_type=visual_type,
             visual_anchor_focus_boost=visual_anchor_focus_boost,
         )
-        focus_score = _clamp(base_focus_score + focus_enrichment_delta)
+        readability_rule_delta, focus_rule_delta, rule_reasons = self._visual_decision_rule_adjustment(
+            candidate,
+            enrichment=enrichment,
+            visual_type=visual_type,
+            genre_cluster=genre_cluster,
+        )
+        readability_score = _clamp(readability_score + readability_rule_delta)
+        focus_score = _clamp(base_focus_score + focus_enrichment_delta + focus_rule_delta)
 
         hard_reject_reasons = self._hard_reject_reasons(
             candidate,
             enrichment=enrichment,
             visual_type=visual_type,
-            small_asset_penalty=small_asset_penalty,
+            small_asset_penalty=effective_small_asset_penalty,
         )
         accepted = (
             not hard_reject_reasons
+            and (
+                visual_type not in {'character', 'poster_art'}
+                or 'vdr1_missing_readable_focus_penalty' not in rule_reasons
+            )
             and readability_score >= MIN_READABILITY_SCORE
             and focus_score >= MIN_FOCUS_SCORE
         )
@@ -973,12 +1117,20 @@ class VisualDecisionEngine:
             rejection_reasons.append('readability_below_threshold')
         if focus_score < MIN_FOCUS_SCORE:
             rejection_reasons.append('focus_below_threshold')
-        if small_asset_penalty >= 0.20:
+        if effective_small_asset_penalty >= 0.20:
             rejection_reasons.append('asset_too_small')
         if metadata_confidence < 0.55:
             rejection_reasons.append('weak_metadata')
         if candidate.source_type not in KNOWN_SOURCE_TYPES:
             rejection_reasons.append('unknown_source_type')
+        if 'vdr1_missing_readable_focus_penalty' in rule_reasons:
+            rejection_reasons.append('missing_readable_focus')
+        if 'vdr1_empty_scene_penalty' in rule_reasons:
+            rejection_reasons.append('empty_background')
+        if 'vdr1_text_heavy_penalty' in rule_reasons:
+            rejection_reasons.append('text_heavy')
+        if 'vdr1_no_collage_penalty' in rule_reasons:
+            rejection_reasons.append('collage_like')
         rejection_reasons = _dedupe_reasons(rejection_reasons)
 
         scoring_reasons = list(enrichment.signals)
@@ -986,6 +1138,7 @@ class VisualDecisionEngine:
             scoring_reasons.append(visual_anchor_boost_reason)
         scoring_reasons.extend(readability_reasons)
         scoring_reasons.extend(focus_reasons)
+        scoring_reasons.extend(rule_reasons)
         if hard_reject_reasons:
             scoring_reasons.extend(f'hard_reject:{reason}' for reason in hard_reject_reasons)
         scoring_reason = '; '.join(dict.fromkeys(item for item in scoring_reasons if _safe_text(item))) or 'base_scoring_only'
@@ -1014,8 +1167,11 @@ class VisualDecisionEngine:
                 'visual_anchor_boost_applied': visual_anchor_boost_applied,
                 'visual_anchor_readability_boost': round(visual_anchor_readability_boost, 3),
                 'visual_anchor_focus_boost': round(visual_anchor_focus_boost, 3),
-                'small_asset_penalty': round(small_asset_penalty, 3),
+                'small_asset_penalty': round(effective_small_asset_penalty, 3),
+                'small_size_readability_relief': round(small_size_readability_relief, 3),
                 'weak_metadata_penalty': round(weak_metadata_penalty, 3),
+                'visual_decision_rule_readability_delta': round(readability_rule_delta, 3),
+                'visual_decision_rule_focus_delta': round(focus_rule_delta, 3),
                 'scoring_reason_parts': scoring_reasons,
             },
             scoring_reason=scoring_reason,
@@ -1141,6 +1297,17 @@ class VisualDecisionEngine:
             part
             for part in (
                 candidate.signal_text,
+                _normalize_text(candidate.path_or_url),
+            )
+            if part
+        )
+
+    @staticmethod
+    def _content_hint_text(candidate: AssetCandidate) -> str:
+        return ' '.join(
+            part
+            for part in (
+                _metadata_text(candidate.metadata),
                 _normalize_text(candidate.path_or_url),
             )
             if part
@@ -1511,6 +1678,223 @@ class VisualDecisionEngine:
             score_name='focus',
         )
 
+    @classmethod
+    def _visual_decision_rule_adjustment(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        visual_type: str,
+        genre_cluster: str,
+    ) -> tuple[float, float, list[str]]:
+        hint_text = cls._hint_text(candidate)
+        content_hint_text = cls._content_hint_text(candidate)
+        has_main_object = cls._has_main_object_signal(content_hint_text)
+        has_group_or_collage_hint = _contains_any_keyword(hint_text, GROUP_HINT_KEYWORDS)
+        has_text_heavy_hint = cls._is_text_heavy_candidate(hint_text)
+        scene_only_candidate = _contains_any_keyword(content_hint_text, SCENE_HINT_KEYWORDS)
+        gameplay_candidate = _contains_any_keyword(content_hint_text, GAMEPLAY_HINT_KEYWORDS)
+        focus_profile = cls._focus_profile(
+            candidate,
+            enrichment=enrichment,
+            hint_text=content_hint_text,
+            has_main_object=has_main_object,
+            has_text_heavy_hint=has_text_heavy_hint,
+            genre_cluster=genre_cluster,
+        )
+
+        readability_delta = 0.0
+        focus_delta = 0.0
+        reasons: list[str] = []
+
+        if (
+            visual_type in {'character', 'poster_art'}
+            and candidate.source_type in CLICKABLE_SOURCE_TYPES
+            and cls._candidate_has_local_asset_file(candidate)
+            and has_main_object
+            and enrichment.estimated_visual_density != 'cluttered'
+        ):
+            readability_delta += 0.06
+            focus_delta += 0.08
+            reasons.append('vdr1_clickable_asset_bonus')
+
+        if visual_type != 'collage':
+            if focus_profile == 'hero':
+                focus_delta += 0.04
+                reasons.append('vdr1_focus_profile_hero_bonus')
+            elif focus_profile == 'gameplay_focus':
+                readability_delta += 0.015
+                focus_delta += 0.03
+                reasons.append('vdr1_focus_profile_gameplay_bonus')
+            elif focus_profile == 'atmosphere':
+                readability_delta += 0.01
+                focus_delta += 0.02
+                reasons.append('vdr1_focus_profile_atmosphere_bonus')
+                if genre_cluster == 'motion_vehicle' and candidate.source_type == 'steam_library_hero':
+                    focus_delta += 0.02
+                    reasons.append('vdr1_motion_vehicle_banner_focus_bonus')
+            else:
+                readability_delta -= 0.18
+                focus_delta -= 0.34
+                reasons.append('vdr1_missing_readable_focus_penalty')
+
+        if (
+            visual_type in {'character', 'poster_art', 'scene'}
+            and scene_only_candidate
+            and not gameplay_candidate
+            and focus_profile == 'none'
+            and enrichment.estimated_subject_scale in {'small', 'unknown'}
+        ):
+            readability_delta -= 0.08
+            focus_delta -= 0.10
+            reasons.append('vdr1_empty_scene_penalty')
+
+        if visual_type != 'collage' and has_group_or_collage_hint and enrichment.composition_bias != 'gameplay':
+            readability_delta -= 0.06
+            focus_delta -= 0.12
+            reasons.append('vdr1_no_collage_penalty')
+
+        if has_text_heavy_hint:
+            readability_delta -= 0.14
+            focus_delta -= 0.08
+            reasons.append('vdr1_text_heavy_penalty')
+
+        return (
+            _clamp_range(readability_delta, -0.24, 0.10),
+            _clamp_range(focus_delta, -0.34, 0.12),
+            reasons,
+        )
+
+    @classmethod
+    def _small_size_readability_relief(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        visual_type: str,
+    ) -> float:
+        if visual_type not in {'character', 'poster_art'}:
+            return 0.0
+        if candidate.source_type not in CLICKABLE_SOURCE_TYPES:
+            return 0.0
+        if not cls._candidate_has_local_asset_file(candidate):
+            return 0.0
+        hint_text = cls._hint_text(candidate)
+        if not cls._has_main_object_signal(hint_text):
+            return 0.0
+
+        relief = 0.0
+        if enrichment.estimated_subject_scale in {'large', 'medium'}:
+            relief += 0.04
+        if enrichment.estimated_focus in {'strong', 'medium'}:
+            relief += 0.04
+        if enrichment.estimated_visual_density == 'simple':
+            relief += 0.02
+        if _contains_keyword(hint_text, 'logo_safe'):
+            relief += 0.02
+        return _clamp_range(relief, 0.0, 0.10)
+
+    @staticmethod
+    def _has_main_object_signal(hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, MAIN_OBJECT_HINT_KEYWORDS)
+
+    @staticmethod
+    def _is_text_heavy_candidate(hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, TEXT_HEAVY_HINT_KEYWORDS)
+
+    @staticmethod
+    def _has_atmosphere_composition_signal(hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, ATMOSPHERE_COMPOSITION_HINT_KEYWORDS)
+
+    @classmethod
+    def _focus_profile(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        hint_text: str,
+        has_main_object: bool,
+        has_text_heavy_hint: bool,
+        genre_cluster: str,
+    ) -> str:
+        if has_text_heavy_hint:
+            return 'none'
+
+        if (
+            enrichment.composition_bias == 'gameplay'
+            and enrichment.estimated_focus in {'strong', 'medium'}
+            and _contains_any_keyword(hint_text, GAMEPLAY_HINT_KEYWORDS)
+            and not cls._is_ui_heavy_screenshot_candidate(
+                candidate,
+                enrichment=enrichment,
+                hint_text=hint_text,
+            )
+        ):
+            return 'gameplay_focus'
+
+        if (
+            genre_cluster == 'motion_vehicle'
+            and candidate.source_type == 'steam_library_hero'
+            and enrichment.composition_bias == 'banner'
+            and enrichment.estimated_subject_scale in {'large', 'medium'}
+            and enrichment.estimated_visual_density in {'simple', 'medium'}
+            and cls._candidate_has_local_asset_file(candidate)
+        ):
+            return 'atmosphere'
+
+        has_source_focus_fallback = (
+            candidate.source_type in HERO_FOCUS_FALLBACK_SOURCE_TYPES
+            and enrichment.composition_bias == 'hero'
+            and enrichment.estimated_subject_scale in {'large', 'medium'}
+            and enrichment.estimated_focus in {'strong', 'medium'}
+            and enrichment.estimated_visual_density != 'cluttered'
+            and not _contains_any_keyword(hint_text, SCENE_HINT_KEYWORDS)
+            and not _contains_any_keyword(hint_text, ABSTRACT_CONTEXTLESS_HINT_KEYWORDS)
+        )
+
+        if (
+            enrichment.composition_bias == 'hero'
+            and
+            (has_main_object or has_source_focus_fallback)
+            and enrichment.estimated_subject_scale in {'large', 'medium'}
+            and enrichment.estimated_focus in {'strong', 'medium'}
+            and enrichment.estimated_visual_density != 'cluttered'
+        ):
+            return 'hero'
+
+        if (
+            enrichment.composition_bias == 'scene'
+            and enrichment.estimated_subject_scale in {'medium', 'large'}
+            and enrichment.estimated_focus in {'strong', 'medium'}
+            and enrichment.estimated_visual_density in {'simple', 'medium'}
+            and cls._has_atmosphere_composition_signal(hint_text)
+        ):
+            return 'atmosphere'
+
+        return 'none'
+
+    @classmethod
+    def _is_ui_heavy_screenshot_candidate(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        hint_text: str,
+    ) -> bool:
+        if candidate.source_type not in {'steam_screenshot', 'official_trailer_frame'} and 'screenshot' not in candidate.kind:
+            return False
+
+        has_ui_hint = _contains_any_keyword(hint_text, UI_HEAVY_SCREENSHOT_HINT_KEYWORDS)
+        if not has_ui_hint:
+            return False
+
+        return (
+            enrichment.composition_bias == 'gameplay'
+            or enrichment.estimated_visual_density == 'cluttered'
+            or cls._is_text_heavy_candidate(hint_text)
+            or _contains_any_keyword(hint_text, MENU_LIKE_UI_HINT_KEYWORDS)
+        )
+
     @staticmethod
     def _cap_enrichment_delta(
         *,
@@ -1536,8 +1920,9 @@ class VisualDecisionEngine:
             reasons.append(f'{score_name}_delta_capped:{raw_delta:+.3f}->{capped_delta:+.3f}')
         return capped_delta, reasons
 
-    @staticmethod
+    @classmethod
     def _hard_reject_reasons(
+        cls,
         candidate: AssetCandidate,
         *,
         enrichment: AssetEnrichment,
@@ -1545,12 +1930,28 @@ class VisualDecisionEngine:
         small_asset_penalty: float,
     ) -> list[str]:
         reasons: list[str] = []
+        hint_text = cls._hint_text(candidate)
+        if not candidate.path_or_url:
+            reasons.append('asset_path_or_url_missing')
+        if candidate.source_type in REJECT_ASSET_TYPES or candidate.kind in REJECT_ASSET_TYPES:
+            reasons.append('rejected_asset_type')
         if candidate.width is None or candidate.height is None:
             reasons.append('missing_dimensions')
         if small_asset_penalty >= 0.35:
             reasons.append('asset_too_small')
         if enrichment.local_image_readable is False:
             reasons.append('invalid_or_unreadable_file')
+        if cls._is_unresolved_template_only_screenshot_candidate(candidate):
+            reasons.append('template_only_screenshot_not_available')
+        if (
+            visual_type != 'collage'
+            and cls._is_ui_heavy_screenshot_candidate(
+                candidate,
+                enrichment=enrichment,
+                hint_text=hint_text,
+            )
+        ):
+            reasons.append('ui_heavy_screenshot_for_single_title')
         if visual_type in {'character', 'poster_art'}:
             if enrichment.composition_bias == 'banner' or enrichment.is_wide_banner:
                 reasons.append('banner_only_for_portrait_intent')
@@ -1719,6 +2120,14 @@ class VisualDecisionEngine:
         )
 
     @classmethod
+    def _is_unresolved_template_only_screenshot_candidate(cls, candidate: AssetCandidate) -> bool:
+        return (
+            candidate.source_type == 'steam_screenshot'
+            and bool(candidate.metadata.get('template_only'))
+            and not cls._candidate_has_local_asset_file(candidate)
+        )
+
+    @classmethod
     def _is_local_fallback_candidate(cls, item: ScoredAsset) -> bool:
         return (
             cls._candidate_source_origin(item.candidate) in LOCAL_FALLBACK_SOURCE_ORIGINS
@@ -1827,6 +2236,10 @@ class VisualDecisionEngine:
             key=lambda item: (
                 0 if item.candidate.is_official else 1,
                 -item.total_score,
+                -self._asset_type_tiebreak_rank(item.candidate),
+                -self._subject_scale_tiebreak_rank(item.enrichment.estimated_subject_scale),
+                -self._focus_tiebreak_rank(item.enrichment.estimated_focus),
+                -self._simplicity_tiebreak_rank(item.enrichment.estimated_visual_density),
                 -item.focus_score,
                 -item.readability_score,
                 -item.candidate.area,
@@ -1834,6 +2247,39 @@ class VisualDecisionEngine:
                 item.candidate.path_or_url,
             ),
         )
+
+    @staticmethod
+    def _asset_type_tiebreak_rank(candidate: AssetCandidate) -> int:
+        source_rank = ASSET_TYPE_PRIORITY.get(candidate.source_type, 0)
+        kind_rank = ASSET_TYPE_PRIORITY.get(candidate.kind, 0)
+        return max(source_rank, kind_rank)
+
+    @staticmethod
+    def _subject_scale_tiebreak_rank(subject_scale: str) -> int:
+        return {
+            'large': 3,
+            'medium': 2,
+            'small': 1,
+            'unknown': 0,
+        }.get(subject_scale, 0)
+
+    @staticmethod
+    def _focus_tiebreak_rank(estimated_focus: str) -> int:
+        return {
+            'strong': 3,
+            'medium': 2,
+            'weak': 1,
+            'unknown': 0,
+        }.get(estimated_focus, 0)
+
+    @staticmethod
+    def _simplicity_tiebreak_rank(visual_density: str) -> int:
+        return {
+            'simple': 3,
+            'medium': 2,
+            'unknown': 1,
+            'cluttered': 0,
+        }.get(visual_density, 0)
 
     def _infer_layout_type(
         self,

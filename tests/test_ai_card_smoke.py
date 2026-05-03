@@ -7,7 +7,7 @@ import shutil
 from PIL import Image
 
 from infrastructure.render.cards.asset_sources.asset_cache import AssetCacheDownloadResult
-from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, run_scenario
+from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, SMOKE_LOCAL_LANDSCAPE_ASSET, run_scenario
 
 
 def _png_bytes() -> bytes:
@@ -141,6 +141,9 @@ def test_ai_card_smoke_current_env_supports_game_eval_seed_layout(tmp_path: Path
         seed=3,
         game_eval=True,
     )
+    rejected_screenshot = next(
+        item for item in result['cover_decision_rejected_assets'] if item.get('source_type') == 'steam_screenshot'
+    )
 
     assert Path(result['image_path']).exists()
     assert Path(result['manifest_path']).exists()
@@ -160,9 +163,63 @@ def test_ai_card_smoke_current_env_supports_game_eval_seed_layout(tmp_path: Path
     assert result['provider'] == 'artwork'
     assert result['ai_attempted'] is False
     assert result['decision_asset_used'] is True
-    assert result['actual_image_source_type'] == 'steam_screenshot'
+    assert result['actual_image_source_type'] == result['cover_decision_image_source_type']
+    assert result['actual_image_source_type'] != 'steam_screenshot'
+    assert 'ui_heavy_screenshot_for_single_title' in rejected_screenshot['rejection_reasons']
     assert result['final_source'] == 'asset'
     assert result['outcome'] == 'official_asset'
+
+
+def test_ai_card_smoke_download_assets_rejects_civilization_ui_screenshot(tmp_path: Path) -> None:
+    png_bytes = _png_bytes()
+    screenshot_cache_path = (
+        Path(__file__).resolve().parents[1]
+        / 'output'
+        / 'cards'
+        / 'official_asset_cache'
+        / 'steam'
+        / '289070'
+        / 'steam_screenshot_1.jpg'
+    )
+    screenshot_cache_path.unlink(missing_ok=True)
+    try:
+        def fake_downloader(*, remote_url: str, cache_path: str, timeout_seconds: int, max_bytes: int) -> AssetCacheDownloadResult:
+            target = Path(cache_path)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(png_bytes)
+            return AssetCacheDownloadResult(
+                cache_path=str(target),
+                cache_status='downloaded',
+                download_attempted=True,
+                bytes_written=len(png_bytes),
+                content_type='image/png',
+            )
+
+        game_input = dict(MINIMAL_SMOKE_GAMES[1])
+        result = run_scenario(
+            scenario='quality_reject',
+            output_root=tmp_path,
+            game_input=game_input,
+            game_set='minimal',
+            download_assets=True,
+            asset_downloader=fake_downloader,
+        )
+        rejected_screenshot = next(
+            item for item in result['cover_decision_rejected_assets'] if item.get('source_type') == 'steam_screenshot'
+        )
+
+        assert result['cover_decision_image_source_type'] != 'steam_screenshot'
+        assert result['decision_asset_used'] is True
+        assert Path(screenshot_cache_path).exists()
+        assert result['actual_image_path_or_url'] == result['selected_asset_cache_path']
+        assert result['actual_image_path_or_url'] != str(screenshot_cache_path)
+        assert result['actual_image_path_or_url'] != SMOKE_LOCAL_LANDSCAPE_ASSET
+        assert Path(result['actual_image_path_or_url']).exists()
+        assert 'ui_heavy_screenshot_for_single_title' in rejected_screenshot['rejection_reasons']
+        assert result['provider'] == 'artwork'
+        assert result['final_source'] == 'asset'
+    finally:
+        screenshot_cache_path.unlink(missing_ok=True)
 
 
 def test_ai_card_smoke_broken_comfyui_falls_back_without_crash(tmp_path: Path) -> None:

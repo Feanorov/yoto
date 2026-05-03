@@ -30,6 +30,14 @@
       "source_hint": "steam",
       "steam_app_id": "289070",
       "license_hint": "local_smoke_fixture",
+      "asset_urls": {
+        "steam_screenshot": {
+          "remote_url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/289070/ss_12cc6e1f4084de5bc0f66bfdbe3aaf3e59388b53.1920x1080.jpg?t=1740607040",
+          "width": 1920,
+          "height": 1080,
+          "kind": "screenshot"
+        }
+      },
       "local_assets": {
         "steam_screenshot": {
           "path_or_url": "video_generator/smoke_test/assets/game.png",
