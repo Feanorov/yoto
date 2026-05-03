@@ -1,0 +1,153 @@
+{
+  "version": 2,
+  "entries": [
+    {
+      "slug": "hades_ii",
+      "game_title": "Hades II",
+      "store_id": "steam:hades_ii",
+      "source_hint": "steam",
+      "steam_app_id": "1145350",
+      "license_hint": "local_smoke_fixture",
+      "local_assets": {
+        "official_press_key_art": {
+          "path_or_url": "video_generator/assets/fallback_game_image.png",
+          "width": 1800,
+          "height": 2700,
+          "kind": "key_art",
+          "metadata": {
+            "subject_focus": "character",
+            "composition": "foreground hero portrait",
+            "logo_safe": true,
+            "weapon_emphasis": "glowing blades"
+          }
+        }
+      }
+    },
+    {
+      "slug": "civilization_vi",
+      "game_title": "Civilization VI",
+      "store_id": "steam:civilization_vi",
+      "source_hint": "steam",
+      "steam_app_id": "289070",
+      "license_hint": "local_smoke_fixture",
+      "local_assets": {
+        "steam_screenshot": {
+          "path_or_url": "video_generator/smoke_test/assets/game.png",
+          "width": 1920,
+          "height": 1080,
+          "kind": "screenshot",
+          "metadata": {
+            "gameplay_focus": "world map",
+            "hud_visible": true,
+            "city_builder_clarity": "high",
+            "strategy_layer": "empire overview"
+          }
+        }
+      }
+    },
+    {
+      "slug": "dave_the_diver",
+      "game_title": "Dave the Diver",
+      "store_id": "steam:dave_the_diver",
+      "source_hint": "steam",
+      "steam_app_id": "1868140",
+      "license_hint": "local_smoke_fixture",
+      "local_assets": {
+        "steam_screenshot": {
+          "path_or_url": "video_generator/smoke_test/assets/game.png",
+          "width": 1920,
+          "height": 1080,
+          "kind": "screenshot",
+          "metadata": {
+            "gameplay_focus": "underwater exploration",
+            "harpoon_action": true,
+            "readable_subject": "diver and fish"
+          }
+        }
+      }
+    },
+    {
+      "slug": "forza_horizon_5",
+      "game_title": "Forza Horizon 5",
+      "store_id": "steam:forza_horizon_5",
+      "source_hint": "steam",
+      "steam_app_id": "1551360",
+      "license_hint": "local_smoke_fixture",
+      "local_assets": {
+        "steam_screenshot": {
+          "path_or_url": "video_generator/smoke_test/assets/game.png",
+          "width": 2560,
+          "height": 1440,
+          "kind": "screenshot",
+          "metadata": {
+            "vehicle_focus": "supercar drift",
+            "scene_focus": "desert road",
+            "speed_lines": true,
+            "crowd_energy": "festival"
+          }
+        }
+      }
+    },
+    {
+      "slug": "ultimate_strategy_collection",
+      "game_title": "Ultimate Strategy Collection",
+      "store_id": "steam:ultimate_strategy_collection",
+      "source_hint": "steam",
+      "license_hint": "local_smoke_fixture",
+      "asset_candidates": [
+        {
+          "source_type": "steam_main_capsule",
+          "path_or_url": "smoke://ultimate_strategy_collection/item_01_capsule.png",
+          "width": 1232,
+          "height": 706,
+          "kind": "main_capsule",
+          "metadata": {
+            "franchise": "entry_one",
+            "series": "strategy collection",
+            "logo_safe": true,
+            "multi_item": true
+          }
+        },
+        {
+          "source_type": "steam_main_capsule",
+          "path_or_url": "smoke://ultimate_strategy_collection/item_02_capsule.png",
+          "width": 1232,
+          "height": 706,
+          "kind": "main_capsule",
+          "metadata": {
+            "franchise": "entry_two",
+            "series": "strategy collection",
+            "logo_safe": true,
+            "multi_item": true
+          }
+        },
+        {
+          "source_type": "steam_main_capsule",
+          "path_or_url": "smoke://ultimate_strategy_collection/item_03_capsule.png",
+          "width": 1232,
+          "height": 706,
+          "kind": "main_capsule",
+          "metadata": {
+            "franchise": "entry_three",
+            "series": "strategy collection",
+            "logo_safe": true,
+            "multi_item": true
+          }
+        },
+        {
+          "source_type": "steam_main_capsule",
+          "path_or_url": "smoke://ultimate_strategy_collection/item_04_capsule.png",
+          "width": 1232,
+          "height": 706,
+          "kind": "main_capsule",
+          "metadata": {
+            "franchise": "entry_four",
+            "series": "strategy collection",
+            "logo_safe": true,
+            "multi_item": true
+          }
+        }
+      ]
+    }
+  ]
+}

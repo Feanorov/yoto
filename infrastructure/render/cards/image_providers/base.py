@@ -33,6 +33,11 @@ class ImageResolutionRequest:
     current_price: str | None = None
     platform_badge: str | None = None
     brand_micro_label: str | None = None
+    genre: str | None = None
+    tags: list[str] | None = None
+    short_description: str | None = None
+    artwork_metadata: dict[str, Any] | None = None
+    cover_decision: dict[str, Any] | None = None
 
 
 class ImageProvider(Protocol):

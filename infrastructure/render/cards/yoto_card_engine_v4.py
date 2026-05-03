@@ -388,6 +388,11 @@ class YotoCardData:
     badge_rotation: float = -6.0
     hero_selection: YotoHeroSelectionDiagnostics | Mapping[str, Any] | None = None
     lane: str | None = None
+    genre: str | None = None
+    tags: list[str] | None = None
+    short_description: str | None = None
+    artwork_metadata: dict[str, Any] | None = None
+    cover_decision: dict[str, Any] | None = None
 
     def normalized_type(self) -> YotoCardType:
         return self.type if isinstance(self.type, YotoCardType) else YotoCardType(str(self.type))
@@ -419,6 +424,11 @@ class YotoCardData:
             badge_rotation=float(payload.get('badge_rotation') or -6.0),
             hero_selection=YotoHeroSelectionDiagnostics.from_mapping(payload.get('hero_selection')) if payload.get('hero_selection') else None,
             lane=str(payload['lane']) if payload.get('lane') is not None else None,
+            genre=str(payload['genre']) if payload.get('genre') is not None else None,
+            tags=[str(item) for item in payload.get('tags', []) if str(item).strip()] if payload.get('tags') else None,
+            short_description=str(payload['short_description']) if payload.get('short_description') is not None else None,
+            artwork_metadata=dict(payload.get('artwork_metadata')) if isinstance(payload.get('artwork_metadata'), Mapping) else None,
+            cover_decision=dict(payload.get('cover_decision')) if isinstance(payload.get('cover_decision'), Mapping) else None,
         )
 
     @classmethod
@@ -445,6 +455,10 @@ class YotoCardData:
                 old_price = str(price_before_minor)
         artwork = artwork_path or getattr(getattr(offer, 'assets', None), 'hero', None) or getattr(offer, 'primary_asset_url', None)
         platform = str(getattr(getattr(offer, 'source', None), 'value', getattr(offer, 'source', ''))).upper()
+        offer_genres = [str(item).strip() for item in getattr(offer, 'genres', []) or [] if str(item).strip()]
+        offer_tags = [str(item).strip() for item in getattr(offer, 'tags', []) or [] if str(item).strip()]
+        offer_metadata_raw = getattr(offer, 'metadata', {}) or {}
+        offer_metadata = dict(offer_metadata_raw) if isinstance(offer_metadata_raw, Mapping) else None
         return cls(
             title=str(getattr(offer, 'title', '')),
             platform=platform,
@@ -454,6 +468,10 @@ class YotoCardData:
             artwork_path=artwork,
             slug=slug or str(getattr(offer, 'title', '')),
             lane=str(getattr(offer, 'lane', '') or getattr(getattr(offer, 'metadata', {}), 'get', lambda *_: None)('lane') or '') or None,
+            genre=offer_genres[0] if offer_genres else None,
+            tags=offer_tags or None,
+            short_description=str(getattr(offer, 'short_description', '') or '').strip() or None,
+            artwork_metadata=offer_metadata,
         )
 
 
@@ -580,6 +598,11 @@ class YotoCardEngineV4:
                 current_price=data.current_price,
                 platform_badge=data.platform_badge,
                 brand_micro_label=data.brand_micro_label,
+                genre=data.genre,
+                tags=[str(item) for item in data.tags or []] or None,
+                short_description=data.short_description,
+                artwork_metadata=dict(data.artwork_metadata) if isinstance(data.artwork_metadata, Mapping) else None,
+                cover_decision=dict(data.cover_decision) if isinstance(data.cover_decision, Mapping) else None,
             )
         )
         artwork = resolved_image.image
@@ -836,6 +859,11 @@ class YotoCardEngineV4:
                 current_price=data.current_price,
                 platform_badge=data.platform_badge,
                 brand_micro_label=data.brand_micro_label,
+                genre=getattr(data, 'genre', None) if data is not None else None,
+                tags=([str(item) for item in (getattr(data, 'tags', None) or [])] or None) if data is not None else None,
+                short_description=getattr(data, 'short_description', None) if data is not None else None,
+                artwork_metadata=dict(getattr(data, 'artwork_metadata', {})) if data is not None and isinstance(getattr(data, 'artwork_metadata', None), Mapping) else None,
+                cover_decision=dict(getattr(data, 'cover_decision', {})) if data is not None and isinstance(getattr(data, 'cover_decision', None), Mapping) else None,
             )
         )
         if diagnostics is not None:

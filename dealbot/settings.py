@@ -75,6 +75,26 @@ class RenderingConfig:
     image_pipeline_version: str
     comfyui_enabled: bool = False
     comfyui_url: str = 'http://127.0.0.1:8188'
+    comfyui_checkpoint: str = 'auto'
+
+
+def load_rendering_config(root_dir: Path) -> RenderingConfig:
+    load_dotenv(root_dir / '.env')
+    rendering = RenderingConfig(
+        card_renderer=os.getenv('CARD_RENDERER_MODE', 'yoto_v4').strip().lower() or 'yoto_v4',
+        fallback_to_legacy=os.getenv('CARD_RENDERER_FALLBACK_TO_LEGACY', '1').strip() != '0',
+        image_provider_mode=os.getenv('IMAGE_PROVIDER_MODE', 'ai_first').strip().lower() or 'ai_first',
+        image_pipeline_version=os.getenv('IMAGE_PIPELINE_VERSION', 'v1').strip() or 'v1',
+        comfyui_enabled=os.getenv('COMFYUI_ENABLED', '1').strip() == '1',
+        comfyui_url=os.getenv('COMFYUI_URL', 'http://127.0.0.1:8188').strip() or 'http://127.0.0.1:8188',
+        comfyui_checkpoint=os.getenv('COMFYUI_CHECKPOINT', 'auto').strip() or 'auto',
+    )
+    os.environ['IMAGE_PROVIDER_MODE'] = rendering.image_provider_mode
+    os.environ['IMAGE_PIPELINE_VERSION'] = rendering.image_pipeline_version
+    os.environ['COMFYUI_ENABLED'] = '1' if rendering.comfyui_enabled else '0'
+    os.environ['COMFYUI_URL'] = rendering.comfyui_url
+    os.environ['COMFYUI_CHECKPOINT'] = rendering.comfyui_checkpoint
+    return rendering
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,7 +116,7 @@ class AppSettings:
 
     @classmethod
     def from_env(cls, root_dir: Path) -> 'AppSettings':
-        load_dotenv(root_dir / '.env')
+        rendering = load_rendering_config(root_dir)
         bot_token = os.getenv('BOT_TOKEN', '').strip()
         channel_username = os.getenv('CHANNEL_USERNAME', '').strip()
         if not bot_token:
@@ -163,15 +183,5 @@ class AppSettings:
                 sale_event_mode=os.getenv('SALE_EVENT_MODE', 'auto').strip().lower(),
                 degraded_sources=degraded,
             ),
-            rendering=RenderingConfig(
-                card_renderer=os.getenv('CARD_RENDERER_MODE', 'yoto_v4').strip().lower() or 'yoto_v4',
-                fallback_to_legacy=os.getenv('CARD_RENDERER_FALLBACK_TO_LEGACY', '1').strip() != '0',
-                image_provider_mode=os.getenv('IMAGE_PROVIDER_MODE', 'artwork_only').strip().lower() or 'artwork_only',
-                image_pipeline_version=os.getenv('IMAGE_PIPELINE_VERSION', 'v1').strip() or 'v1',
-                comfyui_enabled=os.getenv('COMFYUI_ENABLED', '0').strip() == '1',
-                comfyui_url=os.getenv('COMFYUI_URL', 'http://127.0.0.1:8188').strip() or 'http://127.0.0.1:8188',
-            ),
+            rendering=rendering,
         )
-
-
-
