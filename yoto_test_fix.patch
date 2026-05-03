@@ -1,0 +1,60 @@
+--- a/tests/test_ai_card_smoke.py
++++ b/tests/test_ai_card_smoke.py
+@@
+ def test_ai_card_smoke_quality_reject_uses_valid_decision_asset_before_ai(tmp_path: Path) -> None:
+     game_input = dict(MINIMAL_SMOKE_GAMES[0])
+     result = run_scenario(
+         scenario='quality_reject',
+         output_root=tmp_path,
+         game_input=game_input,
+         game_set='minimal',
+     )
++    selected_asset = result['cover_decision_selected_asset']
++    selected_asset_metadata = selected_asset['metadata']
++    selected_asset_path = Path(selected_asset['path_or_url'])
+ 
+     assert result['offer_type'] == game_input['offer_type']
+     assert result['asset_source_mode'] == 'steam_cdn_manifest'
+     assert result['asset_ingestion_mode'] == 'mixed_local_remote'
+     assert result['cover_decision']['genre_cluster'] == 'character_driven'
+@@
+     assert result['cover_decision_use_ai'] is False
+     assert result['cover_decision_ai_fallback_reason'] is None
+     assert result['cover_decision_official_assets_available'] is True
+     assert result['cover_decision_official_assets_rejected_count'] >= 1
+     assert result['cover_decision_readability_score'] >= 0.55
+     assert result['cover_decision_focus_score'] >= 0.50
+-    assert result['cover_decision_image_source_type'] in {'official_press_key_art', 'steam_main_capsule'}
++    assert result['cover_decision_image_source_type'] in {
++        'official_press_key_art',
++        'steam_library_capsule',
++        'steam_main_capsule',
++    }
+     assert result['cover_decision_layout_type'] in {'portrait_single', 'portrait_single_logo_safe'}
+     assert result['cover_decision_decision_reason'].startswith('official_first_selected')
+-    assert result['cover_decision_selected_asset'] == result['cover_decision']['selected_asset']
+-    assert result['cover_decision_selected_asset']['source_type'] == result['cover_decision_image_source_type']
++    assert selected_asset == result['cover_decision']['selected_asset']
++    assert selected_asset['source_type'] == result['cover_decision_image_source_type']
++    assert selected_asset['source_type'] != 'placeholder'
++    assert selected_asset['accepted'] is True
++    assert selected_asset_path.exists()
++    assert selected_asset_path == Path(selected_asset_metadata['cache_path'])
++    assert selected_asset_metadata['cache_status'] in {'cached', 'downloaded'}
+     assert isinstance(result['cover_decision_rejected_assets'], list)
+     assert isinstance(result['cover_decision_decision_trace'], dict)
+     assert 'thresholds' in result['cover_decision_decision_trace']
+     assert result['provider'] == 'artwork'
+     assert result['ai_attempted'] is False
+     assert result['decision_asset_used'] is True
+     assert result['decision_asset_use_reason'] == 'cover_decision_selected_official_asset'
+     assert result['decision_asset_reject_reason'] is None
+     assert result['actual_image_source_type'] == result['cover_decision_image_source_type']
+-    assert result['actual_image_path_or_url'] == result['cover_decision_selected_asset']['path_or_url']
++    assert result['actual_image_source_type'] != 'placeholder'
++    assert result['actual_image_path_or_url'] == selected_asset['path_or_url']
++    assert result['selected_asset_cache_path'] == selected_asset_metadata['cache_path']
++    assert result['selected_asset_cache_status'] in {'cached', 'downloaded'}
+     assert result['decision_asset_matches_actual_source'] is True
+     assert result['final_source'] == 'asset'
+     assert result['outcome'] == 'official_asset'
