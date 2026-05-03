@@ -1,0 +1,54 @@
+--- a/infrastructure/render/cards/image_providers/resolver.py
++++ b/infrastructure/render/cards/image_providers/resolver.py
+@@ -30,6 +30,20 @@
+         has_artwork = request.artwork_path is not None
+         priority = request.priority or self.derive_priority(request.lane)
+         mode = self._normalize_mode(request.mode)
++        ai_attempted = self.ai_provider is not None and getattr(self.ai_provider, 'enabled', False)
++
++        if mode == 'ai_first' and ai_attempted:
++            ai_result = self.ai_provider.resolve(request)
++            if ai_result is not None:
++                return self._with_metadata(
++                    ai_result,
++                    mode=mode,
++                    priority=priority,
++                    decision_reason='ai_generated',
++                    has_artwork=has_artwork,
++                    ai_attempted=True,
++                    ai_succeeded=True,
++                )
+ 
+         artwork = self.artwork_provider.resolve(request)
+         if artwork is not None:
+@@ -40,7 +54,7 @@
+                 priority=priority,
+                 decision_reason=reason,
+                 has_artwork=has_artwork,
+-                ai_attempted=False,
++                ai_attempted=mode == 'ai_first' and ai_attempted,
+                 ai_succeeded=False,
+             )
+ 
+@@ -55,8 +69,7 @@
+                 ai_succeeded=False,
+             )
+ 
+-        ai_attempted = self.ai_provider is not None and getattr(self.ai_provider, 'enabled', False)
+-        if ai_attempted:
++        if ai_attempted and mode != 'ai_first':
+             ai_result = self.ai_provider.resolve(request)
+             if ai_result is not None:
+                 return self._with_metadata(
+@@ -82,9 +95,9 @@
+             request,
+             mode=mode,
+             priority=priority,
+-            decision_reason='placeholder_ai_disabled_or_unavailable',
++            decision_reason='placeholder_ai_failed' if mode == 'ai_first' and ai_attempted else 'placeholder_ai_disabled_or_unavailable',
+             has_artwork=has_artwork,
+-            ai_attempted=False,
++            ai_attempted=mode == 'ai_first' and ai_attempted,
+             ai_succeeded=False,
+         )
+ 

@@ -1,0 +1,79 @@
+diff --git a/tools/run_yoto_comfyui_card_runtime_smoke.py b/tools/run_yoto_comfyui_card_runtime_smoke.py
+new file mode 100644
+index 0000000..6332854
+--- /dev/null
++++ b/tools/run_yoto_comfyui_card_runtime_smoke.py
+@@ -0,0 +1,73 @@
++from __future__ import annotations
++
++import argparse
++import json
++import os
++from pathlib import Path
++
++from infrastructure.render.cards.yoto_card_engine_v4 import YotoCardData, YotoCardEngineV4, YotoCardType
++
++
++def _build_parser() -> argparse.ArgumentParser:
++    parser = argparse.ArgumentParser(description='Run YOTO card pipeline smoke with ComfyUI provider.')
++    parser.add_argument('--mode', choices=('success', 'fallback'), required=True)
++    parser.add_argument('--base-url', default=os.getenv('COMFYUI_URL', 'http://127.0.0.1:8188'))
++    parser.add_argument('--timeout-seconds', type=float, default=2.0)
++    parser.add_argument('--output-dir', default='output/cards/runtime_smoke')
++    return parser
++
++
++def main() -> int:
++    args = _build_parser().parse_args()
++
++    repo_root = Path(__file__).resolve().parents[1]
++    output_dir = (repo_root / args.output_dir).resolve()
++    output_dir.mkdir(parents=True, exist_ok=True)
++
++    os.environ['IMAGE_PROVIDER_MODE'] = 'ai_first'
++    os.environ['COMFYUI_ENABLED'] = '1'
++    os.environ['COMFYUI_URL'] = args.base_url if args.mode == 'success' else 'http://127.0.0.1:1'
++
++    engine = YotoCardEngineV4(output_dir=output_dir)
++    ai_provider = engine.image_resolver.ai_provider
++    if ai_provider is not None:
++        ai_provider.timeout_seconds = max(0.5, float(args.timeout_seconds))
++        ai_provider.poll_interval_seconds = min(getattr(ai_provider, 'poll_interval_seconds', 0.5), 0.1)
++
++    result = engine.render_card(
++        YotoCardData(
++            title='Runtime Smoke AI Provider',
++            platform='STEAM',
++            type=YotoCardType.DISCOUNT,
++            deadline='до 10 квітня',
++            old_price='999 грн',
++            current_price='499 грн',
++            artwork_path=None,
++            slug=f'comfyui_runtime_{args.mode}',
++            platform_badge='STEAM ЗНИЖКА',
++            brand_micro_label='сигнал знижок',
++            lane='high_value_discount',
++        )
++    )
++
++    payload = {
++        'mode': args.mode,
++        'image_path': str(result.image_path),
++        'selected_source': result.diagnostics.selected_source,
++        'decision_reason': result.diagnostics.decision_reason,
++        'image_provider_mode': result.diagnostics.image_provider_mode,
++        'ai_attempted': result.diagnostics.ai_attempted,
++        'ai_succeeded': result.diagnostics.ai_succeeded,
++        'used_placeholder_artwork': result.diagnostics.used_placeholder_artwork,
++        'ai_provider_class': type(ai_provider).__name__ if ai_provider is not None else None,
++        'ok': True,
++    }
++    print(json.dumps(payload, ensure_ascii=False, indent=2))
++
++    if args.mode == 'success':
++        return 0 if result.diagnostics.ai_succeeded and result.diagnostics.selected_source == 'ai' else 1
++    return 0 if (not result.diagnostics.ai_succeeded and result.diagnostics.selected_source == 'placeholder') else 1
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
