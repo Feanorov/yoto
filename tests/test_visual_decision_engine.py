@@ -60,6 +60,20 @@ def _visual_rescue(decision: dict[str, object]) -> dict[str, object]:
     return dict(decision['decision_trace'].get('visual_rescue', {}))
 
 
+def _selected_strategy(decision: dict[str, object]) -> dict[str, object]:
+    return dict(decision['decision_trace'].get('selected_strategy', {}))
+
+
+def _local_rescue_metadata(**extra: object) -> dict[str, object]:
+    metadata: dict[str, object] = {
+        'source_origin': 'local_manifest',
+        'cache_status': 'cached',
+        'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+    }
+    metadata.update(extra)
+    return metadata
+
+
 def _with_valid_fixture_replacement(asset_candidates: list[dict[str, object]]) -> list[dict[str, object]]:
     replaced: list[dict[str, object]] = []
     for payload in asset_candidates:
@@ -1745,6 +1759,67 @@ def test_action_last_resort_sets_action_rescue() -> None:
     assert rescue['rescue_version'] == 'v1_mvp'
 
 
+def test_action_rescue_upgrades_capsule_to_safe_gameplay_screenshot() -> None:
+    decision = _build_decision(
+        game_title='Action Rescue Probe',
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 640,
+                'height': 360,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    combat=True,
+                    boss=True,
+                    subject_focus='hero',
+                    readable_subject=True,
+                    foreground_action=True,
+                ),
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://action-rescue-probe',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+
+    assert decision['use_ai'] is False
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'action_moment'
+    assert decision['rescue_type'] == 'official_action_screenshot_rescue'
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert decision['selected_asset']['source_type'] == 'steam_screenshot'
+    assert decision['selected_asset']['path_or_url'] == SMOKE_LOCAL_LANDSCAPE_ASSET
+    assert strategy['rescue_applied'] is True
+    assert strategy['rescue_reason'] == 'rescue_apply:official_action_screenshot_rescue:steam_screenshot'
+    assert 'rescue_apply:official_action_screenshot_rescue:steam_screenshot' in _policy_reasons(decision)
+    assert strategy['ai_fallback_reason'] is None
+
+
 def test_strategy_signals_still_map_to_strategy_core() -> None:
     decision = _build_decision(
         genre='turn-based strategy',
@@ -1790,6 +1865,54 @@ def test_activity_last_resort_sets_activity_rescue() -> None:
     assert _visual_rescue(decision)['rescue_type'] == decision['rescue_type']
 
 
+def test_activity_rescue_upgrades_capsule_to_safe_activity_candidate() -> None:
+    decision = _build_decision(
+        game_title='Activity Rescue Probe',
+        genre='adventure management sim',
+        tags=['underwater exploration', 'fishing', 'sushi'],
+        short_description='A diver catches fish and returns to a sushi bar after each exploration run.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'diver',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 640,
+                'height': 360,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    activity='fishing',
+                    diver=True,
+                    readable_subject=True,
+                    subject_focus='diver',
+                    foreground_action=True,
+                ),
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+
+    assert decision['use_ai'] is False
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert decision['rescue_type'] == 'official_activity_screenshot_rescue'
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert decision['selected_asset']['source_type'] == 'steam_screenshot'
+    assert strategy['rescue_applied'] is True
+    assert strategy['rescue_reason'] == 'rescue_apply:official_activity_screenshot_rescue:steam_screenshot'
+
+
 def test_strategy_last_resort_sets_strategy_rescue() -> None:
     decision = _build_decision(
         genre='turn-based strategy',
@@ -1821,6 +1944,50 @@ def test_strategy_last_resort_sets_strategy_rescue() -> None:
         'official_art_city_army_map',
     ]
     assert _visual_rescue(decision)['rescue_type'] == decision['rescue_type']
+
+
+def test_strategy_rescue_upgrades_capsule_to_safe_strategy_candidate() -> None:
+    decision = _build_decision(
+        game_title='Strategy Rescue Probe',
+        genre='turn-based strategy',
+        tags=['world map', 'city building', 'armies', 'wonders'],
+        short_description='A strategy campaign expands across the map with armies and major cities.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 640,
+                'height': 360,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    map=True,
+                    city=True,
+                    armies=True,
+                ),
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+
+    assert decision['use_ai'] is False
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'strategy_core'
+    assert decision['rescue_type'] == 'official_strategy_screenshot_rescue'
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert decision['selected_asset']['source_type'] == 'steam_screenshot'
+    assert strategy['rescue_applied'] is True
+    assert strategy['rescue_reason'] == 'rescue_apply:official_strategy_screenshot_rescue:steam_screenshot'
 
 
 def test_last_resort_activity_focus_records_activity_missing_requirement() -> None:
@@ -1860,6 +2027,189 @@ def test_last_resort_activity_focus_records_activity_missing_requirement() -> No
     assert 'no_strategy_core_visual' not in decision['missing_visual_requirements']
 
 
+def test_rescue_does_not_accept_menu_or_ui_heavy_screenshot() -> None:
+    decision = _build_decision(
+        game_title='Blocked Rescue Probe',
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'settings': True,
+                    'menu': 'options panel',
+                    'launcher': 'game launcher',
+                },
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_main_capsule'
+    assert strategy['rescue_applied'] is False
+    assert strategy['rescue_reason'] == 'rescue_skip:hard_blocked_candidates_only'
+    assert screenshot_asset['accepted'] is False
+    assert 'menu_like_screenshot' in screenshot_asset['rejection_reasons']
+
+
+def test_rescue_skips_flat_or_empty_local_manifest_screenshot() -> None:
+    decision = _build_decision(
+        game_title='Unsafe Rescue Probe',
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    background=True,
+                    environment=True,
+                    minimal=True,
+                ),
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_main_capsule'
+    assert strategy['rescue_applied'] is False
+    assert strategy['rescue_reason'] == 'rescue_skip:unsafe_visual_rescue_candidate'
+
+
+def test_rescue_keeps_original_when_no_safe_candidate_exists() -> None:
+    decision = _build_decision(
+        game_title='No Safe Rescue Probe',
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 640,
+                'height': 360,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://official/nonlocal_action_art.png',
+                'metadata': {},
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://no-safe-rescue',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_main_capsule'
+    assert strategy['rescue_applied'] is False
+    assert strategy['rescue_reason'] == 'rescue_skip:no_safe_rescue_candidate'
+    assert decision['selected_asset']['source_type'] != 'ai_generated'
+
+
+def test_rescue_does_not_accept_bad_quality_or_hard_reject_candidate() -> None:
+    decision = _build_decision(
+        game_title='Hard Reject Rescue Probe',
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 200,
+                'height': 120,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    combat=True,
+                    subject_focus='hero',
+                    readable_subject=True,
+                ),
+            },
+        ],
+    )
+
+    strategy = _selected_strategy(decision)
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_main_capsule'
+    assert strategy['rescue_applied'] is False
+    assert strategy['rescue_reason'] == 'rescue_skip:hard_blocked_candidates_only'
+    assert screenshot_asset['quality_tier'] == 'hard_reject'
+    assert 'asset_too_small' in screenshot_asset['rejection_reasons']
+
+
 def test_good_official_no_missing_requirements_sets_no_rescue() -> None:
     decision = _build_decision(
         genre='roguelike shooter',
@@ -1889,31 +2239,49 @@ def test_good_official_no_missing_requirements_sets_no_rescue() -> None:
     assert decision['rescue_blockers'] == []
     assert decision['rescue_version'] == 'v1_mvp'
     assert _visual_rescue(decision)['rescue_needed'] is False
+    assert _selected_strategy(decision)['rescue_applied'] is False
+    assert _selected_strategy(decision)['rescue_reason'] == 'rescue_skip:rescue_not_needed'
 
 
-def test_visual_rescue_does_not_change_selection_or_ai_behavior() -> None:
+def test_rescue_does_not_change_ai_behavior() -> None:
     decision = _build_decision(
+        game_title='AI Guard Probe',
         genre='roguelike shooter',
-        tags=['combat', 'weapon'],
-        short_description='A fighter rushes through ruins with a clear official hero frame available.',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
         asset_candidates=[
             {
-                'source_type': 'official_press_key_art',
-                'width': 1800,
-                'height': 2700,
-                'kind': 'key_art',
-                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
                 'metadata': {
                     'subject_focus': 'hero',
                     'logo_safe': True,
+                    'closeup': True,
                 },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 640,
+                'height': 360,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': _local_rescue_metadata(
+                    combat=True,
+                    boss=True,
+                    subject_focus='hero',
+                    readable_subject=True,
+                    foreground_action=True,
+                ),
             },
             {
                 'source_type': 'ai_generated',
                 'width': 1280,
                 'height': 720,
                 'kind': 'generated_preview',
-                'path_or_url': 'ai://action-intent-debug',
+                'path_or_url': 'ai://ai-guard-probe',
                 'metadata': {
                     'prompt_intent': 'hero_action_focus',
                 },
@@ -1923,8 +2291,11 @@ def test_visual_rescue_does_not_change_selection_or_ai_behavior() -> None:
 
     assert decision['visual_intent_type'] == 'action_moment'
     assert decision['use_ai'] is False
-    assert decision['image_source_type'] == 'official_press_key_art'
-    assert decision['card_type'] == 'simple_hero'
-    assert decision['decision_reason'] == 'official_first_selected_best_scoring_asset'
-    assert decision['rescue_needed'] is False
-    assert decision['rescue_type'] == 'none'
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert decision['selected_asset']['source_type'] == 'steam_screenshot'
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['decision_reason'] == 'official_first_selected_safe_official_close_score_tiebreak'
+    assert decision['rescue_needed'] is True
+    assert decision['rescue_type'] == 'official_action_screenshot_rescue'
+    assert _selected_strategy(decision)['ai_fallback_reason'] is None
+    assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})

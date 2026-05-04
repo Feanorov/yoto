@@ -617,6 +617,53 @@ VISUAL_RESCUE_REQUIRED = 'official_visual_rescue_required'
 VISUAL_RESCUE_REQUIRED_REASON = 'rescue:official_visual_rescue_required:missing_visual_requirements'
 VISUAL_RESCUE_BRIDGE_REQUIRED = 'bridge_or_valid_asset_required'
 VISUAL_RESCUE_BRIDGE_REASON = 'rescue:bridge_or_valid_asset_required:official_asset_bridge_invalid'
+VISUAL_RESCUE_ACTION = 'official_action_screenshot_rescue'
+VISUAL_RESCUE_ACTIVITY = 'official_activity_screenshot_rescue'
+VISUAL_RESCUE_STRATEGY = 'official_strategy_screenshot_rescue'
+VISUAL_RESCUE_VEHICLE = 'official_vehicle_motion_rescue'
+VISUAL_RESCUE_THREAT = 'official_threat_visual_rescue'
+
+APPLICABLE_OFFICIAL_RESCUE_TYPES = frozenset(
+    {
+        VISUAL_RESCUE_ACTION,
+        VISUAL_RESCUE_ACTIVITY,
+        VISUAL_RESCUE_STRATEGY,
+        VISUAL_RESCUE_VEHICLE,
+        VISUAL_RESCUE_THREAT,
+    }
+)
+UNSAFE_VISUAL_RESCUE_REJECTION_REASONS = frozenset(
+    {
+        'asset_too_small',
+        'banner_only_for_portrait_intent',
+        'empty_background',
+        'environment_only_for_character_intent',
+        'focus_below_threshold',
+        'official_asset_failed_quality_gate',
+        'readability_below_threshold',
+        'text_heavy',
+    }
+)
+UNSAFE_VISUAL_RESCUE_SCORING_REASONS = frozenset({'penalty:empty_mood_scene', 'reject:quality_gate'})
+POSITIVE_VISUAL_RESCUE_SCORING_REASONS = frozenset(
+    {
+        'bonus:action_moment',
+        'bonus:clear_subject',
+        'bonus:gameplay_representative',
+        'vdr1_focus_profile_atmosphere_bonus',
+        'vdr1_focus_profile_gameplay_bonus',
+        'vdr1_focus_profile_hero_bonus',
+    }
+)
+
+RESCUE_APPLY_REASON_PREFIX = 'rescue_apply'
+RESCUE_SKIP_REASON_PREFIX = 'rescue_skip'
+RESCUE_SKIP_REASON_NOT_NEEDED = 'rescue_skip:rescue_not_needed'
+RESCUE_SKIP_REASON_TYPE_UNSUPPORTED = 'rescue_skip:rescue_type_not_supported'
+RESCUE_SKIP_REASON_SELECTED_NOT_LAST_RESORT = 'rescue_skip:selected_asset_not_last_resort'
+RESCUE_SKIP_REASON_NO_SAFE_CANDIDATE = 'rescue_skip:no_safe_rescue_candidate'
+RESCUE_SKIP_REASON_HARD_BLOCKED_ONLY = 'rescue_skip:hard_blocked_candidates_only'
+RESCUE_SKIP_REASON_UNSAFE_VISUAL = 'rescue_skip:unsafe_visual_rescue_candidate'
 
 LAST_RESORT_RESCUE_SOURCE_TYPES = frozenset(
     {
@@ -1477,6 +1524,13 @@ class VisualRescueDecision:
 
 
 @dataclass(slots=True)
+class OfficialVisualRescueResult:
+    selected_assets: list[ScoredAsset]
+    rescue_applied: bool
+    rescue_reason: str
+
+
+@dataclass(slots=True)
 class CoverDecision:
     genre_cluster: str
     visual_type: str
@@ -1669,27 +1723,9 @@ class VisualDecisionEngine:
             else:
                 selection_reason = 'ai_fallback_selected_best_ai_candidate'
 
-        self._mark_selected_assets(selected_assets)
-        layout_type, layout_trace = self._infer_layout_type(
-            genre_cluster=genre_cluster,
-            visual_type=visual_type,
-            selected_assets=selected_assets,
-        )
-        selected_asset = self._serialize_selected_assets(
-            selected_assets=selected_assets,
-            layout_type=layout_type,
-        )
-        image_source_type = str(selected_asset.get('source_type') or AI_SOURCE_TYPE) if selected_asset else AI_SOURCE_TYPE
-
         selected_indexes = {item.candidate.index for item in selected_assets}
         ordered_scores = self._ordered_asset_scores(scored_assets)
-        rejected_assets = self._collect_rejected_assets(
-            scored_assets=ordered_scores,
-            selected_indexes=selected_indexes,
-            use_ai=use_ai,
-            genre_cluster=genre_cluster,
-            selection_trace=selection_trace,
-        )
+        selected_image_source_type = selected_assets[0].candidate.source_type if selected_assets else AI_SOURCE_TYPE
         card_type_decision = self._classify_card_type(
             offer_type=offer_type_text,
             current_price=current_price_text,
@@ -1707,7 +1743,7 @@ class VisualDecisionEngine:
             offer_type=offer_type_text,
             current_price=current_price_text,
             old_price=old_price_text,
-            selected_image_source_type=image_source_type,
+            selected_image_source_type=selected_image_source_type,
             card_type=card_type_decision.card_type,
             visual_type=visual_type,
             genre_cluster=genre_cluster,
@@ -1716,11 +1752,44 @@ class VisualDecisionEngine:
         decision_reason = selection_reason if not use_ai else f'{selection_reason}:{ai_fallback_reason}'
         visual_rescue_decision = build_visual_rescue_decision(
             card_type=card_type_decision.card_type,
-            image_source_type=image_source_type,
+            image_source_type=selected_image_source_type,
             visual_intent_type=visual_intent_decision.visual_intent_type,
             missing_visual_requirements=visual_intent_decision.missing_visual_requirements,
             preferred_asset_families=visual_intent_decision.preferred_asset_families,
             decision_reason=decision_reason,
+        )
+        pre_rescue_selected_assets = list(selected_assets)
+        rescue_result = self._apply_official_visual_rescue(
+            selected_assets=selected_assets,
+            scored_assets=ordered_scores,
+            use_ai=use_ai,
+            visual_rescue_decision=visual_rescue_decision,
+        )
+        policy_reasons.append(rescue_result.rescue_reason)
+        selected_assets = list(rescue_result.selected_assets)
+        self._mark_selected_assets(selected_assets)
+        if rescue_result.rescue_applied:
+            self._mark_selected_assets_with_reason(
+                selected_assets=selected_assets,
+                reason=rescue_result.rescue_reason,
+            )
+        layout_type, layout_trace = self._infer_layout_type(
+            genre_cluster=genre_cluster,
+            visual_type=visual_type,
+            selected_assets=selected_assets,
+        )
+        selected_asset = self._serialize_selected_assets(
+            selected_assets=selected_assets,
+            layout_type=layout_type,
+        )
+        image_source_type = str(selected_asset.get('source_type') or AI_SOURCE_TYPE) if selected_asset else AI_SOURCE_TYPE
+        selected_indexes = {item.candidate.index for item in selected_assets}
+        rejected_assets = self._collect_rejected_assets(
+            scored_assets=ordered_scores,
+            selected_indexes=selected_indexes,
+            use_ai=use_ai,
+            genre_cluster=genre_cluster,
+            selection_trace=selection_trace,
         )
         rejection_reasons = sorted(
             {
@@ -1774,6 +1843,9 @@ class VisualDecisionEngine:
                 'selection_reason': selection_reason,
                 'policy_reasons': list(policy_reasons),
                 'rejection_reasons': rejection_reasons,
+                'rescue_applied': rescue_result.rescue_applied,
+                'rescue_reason': rescue_result.rescue_reason,
+                'pre_rescue_selected_source_types': [item.candidate.source_type for item in pre_rescue_selected_assets],
             },
             'close_score_official_tiebreak': bool(selection_trace.get('close_score_official_tiebreak', False)),
             'tiebreak_reason': selection_trace.get('tiebreak_reason'),
@@ -3521,6 +3593,19 @@ class VisualDecisionEngine:
             parts = [part for part in (item.scoring_reason, selection_reason) if _safe_text(part)]
             item.scoring_reason = '; '.join(dict.fromkeys(parts))
 
+    def _mark_selected_assets_with_reason(
+        self,
+        *,
+        selected_assets: Sequence[ScoredAsset],
+        reason: str,
+    ) -> None:
+        for item in selected_assets:
+            scoring_parts = item.score_breakdown.get('scoring_reason_parts')
+            if isinstance(scoring_parts, list):
+                _append_reason(scoring_parts, reason)
+            parts = [part for part in (item.scoring_reason, reason) if _safe_text(part)]
+            item.scoring_reason = '; '.join(dict.fromkeys(parts))
+
     def _ordered_asset_scores(self, scored_assets: Sequence[ScoredAsset]) -> list[ScoredAsset]:
         return sorted(
             list(scored_assets),
@@ -3535,6 +3620,283 @@ class VisualDecisionEngine:
                 item.candidate.path_or_url,
             ),
         )
+
+    def _apply_official_visual_rescue(
+        self,
+        *,
+        selected_assets: Sequence[ScoredAsset],
+        scored_assets: Sequence[ScoredAsset],
+        use_ai: bool,
+        visual_rescue_decision: VisualRescueDecision,
+    ) -> OfficialVisualRescueResult:
+        primary = selected_assets[0] if len(selected_assets) == 1 else None
+        if not visual_rescue_decision.rescue_needed:
+            return OfficialVisualRescueResult(
+                selected_assets=list(selected_assets),
+                rescue_applied=False,
+                rescue_reason=RESCUE_SKIP_REASON_NOT_NEEDED,
+            )
+        if use_ai or primary is None or not primary.candidate.is_official:
+            return OfficialVisualRescueResult(
+                selected_assets=list(selected_assets),
+                rescue_applied=False,
+                rescue_reason=RESCUE_SKIP_REASON_NO_SAFE_CANDIDATE,
+            )
+        if visual_rescue_decision.rescue_type not in APPLICABLE_OFFICIAL_RESCUE_TYPES:
+            return OfficialVisualRescueResult(
+                selected_assets=list(selected_assets),
+                rescue_applied=False,
+                rescue_reason=RESCUE_SKIP_REASON_TYPE_UNSUPPORTED,
+            )
+        if primary.normalized_asset_family not in LAST_RESORT_OFFICIAL_ASSET_FAMILIES:
+            return OfficialVisualRescueResult(
+                selected_assets=list(selected_assets),
+                rescue_applied=False,
+                rescue_reason=RESCUE_SKIP_REASON_SELECTED_NOT_LAST_RESORT,
+            )
+
+        best_candidate: ScoredAsset | None = None
+        best_key: tuple[int, int, int, float, int, float, float, str, str] | None = None
+        hard_blocked_candidate_found = False
+        unsafe_visual_candidate_found = False
+
+        for item in scored_assets:
+            if item.candidate.index == primary.candidate.index or not item.candidate.is_official:
+                continue
+            family_rank = self._rescue_candidate_family_rank(
+                item=item,
+                rescue_type=visual_rescue_decision.rescue_type,
+            )
+            if family_rank is None:
+                continue
+            if not self._candidate_has_local_asset_file(item.candidate):
+                continue
+            if item.quality_tier == 'hard_reject' or self._is_hard_blocked_rescue_candidate(item):
+                hard_blocked_candidate_found = True
+                continue
+            if not self._is_visually_safe_rescue_candidate(
+                item,
+                rescue_type=visual_rescue_decision.rescue_type,
+            ):
+                unsafe_visual_candidate_found = True
+                continue
+            sort_key = (
+                family_rank,
+                0 if item.accepted else 1,
+                -self._quality_tier_rank(item.quality_tier),
+                -item.total_score,
+                -self._normalized_asset_family_rank(item.normalized_asset_family),
+                -item.focus_score,
+                -item.readability_score,
+                item.candidate.source_type,
+                item.candidate.path_or_url,
+            )
+            if best_key is None or sort_key < best_key:
+                best_key = sort_key
+                best_candidate = item
+
+        if best_candidate is None:
+            return OfficialVisualRescueResult(
+                selected_assets=list(selected_assets),
+                rescue_applied=False,
+                rescue_reason=(
+                    RESCUE_SKIP_REASON_UNSAFE_VISUAL
+                    if unsafe_visual_candidate_found
+                    else (
+                        RESCUE_SKIP_REASON_HARD_BLOCKED_ONLY
+                        if hard_blocked_candidate_found
+                        else RESCUE_SKIP_REASON_NO_SAFE_CANDIDATE
+                    )
+                ),
+            )
+
+        return OfficialVisualRescueResult(
+            selected_assets=[best_candidate],
+            rescue_applied=True,
+            rescue_reason=(
+                f'{RESCUE_APPLY_REASON_PREFIX}:{visual_rescue_decision.rescue_type}:{best_candidate.candidate.source_type}'
+            ),
+        )
+
+    @classmethod
+    def _is_hard_blocked_rescue_candidate(cls, item: ScoredAsset) -> bool:
+        hard_blockers = {
+            'local_placeholder_fixture',
+            'asset_path_or_url_missing',
+            'invalid_or_unreadable_file',
+            'standalone_logo_asset',
+            'logo_only_visual',
+            'placeholder_asset',
+            'collage_single_title',
+            'template_only_screenshot_not_available',
+            'menu_like_screenshot',
+            'ui_heavy_screenshot_for_single_title',
+            'rejected_asset_type',
+        }
+        return any(reason in hard_blockers for reason in item.rejection_reasons)
+
+    @classmethod
+    def _candidate_matches_rescue_keywords(cls, candidate: AssetCandidate, *, rescue_type: str) -> bool:
+        signal_text = candidate.signal_text
+        if rescue_type == VISUAL_RESCUE_ACTION:
+            return _contains_any_keyword(signal_text, VISUAL_INTENT_ACTION_KEYWORDS)
+        if rescue_type == VISUAL_RESCUE_ACTIVITY:
+            return _contains_any_keyword(signal_text, VISUAL_INTENT_ACTIVITY_KEYWORDS)
+        if rescue_type == VISUAL_RESCUE_STRATEGY:
+            return _contains_any_keyword(signal_text, VISUAL_INTENT_REAL_STRATEGY_KEYWORDS) or _contains_any_keyword(
+                signal_text,
+                VISUAL_INTENT_BROAD_STRATEGY_KEYWORDS,
+            )
+        if rescue_type == VISUAL_RESCUE_VEHICLE:
+            return _contains_any_keyword(signal_text, VISUAL_INTENT_VEHICLE_KEYWORDS)
+        if rescue_type == VISUAL_RESCUE_THREAT:
+            return _contains_any_keyword(signal_text, VISUAL_INTENT_THREAT_KEYWORDS)
+        return False
+
+    @classmethod
+    def _is_visually_safe_rescue_candidate(cls, item: ScoredAsset, *, rescue_type: str) -> bool:
+        if item.quality_tier not in {'good', 'acceptable'}:
+            return False
+
+        rejection_reasons = set(item.rejection_reasons)
+        if rejection_reasons & UNSAFE_VISUAL_RESCUE_REJECTION_REASONS:
+            return False
+
+        raw_scoring_parts = item.score_breakdown.get('scoring_reason_parts')
+        scoring_reason_parts = raw_scoring_parts if isinstance(raw_scoring_parts, list) else []
+        scoring_parts = {
+            _safe_text(part)
+            for part in scoring_reason_parts
+            if _safe_text(part)
+        }
+        scoring_parts.update(
+            _safe_text(part.strip())
+            for part in item.scoring_reason.split(';')
+            if _safe_text(part.strip())
+        )
+        if scoring_parts & UNSAFE_VISUAL_RESCUE_SCORING_REASONS:
+            return False
+
+        if item.focus_score < MIN_FOCUS_SCORE or item.readability_score < MIN_READABILITY_SCORE:
+            return False
+
+        estimated_focus = item.enrichment.estimated_focus
+        estimated_subject_scale = item.enrichment.estimated_subject_scale
+        estimated_visual_density = item.enrichment.estimated_visual_density
+        composition_bias = item.enrichment.composition_bias
+
+        if estimated_focus in {'weak', 'unknown'} and estimated_subject_scale in {'small', 'unknown'}:
+            return False
+        if estimated_visual_density == 'simple' and estimated_focus in {'weak', 'unknown'}:
+            return False
+
+        has_explicit_rescue_signal = cls._candidate_matches_rescue_keywords(
+            item.candidate,
+            rescue_type=rescue_type,
+        )
+        has_positive_scoring_signal = bool(scoring_parts & POSITIVE_VISUAL_RESCUE_SCORING_REASONS)
+        has_subject_signal = cls._has_main_object_signal(cls._hint_text(item.candidate))
+        metadata_focus = float(item.score_breakdown.get('metadata_focus') or 0.0)
+        metadata_confidence = float(item.score_breakdown.get('metadata_confidence') or 0.0)
+        has_positive_metadata = metadata_focus >= 0.20 or has_subject_signal or has_positive_scoring_signal
+        has_positive_structure = (
+            estimated_focus in {'strong', 'medium'}
+            and estimated_subject_scale in {'large', 'medium'}
+        )
+        has_rescue_composition = (
+            estimated_visual_density in {'medium', 'cluttered'}
+            and composition_bias in {'gameplay', 'hero', 'scene'}
+        )
+
+        if composition_bias in {'banner', 'unknown'} and not has_positive_metadata and not has_explicit_rescue_signal:
+            return False
+        if 'missing_readable_focus' in rejection_reasons and not (
+            has_explicit_rescue_signal and has_positive_metadata and has_positive_structure
+        ):
+            return False
+
+        source_origin = cls._candidate_source_origin(item.candidate)
+        if source_origin in LOCAL_FALLBACK_SOURCE_ORIGINS:
+            return (
+                has_explicit_rescue_signal
+                and (has_positive_structure or has_rescue_composition)
+                and has_positive_metadata
+                and metadata_confidence >= 0.55
+            )
+
+        return (
+            (has_positive_structure and has_positive_metadata)
+            or (
+                has_explicit_rescue_signal
+                and has_rescue_composition
+                and (has_positive_metadata or metadata_confidence >= 0.55)
+            )
+        )
+
+    @classmethod
+    def _rescue_candidate_family_rank(
+        cls,
+        *,
+        item: ScoredAsset,
+        rescue_type: str,
+    ) -> int | None:
+        signal_text = item.candidate.signal_text
+        normalized_family = item.normalized_asset_family
+
+        if rescue_type == VISUAL_RESCUE_ACTION:
+            if normalized_family == 'steam_screenshot':
+                return 0
+            if normalized_family == 'trailer_frame':
+                return 1
+            if normalized_family == 'press_key_art' and _contains_any_keyword(signal_text, VISUAL_INTENT_ACTION_KEYWORDS):
+                return 2
+            if normalized_family == 'steam_library_hero':
+                return 3
+            return None
+        if rescue_type == VISUAL_RESCUE_ACTIVITY:
+            if normalized_family == 'steam_screenshot':
+                return 0
+            if normalized_family == 'trailer_frame':
+                return 1
+            if normalized_family == 'press_key_art' and _contains_any_keyword(signal_text, VISUAL_INTENT_ACTIVITY_KEYWORDS):
+                return 2
+            if normalized_family == 'steam_library_hero':
+                return 3
+            return None
+        if rescue_type == VISUAL_RESCUE_STRATEGY:
+            if normalized_family == 'steam_screenshot':
+                return 0
+            if normalized_family == 'trailer_frame':
+                return 1
+            if normalized_family == 'press_key_art' and (
+                _contains_any_keyword(signal_text, VISUAL_INTENT_REAL_STRATEGY_KEYWORDS)
+                or _contains_any_keyword(signal_text, VISUAL_INTENT_BROAD_STRATEGY_KEYWORDS)
+            ):
+                return 2
+            if normalized_family == 'steam_library_hero':
+                return 3
+            return None
+        if rescue_type == VISUAL_RESCUE_VEHICLE:
+            if normalized_family == 'steam_library_hero':
+                return 0
+            if normalized_family == 'steam_screenshot':
+                return 1
+            if normalized_family == 'trailer_frame':
+                return 2
+            if normalized_family == 'press_key_art' and _contains_any_keyword(signal_text, VISUAL_INTENT_VEHICLE_KEYWORDS):
+                return 3
+            return None
+        if rescue_type == VISUAL_RESCUE_THREAT:
+            if normalized_family == 'steam_screenshot':
+                return 0
+            if normalized_family == 'press_key_art' and _contains_any_keyword(signal_text, VISUAL_INTENT_THREAT_KEYWORDS):
+                return 1
+            if normalized_family == 'trailer_frame':
+                return 2
+            if normalized_family == 'steam_library_hero':
+                return 3
+            return None
+        return None
 
     @staticmethod
     def _quality_tier_rank(quality_tier: str) -> int:
