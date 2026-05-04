@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import json
 from pathlib import Path
 import shutil
 
@@ -140,6 +141,28 @@ def test_ai_card_smoke_current_env_supports_minimal_game_fixture(tmp_path: Path)
     assert result['decision_asset_matches_actual_source'] is True
     assert result['final_source'] == 'asset'
     assert result['outcome'] == 'official_asset'
+
+
+def test_ai_card_smoke_manifest_includes_visual_intent_fields(tmp_path: Path) -> None:
+    game_input = dict(MINIMAL_SMOKE_GAMES[0])
+    result = run_scenario(
+        scenario='current_env',
+        output_root=tmp_path,
+        game_input=game_input,
+        game_set='minimal',
+    )
+    manifest = json.loads(Path(result['manifest_path']).read_text(encoding='utf-8'))
+    provider_cover_decision = manifest['provider_metadata']['cover_decision']
+    trace_visual_intent = provider_cover_decision['decision_trace']['visual_intent']
+
+    assert result['cover_decision']['visual_intent_type']
+    assert result['cover_decision']['visual_intent_reason'].startswith('visual_intent:')
+    assert result['cover_decision']['visual_intent_version'] == 'v1_mvp'
+    assert provider_cover_decision['visual_intent_type'] == result['cover_decision']['visual_intent_type']
+    assert provider_cover_decision['visual_intent_reason'] == result['cover_decision']['visual_intent_reason']
+    assert provider_cover_decision['visual_intent_version'] == 'v1_mvp'
+    assert trace_visual_intent['visual_intent_type'] == provider_cover_decision['visual_intent_type']
+    assert trace_visual_intent['visual_intent_version'] == 'v1_mvp'
 
 
 def test_ai_card_smoke_current_env_supports_game_eval_seed_layout(tmp_path: Path) -> None:

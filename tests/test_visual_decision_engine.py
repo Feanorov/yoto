@@ -48,6 +48,10 @@ def _card_strategy(decision: dict[str, object]) -> dict[str, object]:
     return dict(decision['decision_trace'].get('card_strategy', {}))
 
 
+def _visual_intent(decision: dict[str, object]) -> dict[str, object]:
+    return dict(decision['decision_trace'].get('visual_intent', {}))
+
+
 def _with_valid_fixture_replacement(asset_candidates: list[dict[str, object]]) -> list[dict[str, object]]:
     replaced: list[dict[str, object]] = []
     for payload in asset_candidates:
@@ -1540,3 +1544,175 @@ def test_safe_fallback_when_insufficient_signals() -> None:
     assert decision['use_ai'] is True
     assert decision['card_type'] == 'safe_fallback'
     assert decision['card_type_reason'] == 'card_type:safe_fallback:insufficient_strategy_signals'
+
+
+def test_racing_genre_maps_to_vehicle_motion() -> None:
+    decision = _build_decision(
+        genre='open-world racing',
+        tags=['supercar', 'track'],
+        short_description='A bright car tears across a dusty road at speed.',
+    )
+
+    assert decision['visual_intent_type'] == 'vehicle_motion'
+    assert decision['visual_intent_reason'] == 'visual_intent:vehicle_motion:racing_or_driving'
+    assert decision['visual_intent_version'] == 'v1_mvp'
+    assert _visual_intent(decision)['visual_intent_type'] == decision['visual_intent_type']
+
+
+def test_strategy_genre_maps_to_strategy_core() -> None:
+    decision = _build_decision(
+        genre='turn-based strategy',
+        tags=['4x', 'empire', 'city builder'],
+        short_description='Expand an empire across a tactical map with cities and armies.',
+    )
+
+    assert decision['visual_intent_type'] == 'strategy_core'
+    assert decision['visual_intent_reason'] == 'visual_intent:strategy_core:strategy_or_4x'
+
+
+def test_cozy_or_diving_activity_maps_to_activity_focus() -> None:
+    decision = _build_decision(
+        genre='cozy diving adventure',
+        tags=['diving', 'fishing', 'crafting'],
+        short_description='A diver explores reefs, harpoons fish, and returns to a busy kitchen loop.',
+    )
+
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert decision['visual_intent_reason'] == 'visual_intent:activity_focus:core_activity'
+
+
+def test_horror_maps_to_threat_atmosphere() -> None:
+    decision = _build_decision(
+        genre='survival horror',
+        tags=['monster', 'escape'],
+        short_description='A hunted survivor flees a looming threat through dark corridors.',
+    )
+
+    assert decision['visual_intent_type'] == 'threat_atmosphere'
+    assert decision['visual_intent_reason'] == 'visual_intent:threat_atmosphere:horror'
+
+
+def test_puzzle_maps_to_clean_art() -> None:
+    decision = _build_decision(
+        genre='minimal puzzle',
+        tags=['abstract', 'symbolic'],
+        short_description='A clean symbolic scene frames a single distinct object.',
+    )
+
+    assert decision['visual_intent_type'] == 'clean_art'
+    assert decision['visual_intent_reason'] == 'visual_intent:clean_art:minimal_or_atmospheric'
+
+
+def test_free_offer_maps_to_giveaway_free() -> None:
+    decision = _build_decision(
+        offer_type='giveaway',
+        current_price='FREE',
+    )
+
+    assert decision['visual_intent_type'] == 'giveaway_free'
+    assert decision['visual_intent_reason'] == 'visual_intent:giveaway_free:free_offer'
+
+
+def test_event_offer_maps_to_promo_event() -> None:
+    decision = _build_decision(
+        offer_type='free weekend',
+        short_description='Official event campaign artwork runs for a limited promo window.',
+    )
+
+    assert decision['visual_intent_type'] == 'promo_event'
+    assert decision['visual_intent_reason'] == 'visual_intent:promo_event:official_promo'
+
+
+def test_action_or_roguelike_maps_to_action_moment() -> None:
+    decision = _build_decision(
+        genre='roguelike shooter',
+        tags=['combat', 'boss', 'weapon'],
+        short_description='A fighter charges into a fast combat encounter with enemies closing in.',
+    )
+
+    assert decision['visual_intent_type'] == 'action_moment'
+    assert decision['visual_intent_reason'] == 'visual_intent:action_moment:combat_or_motion'
+
+
+def test_character_driven_maps_to_hero_focus() -> None:
+    decision = _build_decision(
+        genre='fantasy rpg',
+        tags=['story-rich', 'character-driven'],
+        short_description='A character-driven quest follows a recognizable hero through a mythic world.',
+    )
+
+    assert decision['visual_intent_type'] == 'hero_focus'
+    assert decision['visual_intent_reason'] == 'visual_intent:hero_focus:character_driven'
+
+
+def test_last_resort_official_records_missing_visual_requirements() -> None:
+    decision = _build_decision(
+        genre='cozy diving adventure',
+        tags=['diving', 'fishing'],
+        short_description='A diver explores reefs, catches fish, and manages a busy loop.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'diver',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://activity-last-resort',
+                'metadata': {
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            },
+        ],
+    )
+
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert 'no_activity_focus_visual' in decision['missing_visual_requirements']
+    assert 'no_activity_focus_visual' in _visual_intent(decision)['missing_visual_requirements']
+
+
+def test_visual_intent_does_not_change_selection_or_ai_behavior() -> None:
+    decision = _build_decision(
+        genre='roguelike shooter',
+        tags=['combat', 'weapon'],
+        short_description='A fighter rushes through ruins with a clear official hero frame available.',
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://action-intent-debug',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    assert decision['visual_intent_type'] == 'action_moment'
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert decision['card_type'] == 'simple_hero'

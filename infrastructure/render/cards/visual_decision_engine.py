@@ -586,6 +586,30 @@ CARD_TYPE_REASON_GIVEAWAY_FREE = 'card_type:giveaway_free:free_offer'
 CARD_TYPE_REASON_LAST_RESORT_OFFICIAL = 'card_type:last_resort_official:capsule_or_header_selected'
 CARD_TYPE_REASON_SAFE_FALLBACK = 'card_type:safe_fallback:insufficient_strategy_signals'
 
+VISUAL_INTENT_VERSION = 'v1_mvp'
+
+VISUAL_INTENT_HERO_FOCUS = 'hero_focus'
+VISUAL_INTENT_ACTION_MOMENT = 'action_moment'
+VISUAL_INTENT_VEHICLE_MOTION = 'vehicle_motion'
+VISUAL_INTENT_STRATEGY_CORE = 'strategy_core'
+VISUAL_INTENT_ACTIVITY_FOCUS = 'activity_focus'
+VISUAL_INTENT_CLEAN_ART = 'clean_art'
+VISUAL_INTENT_THREAT_ATMOSPHERE = 'threat_atmosphere'
+VISUAL_INTENT_PROMO_EVENT = 'promo_event'
+VISUAL_INTENT_GIVEAWAY_FREE = 'giveaway_free'
+
+VISUAL_INTENT_REASON_HERO_FOCUS = 'visual_intent:hero_focus:character_driven'
+VISUAL_INTENT_REASON_ACTION_MOMENT = 'visual_intent:action_moment:combat_or_motion'
+VISUAL_INTENT_REASON_VEHICLE_MOTION = 'visual_intent:vehicle_motion:racing_or_driving'
+VISUAL_INTENT_REASON_STRATEGY_CORE = 'visual_intent:strategy_core:strategy_or_4x'
+VISUAL_INTENT_REASON_ACTIVITY_FOCUS = 'visual_intent:activity_focus:core_activity'
+VISUAL_INTENT_REASON_CLEAN_ART = 'visual_intent:clean_art:minimal_or_atmospheric'
+VISUAL_INTENT_REASON_THREAT_ATMOSPHERE = 'visual_intent:threat_atmosphere:horror'
+VISUAL_INTENT_REASON_PROMO_EVENT = 'visual_intent:promo_event:official_promo'
+VISUAL_INTENT_REASON_GIVEAWAY_FREE = 'visual_intent:giveaway_free:free_offer'
+VISUAL_INTENT_REASON_CLEAN_ART_SAFE_DEFAULT = 'visual_intent:clean_art:safe_default'
+VISUAL_INTENT_REASON_HERO_FOCUS_SAFE_DEFAULT = 'visual_intent:hero_focus:safe_default'
+
 FREE_OFFER_KEYWORDS = (
     'egs giveaway',
     'free',
@@ -618,11 +642,371 @@ DISCOUNT_OFFER_KEYWORDS = (
     'discount',
     'sale',
 )
+VISUAL_INTENT_PROMO_KEYWORDS = PROMO_EVENT_KEYWORDS + (
+    'campaign',
+    'official campaign',
+    'publisher campaign',
+    'seasonal sale',
+)
+VISUAL_INTENT_VEHICLE_KEYWORDS = (
+    'bike',
+    'car',
+    'driving',
+    'flight',
+    'racing',
+    'road',
+    'track',
+    'transport',
+    'vehicle',
+    'vehicle focused',
+    'vehicle-focused',
+)
+VISUAL_INTENT_STRATEGY_KEYWORDS = (
+    '4x',
+    '4 x',
+    'city builder',
+    'city-builder',
+    'empire',
+    'grand strategy',
+    'management',
+    'real time strategy',
+    'real-time strategy',
+    'rts',
+    'strategy',
+    'tactical',
+    'tactical layer',
+    'tactics',
+    'turn based strategy',
+    'turn-based strategy',
+)
+VISUAL_INTENT_THREAT_KEYWORDS = (
+    'dark adventure',
+    'haunted',
+    'horror',
+    'monster',
+    'psychological horror',
+    'survival horror',
+    'thriller',
+)
+VISUAL_INTENT_ACTIVITY_KEYWORDS = (
+    'building',
+    'cozy',
+    'cooking',
+    'crafting',
+    'dive',
+    'diver',
+    'diving',
+    'exploration',
+    'farming',
+    'fishing',
+    'harpoon',
+    'life sim',
+    'life simulation',
+)
+VISUAL_INTENT_HERO_KEYWORDS = (
+    'anime',
+    'character driven',
+    'character-driven',
+    'fantasy',
+    'role playing',
+    'rpg',
+    'soulslike',
+    'story rich',
+    'story-rich',
+    'visual novel',
+)
+VISUAL_INTENT_ACTION_KEYWORDS = (
+    'action',
+    'boss',
+    'combat',
+    'fighting',
+    'hack and slash',
+    'hack-and-slash',
+    'melee combat',
+    'roguelike',
+    'roguelite',
+    'shooter',
+    'survival combat',
+    'weapon',
+)
+VISUAL_INTENT_CLEAN_ART_KEYWORDS = (
+    'abstract',
+    'atmospheric indie',
+    'minimal',
+    'narrative',
+    'puzzle',
+    'symbolic',
+)
 HERO_LIKE_ASSET_FAMILIES = frozenset({'steam_library_hero', 'press_key_art', 'epic_key_art'})
 GAMEPLAY_LIKE_ASSET_FAMILIES = frozenset({'steam_screenshot', 'trailer_frame'})
 STRONG_SINGLE_IMAGE_ASSET_FAMILIES = HERO_LIKE_ASSET_FAMILIES | GAMEPLAY_LIKE_ASSET_FAMILIES
 LAST_RESORT_OFFICIAL_ASSET_FAMILIES = frozenset({'steam_capsule', 'steam_header'})
 SECONDARY_GAMEPLAY_SOURCE_TYPES = frozenset({'official_trailer_frame', 'steam_screenshot'})
+
+VISUAL_INTENT_SPECS: dict[str, dict[str, Any]] = {
+    VISUAL_INTENT_HERO_FOCUS: {
+        'required_visual_signals': [
+            'main_character',
+            'face_or_silhouette',
+            'weapon_or_magic_or_item',
+            'clear_subject',
+            'readable_pose',
+        ],
+        'avoid_visual_signals': [
+            'logo_only',
+            'title_heavy',
+            'empty_background',
+            'tiny_character',
+            'generic_scenery',
+        ],
+        'preferred_asset_families': [
+            'official_press_key_art',
+            'epic_key_art',
+            'steam_library_hero',
+            'character_artwork',
+        ],
+        'acceptable_fallback_asset_families': [
+            'steam_library_capsule',
+            'steam_main_capsule',
+            'clean_official_capsule',
+            'ai_generated_last_resort',
+        ],
+        'missing_visual_requirement': 'no_hero_focus_visual',
+    },
+    VISUAL_INTENT_ACTION_MOMENT: {
+        'required_visual_signals': [
+            'movement',
+            'combat',
+            'weapon',
+            'enemy',
+            'explosion',
+            'impact',
+            'chase',
+            'boss',
+            'readable_conflict',
+        ],
+        'avoid_visual_signals': [
+            'static_logo_art',
+            'title_only',
+            'menu_like',
+            'inventory_ui',
+            'empty_background',
+        ],
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'trailer_frame',
+            'action_screenshot',
+            'combat_key_art',
+            'steam_library_hero',
+        ],
+        'acceptable_fallback_asset_families': [
+            'official_press_key_art',
+            'character_artwork',
+            'capsule_last_resort',
+            'ai_generated_grounded',
+        ],
+        'missing_visual_requirement': 'no_action_moment_visual',
+    },
+    VISUAL_INTENT_VEHICLE_MOTION: {
+        'required_visual_signals': [
+            'vehicle',
+            'road_or_track',
+            'speed',
+            'drift',
+            'dust',
+            'chase',
+            'motion_blur',
+            'dynamic_angle',
+        ],
+        'avoid_visual_signals': [
+            'garage_menu',
+            'logo_only',
+            'empty_landscape',
+            'static_vehicle_pose',
+        ],
+        'preferred_asset_families': [
+            'steam_library_hero',
+            'gameplay_screenshot',
+            'trailer_frame',
+            'vehicle_key_art',
+        ],
+        'acceptable_fallback_asset_families': [
+            'steam_library_capsule',
+            'steam_main_capsule',
+            'ai_generated_last_resort',
+        ],
+        'missing_visual_requirement': 'no_vehicle_motion_visual',
+    },
+    VISUAL_INTENT_STRATEGY_CORE: {
+        'required_visual_signals': [
+            'map',
+            'board_state',
+            'units',
+            'armies',
+            'city',
+            'base',
+            'empire',
+            'tactical_overview',
+            'settlement',
+        ],
+        'avoid_visual_signals': [
+            'waterfall_only',
+            'empty_landscape',
+            'statue_only',
+            'generic_city_traffic',
+            'logo_only',
+            'title_heavy',
+            'mood_only',
+        ],
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'strategy_map_screenshot',
+            'trailer_frame',
+            'official_art_city_army_map',
+        ],
+        'acceptable_fallback_asset_families': [
+            'steam_library_capsule',
+            'steam_header',
+            'ai_generated_strategy_grounded',
+        ],
+        'missing_visual_requirement': 'no_strategy_core_visual',
+    },
+    VISUAL_INTENT_ACTIVITY_FOCUS: {
+        'required_visual_signals': [
+            'visible_activity',
+            'character_doing_action',
+            'tool_or_object',
+            'environment_explains_gameplay_loop',
+        ],
+        'avoid_visual_signals': [
+            'oversized_crop',
+            'no_activity_visible',
+            'generic_landscape',
+            'empty_nature',
+            'face_only',
+            'body_crop_only',
+        ],
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'activity_screenshot',
+            'trailer_frame',
+            'official_art_with_visible_activity',
+        ],
+        'acceptable_fallback_asset_families': [
+            'capsule_with_visible_activity',
+            'clean_hero_art',
+            'ai_generated_grounded',
+        ],
+        'missing_visual_requirement': 'no_activity_focus_visual',
+    },
+    VISUAL_INTENT_CLEAN_ART: {
+        'required_visual_signals': [
+            'clear_symbol',
+            'readable_scene',
+            'clean_composition',
+            'strong_silhouette',
+            'distinct_object',
+        ],
+        'avoid_visual_signals': [
+            'generic_scenery',
+            'empty_landscape',
+            'unreadable_dark_scene',
+            'no_subject',
+            'visual_noise',
+        ],
+        'preferred_asset_families': [
+            'official_key_art',
+            'steam_library_hero',
+            'clean_gameplay_screenshot',
+            'clean_capsule',
+        ],
+        'acceptable_fallback_asset_families': [
+            'steam_library_capsule',
+            'steam_main_capsule',
+            'ai_generated_cautious',
+        ],
+        'missing_visual_requirement': 'insufficient_visual_intent_signals',
+    },
+    VISUAL_INTENT_THREAT_ATMOSPHERE: {
+        'required_visual_signals': [
+            'threat_cue',
+            'monster',
+            'silhouette',
+            'chase',
+            'danger',
+            'darkness_with_readable_subject',
+            'escape_cue',
+        ],
+        'avoid_visual_signals': [
+            'pure_black',
+            'empty_corridor',
+            'generic_fog',
+            'no_threat',
+            'unreadable_darkness',
+        ],
+        'preferred_asset_families': [
+            'horror_key_art',
+            'gameplay_screenshot_with_threat',
+            'trailer_frame',
+            'steam_library_hero',
+        ],
+        'acceptable_fallback_asset_families': [
+            'clean_dark_official_art',
+            'capsule_with_readable_threat',
+            'ai_generated_threat_grounded',
+        ],
+        'missing_visual_requirement': 'no_threat_atmosphere_visual',
+    },
+    VISUAL_INTENT_PROMO_EVENT: {
+        'required_visual_signals': [
+            'promo_banner',
+            'event_art',
+            'campaign_visual',
+            'official_event_composition',
+        ],
+        'avoid_visual_signals': [
+            'normal_capsule_as_event',
+            'heavy_overlay_over_promo',
+            'overdesigned_layout',
+        ],
+        'preferred_asset_families': [
+            'official_promo_banner',
+            'event_image',
+            'publisher_campaign_image',
+        ],
+        'acceptable_fallback_asset_families': [
+            'simple_hero_art',
+            'clean_official_art',
+            'giveaway_free_art',
+        ],
+        'missing_visual_requirement': 'no_promo_event_visual',
+    },
+    VISUAL_INTENT_GIVEAWAY_FREE: {
+        'required_visual_signals': [
+            'free_signal',
+            'giveaway_signal',
+            'deadline',
+            'clean_official_visual',
+        ],
+        'avoid_visual_signals': [
+            'price_first_layout',
+            'weak_free_signal',
+            'cluttered_sale_design',
+        ],
+        'preferred_asset_families': [
+            'official_key_art',
+            'steam_library_hero',
+            'promo_giveaway_art',
+            'clean_capsule',
+        ],
+        'acceptable_fallback_asset_families': [
+            'steam_library_capsule',
+            'steam_main_capsule',
+            'official_promo_art',
+        ],
+        'missing_visual_requirement': 'no_giveaway_visual',
+    },
+}
 
 
 def _clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
@@ -915,6 +1299,30 @@ class CardTypeDecision:
 
 
 @dataclass(slots=True)
+class VisualIntentDecision:
+    visual_intent_type: str
+    visual_intent_reason: str
+    required_visual_signals: list[str]
+    avoid_visual_signals: list[str]
+    preferred_asset_families: list[str]
+    acceptable_fallback_asset_families: list[str]
+    missing_visual_requirements: list[str]
+    visual_intent_version: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'visual_intent_type': self.visual_intent_type,
+            'visual_intent_reason': self.visual_intent_reason,
+            'required_visual_signals': list(self.required_visual_signals),
+            'avoid_visual_signals': list(self.avoid_visual_signals),
+            'preferred_asset_families': list(self.preferred_asset_families),
+            'acceptable_fallback_asset_families': list(self.acceptable_fallback_asset_families),
+            'missing_visual_requirements': list(self.missing_visual_requirements),
+            'visual_intent_version': self.visual_intent_version,
+        }
+
+
+@dataclass(slots=True)
 class CoverDecision:
     genre_cluster: str
     visual_type: str
@@ -928,6 +1336,14 @@ class CoverDecision:
     card_type_reason: str
     card_strategy_version: str
     card_type_inputs: dict[str, Any]
+    visual_intent_type: str
+    visual_intent_reason: str
+    required_visual_signals: list[str]
+    avoid_visual_signals: list[str]
+    preferred_asset_families: list[str]
+    acceptable_fallback_asset_families: list[str]
+    missing_visual_requirements: list[str]
+    visual_intent_version: str
     decision_reason: str
     decision_trace: dict[str, Any]
 
@@ -945,6 +1361,14 @@ class CoverDecision:
             'card_type_reason': self.card_type_reason,
             'card_strategy_version': self.card_strategy_version,
             'card_type_inputs': _json_ready(self.card_type_inputs),
+            'visual_intent_type': self.visual_intent_type,
+            'visual_intent_reason': self.visual_intent_reason,
+            'required_visual_signals': list(self.required_visual_signals),
+            'avoid_visual_signals': list(self.avoid_visual_signals),
+            'preferred_asset_families': list(self.preferred_asset_families),
+            'acceptable_fallback_asset_families': list(self.acceptable_fallback_asset_families),
+            'missing_visual_requirements': list(self.missing_visual_requirements),
+            'visual_intent_version': self.visual_intent_version,
             'decision_reason': self.decision_reason,
             'decision_trace': _json_ready(self.decision_trace),
         }
@@ -1110,6 +1534,19 @@ class VisualDecisionEngine:
             scored_assets=ordered_scores,
             selected_indexes=selected_indexes,
         )
+        visual_intent_decision = self._classify_visual_intent(
+            genre=genre_text,
+            tags=tag_values,
+            short_description=description_text,
+            offer_type=offer_type_text,
+            current_price=current_price_text,
+            old_price=old_price_text,
+            selected_image_source_type=image_source_type,
+            card_type=card_type_decision.card_type,
+            visual_type=visual_type,
+            genre_cluster=genre_cluster,
+            scored_assets=ordered_scores,
+        )
         decision_reason = selection_reason if not use_ai else f'{selection_reason}:{ai_fallback_reason}'
         rejection_reasons = sorted(
             {
@@ -1188,6 +1625,7 @@ class VisualDecisionEngine:
                 for item in ordered_scores
             ],
             'card_strategy': card_type_decision.to_dict(),
+            'visual_intent': visual_intent_decision.to_dict(),
         }
 
         return CoverDecision(
@@ -1203,6 +1641,14 @@ class VisualDecisionEngine:
             card_type_reason=card_type_decision.card_type_reason,
             card_strategy_version=card_type_decision.card_strategy_version,
             card_type_inputs=card_type_decision.card_type_inputs,
+            visual_intent_type=visual_intent_decision.visual_intent_type,
+            visual_intent_reason=visual_intent_decision.visual_intent_reason,
+            required_visual_signals=visual_intent_decision.required_visual_signals,
+            avoid_visual_signals=visual_intent_decision.avoid_visual_signals,
+            preferred_asset_families=visual_intent_decision.preferred_asset_families,
+            acceptable_fallback_asset_families=visual_intent_decision.acceptable_fallback_asset_families,
+            missing_visual_requirements=visual_intent_decision.missing_visual_requirements,
+            visual_intent_version=visual_intent_decision.visual_intent_version,
             decision_reason=decision_reason,
             decision_trace=decision_trace,
         )
@@ -3241,6 +3687,194 @@ class VisualDecisionEngine:
             if part
         )
         return _contains_any_keyword(hint_text, PROMO_ASSET_HINT_KEYWORDS)
+
+    @classmethod
+    def _classify_visual_intent(
+        cls,
+        *,
+        genre: str,
+        tags: Sequence[str],
+        short_description: str,
+        offer_type: str,
+        current_price: str,
+        old_price: str,
+        selected_image_source_type: str | None,
+        card_type: str,
+        visual_type: str,
+        genre_cluster: str,
+        scored_assets: Sequence[ScoredAsset],
+    ) -> VisualIntentDecision:
+        asset_signal_text = ' '.join(
+            ' '.join(
+                part
+                for part in (
+                    item.candidate.source_type,
+                    item.candidate.kind,
+                    item.normalized_asset_family,
+                    _metadata_signal_text(item.candidate.metadata),
+                )
+                if part
+            )
+            for item in scored_assets
+            if item.candidate.is_official
+        )
+        combined_text = ' '.join(
+            part
+            for part in (
+                genre,
+                ' '.join(tags),
+                short_description,
+                offer_type,
+                selected_image_source_type or '',
+                card_type,
+                visual_type,
+                asset_signal_text,
+            )
+            if part
+        )
+        offer_signal_text = ' '.join(
+            part for part in (offer_type, current_price, old_price, ' '.join(tags), short_description) if part
+        )
+        has_free_weekend_signal = _contains_any_keyword(offer_signal_text, FREE_WEEKEND_KEYWORDS)
+        discount_percent = cls._discount_percent(
+            offer_type=offer_type,
+            current_price=current_price,
+            old_price=old_price,
+        )
+        has_free_offer_signal = (
+            card_type == CARD_TYPE_GIVEAWAY_FREE
+            or (
+                not has_free_weekend_signal
+                and (
+                    discount_percent == 100
+                    or cls._looks_free_price(current_price)
+                    or _contains_any_keyword(offer_signal_text, FREE_OFFER_KEYWORDS)
+                )
+            )
+        )
+        has_promo_signal = (
+            card_type == CARD_TYPE_OFFICIAL_PROMO_CANDIDATE
+            or has_free_weekend_signal
+            or _contains_any_keyword(combined_text, VISUAL_INTENT_PROMO_KEYWORDS)
+            or any(cls._is_promo_or_event_asset(item) for item in scored_assets if item.candidate.is_official)
+        )
+        default_to_hero_focus = bool(
+            card_type == CARD_TYPE_SIMPLE_HERO
+            or visual_type in {'character', 'poster_art'}
+            or genre_cluster == 'character_driven'
+            or (selected_image_source_type in HERO_FOCUS_FALLBACK_SOURCE_TYPES if selected_image_source_type else False)
+        )
+
+        if has_free_offer_signal:
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_GIVEAWAY_FREE,
+                reason=VISUAL_INTENT_REASON_GIVEAWAY_FREE,
+                card_type=card_type,
+            )
+        if has_promo_signal:
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_PROMO_EVENT,
+                reason=VISUAL_INTENT_REASON_PROMO_EVENT,
+                card_type=card_type,
+            )
+        if genre_cluster == 'motion_vehicle' or _contains_any_keyword(combined_text, VISUAL_INTENT_VEHICLE_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_VEHICLE_MOTION,
+                reason=VISUAL_INTENT_REASON_VEHICLE_MOTION,
+                card_type=card_type,
+            )
+        if _contains_any_keyword(combined_text, VISUAL_INTENT_STRATEGY_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_STRATEGY_CORE,
+                reason=VISUAL_INTENT_REASON_STRATEGY_CORE,
+                card_type=card_type,
+            )
+        if _contains_any_keyword(combined_text, VISUAL_INTENT_THREAT_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_THREAT_ATMOSPHERE,
+                reason=VISUAL_INTENT_REASON_THREAT_ATMOSPHERE,
+                card_type=card_type,
+            )
+        if _contains_any_keyword(combined_text, VISUAL_INTENT_ACTIVITY_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_ACTIVITY_FOCUS,
+                reason=VISUAL_INTENT_REASON_ACTIVITY_FOCUS,
+                card_type=card_type,
+            )
+        if _contains_any_keyword(combined_text, VISUAL_INTENT_HERO_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_HERO_FOCUS,
+                reason=VISUAL_INTENT_REASON_HERO_FOCUS,
+                card_type=card_type,
+            )
+        if _contains_any_keyword(combined_text, VISUAL_INTENT_ACTION_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_ACTION_MOMENT,
+                reason=VISUAL_INTENT_REASON_ACTION_MOMENT,
+                card_type=card_type,
+            )
+        if genre_cluster == 'atmospheric_scene' or _contains_any_keyword(combined_text, VISUAL_INTENT_CLEAN_ART_KEYWORDS):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_CLEAN_ART,
+                reason=VISUAL_INTENT_REASON_CLEAN_ART,
+                card_type=card_type,
+            )
+
+        default_intent_type = VISUAL_INTENT_HERO_FOCUS if default_to_hero_focus else VISUAL_INTENT_CLEAN_ART
+        default_reason = (
+            VISUAL_INTENT_REASON_HERO_FOCUS_SAFE_DEFAULT
+            if default_intent_type == VISUAL_INTENT_HERO_FOCUS
+            else VISUAL_INTENT_REASON_CLEAN_ART_SAFE_DEFAULT
+        )
+        return cls._build_visual_intent_decision(
+            default_intent_type,
+            reason=default_reason,
+            card_type=card_type,
+        )
+
+    @classmethod
+    def _build_visual_intent_decision(
+        cls,
+        visual_intent_type: str,
+        *,
+        reason: str,
+        card_type: str,
+    ) -> VisualIntentDecision:
+        spec = VISUAL_INTENT_SPECS.get(visual_intent_type, VISUAL_INTENT_SPECS[VISUAL_INTENT_CLEAN_ART])
+        return VisualIntentDecision(
+            visual_intent_type=visual_intent_type,
+            visual_intent_reason=reason,
+            required_visual_signals=list(spec.get('required_visual_signals') or []),
+            avoid_visual_signals=list(spec.get('avoid_visual_signals') or []),
+            preferred_asset_families=list(spec.get('preferred_asset_families') or []),
+            acceptable_fallback_asset_families=list(spec.get('acceptable_fallback_asset_families') or []),
+            missing_visual_requirements=cls._missing_visual_requirements(
+                visual_intent_type=visual_intent_type,
+                visual_intent_reason=reason,
+                card_type=card_type,
+            ),
+            visual_intent_version=VISUAL_INTENT_VERSION,
+        )
+
+    @classmethod
+    def _missing_visual_requirements(
+        cls,
+        *,
+        visual_intent_type: str,
+        visual_intent_reason: str,
+        card_type: str,
+    ) -> list[str]:
+        if card_type not in {CARD_TYPE_LAST_RESORT_OFFICIAL, CARD_TYPE_SAFE_FALLBACK}:
+            return []
+        if visual_intent_reason in {
+            VISUAL_INTENT_REASON_CLEAN_ART_SAFE_DEFAULT,
+            VISUAL_INTENT_REASON_HERO_FOCUS_SAFE_DEFAULT,
+        }:
+            return ['insufficient_visual_intent_signals']
+        missing_requirement = _safe_text(
+            VISUAL_INTENT_SPECS.get(visual_intent_type, {}).get('missing_visual_requirement')
+        )
+        return [missing_requirement] if missing_requirement else ['insufficient_visual_intent_signals']
 
     @classmethod
     def _discount_percent(
