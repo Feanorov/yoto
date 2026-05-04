@@ -210,6 +210,28 @@ ASSET_TYPE_PRIORITY: dict[str, int] = {
     'title': 30,
 }
 REJECT_ASSET_TYPES = frozenset({'collage', 'ui', 'invalid'})
+QUALITY_TIER_RANK = {
+    'good': 3,
+    'acceptable': 2,
+    'bad': 1,
+    'hard_reject': 0,
+    'ai_fallback': -1,
+}
+NORMALIZED_ASSET_FAMILY_PRIORITY = {
+    'steam_library_hero': 500,
+    'epic_key_art': 490,
+    'press_key_art': 480,
+    'steam_screenshot': 470,
+    'epic_screenshot': 470,
+    'trailer_frame': 430,
+    'steam_header': 320,
+    'steam_capsule': 280,
+    'steam_logo': 80,
+    'placeholder': 60,
+    'collage': 40,
+    'invalid': 0,
+    'ai_fallback': 0,
+}
 
 HERO_HINT_KEYWORDS = (
     'character',
@@ -422,12 +444,106 @@ UI_HEAVY_SCREENSHOT_HINT_KEYWORDS = (
 MENU_LIKE_UI_HINT_KEYWORDS = (
     'button',
     'buttons',
+    'dialog',
+    'dialogue',
     'interface',
+    'inventory',
+    'journal',
+    'launcher',
+    'loadout',
     'menu',
+    'options',
     'overview',
     'panel',
+    'pause',
+    'quest',
+    'questlog',
     'report',
+    'settings',
+    'shop',
+    'skilltree',
+    'store',
+    'tech_tree',
+    'tutorial',
     'ui',
+)
+LOGO_TITLE_HINT_KEYWORDS = (
+    'branding',
+    'brand',
+    'lockup',
+    'logo',
+    'logotype',
+    'title',
+    'title treatment',
+    'title_treatment',
+    'title-treatment',
+    'wordmark',
+)
+PLACEHOLDER_HINT_KEYWORDS = (
+    'coming soon',
+    'coming_soon',
+    'comingsoon',
+    'default',
+    'dummy',
+    'mock',
+    'placeholder',
+    'sample',
+    'temp',
+)
+COLLAGE_HINT_KEYWORDS = (
+    'bundle',
+    'collage',
+    'composite',
+    'contents',
+    'grid',
+    'montage',
+    'mosaic',
+    'packshot',
+)
+MOOD_EMPTY_HINT_KEYWORDS = (
+    'background',
+    'bg',
+    'environment',
+    'landscape',
+    'mood',
+    'scene',
+    'vista',
+    'wallpaper',
+)
+ACTION_HINT_KEYWORDS = (
+    'action',
+    'attack',
+    'battle',
+    'boss',
+    'chase',
+    'combat',
+    'drift',
+    'enemy',
+    'fight',
+    'gameplay',
+    'monster',
+    'race',
+    'racing',
+    'shoot',
+    'vehicle',
+    'weapon',
+)
+SUBJECT_HINT_KEYWORDS = (
+    'boss',
+    'car',
+    'character',
+    'creature',
+    'driver',
+    'enemy',
+    'fighter',
+    'hero',
+    'mech',
+    'party',
+    'protagonist',
+    'ship',
+    'subject',
+    'vehicle_focus',
+    'weapon',
 )
 CLICKABLE_SOURCE_TYPES = frozenset(
     {
@@ -512,6 +628,12 @@ def _primary_rejection_reason(reasons: Sequence[str]) -> str | None:
     return normalized[0] if normalized else None
 
 
+def _append_reason(reasons: list[str], reason: str | None) -> None:
+    normalized = _safe_text(reason)
+    if normalized and normalized not in reasons:
+        reasons.append(normalized)
+
+
 def _json_ready(value: Any) -> Any:
     if isinstance(value, Mapping):
         return {str(key): _json_ready(item) for key, item in value.items()}
@@ -539,6 +661,31 @@ def _metadata_text(metadata: Mapping[str, Any]) -> str:
             for item in value:
                 cleaned_item = _normalize_text(item)
                 if cleaned_item:
+                    values.append(cleaned_item)
+    return ' '.join(values)
+
+
+def _metadata_signal_text(metadata: Mapping[str, Any]) -> str:
+    values: list[str] = []
+    for key, value in metadata.items():
+        normalized_key = _normalize_text(key)
+        if any(token in normalized_key for token in ('cache', 'file', 'path', 'url')):
+            continue
+        if normalized_key:
+            values.append(normalized_key)
+        if isinstance(value, str):
+            cleaned = _normalize_text(value)
+            if cleaned and not any(token in cleaned for token in ('\\', '/', '://')):
+                values.append(cleaned)
+        elif isinstance(value, bool):
+            if value:
+                values.append(normalized_key)
+        elif isinstance(value, (int, float)):
+            values.append(str(value))
+        elif isinstance(value, Sequence) and not isinstance(value, (str, bytes, bytearray)):
+            for item in value:
+                cleaned_item = _normalize_text(item)
+                if cleaned_item and not any(token in cleaned_item for token in ('\\', '/', '://')):
                     values.append(cleaned_item)
     return ' '.join(values)
 
@@ -654,6 +801,8 @@ class ScoredAsset:
     focus_score: float
     total_score: float
     accepted: bool
+    normalized_asset_family: str = 'invalid'
+    quality_tier: str = 'bad'
     visual_anchor_boost_applied: bool = False
     rejection_reasons: list[str] = field(default_factory=list)
     score_breakdown: dict[str, Any] = field(default_factory=dict)
@@ -669,6 +818,8 @@ class ScoredAsset:
                 'focus_score': round(self.focus_score, 3),
                 'total_score': round(self.total_score, 3),
                 'accepted': self.accepted,
+                'normalized_asset_family': self.normalized_asset_family,
+                'quality_tier': self.quality_tier,
                 'visual_anchor_boost_applied': self.visual_anchor_boost_applied,
                 'rejection_reasons': _dedupe_reasons(self.rejection_reasons),
                 'rejection_reason': _primary_rejection_reason(self.rejection_reasons),
@@ -779,10 +930,15 @@ class VisualDecisionEngine:
 
         official_assets = [item for item in scored_assets if item.candidate.is_official]
         ai_assets = [item for item in scored_assets if not item.candidate.is_official]
-        usable_official_assets = [item for item in official_assets if item.accepted]
+        usable_official_assets = [
+            item
+            for item in official_assets
+            if item.quality_tier in {'good', 'acceptable'}
+        ]
 
         use_ai = False
         ai_fallback_reason: str | None = None
+        policy_reasons: list[str] = []
         selected_assets: list[ScoredAsset] = []
         selection_reason = 'official_first_selected_best_scoring_asset'
         selection_trace: dict[str, Any] = {
@@ -793,6 +949,11 @@ class VisualDecisionEngine:
         }
 
         if usable_official_assets:
+            policy_reasons.append(
+                'ai_block:good_official_exists'
+                if any(item.quality_tier == 'good' for item in usable_official_assets)
+                else 'ai_block:acceptable_official_exists'
+            )
             selected_assets, selection_trace = self._select_assets(
                 genre_cluster=genre_cluster,
                 candidates=usable_official_assets,
@@ -803,6 +964,7 @@ class VisualDecisionEngine:
                 selection_reason = 'official_first_selected_best_scoring_collage'
         else:
             use_ai = True
+            policy_reasons.append('ai_unlock:no_acceptable_official')
             ai_fallback_reason = (
                 'no_official_assets'
                 if not official_assets
@@ -824,6 +986,7 @@ class VisualDecisionEngine:
             else:
                 selection_reason = 'ai_fallback_selected_best_ai_candidate'
 
+        self._mark_selected_assets(selected_assets)
         layout_type, layout_trace = self._infer_layout_type(
             genre_cluster=genre_cluster,
             visual_type=visual_type,
@@ -893,6 +1056,7 @@ class VisualDecisionEngine:
                 'selected_scoring_reasons': [item.scoring_reason for item in selected_assets],
                 'ai_fallback_reason': ai_fallback_reason,
                 'selection_reason': selection_reason,
+                'policy_reasons': list(policy_reasons),
                 'rejection_reasons': rejection_reasons,
             },
             'close_score_official_tiebreak': bool(selection_trace.get('close_score_official_tiebreak', False)),
@@ -907,6 +1071,8 @@ class VisualDecisionEngine:
                     'is_local_fallback_candidate': self._is_local_fallback_candidate(item),
                     'safe_close_score_official_candidate': self._is_safe_close_score_official_candidate(item),
                     'visual_anchor_boost_applied': item.visual_anchor_boost_applied,
+                    'normalized_asset_family': item.normalized_asset_family,
+                    'quality_tier': item.quality_tier,
                     'accepted': item.accepted,
                     'total_score': round(item.total_score, 3),
                     'readability_score': round(item.readability_score, 3),
@@ -1029,6 +1195,12 @@ class VisualDecisionEngine:
         genre_cluster: str,
     ) -> ScoredAsset:
         enrichment = self._enrich_asset(candidate)
+        hint_text = self._hint_text(candidate)
+        normalized_asset_family = self._normalized_asset_family(
+            candidate,
+            hint_text=hint_text,
+            visual_type=visual_type,
+        )
         small_asset_penalty = self._small_asset_penalty(candidate)
         small_size_readability_relief = self._small_size_readability_relief(
             candidate,
@@ -1090,6 +1262,7 @@ class VisualDecisionEngine:
             enrichment=enrichment,
             visual_type=visual_type,
             genre_cluster=genre_cluster,
+            normalized_asset_family=normalized_asset_family,
         )
         readability_score = _clamp(readability_score + readability_rule_delta)
         focus_score = _clamp(base_focus_score + focus_enrichment_delta + focus_rule_delta)
@@ -1099,8 +1272,9 @@ class VisualDecisionEngine:
             enrichment=enrichment,
             visual_type=visual_type,
             small_asset_penalty=effective_small_asset_penalty,
+            normalized_asset_family=normalized_asset_family,
         )
-        accepted = (
+        threshold_passed = (
             not hard_reject_reasons
             and (
                 visual_type not in {'character', 'poster_art'}
@@ -1131,16 +1305,50 @@ class VisualDecisionEngine:
             rejection_reasons.append('text_heavy')
         if 'vdr1_no_collage_penalty' in rule_reasons:
             rejection_reasons.append('collage_like')
-        rejection_reasons = _dedupe_reasons(rejection_reasons)
-
         scoring_reasons = list(enrichment.signals)
         if visual_anchor_boost_reason:
             scoring_reasons.append(visual_anchor_boost_reason)
         scoring_reasons.extend(readability_reasons)
         scoring_reasons.extend(focus_reasons)
         scoring_reasons.extend(rule_reasons)
+        scoring_reasons.extend(
+            self._stable_score_reason_aliases(
+                candidate,
+                enrichment=enrichment,
+                normalized_asset_family=normalized_asset_family,
+                visual_type=visual_type,
+                aspect_fit=aspect_fit,
+                small_asset_penalty=effective_small_asset_penalty,
+                hint_text=hint_text,
+            )
+        )
         if hard_reject_reasons:
             scoring_reasons.extend(f'hard_reject:{reason}' for reason in hard_reject_reasons)
+        stable_rejection_aliases = self._stable_rejection_aliases(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            visual_type=visual_type,
+            hint_text=hint_text,
+            hard_reject_reasons=hard_reject_reasons,
+        )
+        rejection_reasons.extend(stable_rejection_aliases)
+        rejection_reasons = _dedupe_reasons(rejection_reasons)
+        scoring_reasons.extend(stable_rejection_aliases)
+        quality_tier = self._official_quality_tier(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            threshold_passed=threshold_passed,
+            scoring_reasons=scoring_reasons,
+            hard_reject_reasons=hard_reject_reasons,
+        )
+        accepted = threshold_passed and (
+            candidate.is_official
+            and quality_tier in {'good', 'acceptable'}
+        )
+        if candidate.is_official and not accepted and quality_tier == 'bad':
+            _append_reason(rejection_reasons, 'official_asset_failed_quality_gate')
+            scoring_reasons.append('reject:quality_gate')
         scoring_reason = '; '.join(dict.fromkeys(item for item in scoring_reasons if _safe_text(item))) or 'base_scoring_only'
 
         return ScoredAsset(
@@ -1150,6 +1358,8 @@ class VisualDecisionEngine:
             focus_score=focus_score,
             total_score=total_score,
             accepted=accepted,
+            normalized_asset_family=normalized_asset_family,
+            quality_tier=quality_tier,
             visual_anchor_boost_applied=visual_anchor_boost_applied,
             rejection_reasons=rejection_reasons,
             score_breakdown={
@@ -1170,12 +1380,135 @@ class VisualDecisionEngine:
                 'small_asset_penalty': round(effective_small_asset_penalty, 3),
                 'small_size_readability_relief': round(small_size_readability_relief, 3),
                 'weak_metadata_penalty': round(weak_metadata_penalty, 3),
+                'threshold_passed': threshold_passed,
+                'normalized_asset_family': normalized_asset_family,
+                'quality_tier': quality_tier,
                 'visual_decision_rule_readability_delta': round(readability_rule_delta, 3),
                 'visual_decision_rule_focus_delta': round(focus_rule_delta, 3),
                 'scoring_reason_parts': scoring_reasons,
             },
             scoring_reason=scoring_reason,
         )
+
+    @classmethod
+    def _stable_score_reason_aliases(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        visual_type: str,
+        aspect_fit: float,
+        small_asset_penalty: float,
+        hint_text: str,
+    ) -> list[str]:
+        reasons: list[str] = []
+        if candidate.is_official and candidate.source_type.startswith(('steam_', 'epic_')):
+            reasons.append('bonus:official_first_party')
+        if candidate.source_type == 'official_press_key_art':
+            reasons.append('bonus:official_press')
+        if cls._has_subject_signal(hint_text):
+            reasons.append('bonus:clear_subject')
+        if cls._has_action_signal(hint_text) and normalized_asset_family in {
+            'steam_library_hero',
+            'steam_screenshot',
+            'trailer_frame',
+            'press_key_art',
+            'epic_key_art',
+        }:
+            reasons.append('bonus:action_moment')
+            reasons.append('bonus:gameplay_representative')
+        if normalized_asset_family in {'steam_library_hero', 'press_key_art', 'epic_key_art'} and not cls._is_text_heavy_candidate(
+            hint_text
+        ):
+            reasons.append('bonus:text_free_brand_art')
+        if normalized_asset_family == 'steam_capsule':
+            reasons.append('penalty:branding_surface_capsule')
+        if normalized_asset_family == 'steam_header':
+            reasons.append('penalty:branding_surface_header')
+        if cls._is_title_heavy_branding_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+        ):
+            reasons.append('penalty:title_heavy')
+        if cls._is_ui_heavy_screenshot_candidate(
+            candidate,
+            enrichment=enrichment,
+            hint_text=hint_text,
+        ):
+            reasons.append('penalty:ui_heavy')
+        if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
+            reasons.append('penalty:menu_like_soft')
+        if cls._is_mood_empty_candidate(hint_text):
+            reasons.append('penalty:empty_mood_scene')
+        if aspect_fit >= 0.88:
+            reasons.append('bonus:aspect_fit_good')
+        elif aspect_fit < 0.60:
+            reasons.append('penalty:aspect_fit_poor')
+        if candidate.area >= 1280 * 720:
+            reasons.append('bonus:high_res')
+        elif small_asset_penalty >= 0.08:
+            reasons.append('penalty:low_res')
+        return reasons
+
+    @classmethod
+    def _stable_rejection_aliases(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        visual_type: str,
+        hint_text: str,
+        hard_reject_reasons: Sequence[str],
+    ) -> list[str]:
+        reasons: list[str] = []
+        if not candidate.path_or_url:
+            reasons.append('reject:invalid_path')
+        if candidate.width is None or candidate.height is None:
+            reasons.append('reject:invalid_dimensions')
+        if 'asset_too_small' in hard_reject_reasons:
+            reasons.append('reject:too_small')
+        if enrichment.local_image_readable is False:
+            reasons.append('reject:unreadable_image')
+        if normalized_asset_family == 'steam_logo':
+            reasons.extend(['reject:standalone_logo_asset', 'reject:logo_only_visual'])
+        if normalized_asset_family == 'placeholder':
+            reasons.append('reject:placeholder_asset')
+        if visual_type != 'collage' and normalized_asset_family == 'collage':
+            reasons.append('reject:collage_single_title')
+        if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
+            reasons.append('reject:menu_like_screenshot')
+        return _dedupe_reasons(reasons)
+
+    @classmethod
+    def _official_quality_tier(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        normalized_asset_family: str,
+        threshold_passed: bool,
+        scoring_reasons: Sequence[str],
+        hard_reject_reasons: Sequence[str],
+    ) -> str:
+        if candidate.source_type == AI_SOURCE_TYPE:
+            return 'ai_fallback'
+        if hard_reject_reasons:
+            return 'hard_reject'
+        if not threshold_passed:
+            return 'bad'
+
+        stable_reason_set = set(scoring_reasons)
+        if 'penalty:title_heavy' in stable_reason_set and normalized_asset_family in {'steam_capsule', 'steam_header'}:
+            return 'bad'
+        if 'penalty:menu_like_soft' in stable_reason_set:
+            return 'bad'
+        if normalized_asset_family in {'steam_library_hero', 'press_key_art', 'epic_key_art', 'steam_screenshot', 'epic_screenshot'}:
+            return 'good'
+        if normalized_asset_family in {'trailer_frame', 'steam_header', 'steam_capsule'}:
+            return 'acceptable'
+        return 'acceptable'
 
     def _enrich_asset(self, candidate: AssetCandidate) -> AssetEnrichment:
         local_image_path, local_image_readable, local_width, local_height = self._inspect_local_image(candidate)
@@ -1312,6 +1645,120 @@ class VisualDecisionEngine:
             )
             if part
         )
+
+    @classmethod
+    def _is_placeholder_candidate(cls, candidate: AssetCandidate) -> bool:
+        filename_text = _normalize_text(Path(_safe_text(candidate.path_or_url)).name)
+        placeholder_text = ' '.join(
+            part
+            for part in (
+                candidate.source_type,
+                candidate.kind,
+                _metadata_signal_text(candidate.metadata),
+                filename_text,
+            )
+            if part
+        )
+        return _contains_any_keyword(placeholder_text, PLACEHOLDER_HINT_KEYWORDS)
+
+    @classmethod
+    def _is_collage_candidate(cls, candidate: AssetCandidate) -> bool:
+        filename_text = _normalize_text(Path(_safe_text(candidate.path_or_url)).name)
+        collage_text = ' '.join(
+            part
+            for part in (
+                candidate.source_type,
+                candidate.kind,
+                _metadata_signal_text(candidate.metadata),
+                filename_text,
+            )
+            if part
+        )
+        return _contains_any_keyword(collage_text, COLLAGE_HINT_KEYWORDS)
+
+    @classmethod
+    def _has_subject_signal(cls, hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, SUBJECT_HINT_KEYWORDS) or _contains_any_keyword(
+            hint_text,
+            HERO_HINT_KEYWORDS,
+        )
+
+    @classmethod
+    def _has_action_signal(cls, hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, ACTION_HINT_KEYWORDS) or _contains_any_keyword(
+            hint_text,
+            GAMEPLAY_HINT_KEYWORDS,
+        )
+
+    @classmethod
+    def _is_standalone_logo_candidate(cls, candidate: AssetCandidate, *, hint_text: str) -> bool:
+        if candidate.source_type == 'steam_logo' or candidate.kind == 'logo':
+            return True
+        if bool(candidate.metadata.get('logo_only')) or bool(candidate.metadata.get('wordmark_only')):
+            return True
+        if not _contains_any_keyword(hint_text, LOGO_TITLE_HINT_KEYWORDS):
+            return False
+        if candidate.source_type in {'steam_library_capsule', 'steam_main_capsule', 'steam_header_capsule'}:
+            return False
+        return not (cls._has_subject_signal(hint_text) or cls._has_action_signal(hint_text))
+
+    @classmethod
+    def _is_title_heavy_branding_candidate(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        normalized_asset_family: str,
+        hint_text: str,
+    ) -> bool:
+        if normalized_asset_family not in {'steam_capsule', 'steam_header'}:
+            return False
+        if cls._is_text_heavy_candidate(hint_text):
+            return True
+        if _contains_any_keyword(hint_text, LOGO_TITLE_HINT_KEYWORDS) and not (
+            cls._has_subject_signal(hint_text) or cls._has_action_signal(hint_text)
+        ):
+            return True
+        return bool(candidate.metadata.get('logo_only'))
+
+    @classmethod
+    def _is_mood_empty_candidate(cls, hint_text: str) -> bool:
+        return _contains_any_keyword(hint_text, MOOD_EMPTY_HINT_KEYWORDS) and not (
+            cls._has_subject_signal(hint_text) or cls._has_action_signal(hint_text)
+        )
+
+    @classmethod
+    def _normalized_asset_family(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        hint_text: str,
+        visual_type: str,
+    ) -> str:
+        if candidate.source_type == AI_SOURCE_TYPE:
+            return 'ai_fallback'
+        if not candidate.path_or_url or candidate.width is None or candidate.height is None:
+            return 'invalid'
+        if cls._is_placeholder_candidate(candidate):
+            return 'placeholder'
+        if visual_type != 'collage' and cls._is_collage_candidate(candidate):
+            return 'collage'
+        if cls._is_standalone_logo_candidate(candidate, hint_text=hint_text):
+            return 'steam_logo'
+        if candidate.source_type == 'steam_library_hero' or 'library_hero' in candidate.kind:
+            return 'steam_library_hero'
+        if candidate.source_type == 'official_press_key_art' or 'key_art' in candidate.kind:
+            return 'press_key_art'
+        if candidate.source_type in {'epic_offer_image', 'epic_library_landscape'}:
+            return 'epic_key_art'
+        if candidate.source_type == 'official_trailer_frame' or 'trailer' in candidate.kind:
+            return 'trailer_frame'
+        if candidate.source_type == 'steam_screenshot' or 'screenshot' in candidate.kind:
+            return 'steam_screenshot'
+        if candidate.source_type == 'steam_header_capsule' or 'header' in candidate.kind:
+            return 'steam_header'
+        if candidate.source_type in {'steam_library_capsule', 'steam_main_capsule'} or 'capsule' in candidate.kind:
+            return 'steam_capsule'
+        return candidate.source_type or candidate.kind or 'invalid'
 
     @staticmethod
     def _composition_bias(candidate: AssetCandidate, *, hint_text: str, is_wide_banner: bool) -> str:
@@ -1686,6 +2133,7 @@ class VisualDecisionEngine:
         enrichment: AssetEnrichment,
         visual_type: str,
         genre_cluster: str,
+        normalized_asset_family: str,
     ) -> tuple[float, float, list[str]]:
         hint_text = cls._hint_text(candidate)
         content_hint_text = cls._content_hint_text(candidate)
@@ -1706,6 +2154,18 @@ class VisualDecisionEngine:
         readability_delta = 0.0
         focus_delta = 0.0
         reasons: list[str] = []
+
+        if normalized_asset_family == 'steam_library_hero':
+            readability_delta += 0.01
+            focus_delta += 0.03
+        elif normalized_asset_family == 'steam_header':
+            readability_delta -= 0.02
+            focus_delta -= 0.04
+            reasons.append('penalty:branding_surface_header')
+        elif normalized_asset_family == 'steam_capsule':
+            readability_delta -= 0.03
+            focus_delta -= 0.07
+            reasons.append('penalty:branding_surface_capsule')
 
         if (
             visual_type in {'character', 'poster_art'}
@@ -1758,6 +2218,30 @@ class VisualDecisionEngine:
             readability_delta -= 0.14
             focus_delta -= 0.08
             reasons.append('vdr1_text_heavy_penalty')
+        if cls._is_title_heavy_branding_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+        ):
+            readability_delta -= 0.10
+            focus_delta -= 0.10
+            reasons.append('penalty:title_heavy')
+        if cls._is_ui_heavy_screenshot_candidate(
+            candidate,
+            enrichment=enrichment,
+            hint_text=hint_text,
+        ):
+            readability_delta -= 0.04
+            focus_delta -= 0.08
+            reasons.append('penalty:ui_heavy')
+        if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
+            readability_delta -= 0.04
+            focus_delta -= 0.06
+            reasons.append('penalty:menu_like_soft')
+        if cls._is_mood_empty_candidate(content_hint_text):
+            readability_delta -= 0.04
+            focus_delta -= 0.08
+            reasons.append('penalty:empty_mood_scene')
 
         return (
             _clamp_range(readability_delta, -0.24, 0.10),
@@ -1884,7 +2368,10 @@ class VisualDecisionEngine:
         if candidate.source_type not in {'steam_screenshot', 'official_trailer_frame'} and 'screenshot' not in candidate.kind:
             return False
 
-        has_ui_hint = _contains_any_keyword(hint_text, UI_HEAVY_SCREENSHOT_HINT_KEYWORDS)
+        has_ui_hint = _contains_any_keyword(
+            hint_text,
+            UI_HEAVY_SCREENSHOT_HINT_KEYWORDS + MENU_LIKE_UI_HINT_KEYWORDS,
+        )
         if not has_ui_hint:
             return False
 
@@ -1894,6 +2381,17 @@ class VisualDecisionEngine:
             or cls._is_text_heavy_candidate(hint_text)
             or _contains_any_keyword(hint_text, MENU_LIKE_UI_HINT_KEYWORDS)
         )
+
+    @classmethod
+    def _is_menu_like_screenshot_candidate(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        hint_text: str,
+    ) -> bool:
+        if candidate.source_type not in {'steam_screenshot', 'official_trailer_frame'} and 'screenshot' not in candidate.kind:
+            return False
+        return _contains_any_keyword(hint_text, MENU_LIKE_UI_HINT_KEYWORDS)
 
     @staticmethod
     def _cap_enrichment_delta(
@@ -1928,6 +2426,7 @@ class VisualDecisionEngine:
         enrichment: AssetEnrichment,
         visual_type: str,
         small_asset_penalty: float,
+        normalized_asset_family: str,
     ) -> list[str]:
         reasons: list[str] = []
         hint_text = cls._hint_text(candidate)
@@ -1941,8 +2440,18 @@ class VisualDecisionEngine:
             reasons.append('asset_too_small')
         if enrichment.local_image_readable is False:
             reasons.append('invalid_or_unreadable_file')
+        if normalized_asset_family == 'steam_logo':
+            reasons.append('standalone_logo_asset')
+        if bool(candidate.metadata.get('logo_only')) or bool(candidate.metadata.get('unreadable')):
+            reasons.append('logo_only_visual')
+        if normalized_asset_family == 'placeholder':
+            reasons.append('placeholder_asset')
+        if visual_type != 'collage' and normalized_asset_family == 'collage':
+            reasons.append('collage_single_title')
         if cls._is_unresolved_template_only_screenshot_candidate(candidate):
             reasons.append('template_only_screenshot_not_available')
+        if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
+            reasons.append('menu_like_screenshot')
         if (
             visual_type != 'collage'
             and cls._is_ui_heavy_screenshot_candidate(
@@ -2230,23 +2739,51 @@ class VisualDecisionEngine:
             return ranked[:2], bundle_trace
         return ranked[:1], bundle_trace
 
+    @staticmethod
+    def _selection_reason_tag(item: ScoredAsset) -> str:
+        mapping = {
+            'steam_library_hero': 'select:steam_library_hero',
+            'epic_key_art': 'select:epic_key_art',
+            'press_key_art': 'select:press_key_art',
+            'steam_screenshot': 'select:steam_screenshot',
+            'epic_screenshot': 'select:epic_screenshot',
+            'trailer_frame': 'select:trailer_frame',
+            'steam_header': 'select:steam_header',
+            'steam_capsule': 'select:steam_capsule_last_resort',
+        }
+        return mapping.get(item.normalized_asset_family, f'select:{item.normalized_asset_family}')
+
+    def _mark_selected_assets(self, selected_assets: Sequence[ScoredAsset]) -> None:
+        for item in selected_assets:
+            selection_reason = self._selection_reason_tag(item)
+            scoring_parts = item.score_breakdown.get('scoring_reason_parts')
+            if isinstance(scoring_parts, list):
+                _append_reason(scoring_parts, selection_reason)
+            parts = [part for part in (item.scoring_reason, selection_reason) if _safe_text(part)]
+            item.scoring_reason = '; '.join(dict.fromkeys(parts))
+
     def _ordered_asset_scores(self, scored_assets: Sequence[ScoredAsset]) -> list[ScoredAsset]:
         return sorted(
             list(scored_assets),
             key=lambda item: (
                 0 if item.candidate.is_official else 1,
+                -self._quality_tier_rank(item.quality_tier),
                 -item.total_score,
-                -self._asset_type_tiebreak_rank(item.candidate),
-                -self._subject_scale_tiebreak_rank(item.enrichment.estimated_subject_scale),
-                -self._focus_tiebreak_rank(item.enrichment.estimated_focus),
-                -self._simplicity_tiebreak_rank(item.enrichment.estimated_visual_density),
-                -item.focus_score,
-                -item.readability_score,
+                -self._normalized_asset_family_rank(item.normalized_asset_family),
+                -float(item.score_breakdown.get('aspect_fit') or 0.0),
                 -item.candidate.area,
                 item.candidate.source_type,
                 item.candidate.path_or_url,
             ),
         )
+
+    @staticmethod
+    def _quality_tier_rank(quality_tier: str) -> int:
+        return QUALITY_TIER_RANK.get(quality_tier, -2)
+
+    @staticmethod
+    def _normalized_asset_family_rank(normalized_asset_family: str) -> int:
+        return NORMALIZED_ASSET_FAMILY_PRIORITY.get(normalized_asset_family, 0)
 
     @staticmethod
     def _asset_type_tiebreak_rank(candidate: AssetCandidate) -> int:
@@ -2439,9 +2976,13 @@ class VisualDecisionEngine:
             focus_score=0.0,
             total_score=0.0,
             accepted=False,
+            normalized_asset_family='ai_fallback',
+            quality_tier='ai_fallback',
             rejection_reasons=[],
             score_breakdown={
                 'synthetic_candidate': True,
+                'normalized_asset_family': 'ai_fallback',
+                'quality_tier': 'ai_fallback',
             },
             scoring_reason='synthetic_ai_placeholder',
         )

@@ -6,6 +6,37 @@ from infrastructure.render.cards.visual_decision_engine import build_cover_decis
 from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, SMOKE_LOCAL_LANDSCAPE_ASSET, SMOKE_LOCAL_PORTRAIT_ASSET
 
 
+def _build_decision(
+    *,
+    game_title: str = 'Hero Signal',
+    genre: str = 'action rpg',
+    tags: list[str] | None = None,
+    short_description: str = 'A clear hero key art exists.',
+    offer_type: str = 'discount',
+    asset_candidates: list[dict[str, object]] | None = None,
+) -> dict[str, object]:
+    return build_cover_decision(
+        game_title=game_title,
+        genre=genre,
+        tags=tags or ['hero'],
+        short_description=short_description,
+        offer_type=offer_type,
+        asset_candidates=asset_candidates or [],
+    ).to_dict()
+
+
+def _asset_by_source_type(decision: dict[str, object], source_type: str) -> dict[str, object]:
+    return next(item for item in decision['asset_scores'] if item['source_type'] == source_type)
+
+
+def _asset_by_path(decision: dict[str, object], path_or_url: str | None) -> dict[str, object]:
+    return next(item for item in decision['asset_scores'] if item['path_or_url'] == path_or_url)
+
+
+def _policy_reasons(decision: dict[str, object]) -> list[str]:
+    return list(decision['decision_trace']['selected_strategy'].get('policy_reasons', []))
+
+
 def test_visual_decision_engine_hades_prefers_official_character_art() -> None:
     game_input = dict(MINIMAL_SMOKE_GAMES[0])
     decision = build_cover_decision(
@@ -656,3 +687,415 @@ def test_visual_decision_engine_rejects_invalid_collage_candidate_before_ai_fall
     assert rejected_collage['accepted'] is False
     assert 'asset_path_or_url_missing' in rejected_collage['rejection_reasons']
     assert 'rejected_asset_type' in rejected_collage['rejection_reasons']
+
+
+def test_visual_decision_engine_hero_beats_capsule_with_stable_reasons() -> None:
+    decision = _build_decision(
+        game_title='Neon Pursuit',
+        genre='open-world racing',
+        tags=['vehicle', 'drift', 'speed'],
+        short_description='A fast vehicle action scene with a clear hero car.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                    'vehicle_focus': 'cover car',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1800,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'vehicle_focus': 'hero car drift',
+                    'foreground': 'supercar',
+                    'action': 'high speed turn',
+                },
+            },
+        ],
+    )
+
+    hero_asset = _asset_by_source_type(decision, 'steam_library_hero')
+    capsule_asset = _asset_by_source_type(decision, 'steam_main_capsule')
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert hero_asset['accepted'] is True
+    assert 'select:steam_library_hero' in hero_asset['scoring_reason']
+    assert capsule_asset['accepted'] is True
+    assert 'penalty:branding_surface_capsule' in capsule_asset['scoring_reason']
+
+
+def test_visual_decision_engine_gameplay_beats_logo_with_hard_reject_reason() -> None:
+    decision = _build_decision(
+        game_title='Blaze Raid',
+        genre='action shooter',
+        tags=['combat', 'weapon'],
+        short_description='An explosive firefight with a clear hero and enemy pressure.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'gameplay_focus': 'combat encounter',
+                    'weapon': 'rifle',
+                    'enemy': 'boss',
+                },
+            },
+            {
+                'source_type': 'steam_logo',
+                'width': 1200,
+                'height': 600,
+                'kind': 'logo',
+                'path_or_url': 'smoke://logo.png',
+                'metadata': {
+                    'logo': True,
+                    'title': True,
+                },
+            },
+        ],
+    )
+
+    gameplay_asset = _asset_by_source_type(decision, 'steam_screenshot')
+    logo_asset = _asset_by_source_type(decision, 'steam_logo')
+
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert gameplay_asset['accepted'] is True
+    assert logo_asset['accepted'] is False
+    assert 'standalone_logo_asset' in logo_asset['rejection_reasons']
+    assert 'reject:standalone_logo_asset' in logo_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_library_hero_beats_failed_menu_screenshot() -> None:
+    decision = _build_decision(
+        game_title='Forza Horizon 5',
+        genre='open-world racing',
+        tags=['supercar drift', 'festival speed'],
+        short_description='A racing festival surges through bright desert roads with a clear vehicle focus.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'settings': True,
+                    'launcher': 'festival launcher',
+                    'menu': 'options panel',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1800,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'vehicle_focus': 'supercar drift',
+                    'foreground': 'hero car',
+                },
+            },
+        ],
+    )
+
+    hero_asset = _asset_by_source_type(decision, 'steam_library_hero')
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert hero_asset['accepted'] is True
+    assert screenshot_asset['accepted'] is False
+    assert 'menu_like_screenshot' in screenshot_asset['rejection_reasons']
+    assert 'reject:menu_like_screenshot' in screenshot_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_invalid_path_or_url_none_rejected() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': None,
+                'metadata': {
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    invalid_asset = _asset_by_path(decision, '')
+    valid_asset = _asset_by_path(decision, SMOKE_LOCAL_PORTRAIT_ASSET)
+
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert valid_asset['accepted'] is True
+    assert invalid_asset['accepted'] is False
+    assert 'asset_path_or_url_missing' in invalid_asset['rejection_reasons']
+    assert 'reject:invalid_path' in invalid_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_placeholder_rejected_if_official_valid_exists() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://placeholder_art.png',
+                'metadata': {
+                    'placeholder': True,
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    placeholder_asset = _asset_by_path(decision, 'smoke://placeholder_art.png')
+    valid_asset = _asset_by_path(decision, SMOKE_LOCAL_PORTRAIT_ASSET)
+
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert valid_asset['accepted'] is True
+    assert placeholder_asset['accepted'] is False
+    assert 'placeholder_asset' in placeholder_asset['rejection_reasons']
+    assert 'reject:placeholder_asset' in placeholder_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_ui_heavy_screenshot_penalized_against_clean_official() -> None:
+    decision = _build_decision(
+        game_title='Empire Front',
+        genre='turn-based strategy',
+        tags=['strategy', 'world map'],
+        short_description='Armies clash across a growing empire with a clear battlefield center.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'hud': True,
+                    'inventory': 'city panel',
+                    'overview': 'strategy overview',
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'leader portrait',
+                    'poster_layout': True,
+                },
+            },
+        ],
+    )
+
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert screenshot_asset['accepted'] is False
+    assert 'penalty:ui_heavy' in screenshot_asset['scoring_reason']
+    assert 'menu_like_screenshot' in screenshot_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_collage_rejected_in_single_title_mode() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://group_art.png',
+                'metadata': {
+                    'collage': True,
+                    'grid': True,
+                    'multiple_characters': True,
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    collage_asset = _asset_by_path(decision, 'smoke://group_art.png')
+
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert collage_asset['accepted'] is False
+    assert 'collage_single_title' in collage_asset['rejection_reasons']
+    assert 'reject:collage_single_title' in collage_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_capsule_allowed_only_if_no_better_official_exists() -> None:
+    decision = _build_decision(
+        game_title='Quiet Forge',
+        genre='cozy farming',
+        tags=['town', 'crops'],
+        short_description='A cozy town and farm.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://quiet',
+                'metadata': {},
+            },
+        ],
+    )
+
+    capsule_asset = _asset_by_source_type(decision, 'steam_library_capsule')
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_library_capsule'
+    assert capsule_asset['accepted'] is True
+    assert 'select:steam_capsule_last_resort' in capsule_asset['scoring_reason']
+    assert 'penalty:branding_surface_capsule' in capsule_asset['scoring_reason']
+
+
+def test_visual_decision_engine_ai_fallback_when_only_bad_official_assets_exist() -> None:
+    decision = _build_decision(
+        game_title='Prototype Echo',
+        genre='action adventure',
+        asset_candidates=[
+            {
+                'source_type': 'steam_logo',
+                'width': 1200,
+                'height': 600,
+                'kind': 'logo',
+                'path_or_url': 'smoke://logo.png',
+                'metadata': {
+                    'logo': True,
+                    'title': True,
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://placeholder_art.png',
+                'metadata': {
+                    'placeholder': True,
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'settings': True,
+                    'launcher': 'setup launcher',
+                    'menu': 'options panel',
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://echo',
+                'metadata': {
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            },
+        ],
+    )
+
+    assert decision['use_ai'] is True
+    assert decision['image_source_type'] == 'ai_generated'
+    assert 'ai_unlock:no_acceptable_official' in _policy_reasons(decision)
+
+
+def test_visual_decision_engine_ai_blocked_when_strong_official_exists() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://hero',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    selected_asset = _asset_by_path(decision, SMOKE_LOCAL_PORTRAIT_ASSET)
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'official_press_key_art'
+    assert selected_asset['accepted'] is True
+    assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})
