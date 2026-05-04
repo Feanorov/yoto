@@ -643,7 +643,6 @@ DISCOUNT_OFFER_KEYWORDS = (
     'sale',
 )
 VISUAL_INTENT_PROMO_KEYWORDS = PROMO_EVENT_KEYWORDS + (
-    'campaign',
     'official campaign',
     'publisher campaign',
     'seasonal sale',
@@ -661,23 +660,38 @@ VISUAL_INTENT_VEHICLE_KEYWORDS = (
     'vehicle focused',
     'vehicle-focused',
 )
-VISUAL_INTENT_STRATEGY_KEYWORDS = (
+VISUAL_INTENT_REAL_STRATEGY_KEYWORDS = (
     '4x',
     '4 x',
+    'armies',
+    'army',
+    'base',
+    'board state',
+    'board_state',
     'city builder',
+    'city building',
     'city-builder',
     'empire',
     'grand strategy',
-    'management',
+    'map',
     'real time strategy',
     'real-time strategy',
     'rts',
+    'settlement',
     'strategy',
     'tactical',
     'tactical layer',
     'tactics',
     'turn based strategy',
     'turn-based strategy',
+    'units',
+    'world map',
+    'wonders',
+)
+VISUAL_INTENT_BROAD_STRATEGY_KEYWORDS = (
+    'management',
+    'sim',
+    'simulation',
 )
 VISUAL_INTENT_THREAT_KEYWORDS = (
     'dark adventure',
@@ -689,6 +703,7 @@ VISUAL_INTENT_THREAT_KEYWORDS = (
     'thriller',
 )
 VISUAL_INTENT_ACTIVITY_KEYWORDS = (
+    'adventure',
     'building',
     'cozy',
     'cooking',
@@ -698,10 +713,31 @@ VISUAL_INTENT_ACTIVITY_KEYWORDS = (
     'diving',
     'exploration',
     'farming',
+    'fish',
     'fishing',
     'harpoon',
     'life sim',
     'life simulation',
+    'sushi',
+    'underwater',
+)
+VISUAL_INTENT_ACTIVITY_LOOP_PRIORITY_KEYWORDS = (
+    'building',
+    'cozy',
+    'cooking',
+    'crafting',
+    'dive',
+    'diver',
+    'diving',
+    'exploration',
+    'farming',
+    'fish',
+    'fishing',
+    'harpoon',
+    'life sim',
+    'life simulation',
+    'sushi',
+    'underwater',
 )
 VISUAL_INTENT_HERO_KEYWORDS = (
     'anime',
@@ -1062,6 +1098,10 @@ def _contains_keyword(text: str, keyword: str) -> bool:
 
 def _contains_any_keyword(text: str, keywords: Sequence[str]) -> bool:
     return any(_contains_keyword(text, keyword) for keyword in keywords)
+
+
+def _matched_exact_keywords(text: str, keywords: Sequence[str]) -> list[str]:
+    return [keyword for keyword in keywords if _contains_keyword(text, keyword)]
 
 
 def _dedupe_reasons(reasons: Sequence[str]) -> list[str]:
@@ -3758,6 +3798,14 @@ class VisualDecisionEngine:
             or _contains_any_keyword(combined_text, VISUAL_INTENT_PROMO_KEYWORDS)
             or any(cls._is_promo_or_event_asset(item) for item in scored_assets if item.candidate.is_official)
         )
+        activity_signal_matches = _matched_exact_keywords(combined_text, VISUAL_INTENT_ACTIVITY_KEYWORDS)
+        strong_activity_signal_matches = _matched_exact_keywords(
+            combined_text,
+            VISUAL_INTENT_ACTIVITY_LOOP_PRIORITY_KEYWORDS,
+        )
+        real_strategy_signal_matches = _matched_exact_keywords(combined_text, VISUAL_INTENT_REAL_STRATEGY_KEYWORDS)
+        broad_strategy_signal_matches = _matched_exact_keywords(combined_text, VISUAL_INTENT_BROAD_STRATEGY_KEYWORDS)
+        has_strong_activity_signal = bool(strong_activity_signal_matches) or len(activity_signal_matches) >= 2
         default_to_hero_focus = bool(
             card_type == CARD_TYPE_SIMPLE_HERO
             or visual_type in {'character', 'poster_art'}
@@ -3783,19 +3831,25 @@ class VisualDecisionEngine:
                 reason=VISUAL_INTENT_REASON_VEHICLE_MOTION,
                 card_type=card_type,
             )
-        if _contains_any_keyword(combined_text, VISUAL_INTENT_STRATEGY_KEYWORDS):
-            return cls._build_visual_intent_decision(
-                VISUAL_INTENT_STRATEGY_CORE,
-                reason=VISUAL_INTENT_REASON_STRATEGY_CORE,
-                card_type=card_type,
-            )
         if _contains_any_keyword(combined_text, VISUAL_INTENT_THREAT_KEYWORDS):
             return cls._build_visual_intent_decision(
                 VISUAL_INTENT_THREAT_ATMOSPHERE,
                 reason=VISUAL_INTENT_REASON_THREAT_ATMOSPHERE,
                 card_type=card_type,
             )
-        if _contains_any_keyword(combined_text, VISUAL_INTENT_ACTIVITY_KEYWORDS):
+        if has_strong_activity_signal and not real_strategy_signal_matches:
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_ACTIVITY_FOCUS,
+                reason=VISUAL_INTENT_REASON_ACTIVITY_FOCUS,
+                card_type=card_type,
+            )
+        if real_strategy_signal_matches or (broad_strategy_signal_matches and not has_strong_activity_signal):
+            return cls._build_visual_intent_decision(
+                VISUAL_INTENT_STRATEGY_CORE,
+                reason=VISUAL_INTENT_REASON_STRATEGY_CORE,
+                card_type=card_type,
+            )
+        if activity_signal_matches:
             return cls._build_visual_intent_decision(
                 VISUAL_INTENT_ACTIVITY_FOCUS,
                 reason=VISUAL_INTENT_REASON_ACTIVITY_FOCUS,

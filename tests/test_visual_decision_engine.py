@@ -1581,6 +1581,17 @@ def test_cozy_or_diving_activity_maps_to_activity_focus() -> None:
     assert decision['visual_intent_reason'] == 'visual_intent:activity_focus:core_activity'
 
 
+def test_activity_loop_overrides_management_sim_to_activity_focus() -> None:
+    decision = _build_decision(
+        genre='adventure management sim',
+        tags=['underwater exploration', 'harpoon hunt', 'tropical reef', 'night sushi bar'],
+        short_description='A diver explores a reef, catches fish, and supports a busy sushi bar.',
+    )
+
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert decision['visual_intent_reason'] == 'visual_intent:activity_focus:core_activity'
+
+
 def test_horror_maps_to_threat_atmosphere() -> None:
     decision = _build_decision(
         genre='survival horror',
@@ -1680,6 +1691,54 @@ def test_last_resort_official_records_missing_visual_requirements() -> None:
     assert decision['visual_intent_type'] == 'activity_focus'
     assert 'no_activity_focus_visual' in decision['missing_visual_requirements']
     assert 'no_activity_focus_visual' in _visual_intent(decision)['missing_visual_requirements']
+
+
+def test_strategy_signals_still_map_to_strategy_core() -> None:
+    decision = _build_decision(
+        genre='turn-based strategy',
+        tags=['world map', 'city building', 'armies', 'wonders'],
+        short_description='A strategy campaign expands across the map with armies and major cities.',
+    )
+
+    assert decision['visual_intent_type'] == 'strategy_core'
+    assert decision['visual_intent_reason'] == 'visual_intent:strategy_core:strategy_or_4x'
+
+
+def test_last_resort_activity_focus_records_activity_missing_requirement() -> None:
+    decision = _build_decision(
+        genre='adventure management sim',
+        tags=['underwater exploration', 'fishing', 'sushi'],
+        short_description='A diver catches fish and returns to a sushi bar after each exploration run.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'diver',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://activity-focus-last-resort',
+                'metadata': {
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            },
+        ],
+    )
+
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert 'no_activity_focus_visual' in decision['missing_visual_requirements']
+    assert 'no_strategy_core_visual' not in decision['missing_visual_requirements']
 
 
 def test_visual_intent_does_not_change_selection_or_ai_behavior() -> None:
