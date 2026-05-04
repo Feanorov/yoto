@@ -751,6 +751,13 @@ def _metadata_signal_text(metadata: Mapping[str, Any]) -> str:
     return ' '.join(values)
 
 
+def _basename_text(value: Any) -> str:
+    raw_value = _safe_text(value)
+    if not raw_value:
+        return ''
+    return Path(raw_value.replace('\\', '/')).name.lower()
+
+
 @dataclass(slots=True)
 class AssetCandidate:
     index: int
@@ -2543,6 +2550,8 @@ class VisualDecisionEngine:
             reasons.append('asset_too_small')
         if enrichment.local_image_readable is False:
             reasons.append('invalid_or_unreadable_file')
+        if cls._is_local_placeholder_fixture_candidate(candidate):
+            reasons.append('local_placeholder_fixture')
         if normalized_asset_family == 'steam_logo':
             reasons.append('standalone_logo_asset')
         if bool(candidate.metadata.get('logo_only')) or bool(candidate.metadata.get('unreadable')):
@@ -2737,6 +2746,26 @@ class VisualDecisionEngine:
             candidate.source_type == 'steam_screenshot'
             and bool(candidate.metadata.get('template_only'))
             and not cls._candidate_has_local_asset_file(candidate)
+        )
+
+    @classmethod
+    def _is_local_placeholder_fixture_candidate(cls, candidate: AssetCandidate) -> bool:
+        path_basename = _basename_text(candidate.path_or_url)
+        cache_path_basename = _basename_text(candidate.metadata.get('cache_path'))
+        license_hint = _normalize_text(candidate.metadata.get('license_hint'))
+        source_origin = cls._candidate_source_origin(candidate)
+
+        if path_basename == 'fallback_game_image.png':
+            return True
+        if cache_path_basename == 'fallback_game_image.png':
+            return True
+        if source_origin in {'fixture_fallback', 'local_smoke_fixture', 'local smoke fixture'}:
+            return True
+        if license_hint == 'local_smoke_fixture' and 'fallback_game_image.png' in {path_basename, cache_path_basename}:
+            return True
+        return bool(
+            candidate.metadata.get('is_local_fallback_candidate')
+            and 'fallback_game_image.png' in {path_basename, cache_path_basename}
         )
 
     @classmethod

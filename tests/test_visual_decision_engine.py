@@ -5,6 +5,9 @@ from pathlib import Path
 from infrastructure.render.cards.visual_decision_engine import build_cover_decision, resolve_cover_decision_asset_bridge
 from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, SMOKE_LOCAL_LANDSCAPE_ASSET, SMOKE_LOCAL_PORTRAIT_ASSET
 
+REJECTED_LOCAL_FIXTURE_ASSET = SMOKE_LOCAL_PORTRAIT_ASSET
+SMOKE_LOCAL_PORTRAIT_ASSET = SMOKE_LOCAL_LANDSCAPE_ASSET
+
 
 def _build_decision(
     *,
@@ -45,6 +48,20 @@ def _card_strategy(decision: dict[str, object]) -> dict[str, object]:
     return dict(decision['decision_trace'].get('card_strategy', {}))
 
 
+def _with_valid_fixture_replacement(asset_candidates: list[dict[str, object]]) -> list[dict[str, object]]:
+    replaced: list[dict[str, object]] = []
+    for payload in asset_candidates:
+        item = dict(payload)
+        metadata = dict(item.get('metadata') or {})
+        if item.get('path_or_url') == REJECTED_LOCAL_FIXTURE_ASSET:
+            item['path_or_url'] = SMOKE_LOCAL_PORTRAIT_ASSET
+        if metadata.get('cache_path') == REJECTED_LOCAL_FIXTURE_ASSET:
+            metadata['cache_path'] = SMOKE_LOCAL_PORTRAIT_ASSET
+        item['metadata'] = metadata
+        replaced.append(item)
+    return replaced
+
+
 def test_visual_decision_engine_hades_prefers_official_character_art() -> None:
     game_input = dict(MINIMAL_SMOKE_GAMES[0])
     decision = build_cover_decision(
@@ -53,7 +70,7 @@ def test_visual_decision_engine_hades_prefers_official_character_art() -> None:
         tags=game_input['tags'],
         short_description=game_input['short_description'],
         offer_type=game_input['offer_type'],
-        asset_candidates=game_input['asset_candidates'],
+        asset_candidates=_with_valid_fixture_replacement(game_input['asset_candidates']),
     ).to_dict()
 
     assert decision['genre_cluster'] == 'character_driven'
@@ -73,7 +90,7 @@ def test_visual_decision_engine_hades_does_not_saturate_top_scores() -> None:
         tags=game_input['tags'],
         short_description=game_input['short_description'],
         offer_type=game_input['offer_type'],
-        asset_candidates=game_input['asset_candidates'],
+        asset_candidates=_with_valid_fixture_replacement(game_input['asset_candidates']),
     ).to_dict()
 
     asset_scores = [dict(item) for item in decision['asset_scores'] if isinstance(item, dict)]
@@ -269,7 +286,7 @@ def test_visual_decision_engine_bridge_accepts_real_local_official_asset() -> No
         tags=game_input['tags'],
         short_description=game_input['short_description'],
         offer_type=game_input['offer_type'],
-        asset_candidates=game_input['asset_candidates'],
+        asset_candidates=_with_valid_fixture_replacement(game_input['asset_candidates']),
     ).to_dict()
 
     bridge = resolve_cover_decision_asset_bridge(cover_decision)
@@ -375,6 +392,7 @@ def test_visual_decision_engine_prefers_clickable_asset_over_empty_scene_press_a
 
 
 def test_visual_decision_engine_penalizes_text_heavy_capsules() -> None:
+    clean_capsule_path = SMOKE_LOCAL_PORTRAIT_ASSET.replace('\\', '/')
     decision = build_cover_decision(
         game_title='Mystic Quest',
         genre='action rpg',
@@ -395,28 +413,28 @@ def test_visual_decision_engine_penalizes_text_heavy_capsules() -> None:
                     'marketing_copy': 'deluxe edition out now',
                 },
             },
-            {
-                'source_type': 'steam_main_capsule',
-                'width': 1232,
-                'height': 706,
-                'kind': 'main_capsule',
-                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
-                'metadata': {
-                    'subject_focus': 'hero',
-                    'logo_safe': True,
-                    'marketing_pose': 'closeup action',
-                },
+                {
+                    'source_type': 'steam_main_capsule',
+                    'width': 1232,
+                    'height': 706,
+                    'kind': 'main_capsule',
+                    'path_or_url': clean_capsule_path,
+                    'metadata': {
+                        'subject_focus': 'hero',
+                        'logo_safe': True,
+                        'marketing_pose': 'closeup action',
+                    },
             },
         ],
     ).to_dict()
 
-    clean_asset = next(item for item in decision['asset_scores'] if item['path_or_url'] == SMOKE_LOCAL_PORTRAIT_ASSET)
+    clean_asset = next(item for item in decision['asset_scores'] if item['path_or_url'] == clean_capsule_path)
     text_heavy_asset = next(
         item for item in decision['asset_scores'] if item['path_or_url'] == SMOKE_LOCAL_LANDSCAPE_ASSET
     )
 
     assert decision['image_source_type'] == 'steam_main_capsule'
-    assert decision['selected_asset']['path_or_url'] == SMOKE_LOCAL_PORTRAIT_ASSET
+    assert decision['selected_asset']['path_or_url'] == clean_capsule_path
     assert clean_asset['total_score'] > text_heavy_asset['total_score']
     assert 'vdr1_text_heavy_penalty' in text_heavy_asset['scoring_reason']
 
@@ -1287,6 +1305,51 @@ def test_visual_decision_engine_ai_blocked_when_strong_official_exists() -> None
     assert decision['image_source_type'] == 'official_press_key_art'
     assert selected_asset['accepted'] is True
     assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})
+
+
+def test_visual_decision_engine_rejects_local_placeholder_fixture_with_official_replacement() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': REJECTED_LOCAL_FIXTURE_ASSET,
+                'metadata': {
+                    'cache_path': REJECTED_LOCAL_FIXTURE_ASSET,
+                    'source_origin': 'local_manifest',
+                    'license_hint': 'local_smoke_fixture',
+                    'is_local_fallback_candidate': True,
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1600,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'source_origin': 'steam_cdn_manifest',
+                    'cache_status': 'cached',
+                    'subject_focus': 'hero',
+                    'scene_focus': 'action',
+                },
+            },
+        ],
+    )
+
+    fixture_asset = _asset_by_path(decision, REJECTED_LOCAL_FIXTURE_ASSET)
+    replacement_asset = _asset_by_path(decision, SMOKE_LOCAL_LANDSCAPE_ASSET)
+
+    assert fixture_asset['accepted'] is False
+    assert 'local_placeholder_fixture' in fixture_asset['rejection_reasons']
+    assert 'hard_reject:local_placeholder_fixture' in fixture_asset['scoring_reason']
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert decision['selected_asset']['path_or_url'] == SMOKE_LOCAL_LANDSCAPE_ASSET
+    assert replacement_asset['accepted'] is True
 
 
 def test_simple_hero_card_type_for_strong_library_hero() -> None:
