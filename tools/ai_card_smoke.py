@@ -26,7 +26,7 @@ VALID_SCENARIOS = ('current_env', 'broken_comfyui', 'quality_reject', 'pure_gene
 DEFAULT_PROMPT_VARIANT = 'shot_focused_cinematic_grounded'
 VALID_PROMPT_VARIANTS = (DEFAULT_PROMPT_VARIANT, 'hero_action_focus')
 DEFAULT_GAME_SET = 'synthetic'
-VALID_GAME_SETS = (DEFAULT_GAME_SET, 'minimal')
+VALID_GAME_SETS = (DEFAULT_GAME_SET, 'minimal', 'expanded')
 DEFAULT_EVAL_GAME_SET = 'minimal'
 DEFAULT_SEEDS_PER_GAME = 1
 BROKEN_COMFYUI_URL = 'http://127.0.0.1:9/broken-timeout'
@@ -50,6 +50,50 @@ def make_asset_candidate(
         'kind': kind,
         'path_or_url': path_or_url,
         'metadata': dict(metadata or {}),
+    }
+
+
+def make_local_eval_game(
+    *,
+    slug: str,
+    title: str,
+    old_price: str,
+    current_price: str,
+    genre: str,
+    tags: list[str],
+    short_description: str,
+    artwork_metadata: dict[str, Any],
+    screenshot_metadata: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        'slug': slug,
+        'store_id': f'steam:{slug}',
+        'source_hint': 'steam',
+        'steam_app_id': None,
+        'title': title,
+        'platform': 'STEAM',
+        'type': YotoCardType.DISCOUNT,
+        'offer_type': 'discount',
+        'deadline': 'until 30 Apr, 18:00',
+        'old_price': old_price,
+        'current_price': current_price,
+        'platform_badge': 'STEAM DISCOUNT',
+        'brand_micro_label': 'expanded eval',
+        'lane': 'high_value_discount',
+        'genre': genre,
+        'tags': list(tags),
+        'short_description': short_description,
+        'artwork_metadata': dict(artwork_metadata),
+        'local_assets': {
+            'steam_screenshot': make_asset_candidate(
+                'steam_screenshot',
+                1920,
+                1080,
+                'screenshot',
+                SMOKE_LOCAL_LANDSCAPE_ASSET,
+                metadata=dict(screenshot_metadata),
+            ),
+        },
     }
 
 
@@ -539,6 +583,119 @@ GAME_EVAL_MINIMAL_SMOKE_GAMES = MINIMAL_SMOKE_GAMES[:4] + (
     },
 )
 
+GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
+    make_local_eval_game(
+        slug='ghost_of_tsushima',
+        title='Ghost of Tsushima',
+        old_price='1499 UAH',
+        current_price='-25%',
+        genre='open-world samurai action',
+        tags=['katana duel', 'stormy grassland', 'mounted pursuit', 'war banners'],
+        short_description='A lone samurai rides through wind-whipped grasslands, cutting through invaders with fast blade work, ambushes, and cinematic battlefield momentum.',
+        artwork_metadata={
+            'subject': 'armored samurai in the foreground',
+            'action': 'drawing a katana during a mounted charge',
+            'setting': 'stormy field lined with tall grass and banners',
+            'atmosphere': 'heroic, urgent, windswept conflict',
+            'lighting': 'moody daylight broken by hard silver highlights',
+        },
+        screenshot_metadata={
+            'combat': True,
+            'movement': True,
+            'readable_subject': 'samurai and enemy clash',
+            'scene_focus': 'open-field duel',
+        },
+    ),
+    make_local_eval_game(
+        slug='star_wars_outlaws',
+        title='Star Wars Outlaws',
+        old_price='1799 UAH',
+        current_price='-20%',
+        genre='open-world sci-fi action adventure',
+        tags=['scoundrel', 'blaster chase', 'speeder bike', 'imperial outpost'],
+        short_description='A resourceful outlaw dashes between imperial patrols, cantinas, and dusty settlements while pulling off fast blaster escapes across hostile frontier worlds.',
+        artwork_metadata={
+            'subject': 'scoundrel and companion in the foreground',
+            'action': 'breaking into a blaster chase beside a speeder bike',
+            'setting': 'dusty frontier outpost with patrol lights and hangars',
+            'atmosphere': 'scrappy, kinetic, cinematic caper energy',
+            'lighting': 'warm dusk light with neon accents and engine glow',
+        },
+        screenshot_metadata={
+            'combat': True,
+            'chase': True,
+            'readable_subject': 'outlaw in motion',
+            'scene_focus': 'frontier action beat',
+        },
+    ),
+    make_local_eval_game(
+        slug='subnautica',
+        title='Subnautica',
+        old_price='799 UAH',
+        current_price='-50%',
+        genre='underwater survival exploration',
+        tags=['diving', 'alien reef', 'submersible', 'deep ocean'],
+        short_description='A diver slips through glowing reefs, strange caverns, and open water while gathering resources, piloting submersibles, and avoiding massive alien predators.',
+        artwork_metadata={
+            'subject': 'diver silhouette against open water',
+            'action': 'swimming toward a glowing reef while scanning terrain',
+            'setting': 'bright alien reef fading into deep blue ocean',
+            'atmosphere': 'curious, vulnerable, exploratory',
+            'lighting': 'clear aqua light with bioluminescent highlights',
+        },
+        screenshot_metadata={
+            'activity_focus': 'underwater exploration',
+            'environment_readability': 'high',
+            'readable_subject': 'diver and reef path',
+            'scene_focus': 'submersible survival route',
+        },
+    ),
+    make_local_eval_game(
+        slug='no_mans_sky',
+        title="No Man's Sky",
+        old_price='999 UAH',
+        current_price='-60%',
+        genre='space exploration survival',
+        tags=['starship', 'alien world', 'suit visor', 'distant horizon'],
+        short_description='A traveler explores vivid alien planets, launches between stars, and gathers resources across wide horizons filled with strange fauna, weather, and discovery.',
+        artwork_metadata={
+            'subject': 'suited explorer near a landed starship',
+            'action': 'setting out across an alien plain toward a distant signal',
+            'setting': 'colorful extraterrestrial landscape with strange flora',
+            'atmosphere': 'hopeful, expansive, exploratory wonder',
+            'lighting': 'bright atmospheric glow with long horizon light',
+        },
+        screenshot_metadata={
+            'activity_focus': 'planetary exploration',
+            'travel_readability': 'high',
+            'readable_subject': 'explorer and starship',
+            'scene_focus': 'alien-world traversal',
+        },
+    ),
+    make_local_eval_game(
+        slug='dead_space',
+        title='Dead Space',
+        old_price='1399 UAH',
+        current_price='-30%',
+        genre='survival horror',
+        tags=['plasma cutter', 'derelict corridor', 'necromorph', 'red alarm'],
+        short_description='A lone engineer moves through blood-streaked corridors and failing systems, carving through grotesque threats as alarms flash across a dead mining ship.',
+        artwork_metadata={
+            'subject': 'isolated engineer framed by a dark corridor',
+            'action': 'raising a plasma cutter toward an incoming threat',
+            'setting': 'derelict ship hallway with sparks and ruptured panels',
+            'atmosphere': 'claustrophobic dread, menace, survival panic',
+            'lighting': 'deep shadow cut by red emergency strobes and sparks',
+        },
+        screenshot_metadata={
+            'threat_focus': 'incoming creature threat',
+            'atmosphere': 'hostile corridor pressure',
+            'readable_subject': 'engineer facing danger',
+            'scene_focus': 'survival horror confrontation',
+        },
+    ),
+)
+
 
 def build_smoke_data(
     *,
@@ -988,6 +1145,8 @@ def resolve_game_inputs(game_set: str, *, game_eval: bool = False) -> list[dict[
         if game_eval:
             return [dict(item) for item in GAME_EVAL_MINIMAL_SMOKE_GAMES]
         return [dict(item) for item in MINIMAL_SMOKE_GAMES]
+    if normalized == 'expanded':
+        return [dict(item) for item in GAME_EVAL_EXPANDED_SMOKE_GAMES]
     return [dict(DEFAULT_SMOKE_GAME)]
 
 
