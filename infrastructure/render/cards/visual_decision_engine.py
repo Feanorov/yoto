@@ -609,6 +609,100 @@ VISUAL_INTENT_REASON_PROMO_EVENT = 'visual_intent:promo_event:official_promo'
 VISUAL_INTENT_REASON_GIVEAWAY_FREE = 'visual_intent:giveaway_free:free_offer'
 VISUAL_INTENT_REASON_CLEAN_ART_SAFE_DEFAULT = 'visual_intent:clean_art:safe_default'
 VISUAL_INTENT_REASON_HERO_FOCUS_SAFE_DEFAULT = 'visual_intent:hero_focus:safe_default'
+VISUAL_RESCUE_VERSION = 'v1_mvp'
+
+VISUAL_RESCUE_NONE = 'none'
+VISUAL_RESCUE_REASON_NONE = 'rescue:none:visual_requirements_satisfied'
+VISUAL_RESCUE_REQUIRED = 'official_visual_rescue_required'
+VISUAL_RESCUE_REQUIRED_REASON = 'rescue:official_visual_rescue_required:missing_visual_requirements'
+VISUAL_RESCUE_BRIDGE_REQUIRED = 'bridge_or_valid_asset_required'
+VISUAL_RESCUE_BRIDGE_REASON = 'rescue:bridge_or_valid_asset_required:official_asset_bridge_invalid'
+
+LAST_RESORT_RESCUE_SOURCE_TYPES = frozenset(
+    {
+        'steam_library_capsule',
+        'steam_main_capsule',
+        'steam_header_capsule',
+    }
+)
+
+VISUAL_RESCUE_RULES: dict[str, dict[str, Any]] = {
+    VISUAL_INTENT_ACTION_MOMENT: {
+        'missing_requirement': 'no_action_moment_visual',
+        'rescue_type': 'official_action_screenshot_rescue',
+        'reason_prefix': 'rescue:official_action_screenshot',
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'trailer_frame',
+            'action_screenshot',
+            'combat_key_art',
+            'steam_library_hero',
+        ],
+        'allow_last_resort': True,
+    },
+    VISUAL_INTENT_ACTIVITY_FOCUS: {
+        'missing_requirement': 'no_activity_focus_visual',
+        'rescue_type': 'official_activity_screenshot_rescue',
+        'reason_prefix': 'rescue:official_activity_screenshot',
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'activity_screenshot',
+            'trailer_frame',
+            'official_art_with_visible_activity',
+        ],
+        'allow_last_resort': True,
+    },
+    VISUAL_INTENT_STRATEGY_CORE: {
+        'missing_requirement': 'no_strategy_core_visual',
+        'rescue_type': 'official_strategy_screenshot_rescue',
+        'reason_prefix': 'rescue:official_strategy_screenshot',
+        'preferred_asset_families': [
+            'gameplay_screenshot',
+            'strategy_map_screenshot',
+            'trailer_frame',
+            'official_art_city_army_map',
+        ],
+        'allow_last_resort': True,
+    },
+    VISUAL_INTENT_VEHICLE_MOTION: {
+        'missing_requirement': 'no_vehicle_motion_visual',
+        'rescue_type': 'official_vehicle_motion_rescue',
+        'reason_prefix': 'rescue:official_vehicle_motion',
+        'preferred_asset_families': [
+            'steam_library_hero',
+            'gameplay_screenshot',
+            'trailer_frame',
+            'vehicle_key_art',
+        ],
+        'allow_last_resort': True,
+    },
+    VISUAL_INTENT_THREAT_ATMOSPHERE: {
+        'missing_requirement': 'no_threat_atmosphere_visual',
+        'rescue_type': 'official_threat_visual_rescue',
+        'reason_prefix': 'rescue:official_threat_visual',
+        'preferred_asset_families': [
+            'horror_key_art',
+            'gameplay_screenshot_with_threat',
+            'trailer_frame',
+            'steam_library_hero',
+        ],
+        'allow_last_resort': True,
+    },
+    VISUAL_INTENT_PROMO_EVENT: {
+        'missing_requirement': 'no_promo_event_visual',
+        'rescue_type': 'official_promo_visual_rescue',
+        'reason_prefix': 'rescue:official_promo_visual_rescue',
+        'preferred_asset_families': [],
+        'allow_last_resort': False,
+    },
+    VISUAL_INTENT_GIVEAWAY_FREE: {
+        'missing_requirement': 'no_giveaway_visual',
+        'rescue_type': 'official_giveaway_visual_rescue',
+        'reason_prefix': 'rescue:official_giveaway_visual_rescue',
+        'preferred_asset_families': [],
+        'allow_last_resort': False,
+    },
+}
 
 FREE_OFFER_KEYWORDS = (
     'egs giveaway',
@@ -1363,6 +1457,26 @@ class VisualIntentDecision:
 
 
 @dataclass(slots=True)
+class VisualRescueDecision:
+    rescue_needed: bool
+    rescue_reason: str
+    rescue_type: str
+    rescue_preferred_asset_families: list[str]
+    rescue_blockers: list[str]
+    rescue_version: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'rescue_needed': self.rescue_needed,
+            'rescue_reason': self.rescue_reason,
+            'rescue_type': self.rescue_type,
+            'rescue_preferred_asset_families': list(self.rescue_preferred_asset_families),
+            'rescue_blockers': list(self.rescue_blockers),
+            'rescue_version': self.rescue_version,
+        }
+
+
+@dataclass(slots=True)
 class CoverDecision:
     genre_cluster: str
     visual_type: str
@@ -1384,6 +1498,12 @@ class CoverDecision:
     acceptable_fallback_asset_families: list[str]
     missing_visual_requirements: list[str]
     visual_intent_version: str
+    rescue_needed: bool
+    rescue_reason: str
+    rescue_type: str
+    rescue_preferred_asset_families: list[str]
+    rescue_blockers: list[str]
+    rescue_version: str
     decision_reason: str
     decision_trace: dict[str, Any]
 
@@ -1409,6 +1529,12 @@ class CoverDecision:
             'acceptable_fallback_asset_families': list(self.acceptable_fallback_asset_families),
             'missing_visual_requirements': list(self.missing_visual_requirements),
             'visual_intent_version': self.visual_intent_version,
+            'rescue_needed': self.rescue_needed,
+            'rescue_reason': self.rescue_reason,
+            'rescue_type': self.rescue_type,
+            'rescue_preferred_asset_families': list(self.rescue_preferred_asset_families),
+            'rescue_blockers': list(self.rescue_blockers),
+            'rescue_version': self.rescue_version,
             'decision_reason': self.decision_reason,
             'decision_trace': _json_ready(self.decision_trace),
         }
@@ -1588,6 +1714,14 @@ class VisualDecisionEngine:
             scored_assets=ordered_scores,
         )
         decision_reason = selection_reason if not use_ai else f'{selection_reason}:{ai_fallback_reason}'
+        visual_rescue_decision = build_visual_rescue_decision(
+            card_type=card_type_decision.card_type,
+            image_source_type=image_source_type,
+            visual_intent_type=visual_intent_decision.visual_intent_type,
+            missing_visual_requirements=visual_intent_decision.missing_visual_requirements,
+            preferred_asset_families=visual_intent_decision.preferred_asset_families,
+            decision_reason=decision_reason,
+        )
         rejection_reasons = sorted(
             {
                 reason
@@ -1666,6 +1800,7 @@ class VisualDecisionEngine:
             ],
             'card_strategy': card_type_decision.to_dict(),
             'visual_intent': visual_intent_decision.to_dict(),
+            'visual_rescue': visual_rescue_decision.to_dict(),
         }
 
         return CoverDecision(
@@ -1689,6 +1824,12 @@ class VisualDecisionEngine:
             acceptable_fallback_asset_families=visual_intent_decision.acceptable_fallback_asset_families,
             missing_visual_requirements=visual_intent_decision.missing_visual_requirements,
             visual_intent_version=visual_intent_decision.visual_intent_version,
+            rescue_needed=visual_rescue_decision.rescue_needed,
+            rescue_reason=visual_rescue_decision.rescue_reason,
+            rescue_type=visual_rescue_decision.rescue_type,
+            rescue_preferred_asset_families=visual_rescue_decision.rescue_preferred_asset_families,
+            rescue_blockers=visual_rescue_decision.rescue_blockers,
+            rescue_version=visual_rescue_decision.rescue_version,
             decision_reason=decision_reason,
             decision_trace=decision_trace,
         )
@@ -4043,6 +4184,102 @@ def build_cover_decision(
         current_price=current_price,
         old_price=old_price,
         asset_candidates=asset_candidates,
+    )
+
+
+def build_visual_rescue_decision(
+    *,
+    card_type: str | None,
+    image_source_type: str | None,
+    visual_intent_type: str | None,
+    missing_visual_requirements: Sequence[str] | None,
+    preferred_asset_families: Sequence[str] | None = None,
+    decision_reason: str | None = None,
+    decision_asset_reject_reason: str | None = None,
+    final_source: str | None = None,
+    outcome: str | None = None,
+) -> VisualRescueDecision:
+    normalized_card_type = _safe_text(card_type)
+    normalized_image_source_type = _safe_text(image_source_type)
+    normalized_visual_intent_type = _safe_text(visual_intent_type)
+    normalized_decision_reason = _safe_text(decision_reason)
+    normalized_decision_asset_reject_reason = _safe_text(decision_asset_reject_reason)
+    normalized_final_source = _safe_text(final_source)
+    normalized_outcome = _safe_text(outcome)
+    missing = [str(item) for item in missing_visual_requirements or [] if _safe_text(item)]
+    rescue_families = [str(item) for item in preferred_asset_families or [] if _safe_text(item)]
+
+    blockers: list[str] = []
+    if (
+        normalized_card_type == CARD_TYPE_LAST_RESORT_OFFICIAL
+        and normalized_image_source_type in LAST_RESORT_RESCUE_SOURCE_TYPES
+    ):
+        blockers.append('selected_asset_is_capsule_last_resort')
+
+    bridge_invalid = bool(
+        normalized_decision_asset_reject_reason == 'invalid_or_nonlocal_asset_path'
+        or normalized_decision_reason == 'official_asset_bridge_invalid'
+        or (
+            normalized_final_source == 'fallback'
+            and normalized_decision_asset_reject_reason == 'invalid_or_nonlocal_asset_path'
+        )
+        or (
+            normalized_outcome == 'ai_hard_failure'
+            and normalized_decision_asset_reject_reason == 'invalid_or_nonlocal_asset_path'
+        )
+    )
+    if bridge_invalid:
+        if normalized_decision_asset_reject_reason == 'invalid_or_nonlocal_asset_path':
+            blockers.append('invalid_or_nonlocal_asset_path')
+        if normalized_decision_reason == 'official_asset_bridge_invalid' or normalized_final_source == 'fallback':
+            blockers.append('bridge_invalid')
+        return VisualRescueDecision(
+            rescue_needed=True,
+            rescue_reason=VISUAL_RESCUE_BRIDGE_REASON,
+            rescue_type=VISUAL_RESCUE_BRIDGE_REQUIRED,
+            rescue_preferred_asset_families=[
+                'valid_cached_official_asset',
+                'downloaded_official_asset',
+                'local_existing_asset',
+            ],
+            rescue_blockers=_dedupe_reasons(blockers),
+            rescue_version=VISUAL_RESCUE_VERSION,
+        )
+
+    rule = VISUAL_RESCUE_RULES.get(normalized_visual_intent_type)
+    if rule is not None:
+        required_missing = _safe_text(rule.get('missing_requirement'))
+        allow_last_resort = bool(rule.get('allow_last_resort', False))
+        if (required_missing and required_missing in missing) or (
+            allow_last_resort and normalized_card_type == CARD_TYPE_LAST_RESORT_OFFICIAL
+        ):
+            families = [str(item) for item in rule.get('preferred_asset_families') or [] if _safe_text(item)]
+            return VisualRescueDecision(
+                rescue_needed=True,
+                rescue_reason=f"{rule['reason_prefix']}:{required_missing or 'missing_visual_requirements'}",
+                rescue_type=str(rule['rescue_type']),
+                rescue_preferred_asset_families=families or list(rescue_families),
+                rescue_blockers=_dedupe_reasons(blockers),
+                rescue_version=VISUAL_RESCUE_VERSION,
+            )
+
+    if missing:
+        return VisualRescueDecision(
+            rescue_needed=True,
+            rescue_reason=VISUAL_RESCUE_REQUIRED_REASON,
+            rescue_type=VISUAL_RESCUE_REQUIRED,
+            rescue_preferred_asset_families=list(rescue_families),
+            rescue_blockers=_dedupe_reasons(blockers),
+            rescue_version=VISUAL_RESCUE_VERSION,
+        )
+
+    return VisualRescueDecision(
+        rescue_needed=False,
+        rescue_reason=VISUAL_RESCUE_REASON_NONE,
+        rescue_type=VISUAL_RESCUE_NONE,
+        rescue_preferred_asset_families=[],
+        rescue_blockers=[],
+        rescue_version=VISUAL_RESCUE_VERSION,
     )
 
 

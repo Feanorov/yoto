@@ -205,6 +205,29 @@ def test_ai_card_smoke_manifest_includes_visual_intent_fields(tmp_path: Path) ->
     assert trace_visual_intent['visual_intent_version'] == 'v1_mvp'
 
 
+def test_ai_card_smoke_manifest_includes_visual_rescue_fields(tmp_path: Path) -> None:
+    game_input = dict(MINIMAL_SMOKE_GAMES[2])
+    result = run_scenario(
+        scenario='current_env',
+        output_root=tmp_path,
+        game_input=game_input,
+        game_set='minimal',
+    )
+    manifest = json.loads(Path(result['manifest_path']).read_text(encoding='utf-8'))
+    provider_cover_decision = manifest['provider_metadata']['cover_decision']
+    trace_visual_rescue = provider_cover_decision['decision_trace']['visual_rescue']
+
+    assert provider_cover_decision['rescue_needed'] == result['cover_decision']['rescue_needed']
+    assert provider_cover_decision['rescue_type'] == result['cover_decision']['rescue_type']
+    assert provider_cover_decision['rescue_version'] == 'v1_mvp'
+    assert trace_visual_rescue['rescue_needed'] == provider_cover_decision['rescue_needed']
+    assert trace_visual_rescue['rescue_type'] == provider_cover_decision['rescue_type']
+    assert trace_visual_rescue['rescue_version'] == 'v1_mvp'
+    assert result['rescue_needed'] == result['visual_rescue']['rescue_needed']
+    assert result['rescue_type'] == result['visual_rescue']['rescue_type']
+    assert result['rescue_version'] == 'v1_mvp'
+
+
 def test_ai_card_smoke_current_env_supports_game_eval_seed_layout(tmp_path: Path) -> None:
     game_input = dict(MINIMAL_SMOKE_GAMES[1])
     result = run_scenario(
@@ -440,6 +463,10 @@ def test_ai_card_smoke_nonlocal_smoke_selected_official_does_not_silently_fall_t
     assert result['fallback_reason'] == 'official_asset_bridge_invalid'
     assert result['final_source'] == 'fallback'
     assert result['outcome'] == 'ai_hard_failure'
+    assert result['rescue_needed'] is True
+    assert result['rescue_reason'] == 'rescue:bridge_or_valid_asset_required:official_asset_bridge_invalid'
+    assert result['rescue_type'] == 'bridge_or_valid_asset_required'
+    assert 'invalid_or_nonlocal_asset_path' in result['rescue_blockers']
 
 
 def test_ai_card_smoke_quality_reject_remote_only_asset_stays_out_of_renderer(tmp_path: Path) -> None:

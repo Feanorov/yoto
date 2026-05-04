@@ -18,7 +18,7 @@ if str(REPO_ROOT) not in sys.path:
 from dealbot.settings import load_rendering_config
 from infrastructure.render.cards.asset_sources.official_asset_source import resolve_official_asset_candidates
 from infrastructure.render.cards.image_providers import ComfyUIImageProvider, ImageResolutionRequest, ResolvedImage
-from infrastructure.render.cards.visual_decision_engine import build_cover_decision
+from infrastructure.render.cards.visual_decision_engine import build_cover_decision, build_visual_rescue_decision
 from infrastructure.render.cards.yoto_card_engine_v4 import CARD_SIZE, YotoCardData, YotoCardEngineV4, YotoCardType
 
 OUTPUT_ROOT = REPO_ROOT / 'output' / 'cards'
@@ -1506,6 +1506,17 @@ def run_scenario(
         ai_succeeded=ai_succeeded,
         fallback_used=fallback_used,
     )
+    visual_rescue = build_visual_rescue_decision(
+        card_type=cover_decision_payload.get('card_type'),
+        image_source_type=cover_decision_payload.get('image_source_type'),
+        visual_intent_type=cover_decision_payload.get('visual_intent_type'),
+        missing_visual_requirements=cover_decision_payload.get('missing_visual_requirements'),
+        preferred_asset_families=cover_decision_payload.get('preferred_asset_families'),
+        decision_reason=diagnostics.get('decision_reason'),
+        decision_asset_reject_reason=decision_asset_reject_reason,
+        final_source=final_source,
+        outcome=outcome,
+    ).to_dict()
     manifest = {
         'created_at': datetime.utcnow().isoformat() + 'Z',
         'scenario': scenario,
@@ -1592,6 +1603,21 @@ def run_scenario(
         'grounding_summary': grounding_summary,
         'visual_intent': visual_intent,
         'visual_intent_reason': visual_intent_reason,
+        'visual_rescue': visual_rescue,
+        'rescue_needed': bool(visual_rescue.get('rescue_needed', False)),
+        'rescue_reason': visual_rescue.get('rescue_reason'),
+        'rescue_type': visual_rescue.get('rescue_type'),
+        'rescue_preferred_asset_families': [
+            str(item)
+            for item in visual_rescue.get('rescue_preferred_asset_families') or []
+            if str(item).strip()
+        ],
+        'rescue_blockers': [
+            str(item)
+            for item in visual_rescue.get('rescue_blockers') or []
+            if str(item).strip()
+        ],
+        'rescue_version': visual_rescue.get('rescue_version'),
         'variation_enabled': variation_enabled,
         'variation_id': variation_id,
         'variation_slots': variation_slots,
@@ -1712,6 +1738,7 @@ def run_scenario(
     manifest['provider_metadata']['grounding_summary'] = grounding_summary
     manifest['provider_metadata']['visual_intent'] = visual_intent
     manifest['provider_metadata']['visual_intent_reason'] = visual_intent_reason
+    manifest['provider_metadata']['visual_rescue'] = visual_rescue
     manifest['provider_metadata']['variation_enabled'] = variation_enabled
     manifest['provider_metadata']['variation_id'] = variation_id
     manifest['provider_metadata']['variation_slots'] = variation_slots

@@ -2,7 +2,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from infrastructure.render.cards.visual_decision_engine import build_cover_decision, resolve_cover_decision_asset_bridge
+from infrastructure.render.cards.visual_decision_engine import (
+    build_cover_decision,
+    build_visual_rescue_decision,
+    resolve_cover_decision_asset_bridge,
+)
 from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, SMOKE_LOCAL_LANDSCAPE_ASSET, SMOKE_LOCAL_PORTRAIT_ASSET
 
 REJECTED_LOCAL_FIXTURE_ASSET = SMOKE_LOCAL_PORTRAIT_ASSET
@@ -50,6 +54,10 @@ def _card_strategy(decision: dict[str, object]) -> dict[str, object]:
 
 def _visual_intent(decision: dict[str, object]) -> dict[str, object]:
     return dict(decision['decision_trace'].get('visual_intent', {}))
+
+
+def _visual_rescue(decision: dict[str, object]) -> dict[str, object]:
+    return dict(decision['decision_trace'].get('visual_rescue', {}))
 
 
 def _with_valid_fixture_replacement(asset_candidates: list[dict[str, object]]) -> list[dict[str, object]]:
@@ -1715,6 +1723,28 @@ def test_last_resort_official_records_missing_visual_requirements() -> None:
     assert 'no_activity_focus_visual' in _visual_intent(decision)['missing_visual_requirements']
 
 
+def test_action_last_resort_sets_action_rescue() -> None:
+    rescue = build_visual_rescue_decision(
+        card_type='last_resort_official',
+        image_source_type='steam_main_capsule',
+        visual_intent_type='action_moment',
+        missing_visual_requirements=['no_action_moment_visual'],
+    ).to_dict()
+
+    assert rescue['rescue_needed'] is True
+    assert rescue['rescue_reason'] == 'rescue:official_action_screenshot:no_action_moment_visual'
+    assert rescue['rescue_type'] == 'official_action_screenshot_rescue'
+    assert rescue['rescue_preferred_asset_families'] == [
+        'gameplay_screenshot',
+        'trailer_frame',
+        'action_screenshot',
+        'combat_key_art',
+        'steam_library_hero',
+    ]
+    assert 'selected_asset_is_capsule_last_resort' in rescue['rescue_blockers']
+    assert rescue['rescue_version'] == 'v1_mvp'
+
+
 def test_strategy_signals_still_map_to_strategy_core() -> None:
     decision = _build_decision(
         genre='turn-based strategy',
@@ -1724,6 +1754,73 @@ def test_strategy_signals_still_map_to_strategy_core() -> None:
 
     assert decision['visual_intent_type'] == 'strategy_core'
     assert decision['visual_intent_reason'] == 'visual_intent:strategy_core:strategy_or_4x'
+
+
+def test_activity_last_resort_sets_activity_rescue() -> None:
+    decision = _build_decision(
+        genre='adventure management sim',
+        tags=['underwater exploration', 'fishing', 'sushi'],
+        short_description='A diver catches fish and returns to a sushi bar after each exploration run.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'diver',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+        ],
+    )
+
+    assert decision['visual_intent_type'] == 'activity_focus'
+    assert decision['rescue_needed'] is True
+    assert decision['rescue_reason'] == 'rescue:official_activity_screenshot:no_activity_focus_visual'
+    assert decision['rescue_type'] == 'official_activity_screenshot_rescue'
+    assert decision['rescue_preferred_asset_families'] == [
+        'gameplay_screenshot',
+        'activity_screenshot',
+        'trailer_frame',
+        'official_art_with_visible_activity',
+    ]
+    assert _visual_rescue(decision)['rescue_type'] == decision['rescue_type']
+
+
+def test_strategy_last_resort_sets_strategy_rescue() -> None:
+    decision = _build_decision(
+        genre='turn-based strategy',
+        tags=['world map', 'city building', 'armies', 'wonders'],
+        short_description='A strategy campaign expands across the map with armies and major cities.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['visual_intent_type'] == 'strategy_core'
+    assert decision['rescue_needed'] is True
+    assert decision['rescue_reason'] == 'rescue:official_strategy_screenshot:no_strategy_core_visual'
+    assert decision['rescue_type'] == 'official_strategy_screenshot_rescue'
+    assert decision['rescue_preferred_asset_families'] == [
+        'gameplay_screenshot',
+        'strategy_map_screenshot',
+        'trailer_frame',
+        'official_art_city_army_map',
+    ]
+    assert _visual_rescue(decision)['rescue_type'] == decision['rescue_type']
 
 
 def test_last_resort_activity_focus_records_activity_missing_requirement() -> None:
@@ -1763,7 +1860,38 @@ def test_last_resort_activity_focus_records_activity_missing_requirement() -> No
     assert 'no_strategy_core_visual' not in decision['missing_visual_requirements']
 
 
-def test_visual_intent_does_not_change_selection_or_ai_behavior() -> None:
+def test_good_official_no_missing_requirements_sets_no_rescue() -> None:
+    decision = _build_decision(
+        genre='roguelike shooter',
+        tags=['combat', 'weapon'],
+        short_description='A fighter rushes through ruins with a clear official hero frame available.',
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    assert decision['use_ai'] is False
+    assert decision['card_type'] == 'simple_hero'
+    assert decision['missing_visual_requirements'] == []
+    assert decision['rescue_needed'] is False
+    assert decision['rescue_reason'] == 'rescue:none:visual_requirements_satisfied'
+    assert decision['rescue_type'] == 'none'
+    assert decision['rescue_blockers'] == []
+    assert decision['rescue_version'] == 'v1_mvp'
+    assert _visual_rescue(decision)['rescue_needed'] is False
+
+
+def test_visual_rescue_does_not_change_selection_or_ai_behavior() -> None:
     decision = _build_decision(
         genre='roguelike shooter',
         tags=['combat', 'weapon'],
@@ -1797,3 +1925,6 @@ def test_visual_intent_does_not_change_selection_or_ai_behavior() -> None:
     assert decision['use_ai'] is False
     assert decision['image_source_type'] == 'official_press_key_art'
     assert decision['card_type'] == 'simple_hero'
+    assert decision['decision_reason'] == 'official_first_selected_best_scoring_asset'
+    assert decision['rescue_needed'] is False
+    assert decision['rescue_type'] == 'none'
