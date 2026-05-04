@@ -8,7 +8,16 @@ import shutil
 from PIL import Image
 
 from infrastructure.render.cards.asset_sources.asset_cache import AssetCacheDownloadResult
-from tools.ai_card_smoke import MINIMAL_SMOKE_GAMES, SMOKE_LOCAL_LANDSCAPE_ASSET, run_scenario
+from infrastructure.render.cards.image_providers import ArtworkImageProvider, ImageResolutionRequest, ResolvedImage, YotoImageResolver
+from tools.ai_card_smoke import (
+    MINIMAL_SMOKE_GAMES,
+    SMOKE_LOCAL_LANDSCAPE_ASSET,
+    classify_outcome,
+    infer_fallback_reason,
+    infer_fallback_used,
+    infer_final_source,
+    run_scenario,
+)
 
 
 def _png_bytes() -> bytes:
@@ -20,6 +29,37 @@ def _png_bytes() -> bytes:
 def _clear_test_cache(identifier: str) -> None:
     cache_dir = Path(__file__).resolve().parents[1] / 'output' / 'cards' / 'official_asset_cache' / 'steam' / identifier
     shutil.rmtree(cache_dir, ignore_errors=True)
+
+
+class _FakeProvider:
+    def __init__(self, result: ResolvedImage | None, *, enabled: bool = True) -> None:
+        self.result = result
+        self.enabled = enabled
+        self.calls = 0
+
+    def resolve(self, request: ImageResolutionRequest) -> ResolvedImage | None:
+        self.calls += 1
+        return self.result
+
+
+def _resolver_request(*, cover_decision: dict[str, object], mode: str = 'ai_first') -> ImageResolutionRequest:
+    return ImageResolutionRequest(
+        artwork_path=None,
+        title='Bridge Safety Smoke',
+        platform='STEAM',
+        slug='bridge_safety_smoke',
+        card_type='DISCOUNT',
+        lane='high_value_discount',
+        mode=mode,
+        priority='',
+        image_size=(1280, 720),
+        cover_decision=cover_decision,
+    )
+
+
+def _write_test_png(path: Path, *, color: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new('RGB', (1280, 720), color).save(path, format='PNG')
 
 
 def test_ai_card_smoke_current_env_reports_ai_runtime(tmp_path: Path) -> None:
@@ -372,7 +412,7 @@ def test_ai_card_smoke_quality_reject_uses_valid_decision_asset_before_ai(tmp_pa
     assert result['outcome'] == 'official_asset'
 
 
-def test_ai_card_smoke_quality_reject_rejects_nonlocal_bundle_decision_asset(tmp_path: Path) -> None:
+def test_ai_card_smoke_nonlocal_smoke_selected_official_does_not_silently_fall_to_ai(tmp_path: Path) -> None:
     game_input = dict(MINIMAL_SMOKE_GAMES[4])
     result = run_scenario(
         scenario='quality_reject',
@@ -394,10 +434,12 @@ def test_ai_card_smoke_quality_reject_rejects_nonlocal_bundle_decision_asset(tmp
     assert result['actual_image_path_or_url'] is None
     assert result['decision_asset_matches_actual_source'] is False
     assert result['provider'] == 'placeholder'
-    assert result['ai_attempted'] is True
+    assert result['ai_attempted'] is False
+    assert result['ai_succeeded'] is False
     assert result['fallback_used'] is True
+    assert result['fallback_reason'] == 'official_asset_bridge_invalid'
     assert result['final_source'] == 'fallback'
-    assert result['outcome'] == 'ai_fallback'
+    assert result['outcome'] == 'ai_hard_failure'
 
 
 def test_ai_card_smoke_quality_reject_remote_only_asset_stays_out_of_renderer(tmp_path: Path) -> None:
@@ -430,8 +472,9 @@ def test_ai_card_smoke_quality_reject_remote_only_asset_stays_out_of_renderer(tm
     assert result['decision_asset_reject_reason'] == 'remote_not_cached'
     assert result['provider'] == 'placeholder'
     assert result['fallback_used'] is True
+    assert result['fallback_reason'] == 'official_asset_bridge_invalid'
     assert result['final_source'] == 'fallback'
-    assert result['outcome'] == 'ai_fallback'
+    assert result['outcome'] == 'ai_hard_failure'
 
 
 def test_ai_card_smoke_download_assets_promotes_downloaded_remote_candidate(tmp_path: Path) -> None:
@@ -527,3 +570,185 @@ def test_ai_card_smoke_download_assets_failure_keeps_fallback_safe(tmp_path: Pat
     assert result['provider'] == 'placeholder'
     assert result['fallback_used'] is True
     assert result['final_source'] == 'fallback'
+
+
+def test_valid_cached_official_asset_still_uses_asset(tmp_path: Path) -> None:
+    cached_asset_path = tmp_path / 'official_asset_cache' / 'steam_main_capsule.png'
+    generated_asset_path = tmp_path / 'generated' / 'ai.png'
+    _write_test_png(cached_asset_path, color='#4477aa')
+    _write_test_png(generated_asset_path, color='#22aa55')
+
+    ai_provider = _FakeProvider(
+        ResolvedImage(
+            image=Image.new('RGB', (1280, 720), '#22aa55'),
+            metadata={
+                'selected_source': 'ai',
+                'provider_name': 'ai',
+                'asset_path': str(generated_asset_path.resolve()),
+            },
+        )
+    )
+    resolver = YotoImageResolver(
+        artwork_provider=ArtworkImageProvider(),
+        ai_provider=ai_provider,
+        placeholder_provider=_FakeProvider(
+            ResolvedImage(
+                image=Image.new('RGB', (1280, 720), '#111111'),
+                metadata={'selected_source': 'placeholder', 'provider_name': 'placeholder'},
+            )
+        ),
+        mode='ai_first',
+    )
+
+    result = resolver.resolve(
+        _resolver_request(
+            cover_decision={
+                'use_ai': False,
+                'image_source_type': 'steam_main_capsule',
+                'selected_asset': {
+                    'source_type': 'steam_main_capsule',
+                    'path_or_url': 'https://cdn.example.com/steam_main_capsule.png',
+                    'cache_path': str(cached_asset_path),
+                    'metadata': {
+                        'cache_path': str(cached_asset_path),
+                        'cache_status': 'downloaded',
+                    },
+                },
+            }
+        )
+    )
+
+    final_source = infer_final_source(str(result.metadata.get('selected_source') or ''))
+
+    assert final_source == 'asset'
+    assert result.metadata['decision_asset_used'] is True
+    assert result.metadata['decision_asset_reject_reason'] is None
+    assert result.metadata['actual_image_source_type'] == 'steam_main_capsule'
+    assert result.metadata['actual_image_path_or_url'] == str(cached_asset_path.resolve())
+    assert result.metadata['decision_asset_matches_actual_source'] is True
+    assert ai_provider.calls == 0
+
+
+def test_nonlocal_smoke_selected_official_does_not_silently_fall_to_ai(tmp_path: Path) -> None:
+    generated_asset_path = tmp_path / 'generated' / 'ai.png'
+    _write_test_png(generated_asset_path, color='#22aa55')
+
+    ai_provider = _FakeProvider(
+        ResolvedImage(
+            image=Image.new('RGB', (1280, 720), '#22aa55'),
+            metadata={
+                'selected_source': 'ai',
+                'provider_name': 'ai',
+                'asset_path': str(generated_asset_path.resolve()),
+            },
+        )
+    )
+    resolver = YotoImageResolver(
+        artwork_provider=ArtworkImageProvider(),
+        ai_provider=ai_provider,
+        placeholder_provider=_FakeProvider(
+            ResolvedImage(
+                image=Image.new('RGB', (1280, 720), '#111111'),
+                metadata={'selected_source': 'placeholder', 'provider_name': 'placeholder'},
+            )
+        ),
+        mode='ai_first',
+    )
+
+    result = resolver.resolve(
+        _resolver_request(
+            cover_decision={
+                'use_ai': False,
+                'image_source_type': 'steam_main_capsule',
+                'selected_asset': {
+                    'source_type': 'steam_main_capsule',
+                    'path_or_url': 'smoke://bundle/item_01_capsule.png',
+                    'metadata': {
+                        'source_origin': 'local_manifest',
+                        'cache_status': 'missing',
+                    },
+                },
+            }
+        )
+    )
+
+    final_source = infer_final_source(str(result.metadata.get('selected_source') or ''))
+    fallback_used = infer_fallback_used(final_source)
+    fallback_reason = infer_fallback_reason(
+        fallback_used=fallback_used,
+        decision_reason=result.metadata.get('decision_reason'),
+    )
+    outcome = classify_outcome(
+        final_source=final_source,
+        ai_attempted=bool(result.metadata.get('ai_attempted', False)),
+        ai_succeeded=bool(result.metadata.get('ai_succeeded', False)),
+        fallback_used=fallback_used,
+    )
+
+    assert final_source != 'ai'
+    assert result.metadata['selected_source'] == 'placeholder'
+    assert result.metadata['actual_image_source_type'] != 'ai_generated'
+    assert result.metadata['decision_asset_used'] is False
+    assert result.metadata['decision_asset_reject_reason'] == 'invalid_or_nonlocal_asset_path'
+    assert fallback_used is True
+    assert fallback_reason == 'official_asset_bridge_invalid'
+    assert outcome == 'ai_hard_failure'
+    assert ai_provider.calls == 0
+
+
+def test_ai_still_allowed_when_cover_decision_use_ai_true(tmp_path: Path) -> None:
+    generated_asset_path = tmp_path / 'generated' / 'ai.png'
+    _write_test_png(generated_asset_path, color='#22aa55')
+
+    ai_provider = _FakeProvider(
+        ResolvedImage(
+            image=Image.new('RGB', (1280, 720), '#22aa55'),
+            metadata={
+                'selected_source': 'ai',
+                'provider_name': 'ai',
+                'asset_path': str(generated_asset_path.resolve()),
+            },
+        )
+    )
+    resolver = YotoImageResolver(
+        artwork_provider=ArtworkImageProvider(),
+        ai_provider=ai_provider,
+        placeholder_provider=_FakeProvider(
+            ResolvedImage(
+                image=Image.new('RGB', (1280, 720), '#111111'),
+                metadata={'selected_source': 'placeholder', 'provider_name': 'placeholder'},
+            )
+        ),
+        mode='ai_first',
+    )
+
+    result = resolver.resolve(
+        _resolver_request(
+            cover_decision={
+                'use_ai': True,
+                'image_source_type': 'ai_generated',
+                'selected_asset': {
+                    'source_type': 'ai_generated',
+                    'path_or_url': 'ai://generated/strategy_core',
+                },
+            }
+        )
+    )
+
+    final_source = infer_final_source(str(result.metadata.get('selected_source') or ''))
+    fallback_used = infer_fallback_used(final_source)
+    outcome = classify_outcome(
+        final_source=final_source,
+        ai_attempted=bool(result.metadata.get('ai_attempted', False)),
+        ai_succeeded=bool(result.metadata.get('ai_succeeded', False)),
+        fallback_used=fallback_used,
+    )
+
+    assert final_source == 'ai'
+    assert result.metadata['actual_image_source_type'] == 'ai_generated'
+    assert result.metadata['cover_decision_use_ai'] is True
+    assert result.metadata['decision_asset_used'] is False
+    assert result.metadata['decision_asset_reject_reason'] == 'decision_prefers_ai'
+    assert result.metadata['decision_reason'] == 'ai_generated_missing_artwork'
+    assert outcome == 'ai_runtime'
+    assert ai_provider.calls == 1

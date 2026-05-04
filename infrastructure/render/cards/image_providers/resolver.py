@@ -188,6 +188,15 @@ class YotoImageResolver:
             ),
         }
 
+    @staticmethod
+    def _cover_decision_blocks_ai_fallback(*, request: ImageResolutionRequest, bridge) -> bool:
+        cover_decision = request.cover_decision if isinstance(request.cover_decision, dict) else None
+        return bool(
+            cover_decision is not None
+            and not bool(cover_decision.get('use_ai', False))
+            and not bool(getattr(bridge, 'candidate_valid', False))
+        )
+
     def resolve(self, request: ImageResolutionRequest) -> ResolvedImage:
         decision_asset_bridge = resolve_cover_decision_asset_bridge(request.cover_decision)
         effective_request = (
@@ -295,6 +304,39 @@ class YotoImageResolver:
                 ai_attempted=False,
                 ai_succeeded=False,
                 resolver_trace=resolver_trace,
+                bridge=decision_asset_bridge,
+            )
+
+        ai_blocked_by_cover_decision = self._cover_decision_blocks_ai_fallback(
+            request=request,
+            bridge=decision_asset_bridge,
+        )
+        resolver_trace['cover_decision_ai_fallback_blocked'] = ai_blocked_by_cover_decision
+        self._append_trace(
+            resolver_trace,
+            candidate_provider='ai',
+            check_name='cover_decision_allows_ai_fallback',
+            check_result=not ai_blocked_by_cover_decision,
+            fail_reason='official_asset_bridge_invalid' if ai_blocked_by_cover_decision else None,
+        )
+        if ai_blocked_by_cover_decision:
+            self._append_trace(
+                resolver_trace,
+                candidate_provider='placeholder',
+                check_name='placeholder_fallback_selected',
+                check_result=True,
+                fail_reason=None,
+            )
+            return self._placeholder(
+                request,
+                mode=mode,
+                priority=priority,
+                decision_reason='official_asset_bridge_invalid',
+                has_artwork=has_artwork,
+                ai_attempted=False,
+                ai_succeeded=False,
+                resolver_trace=resolver_trace,
+                quality_metadata=None,
                 bridge=decision_asset_bridge,
             )
 

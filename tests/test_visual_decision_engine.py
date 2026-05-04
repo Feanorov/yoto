@@ -303,6 +303,28 @@ def test_visual_decision_engine_bridge_accepts_real_local_official_asset() -> No
     assert bridge.decision_asset_reject_reason is None
 
 
+def test_visual_decision_engine_bridge_accepts_cached_official_asset_path_from_metadata() -> None:
+    bridge = resolve_cover_decision_asset_bridge(
+        {
+            'use_ai': False,
+            'selected_asset': {
+                'source_type': 'official_press_key_art',
+                'path_or_url': 'https://cdn.example.com/official_press_key_art.png',
+                'metadata': {
+                    'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                    'cache_status': 'downloaded',
+                },
+            },
+        }
+    )
+
+    assert bridge.candidate_valid is True
+    assert bridge.selected_asset_source_type == 'official_press_key_art'
+    assert bridge.resolved_local_path == str(Path(SMOKE_LOCAL_PORTRAIT_ASSET).resolve())
+    assert bridge.decision_asset_use_reason == 'cover_decision_selected_official_asset'
+    assert bridge.decision_asset_reject_reason is None
+
+
 def test_visual_decision_engine_bridge_rejects_nonlocal_or_aggregate_assets() -> None:
     bundle_input = dict(MINIMAL_SMOKE_GAMES[4])
     bundle_decision = build_cover_decision(

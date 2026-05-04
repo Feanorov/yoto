@@ -4086,7 +4086,7 @@ def resolve_cover_decision_asset_bridge(cover_decision: Mapping[str, Any] | None
 
     payload = {str(key): _json_ready(value) for key, value in selected_asset.items()}
     source_type = _normalize_text(payload.get('source_type')) or None
-    resolved_path = _resolve_local_readable_image_path(payload.get('path_or_url'))
+    resolved_path = _resolve_selected_asset_local_path(payload)
     if resolved_path is None:
         return DecisionAssetBridge(
             selected_asset=payload,
@@ -4115,6 +4115,24 @@ def resolve_cover_decision_asset_bridge(cover_decision: Mapping[str, Any] | None
         decision_asset_use_reason='cover_decision_selected_official_asset',
         decision_asset_reject_reason=None,
     )
+
+
+def _resolve_selected_asset_local_path(selected_asset: Mapping[str, Any]) -> str | None:
+    metadata = selected_asset.get('metadata')
+    candidate_values: list[Any] = [selected_asset.get('path_or_url'), selected_asset.get('cache_path')]
+    if isinstance(metadata, Mapping):
+        candidate_values.append(metadata.get('cache_path'))
+
+    seen_values: set[str] = set()
+    for value in candidate_values:
+        normalized_value = _safe_text(value)
+        if not normalized_value or normalized_value in seen_values:
+            continue
+        seen_values.add(normalized_value)
+        resolved_path = _resolve_local_readable_image_path(normalized_value)
+        if resolved_path is not None:
+            return resolved_path
+    return None
 
 
 def _resolve_local_readable_image_path(value: Any) -> str | None:
