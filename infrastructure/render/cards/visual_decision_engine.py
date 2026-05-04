@@ -930,11 +930,8 @@ class VisualDecisionEngine:
 
         official_assets = [item for item in scored_assets if item.candidate.is_official]
         ai_assets = [item for item in scored_assets if not item.candidate.is_official]
-        usable_official_assets = [
-            item
-            for item in official_assets
-            if item.quality_tier in {'good', 'acceptable'}
-        ]
+        # Accepted official assets, including last-resort capsules/headers, must block AI fallback.
+        usable_official_assets = [item for item in official_assets if item.accepted]
 
         use_ai = False
         ai_fallback_reason: str | None = None

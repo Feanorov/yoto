@@ -1009,6 +1009,88 @@ def test_visual_decision_engine_capsule_allowed_only_if_no_better_official_exist
     assert 'penalty:branding_surface_capsule' in capsule_asset['scoring_reason']
 
 
+def test_visual_decision_engine_usable_weak_official_capsule_blocks_ai() -> None:
+    decision = _build_decision(
+        game_title='Quiet Forge',
+        genre='cozy farming',
+        tags=['town', 'crops'],
+        short_description='A cozy town and farm.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://quiet',
+                'metadata': {},
+            },
+        ],
+    )
+
+    capsule_asset = _asset_by_source_type(decision, 'steam_library_capsule')
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_library_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_library_capsule'
+    assert capsule_asset['accepted'] is True
+    assert 'select:steam_capsule_last_resort' in capsule_asset['scoring_reason']
+    assert 'penalty:branding_surface_capsule' in capsule_asset['scoring_reason']
+    assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})
+
+
+def test_visual_decision_engine_weak_but_accepted_official_does_not_unlock_ai() -> None:
+    decision = _build_decision(
+        game_title='Nightfall Run',
+        genre='action rpg',
+        tags=['hero', 'ruins'],
+        short_description='A hero fights through ruined halls.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://nightfall_run',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    official_asset = _asset_by_source_type(decision, 'steam_main_capsule')
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_main_capsule'
+    assert official_asset['accepted'] is True
+    assert 'penalty:branding_surface_capsule' in official_asset['scoring_reason']
+    assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})
+
+
 def test_visual_decision_engine_ai_fallback_when_only_bad_official_assets_exist() -> None:
     decision = _build_decision(
         game_title='Prototype Echo',
@@ -1063,6 +1145,104 @@ def test_visual_decision_engine_ai_fallback_when_only_bad_official_assets_exist(
 
     assert decision['use_ai'] is True
     assert decision['image_source_type'] == 'ai_generated'
+    assert 'ai_unlock:no_acceptable_official' in _policy_reasons(decision)
+
+
+def test_visual_decision_engine_ai_unlocks_only_when_all_official_hard_rejected() -> None:
+    decision = _build_decision(
+        game_title='Prototype Echo',
+        genre='action adventure',
+        tags=['hero'],
+        short_description='Only broken official assets remain.',
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': '',
+                'metadata': {
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://placeholder_art.png',
+                'metadata': {
+                    'placeholder': True,
+                    'subject_focus': 'hero',
+                },
+            },
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': 'smoke://collage_art.png',
+                'metadata': {
+                    'collage': True,
+                    'grid': True,
+                    'multiple_characters': True,
+                },
+            },
+            {
+                'source_type': 'steam_logo',
+                'width': 1200,
+                'height': 600,
+                'kind': 'logo',
+                'path_or_url': 'smoke://logo.png',
+                'metadata': {
+                    'logo': True,
+                    'title': True,
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'settings': True,
+                    'launcher': 'setup launcher',
+                    'menu': 'options panel',
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://echo',
+                'metadata': {
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            },
+        ],
+    )
+
+    invalid_asset = _asset_by_path(decision, '')
+    placeholder_asset = _asset_by_path(decision, 'smoke://placeholder_art.png')
+    collage_asset = _asset_by_path(decision, 'smoke://collage_art.png')
+    logo_asset = _asset_by_source_type(decision, 'steam_logo')
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+    official_assets = [item for item in decision['asset_scores'] if item['is_official'] is True]
+
+    assert decision['use_ai'] is True
+    assert decision['image_source_type'] == 'ai_generated'
+    assert decision['selected_asset']['source_type'] == 'ai_generated'
+    assert all(item['accepted'] is False for item in official_assets)
+    assert 'asset_path_or_url_missing' in invalid_asset['rejection_reasons']
+    assert 'reject:invalid_path' in invalid_asset['rejection_reasons']
+    assert 'placeholder_asset' in placeholder_asset['rejection_reasons']
+    assert 'reject:placeholder_asset' in placeholder_asset['rejection_reasons']
+    assert 'collage_single_title' in collage_asset['rejection_reasons']
+    assert 'reject:collage_single_title' in collage_asset['rejection_reasons']
+    assert 'standalone_logo_asset' in logo_asset['rejection_reasons']
+    assert 'menu_like_screenshot' in screenshot_asset['rejection_reasons']
     assert 'ai_unlock:no_acceptable_official' in _policy_reasons(decision)
 
 
