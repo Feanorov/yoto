@@ -483,6 +483,62 @@ MINIMAL_SMOKE_GAMES = (
     },
 )
 
+GAME_EVAL_MINIMAL_SMOKE_GAMES = MINIMAL_SMOKE_GAMES[:4] + (
+    {
+        'slug': 'pacific_drive',
+        'store_id': 'steam:pacific_drive',
+        'source_hint': 'steam',
+        'steam_app_id': None,
+        'title': 'Pacific Drive',
+        'platform': 'STEAM',
+        'type': YotoCardType.DISCOUNT,
+        'offer_type': 'discount',
+        'deadline': 'until 30 Apr, 18:00',
+        'old_price': '899 UAH',
+        'current_price': '-35%',
+        'platform_badge': 'STEAM DISCOUNT',
+        'brand_micro_label': 'minimal smoke',
+        'lane': 'high_value_discount',
+        'genre': 'survival driving',
+        'tags': ['station wagon', 'stormfront', 'roadside anomaly', 'escape run'],
+        'short_description': 'A battered station wagon pushes through storm-wrapped forests and roadside anomalies, scavenging supplies while racing toward the next safe extraction gate.',
+        'artwork_metadata': {
+            'subject': 'weather-beaten station wagon in the foreground',
+            'action': 'accelerating away from a collapsing roadside anomaly',
+            'setting': 'stormy pine highway lined with electrical debris',
+            'atmosphere': 'tense, strange, survival-focused momentum',
+            'lighting': 'cold overcast daylight cut by bright electrical arcs',
+        },
+        'local_assets': {
+            'steam_screenshot': make_asset_candidate(
+                'steam_screenshot',
+                1920,
+                1080,
+                'screenshot',
+                SMOKE_LOCAL_LANDSCAPE_ASSET,
+                metadata={
+                    'vehicle_focus': 'station wagon escape run',
+                    'scene_focus': 'hazardous roadway traversal',
+                    'survival_motion': True,
+                    'readable_subject': 'car against storm anomaly',
+                },
+            ),
+        },
+        'asset_candidates': [
+            make_asset_candidate(
+                'ai_generated',
+                1280,
+                720,
+                'generated_preview',
+                'ai://preview/pacific_drive',
+                metadata={
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            ),
+        ],
+    },
+)
+
 
 def build_smoke_data(
     *,
@@ -926,9 +982,11 @@ def resolve_selected_game_set(*, game_set: str, game_eval: bool) -> str:
     return normalized
 
 
-def resolve_game_inputs(game_set: str) -> list[dict[str, Any]]:
+def resolve_game_inputs(game_set: str, *, game_eval: bool = False) -> list[dict[str, Any]]:
     normalized = normalize_game_set(game_set)
     if normalized == 'minimal':
+        if game_eval:
+            return [dict(item) for item in GAME_EVAL_MINIMAL_SMOKE_GAMES]
         return [dict(item) for item in MINIMAL_SMOKE_GAMES]
     return [dict(DEFAULT_SMOKE_GAME)]
 
@@ -2207,7 +2265,7 @@ def render_ai_card_smoke(
     if selected_prompt_variant not in VALID_PROMPT_VARIANTS:
         raise ValueError(f'Unsupported prompt variant: {prompt_variant}')
     selected_game_set = resolve_selected_game_set(game_set=game_set, game_eval=game_eval)
-    game_inputs = resolve_game_inputs(selected_game_set)
+    game_inputs = resolve_game_inputs(selected_game_set, game_eval=game_eval)
     selected_seeds_per_game = max(1, int(seeds_per_game or DEFAULT_SEEDS_PER_GAME))
     prompt_variants = list(VALID_PROMPT_VARIANTS if compare_prompt_variants else (selected_prompt_variant,))
     total_runs = max(1, int(runs))
