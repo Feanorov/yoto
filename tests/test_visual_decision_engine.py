@@ -13,6 +13,8 @@ def _build_decision(
     tags: list[str] | None = None,
     short_description: str = 'A clear hero key art exists.',
     offer_type: str = 'discount',
+    current_price: str | None = None,
+    old_price: str | None = None,
     asset_candidates: list[dict[str, object]] | None = None,
 ) -> dict[str, object]:
     return build_cover_decision(
@@ -22,6 +24,8 @@ def _build_decision(
         short_description=short_description,
         offer_type=offer_type,
         asset_candidates=asset_candidates or [],
+        current_price=current_price,
+        old_price=old_price,
     ).to_dict()
 
 
@@ -35,6 +39,10 @@ def _asset_by_path(decision: dict[str, object], path_or_url: str | None) -> dict
 
 def _policy_reasons(decision: dict[str, object]) -> list[str]:
     return list(decision['decision_trace']['selected_strategy'].get('policy_reasons', []))
+
+
+def _card_strategy(decision: dict[str, object]) -> dict[str, object]:
+    return dict(decision['decision_trace'].get('card_strategy', {}))
 
 
 def test_visual_decision_engine_hades_prefers_official_character_art() -> None:
@@ -1279,3 +1287,193 @@ def test_visual_decision_engine_ai_blocked_when_strong_official_exists() -> None
     assert decision['image_source_type'] == 'official_press_key_art'
     assert selected_asset['accepted'] is True
     assert any(reason in _policy_reasons(decision) for reason in {'ai_block:good_official_exists', 'ai_block:acceptable_official_exists'})
+
+
+def test_simple_hero_card_type_for_strong_library_hero() -> None:
+    decision = _build_decision(
+        genre='racing action',
+        tags=['hero', 'vehicle', 'speed'],
+        short_description='A strong hero-style official racing banner with clear action focus.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1600,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'vehicle_focus': 'hero car',
+                    'subject_focus': 'foreground vehicle',
+                    'action': 'drifting at speed',
+                    'scene_focus': 'racing duel',
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://library-hero',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+    strategy = _card_strategy(decision)
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert decision['card_type'] == 'simple_hero'
+    assert decision['card_type_reason'] == 'card_type:simple_hero:strong_official_visual'
+    assert decision['card_strategy_version'] == 'v2_mvp'
+    assert decision['card_type_inputs']['selected_image_source_type'] == 'steam_library_hero'
+    assert strategy['card_type'] == decision['card_type']
+    assert strategy['card_type_reason'] == decision['card_type_reason']
+
+
+def test_last_resort_official_for_capsule_selection() -> None:
+    decision = _build_decision(
+        asset_candidates=[
+            {
+                'source_type': 'steam_main_capsule',
+                'width': 1232,
+                'height': 706,
+                'kind': 'main_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                    'closeup': True,
+                },
+            },
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://capsule-last-resort',
+                'metadata': {
+                    'prompt_intent': 'hero_action_focus',
+                },
+            },
+        ],
+    )
+
+    assert decision['image_source_type'] == 'steam_main_capsule'
+    assert decision['card_type'] == 'last_resort_official'
+    assert decision['card_type_reason'] == 'card_type:last_resort_official:capsule_or_header_selected'
+    assert decision['card_type_inputs']['is_last_resort_official'] is True
+
+
+def test_giveaway_free_for_free_offer() -> None:
+    decision = _build_decision(
+        offer_type='giveaway',
+        current_price='FREE',
+        asset_candidates=[
+            {
+                'source_type': 'official_press_key_art',
+                'width': 1800,
+                'height': 2700,
+                'kind': 'key_art',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'subject_focus': 'hero',
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    assert decision['card_type'] == 'giveaway_free'
+    assert decision['card_type_reason'] == 'card_type:giveaway_free:free_offer'
+
+
+def test_composite_deal_candidate_when_hero_plus_multiple_gameplay_assets() -> None:
+    decision = _build_decision(
+        game_title='Composite Candidate',
+        genre='racing action',
+        tags=['vehicle', 'racing', 'speed'],
+        short_description='A premium racing deal with hero art and multiple clean gameplay moments.',
+        offer_type='discount',
+        current_price='-75%',
+        old_price='999 UAH',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1600,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'vehicle_focus': 'foreground car',
+                    'action': 'drift battle',
+                    'scene_focus': 'racing duel',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'gameplay_focus': 'high speed chase',
+                    'vehicle_focus': 'race car',
+                    'combat_clarity': 'high',
+                },
+            },
+            {
+                'source_type': 'official_trailer_frame',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'trailer_frame',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'gameplay_focus': 'finish line sprint',
+                    'vehicle_focus': 'lead car',
+                    'scene_focus': 'race climax',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': 'smoke://composite/menu_shot.png',
+                'metadata': {
+                    'menu': 'pause menu',
+                    'ui': 'full screen',
+                },
+            },
+        ],
+    )
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert decision['card_type'] == 'composite_deal_candidate'
+    assert decision['card_type_reason'] == 'card_type:composite_deal_candidate:hero_plus_gameplay_assets'
+    assert decision['card_type_inputs']['discount_percent'] == 75
+    assert decision['card_type_inputs']['usable_secondary_visual_count'] >= 2
+    assert decision['card_type_inputs']['has_hero_like_asset'] is True
+    assert decision['card_type_inputs']['has_gameplay_like_asset'] is True
+
+
+def test_safe_fallback_when_insufficient_signals() -> None:
+    decision = _build_decision(
+        offer_type='discount',
+        asset_candidates=[
+            {
+                'source_type': 'ai_generated',
+                'width': 1280,
+                'height': 720,
+                'kind': 'generated_preview',
+                'path_or_url': 'ai://safe-fallback',
+                'metadata': {
+                    'prompt_intent': 'shot_focused_cinematic_grounded',
+                },
+            },
+        ],
+    )
+
+    assert decision['use_ai'] is True
+    assert decision['card_type'] == 'safe_fallback'
+    assert decision['card_type_reason'] == 'card_type:safe_fallback:insufficient_strategy_signals'

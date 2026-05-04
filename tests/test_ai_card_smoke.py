@@ -60,6 +60,17 @@ def test_ai_card_smoke_current_env_reports_ai_runtime(tmp_path: Path) -> None:
     assert 'artwork_metadata' in result['grounding_fields_used']
     assert 'title=AI Provider Smoke' in result['grounding_summary']
     assert 'no ui' in result['negative_prompt_summary']
+    assert result['cover_decision_card_strategy_version'] == 'v2_mvp'
+    assert result['cover_decision_card_type'] in {
+        'simple_hero',
+        'composite_deal_candidate',
+        'official_promo_candidate',
+        'giveaway_free',
+        'last_resort_official',
+        'safe_fallback',
+    }
+    assert result['cover_decision_card_type_reason'].startswith('card_type:')
+    assert result['cover_decision_decision_trace']['card_strategy']['card_type'] == result['cover_decision_card_type']
     assert result['fallback_used'] is False
     assert result['fallback_reason'] is None
     assert result['final_source'] == 'ai'

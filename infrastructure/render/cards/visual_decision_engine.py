@@ -570,6 +570,60 @@ FOCUS_ENRICHMENT_MAX_NEGATIVE_DELTA = 0.22
 VISUAL_ANCHOR_READABILITY_BOOST = 0.015
 VISUAL_ANCHOR_FOCUS_BOOST = 0.020
 
+CARD_STRATEGY_VERSION = 'v2_mvp'
+
+CARD_TYPE_SIMPLE_HERO = 'simple_hero'
+CARD_TYPE_COMPOSITE_DEAL_CANDIDATE = 'composite_deal_candidate'
+CARD_TYPE_OFFICIAL_PROMO_CANDIDATE = 'official_promo_candidate'
+CARD_TYPE_GIVEAWAY_FREE = 'giveaway_free'
+CARD_TYPE_LAST_RESORT_OFFICIAL = 'last_resort_official'
+CARD_TYPE_SAFE_FALLBACK = 'safe_fallback'
+
+CARD_TYPE_REASON_SIMPLE_HERO = 'card_type:simple_hero:strong_official_visual'
+CARD_TYPE_REASON_COMPOSITE_DEAL_CANDIDATE = 'card_type:composite_deal_candidate:hero_plus_gameplay_assets'
+CARD_TYPE_REASON_OFFICIAL_PROMO_CANDIDATE = 'card_type:official_promo_candidate:promo_or_event_asset'
+CARD_TYPE_REASON_GIVEAWAY_FREE = 'card_type:giveaway_free:free_offer'
+CARD_TYPE_REASON_LAST_RESORT_OFFICIAL = 'card_type:last_resort_official:capsule_or_header_selected'
+CARD_TYPE_REASON_SAFE_FALLBACK = 'card_type:safe_fallback:insufficient_strategy_signals'
+
+FREE_OFFER_KEYWORDS = (
+    'egs giveaway',
+    'free',
+    'freebie',
+    'giveaway',
+)
+FREE_WEEKEND_KEYWORDS = (
+    'free weekend',
+    'free_weekend',
+)
+PROMO_EVENT_KEYWORDS = (
+    'event',
+    'festival',
+    'free weekend',
+    'free_weekend',
+    'promo',
+    'promotion',
+)
+PROMO_ASSET_HINT_KEYWORDS = (
+    'banner',
+    'event',
+    'free weekend',
+    'free_weekend',
+    'promo',
+    'promotion',
+    'sale',
+)
+DISCOUNT_OFFER_KEYWORDS = (
+    'deal',
+    'discount',
+    'sale',
+)
+HERO_LIKE_ASSET_FAMILIES = frozenset({'steam_library_hero', 'press_key_art', 'epic_key_art'})
+GAMEPLAY_LIKE_ASSET_FAMILIES = frozenset({'steam_screenshot', 'trailer_frame'})
+STRONG_SINGLE_IMAGE_ASSET_FAMILIES = HERO_LIKE_ASSET_FAMILIES | GAMEPLAY_LIKE_ASSET_FAMILIES
+LAST_RESORT_OFFICIAL_ASSET_FAMILIES = frozenset({'steam_capsule', 'steam_header'})
+SECONDARY_GAMEPLAY_SOURCE_TYPES = frozenset({'official_trailer_frame', 'steam_screenshot'})
+
 
 def _clamp(value: float, minimum: float = 0.0, maximum: float = 1.0) -> float:
     return max(minimum, min(maximum, value))
@@ -593,6 +647,13 @@ def _safe_int(value: Any) -> int | None:
     except (TypeError, ValueError):
         return None
     return parsed if parsed > 0 else None
+
+
+def _safe_float(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _contains_any(text: str, keywords: Sequence[str]) -> bool:
@@ -831,6 +892,22 @@ class ScoredAsset:
 
 
 @dataclass(slots=True)
+class CardTypeDecision:
+    card_type: str
+    card_type_reason: str
+    card_strategy_version: str
+    card_type_inputs: dict[str, Any]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            'card_type': self.card_type,
+            'card_type_reason': self.card_type_reason,
+            'card_strategy_version': self.card_strategy_version,
+            'card_type_inputs': _json_ready(self.card_type_inputs),
+        }
+
+
+@dataclass(slots=True)
 class CoverDecision:
     genre_cluster: str
     visual_type: str
@@ -840,6 +917,10 @@ class CoverDecision:
     selected_asset: dict[str, Any] | None
     asset_scores: list[dict[str, Any]]
     rejected_assets: list[dict[str, Any]]
+    card_type: str
+    card_type_reason: str
+    card_strategy_version: str
+    card_type_inputs: dict[str, Any]
     decision_reason: str
     decision_trace: dict[str, Any]
 
@@ -853,6 +934,10 @@ class CoverDecision:
             'selected_asset': _json_ready(self.selected_asset),
             'asset_scores': _json_ready(self.asset_scores),
             'rejected_assets': _json_ready(self.rejected_assets),
+            'card_type': self.card_type,
+            'card_type_reason': self.card_type_reason,
+            'card_strategy_version': self.card_strategy_version,
+            'card_type_inputs': _json_ready(self.card_type_inputs),
             'decision_reason': self.decision_reason,
             'decision_trace': _json_ready(self.decision_trace),
         }
@@ -888,12 +973,16 @@ class VisualDecisionEngine:
         short_description: str | None,
         offer_type: str | None,
         asset_candidates: Sequence[Mapping[str, Any]] | None,
+        current_price: str | None = None,
+        old_price: str | None = None,
     ) -> CoverDecision:
         title_text = _safe_text(game_title)
         genre_text = _safe_text(genre)
         tag_values = [_safe_text(item) for item in tags or [] if _safe_text(item)]
         description_text = _safe_text(short_description)
         offer_type_text = _safe_text(offer_type)
+        current_price_text = _safe_text(current_price)
+        old_price_text = _safe_text(old_price)
         candidates = self._normalize_candidates(asset_candidates)
 
         combined_text = ' '.join(
@@ -1004,6 +1093,16 @@ class VisualDecisionEngine:
             genre_cluster=genre_cluster,
             selection_trace=selection_trace,
         )
+        card_type_decision = self._classify_card_type(
+            offer_type=offer_type_text,
+            current_price=current_price_text,
+            old_price=old_price_text,
+            tags=tag_values,
+            use_ai=use_ai,
+            selected_assets=selected_assets,
+            scored_assets=ordered_scores,
+            selected_indexes=selected_indexes,
+        )
         decision_reason = selection_reason if not use_ai else f'{selection_reason}:{ai_fallback_reason}'
         rejection_reasons = sorted(
             {
@@ -1022,6 +1121,8 @@ class VisualDecisionEngine:
                 'tags': list(tag_values),
                 'short_description': description_text,
                 'offer_type': offer_type_text,
+                'current_price': current_price_text or None,
+                'old_price': old_price_text or None,
             },
             'matched_rules': {
                 'genre_cluster': genre_trace,
@@ -1079,6 +1180,7 @@ class VisualDecisionEngine:
                 }
                 for item in ordered_scores
             ],
+            'card_strategy': card_type_decision.to_dict(),
         }
 
         return CoverDecision(
@@ -1090,6 +1192,10 @@ class VisualDecisionEngine:
             selected_asset=selected_asset,
             asset_scores=[item.to_dict() for item in ordered_scores],
             rejected_assets=rejected_assets,
+            card_type=card_type_decision.card_type,
+            card_type_reason=card_type_decision.card_type_reason,
+            card_strategy_version=card_type_decision.card_strategy_version,
+            card_type_inputs=card_type_decision.card_type_inputs,
             decision_reason=decision_reason,
             decision_trace=decision_trace,
         )
@@ -2937,6 +3043,218 @@ class VisualDecisionEngine:
             rejected_assets.append(payload)
         return rejected_assets
 
+    @classmethod
+    def _classify_card_type(
+        cls,
+        *,
+        offer_type: str,
+        current_price: str,
+        old_price: str,
+        tags: Sequence[str],
+        use_ai: bool,
+        selected_assets: Sequence[ScoredAsset],
+        scored_assets: Sequence[ScoredAsset],
+        selected_indexes: set[int],
+    ) -> CardTypeDecision:
+        primary = selected_assets[0] if selected_assets else None
+        selected_image_source_type = primary.candidate.source_type if primary is not None else None
+        selected_family = primary.normalized_asset_family if primary is not None else None
+        selected_quality_tier = primary.quality_tier if primary is not None else None
+        selected_is_accepted = bool(primary.accepted) if primary is not None else False
+        discount_percent = cls._discount_percent(
+            offer_type=offer_type,
+            current_price=current_price,
+            old_price=old_price,
+        )
+        has_hero_like_asset = any(
+            item.candidate.is_official
+            and item.accepted
+            and item.normalized_asset_family in HERO_LIKE_ASSET_FAMILIES
+            for item in scored_assets
+        )
+        has_gameplay_like_asset = any(cls._is_usable_gameplay_like_asset(item) for item in scored_assets)
+        is_last_resort_official = bool(
+            primary is not None
+            and not use_ai
+            and primary.candidate.is_official
+            and primary.accepted
+            and primary.normalized_asset_family in LAST_RESORT_OFFICIAL_ASSET_FAMILIES
+        )
+        usable_secondary_visual_count = sum(
+            1
+            for item in scored_assets
+            if item.candidate.index not in selected_indexes and cls._is_usable_secondary_gameplay_asset(item)
+        )
+        inputs = {
+            'offer_type': offer_type or None,
+            'discount_percent': discount_percent,
+            'selected_image_source_type': selected_image_source_type,
+            'usable_secondary_visual_count': usable_secondary_visual_count,
+            'has_hero_like_asset': has_hero_like_asset,
+            'has_gameplay_like_asset': has_gameplay_like_asset,
+            'is_last_resort_official': is_last_resort_official,
+        }
+
+        offer_signal_text = ' '.join(part for part in (offer_type, ' '.join(tags)) if part)
+        has_free_weekend_signal = _contains_any_keyword(offer_signal_text, FREE_WEEKEND_KEYWORDS)
+        has_free_offer_signal = (
+            not has_free_weekend_signal
+            and (
+                discount_percent == 100
+                or cls._looks_free_price(current_price)
+                or _contains_any_keyword(offer_signal_text, FREE_OFFER_KEYWORDS)
+            )
+        )
+        has_promo_signal = _contains_any_keyword(offer_signal_text, PROMO_EVENT_KEYWORDS) or any(
+            cls._is_promo_or_event_asset(item)
+            for item in scored_assets
+            if item.candidate.is_official
+        )
+        is_discount_offer = (
+            not has_free_offer_signal
+            and _contains_any_keyword(offer_signal_text, DISCOUNT_OFFER_KEYWORDS)
+        )
+        has_primary_official_visual = bool(
+            primary is not None
+            and not use_ai
+            and primary.candidate.is_official
+            and selected_is_accepted
+        )
+        has_strong_discount = discount_percent is not None and discount_percent >= 40
+        has_strong_official_visual = bool(
+            primary is not None
+            and not use_ai
+            and primary.candidate.is_official
+            and selected_is_accepted
+            and selected_quality_tier == 'good'
+            and selected_family in STRONG_SINGLE_IMAGE_ASSET_FAMILIES
+        )
+
+        if has_free_offer_signal:
+            return CardTypeDecision(
+                card_type=CARD_TYPE_GIVEAWAY_FREE,
+                card_type_reason=CARD_TYPE_REASON_GIVEAWAY_FREE,
+                card_strategy_version=CARD_STRATEGY_VERSION,
+                card_type_inputs=inputs,
+            )
+        if has_promo_signal:
+            return CardTypeDecision(
+                card_type=CARD_TYPE_OFFICIAL_PROMO_CANDIDATE,
+                card_type_reason=CARD_TYPE_REASON_OFFICIAL_PROMO_CANDIDATE,
+                card_strategy_version=CARD_STRATEGY_VERSION,
+                card_type_inputs=inputs,
+            )
+        if (
+            is_discount_offer
+            and has_strong_discount
+            and usable_secondary_visual_count >= 2
+            and (has_hero_like_asset or has_primary_official_visual)
+        ):
+            return CardTypeDecision(
+                card_type=CARD_TYPE_COMPOSITE_DEAL_CANDIDATE,
+                card_type_reason=CARD_TYPE_REASON_COMPOSITE_DEAL_CANDIDATE,
+                card_strategy_version=CARD_STRATEGY_VERSION,
+                card_type_inputs=inputs,
+            )
+        if has_strong_official_visual:
+            return CardTypeDecision(
+                card_type=CARD_TYPE_SIMPLE_HERO,
+                card_type_reason=CARD_TYPE_REASON_SIMPLE_HERO,
+                card_strategy_version=CARD_STRATEGY_VERSION,
+                card_type_inputs=inputs,
+            )
+        if is_last_resort_official:
+            return CardTypeDecision(
+                card_type=CARD_TYPE_LAST_RESORT_OFFICIAL,
+                card_type_reason=CARD_TYPE_REASON_LAST_RESORT_OFFICIAL,
+                card_strategy_version=CARD_STRATEGY_VERSION,
+                card_type_inputs=inputs,
+            )
+        return CardTypeDecision(
+            card_type=CARD_TYPE_SAFE_FALLBACK,
+            card_type_reason=CARD_TYPE_REASON_SAFE_FALLBACK,
+            card_strategy_version=CARD_STRATEGY_VERSION,
+            card_type_inputs=inputs,
+        )
+
+    @classmethod
+    def _is_usable_gameplay_like_asset(cls, item: ScoredAsset) -> bool:
+        return (
+            item.candidate.is_official
+            and item.accepted
+            and item.normalized_asset_family in GAMEPLAY_LIKE_ASSET_FAMILIES
+            and not cls._has_secondary_visual_rejection(item)
+        )
+
+    @classmethod
+    def _is_usable_secondary_gameplay_asset(cls, item: ScoredAsset) -> bool:
+        return (
+            cls._is_usable_gameplay_like_asset(item)
+            and item.candidate.source_type in SECONDARY_GAMEPLAY_SOURCE_TYPES
+        )
+
+    @staticmethod
+    def _has_secondary_visual_rejection(item: ScoredAsset) -> bool:
+        return any(
+            reason in {'menu_like_screenshot', 'ui_heavy_screenshot_for_single_title'}
+            for reason in item.rejection_reasons
+        )
+
+    @classmethod
+    def _is_promo_or_event_asset(cls, item: ScoredAsset) -> bool:
+        hint_text = ' '.join(
+            part
+            for part in (
+                item.candidate.source_type,
+                item.candidate.kind,
+                _metadata_signal_text(item.candidate.metadata),
+            )
+            if part
+        )
+        return _contains_any_keyword(hint_text, PROMO_ASSET_HINT_KEYWORDS)
+
+    @classmethod
+    def _discount_percent(
+        cls,
+        *,
+        offer_type: str,
+        current_price: str,
+        old_price: str,
+    ) -> int | None:
+        for value in (current_price, offer_type):
+            match = re.search(r'(\d{1,3})\s*%', value)
+            if match:
+                parsed = _safe_int(match.group(1))
+                if parsed is not None:
+                    return min(parsed, 100)
+        if cls._looks_free_price(current_price):
+            return 100
+
+        old_amount = cls._price_amount(old_price)
+        current_amount = cls._price_amount(current_price)
+        if old_amount is None or current_amount is None or old_amount <= 0.0 or current_amount > old_amount:
+            return None
+        percent = round(((old_amount - current_amount) / old_amount) * 100)
+        return max(0, min(percent, 100))
+
+    @staticmethod
+    def _looks_free_price(value: str) -> bool:
+        normalized = _normalize_text(value)
+        return bool(normalized) and _contains_any_keyword(normalized, ('free', '0'))
+
+    @staticmethod
+    def _price_amount(value: str) -> float | None:
+        normalized = _safe_text(value)
+        if not normalized or '%' in normalized:
+            return None
+        compact = normalized.replace(' ', '')
+        matches = re.findall(r'\d+(?:[.,]\d+)?', compact)
+        if not matches:
+            return None
+        raw_value = matches[0]
+        normalized_number = raw_value.replace(',', '.')
+        return _safe_float(normalized_number)
+
     def _synthetic_ai_asset(self, *, genre_cluster: str, visual_type: str) -> ScoredAsset:
         candidate = AssetCandidate(
             index=-1,
@@ -2996,6 +3314,8 @@ def build_cover_decision(
     short_description: str | None,
     offer_type: str | None,
     asset_candidates: Sequence[Mapping[str, Any]] | None,
+    current_price: str | None = None,
+    old_price: str | None = None,
 ) -> CoverDecision:
     return DEFAULT_VISUAL_DECISION_ENGINE.decide(
         game_title=game_title,
@@ -3003,6 +3323,8 @@ def build_cover_decision(
         tags=tags,
         short_description=short_description,
         offer_type=offer_type,
+        current_price=current_price,
+        old_price=old_price,
         asset_candidates=asset_candidates,
     )
 

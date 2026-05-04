@@ -1121,6 +1121,8 @@ def run_scenario(
             short_description=data.short_description,
             offer_type=offer_type,
             asset_candidates=asset_candidates,
+            current_price=data.current_price,
+            old_price=data.old_price,
         ).to_dict()
     )
     cover_decision_selected_asset = (
@@ -1214,6 +1216,14 @@ def run_scenario(
         else None
     )
     cover_decision_ai_fallback_reason = cover_decision_selected_strategy.get('ai_fallback_reason')
+    cover_decision_card_type = cover_decision_payload.get('card_type')
+    cover_decision_card_type_reason = cover_decision_payload.get('card_type_reason')
+    cover_decision_card_strategy_version = cover_decision_payload.get('card_strategy_version')
+    cover_decision_card_type_inputs = (
+        dict(cover_decision_payload.get('card_type_inputs'))
+        if isinstance(cover_decision_payload.get('card_type_inputs'), dict)
+        else {}
+    )
     data.cover_decision = dict(cover_decision_payload)
     request = build_image_request(engine, data)
     resolver_trace: dict[str, Any] | None = None
@@ -1600,6 +1610,10 @@ def run_scenario(
         'cover_decision_use_ai': bool(cover_decision_payload.get('use_ai', False)),
         'cover_decision_decision_reason': cover_decision_payload.get('decision_reason'),
         'cover_decision_decision_trace': cover_decision_decision_trace,
+        'cover_decision_card_type': cover_decision_card_type,
+        'cover_decision_card_type_reason': cover_decision_card_type_reason,
+        'cover_decision_card_strategy_version': cover_decision_card_strategy_version,
+        'cover_decision_card_type_inputs': cover_decision_card_type_inputs,
         'cover_decision_readability_score': cover_decision_readability_score,
         'cover_decision_focus_score': cover_decision_focus_score,
         'cover_decision_asset_metadata_enriched': cover_decision_asset_metadata_enriched,
@@ -1744,6 +1758,10 @@ def run_scenario(
     manifest['provider_metadata']['cover_decision_use_ai'] = bool(cover_decision_payload.get('use_ai', False))
     manifest['provider_metadata']['cover_decision_decision_reason'] = cover_decision_payload.get('decision_reason')
     manifest['provider_metadata']['cover_decision_decision_trace'] = cover_decision_decision_trace
+    manifest['provider_metadata']['cover_decision_card_type'] = cover_decision_card_type
+    manifest['provider_metadata']['cover_decision_card_type_reason'] = cover_decision_card_type_reason
+    manifest['provider_metadata']['cover_decision_card_strategy_version'] = cover_decision_card_strategy_version
+    manifest['provider_metadata']['cover_decision_card_type_inputs'] = cover_decision_card_type_inputs
     manifest['provider_metadata']['cover_decision_readability_score'] = cover_decision_readability_score
     manifest['provider_metadata']['cover_decision_focus_score'] = cover_decision_focus_score
     manifest['provider_metadata']['cover_decision_asset_metadata_enriched'] = cover_decision_asset_metadata_enriched
@@ -1858,6 +1876,13 @@ def print_run_result(result: dict[str, Any], *, run_index: int, total_runs: int,
     print(f"cover_decision.layout_type = {result.get('cover_decision_layout_type') or 'none'}")
     print(f"cover_decision.use_ai = {str(bool(result.get('cover_decision_use_ai', False))).lower()}")
     print(f"cover_decision.decision_reason = {result.get('cover_decision_decision_reason') or 'none'}")
+    print(f"cover_decision.card_type = {result.get('cover_decision_card_type') or 'none'}")
+    print(f"cover_decision.card_type_reason = {result.get('cover_decision_card_type_reason') or 'none'}")
+    print(f"cover_decision.card_strategy_version = {result.get('cover_decision_card_strategy_version') or 'none'}")
+    print(
+        "cover_decision.card_type_inputs = "
+        f"{json.dumps(result.get('cover_decision_card_type_inputs') or {}, ensure_ascii=False)}"
+    )
     print(
         "cover_decision.decision_trace = "
         f"{json.dumps(result.get('cover_decision_decision_trace') or {}, ensure_ascii=False)}"
