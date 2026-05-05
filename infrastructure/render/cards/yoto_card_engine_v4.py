@@ -188,6 +188,16 @@ class YotoTitleLayout:
 
 
 @dataclass(slots=True, frozen=True)
+class YotoPrimarySignalLayout:
+    text: str
+    font: ImageFont.FreeTypeFont | ImageFont.ImageFont
+    x: int
+    y: int
+    width: int
+    height: int
+
+
+@dataclass(slots=True, frozen=True)
 class YotoStickerTextLayout:
     lines: list[str]
     font: ImageFont.FreeTypeFont | ImageFont.ImageFont
@@ -568,7 +578,7 @@ class YotoCardEngineV4:
             'sticker_header': diagnostics.sticker_header,
             'sticker_text': diagnostics.sticker_text,
             'typography_system': 'role_based_segoe_v2',
-            'finish_system': 'premium_finish_v2',
+            'finish_system': 'clean_mvp_v1',
         }
         diagnostics.editorial_phrase = self._normalize_editorial_phrase(data.editorial_phrase)
         gameplay_selection = self._resolve_gameplay_selection(
@@ -638,53 +648,539 @@ class YotoCardEngineV4:
         diagnostics.hero_fallback_used = hero_selection.fallback_used
         diagnostics.hero_selection = hero_selection.to_snapshot()
 
-        canvas = Image.new('RGB', CARD_SIZE, DARK_BG)
-        background = self.apply_background_treatment(artwork, card_type)
-        canvas.paste(background, (0, 0))
-
-        hero = self._compose_hero_artwork(artwork)
-        top_zone_layout = self._top_zone_layout_profile(hero, data, diagnostics, card_type)
-        diagnostics.text_payload['top_zone_layout_mode'] = str(top_zone_layout.get('layout_mode') or 'default')
-        diagnostics.text_payload['top_zone_badge_anchor'] = str(top_zone_layout.get('badge_anchor') or 'top_right')
-        candidate_scores = top_zone_layout.get('candidate_scores')
-        if candidate_scores:
-            diagnostics.text_payload['top_zone_candidate_scores'] = dict(candidate_scores)
-        composition_profile = self._composition_profile(hero, data, diagnostics, card_type, top_zone_layout=top_zone_layout)
-        diagnostics.text_payload['composition_mode'] = str(composition_profile.get('mode') or 'default')
-        canvas.paste(hero, (0, 0))
-        canvas = self._apply_hero_depth(canvas, card_type)
-        canvas = self.draw_top_zone_scaffold(canvas, card_type, top_zone_layout=top_zone_layout, diagnostics=diagnostics)
-        canvas = self.draw_platform_badge(canvas, diagnostics.platform_badge_text, card_type, diagnostics=diagnostics, top_zone_layout=top_zone_layout)
-        canvas = self.draw_free_or_discount_badge(canvas, data, diagnostics, card_type, top_zone_layout=top_zone_layout)
-        panel_kicker_text = self._panel_kicker_text(data, diagnostics, card_type)
-        canvas = self.draw_lower_third_panel(canvas, card_type, panel_kicker_text, diagnostics=diagnostics, composition_profile=composition_profile)
-        canvas, has_gameplay_strip, gameplay_count = self.draw_gameplay_strip(canvas, data, card_type, diagnostics=diagnostics)
-        diagnostics.has_gameplay_strip = has_gameplay_strip
-        diagnostics.gameplay_count = gameplay_count
-        if gameplay_count and diagnostics.gameplay_selected_count == 0:
-            diagnostics.gameplay_selected_count = gameplay_count
-            diagnostics.gameplay_selection['selected_count'] = gameplay_count
-            if not diagnostics.gameplay_selection.get('selected_urls'):
-                diagnostics.gameplay_selection['selected_urls'] = [str(item) for item in (data.gameplay_images or [])[:gameplay_count]]
-        canvas, title_layout = self.draw_title(canvas, data, card_type, diagnostics=diagnostics, composition_profile=composition_profile)
+        canvas = self._compose_clean_background(artwork, used_placeholder=diagnostics.used_placeholder_artwork).convert('RGBA')
+        layout_profile = self._clean_layout_profile(data, diagnostics, card_type)
+        diagnostics.hero_rect = (0, 0, CARD_SIZE[0], CARD_SIZE[1])
+        diagnostics.lower_third_rect = (
+            0,
+            int(layout_profile['gradient_top']),
+            CARD_SIZE[0],
+            CARD_SIZE[1],
+        )
+        diagnostics.text_payload.update(
+            {
+                'composition_mode': str(layout_profile['mode']),
+                'title_shelf': 'suppressed',
+                'gradient_height': int(layout_profile['gradient_height']),
+                'legacy_chrome_removed': True,
+            }
+        )
+        canvas = self._apply_clean_bottom_gradient(canvas, layout_profile)
+        canvas = self._draw_clean_platform_label(canvas, data, diagnostics, card_type, layout_profile)
+        canvas, signal_layout = self._draw_clean_primary_signal(canvas, data, diagnostics, card_type, layout_profile)
+        canvas, title_layout = self._draw_clean_title(canvas, data, diagnostics, layout_profile, signal_layout)
         diagnostics.title_lines = title_layout.lines
         diagnostics.title_mode = title_layout.mode
-        composition_mode = str(composition_profile.get('mode') or '')
-        if card_type == YotoCardType.FREE_GAME and composition_mode.startswith('epic_free_system') and not data.current_price:
-            canvas, diagnostics.meta_alignment = self.draw_free_game_meta_row(canvas, data, title_layout, diagnostics=diagnostics, composition_profile=composition_profile)
-        elif card_type in {YotoCardType.FESTIVAL, YotoCardType.TOP_LIST} and composition_mode.startswith(('festival_system', 'top_list_system')) and not data.current_price:
-            canvas, diagnostics.meta_alignment = self.draw_editorial_meta_row(canvas, data, title_layout, card_type, diagnostics=diagnostics, composition_profile=composition_profile)
-        elif card_type == YotoCardType.DISCOUNT and composition_mode.startswith('discount_system'):
-            canvas, diagnostics.meta_alignment = self.draw_discount_meta_row(canvas, data, title_layout, diagnostics=diagnostics, composition_profile=composition_profile)
-        else:
-            canvas = self.draw_deadline_pill(canvas, data, title_layout, card_type, diagnostics=diagnostics)
-            canvas, diagnostics.meta_alignment = self.draw_price_information(canvas, data, title_layout, card_type, diagnostics=diagnostics)
-        canvas = self.draw_yoto_brand_lockup(canvas, data, card_type, diagnostics=diagnostics, composition_profile=composition_profile)
+        canvas, diagnostics.meta_alignment = self._draw_clean_meta_line(
+            canvas,
+            data,
+            diagnostics,
+            card_type,
+            layout_profile,
+            title_layout,
+            signal_layout.text,
+        )
+        canvas = self._draw_clean_brand_mark(canvas, card_type, diagnostics, layout_profile)
+        diagnostics.has_gameplay_strip = False
+        diagnostics.gameplay_count = 0
 
         path = self.output_dir / f'{OUTPUT_PREFIX}{slug}.png'
         canvas.convert('RGB').save(path, format='PNG', compress_level=1)
         diagnostics.output_path = path
         return YotoCardRenderResult(image_path=path, diagnostics=diagnostics)
+
+    def _compose_clean_background(self, artwork: Image.Image, *, used_placeholder: bool = False) -> Image.Image:
+        source = artwork.convert('RGB') if artwork.mode != 'RGB' else artwork
+        if used_placeholder:
+            background = self._smart_cover(
+                source,
+                CARD_SIZE,
+                zoom_levels=(0.78, 0.72, 0.66, 0.60),
+                candidate_rows=(0.58, 0.68, 0.78, 0.86),
+            )
+            background = Image.blend(background, Image.new('RGB', CARD_SIZE, '#090c11'), 0.22)
+            overlay = Image.new('RGBA', CARD_SIZE, (0, 0, 0, 0))
+            draw = ImageDraw.Draw(overlay)
+            draw.rectangle((0, 0, CARD_SIZE[0], 54), fill=(7, 9, 13, 220))
+            fade_height = int(CARD_SIZE[1] * 0.40)
+            for y in range(54, fade_height):
+                ratio = (y - 54) / max(fade_height - 54, 1)
+                alpha = int(208 * ((1.0 - ratio) ** 1.45))
+                draw.line((0, y, CARD_SIZE[0], y), fill=(7, 9, 13, alpha))
+            return Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
+        return self._smart_cover(
+            source,
+            CARD_SIZE,
+            zoom_levels=(1.0, 0.94, 0.88, 0.82),
+            candidate_rows=(0.22, 0.36, 0.50, 0.64, 0.78),
+        )
+
+    def _clean_layout_profile(
+        self,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+    ) -> dict[str, Any]:
+        used_placeholder = diagnostics.used_placeholder_artwork
+        primary_signal = self._clean_primary_signal_text(data, diagnostics, card_type)
+        primary_len = len(primary_signal)
+        gradient_height = 320 if card_type == YotoCardType.DISCOUNT else 304
+        if used_placeholder:
+            gradient_height += 16
+        signal_sizes: tuple[int, ...]
+        if card_type == YotoCardType.DISCOUNT:
+            signal_sizes = (146, 138, 130, 122, 114, 108) if primary_len <= 5 else (136, 128, 120, 114, 108, 102)
+        elif card_type == YotoCardType.FREE_GAME:
+            signal_sizes = (124, 116, 108, 100, 92, 84)
+        else:
+            signal_sizes = (118, 110, 102, 94, 86)
+        return {
+            'mode': f"clean_mvp_{card_type.value.lower()}_{'placeholder' if used_placeholder else 'hero'}",
+            'content_left': 60,
+            'content_right': CARD_SIZE[0] - 60,
+            'gradient_height': gradient_height,
+            'gradient_top': CARD_SIZE[1] - gradient_height,
+            'signal_top_offset': 22 if card_type == YotoCardType.DISCOUNT else 28,
+            'signal_font_sizes': signal_sizes,
+            'signal_max_width': 760 if card_type == YotoCardType.DISCOUNT else 920,
+            'signal_fill': '#ffca3a' if card_type == YotoCardType.DISCOUNT else self._palette(card_type).accent,
+            'signal_stroke_fill': '#53240a' if card_type == YotoCardType.DISCOUNT else '#061018',
+            'signal_stroke_width': 2 if card_type == YotoCardType.DISCOUNT else 1,
+            'signal_shadow_layers': ((4, 5, 108), (2, 3, 54)),
+            'title_gap': 4,
+            'title_max_width': 1020,
+            'title_single_sizes': (82, 78, 74, 70, 64, 60, 56),
+            'title_multi_sizes': (62, 58, 54, 50, 48, 46),
+            'title_line_gap': 4,
+            'title_bottom_padding': 56,
+            'meta_font_sizes': (28, 26, 24, 22, 20),
+            'meta_gap': 16,
+            'meta_max_width': 980,
+            'meta_bottom': 682,
+            'meta_fill': (255, 255, 255, 194),
+            'brand_font_size': 24,
+            'brand_right': 42,
+            'brand_bottom': 676,
+            'platform_label_font_size': 26,
+            'platform_label_max_width': 340,
+            'platform_label_x': 60,
+            'platform_label_y': 42,
+        }
+
+    def _apply_clean_bottom_gradient(
+        self,
+        canvas: Image.Image,
+        layout_profile: Mapping[str, Any],
+    ) -> Image.Image:
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        top = int(layout_profile['gradient_top'])
+        for y in range(top, CARD_SIZE[1]):
+            ratio = (y - top) / max(CARD_SIZE[1] - top - 1, 1)
+            eased = ratio ** 1.45
+            alpha = int(8 + 212 * eased)
+            draw.line((0, y, CARD_SIZE[0], y), fill=(5, 8, 12, max(0, min(alpha, 228))))
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay)
+
+    def _draw_clean_platform_label(
+        self,
+        canvas: Image.Image,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+        layout_profile: Mapping[str, Any],
+    ) -> Image.Image:
+        if not data.platform_badge:
+            diagnostics.text_payload['platform_badge_rendered'] = False
+            return canvas
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        text = self._normalize_display_text(data.platform_badge)
+        default_text = self._default_platform_badge_text(str(data.platform or ''), card_type)
+        if not text or text == default_text:
+            diagnostics.text_payload['platform_badge_rendered'] = False
+            return canvas
+        role = self._typography_role('platform_badge')
+        font = self._load_font_for_text(
+            int(layout_profile['platform_label_font_size']),
+            role.candidates,
+            text,
+            diagnostics=diagnostics,
+            layer='platform_badge',
+        )
+        display_text = self._role_text(text, 'platform_badge')
+        max_width = int(layout_profile['platform_label_max_width'])
+        letter_spacing = self._letter_spacing_px(font, role.tracking_em)
+        if self._textlength(draw, display_text, font, letter_spacing=letter_spacing) > max_width:
+            display_text = self._ellipsize(draw, display_text, font, max_width, letter_spacing=letter_spacing)
+        self._draw_role_text(
+            draw,
+            (int(layout_profile['platform_label_x']), int(layout_profile['platform_label_y'])),
+            display_text,
+            font,
+            (255, 255, 255, 188),
+            role='platform_badge',
+            shadow_layers=((1, 2, 28),),
+            stroke_width=0,
+        )
+        diagnostics.platform_badge_text = display_text
+        diagnostics.text_payload['platform_badge'] = display_text
+        diagnostics.text_payload['platform_badge_rendered'] = True
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay)
+
+    def _default_platform_badge_text(self, platform: str, card_type: YotoCardType) -> str:
+        normalized_platform = self._normalize_display_text(str(platform or '').upper().strip())
+        if card_type == YotoCardType.FREE_GAME:
+            return f'{normalized_platform} {GIVEAWAY_LABEL}'.strip() if normalized_platform else GIVEAWAY_LABEL
+        if card_type == YotoCardType.DISCOUNT:
+            return f'{normalized_platform} {SALE_LABEL}'.strip() if normalized_platform else SALE_LABEL
+        if card_type == YotoCardType.FESTIVAL:
+            return f'{EVENT_LABEL} {normalized_platform}'.strip() if normalized_platform else EVENT_LABEL
+        return f'{normalized_platform} {UA_TOP}'.strip() if normalized_platform else UA_TOP
+
+    def _clean_primary_signal_text(
+        self,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+    ) -> str:
+        if card_type == YotoCardType.DISCOUNT and data.current_price:
+            return self._normalize_display_text(data.current_price)
+        if data.current_price and card_type != YotoCardType.DISCOUNT:
+            return self._normalize_display_text(data.current_price)
+        if diagnostics.sticker_text:
+            return self._normalize_display_text(diagnostics.sticker_text)
+        if card_type == YotoCardType.FREE_GAME:
+            return UA_FREE
+        if card_type == YotoCardType.DISCOUNT:
+            return UA_DISCOUNT
+        if card_type == YotoCardType.FESTIVAL:
+            return UA_EVENT
+        return UA_TOP
+
+    def _draw_clean_primary_signal(
+        self,
+        canvas: Image.Image,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+        layout_profile: Mapping[str, Any],
+    ) -> tuple[Image.Image, YotoPrimarySignalLayout]:
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        text = self._clean_primary_signal_text(data, diagnostics, card_type)
+        role = self._typography_role('badge_main')
+        layout = self._fit_text_block(
+            draw,
+            text,
+            candidates=role.candidates,
+            font_sizes=tuple(int(size) for size in layout_profile['signal_font_sizes']),
+            max_width=int(layout_profile['signal_max_width']),
+            max_lines=1,
+            prefer_multiline=False,
+            diagnostics=diagnostics,
+            layer='primary_signal',
+            tracking_em=role.tracking_em,
+        )
+        display_text = self._role_text(layout.lines[0], 'badge_main')
+        letter_spacing = self._letter_spacing_px(layout.font, role.tracking_em)
+        width = int(self._textlength(draw, display_text, layout.font, letter_spacing=letter_spacing))
+        bbox = draw.textbbox((0, 0), 'Ag', font=layout.font)
+        height = max(1, bbox[3] - bbox[1])
+        x = int(layout_profile['content_left'])
+        y = int(layout_profile['gradient_top']) + int(layout_profile['signal_top_offset'])
+        self._draw_role_text(
+            draw,
+            (x, y),
+            display_text,
+            layout.font,
+            str(layout_profile['signal_fill']),
+            role='badge_main',
+            shadow_layers=tuple(layout_profile['signal_shadow_layers']),
+            stroke_width=int(layout_profile['signal_stroke_width']),
+            stroke_fill=str(layout_profile['signal_stroke_fill']),
+        )
+        diagnostics.text_payload['primary_signal'] = display_text
+        diagnostics.text_payload['primary_signal_font_size'] = int(getattr(layout.font, 'size', 0) or height)
+        diagnostics.text_payload['primary_signal_bounds'] = (x, y, x + width, y + height)
+        if card_type == YotoCardType.DISCOUNT:
+            diagnostics.text_payload['meta_current_signal'] = display_text
+        signal_layout = YotoPrimarySignalLayout(
+            text=display_text,
+            font=layout.font,
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+        )
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay), signal_layout
+
+    def _resolve_clean_title_layout(
+        self,
+        draw: ImageDraw.ImageDraw,
+        title: str,
+        signal_layout: YotoPrimarySignalLayout,
+        diagnostics: YotoCardDiagnostics | None,
+        layout_profile: Mapping[str, Any],
+        *,
+        reserve_meta: bool,
+    ) -> YotoTitleLayout:
+        role = self._typography_role('title')
+        normalized_title = self._normalize_display_text(title)
+        x = int(layout_profile['content_left'])
+        y = signal_layout.y + signal_layout.height + int(layout_profile['title_gap'])
+        max_width = int(layout_profile['title_max_width'])
+        meta_reserve = 42 if reserve_meta else 0
+        max_height = max(48, int(layout_profile['meta_bottom']) - y - meta_reserve)
+        line_gap = int(layout_profile['title_line_gap'])
+
+        for size in tuple(int(value) for value in layout_profile['title_single_sizes']):
+            font = self._load_font_for_text(size, role.candidates, normalized_title, diagnostics=diagnostics, layer='title')
+            display_text = self._role_text(normalized_title, 'title')
+            width = self._textlength(draw, display_text, font, letter_spacing=self._letter_spacing_px(font, role.tracking_em))
+            bbox = draw.textbbox((0, 0), 'Ag', font=font)
+            line_height = max(1, bbox[3] - bbox[1])
+            if width <= max_width and line_height <= max_height:
+                return YotoTitleLayout(
+                    lines=[normalized_title],
+                    font=font,
+                    x=x,
+                    y=y,
+                    line_height=line_height,
+                    meta_y=y + line_height + int(layout_profile['meta_gap']),
+                    mode='single_line',
+                )
+
+        chosen_lines = [normalized_title]
+        chosen_font = self._load_font_for_text(46, role.candidates, normalized_title, diagnostics=diagnostics, layer='title')
+        chosen_height = max(1, draw.textbbox((0, 0), 'Ag', font=chosen_font)[3] - draw.textbbox((0, 0), 'Ag', font=chosen_font)[1])
+        for size in tuple(int(value) for value in layout_profile['title_multi_sizes']):
+            font = self._load_font_for_text(size, role.candidates, normalized_title, diagnostics=diagnostics, layer='title')
+            lines, clipped = self._wrap_text(draw, normalized_title, font, max_width=max_width, max_lines=2, tracking_em=role.tracking_em)
+            if not lines:
+                lines = [normalized_title]
+            bbox = draw.textbbox((0, 0), 'Ag', font=font)
+            line_height = max(1, bbox[3] - bbox[1])
+            total_height = len(lines) * line_height + max(0, len(lines) - 1) * line_gap
+            chosen_lines = lines
+            chosen_font = font
+            chosen_height = line_height
+            if not clipped and total_height <= max_height:
+                return YotoTitleLayout(
+                    lines=lines,
+                    font=font,
+                    x=x,
+                    y=y,
+                    line_height=line_height,
+                    meta_y=y + total_height + int(layout_profile['meta_gap']),
+                    mode='two_line' if len(lines) > 1 else 'single_line',
+                )
+
+        fitted_lines, _ = self._wrap_text(draw, normalized_title, chosen_font, max_width=max_width, max_lines=2, tracking_em=role.tracking_em)
+        if not fitted_lines:
+            fitted_lines = [normalized_title]
+        total_height = len(fitted_lines) * chosen_height + max(0, len(fitted_lines) - 1) * line_gap
+        return YotoTitleLayout(
+            lines=fitted_lines[:2],
+            font=chosen_font,
+            x=x,
+            y=y,
+            line_height=chosen_height,
+            meta_y=y + total_height + int(layout_profile['meta_gap']),
+            mode='two_line' if len(fitted_lines) > 1 else 'single_line',
+        )
+
+    def _draw_clean_title(
+        self,
+        canvas: Image.Image,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        layout_profile: Mapping[str, Any],
+        signal_layout: YotoPrimarySignalLayout,
+    ) -> tuple[Image.Image, YotoTitleLayout]:
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        reserve_meta = bool(self._clean_meta_parts(data, diagnostics, data.normalized_type(), signal_layout.text))
+        layout = self._resolve_clean_title_layout(draw, data.title, signal_layout, diagnostics, layout_profile, reserve_meta=reserve_meta)
+        title_role = self._typography_role('title')
+        widths: list[int] = []
+        line_gap = int(layout_profile['title_line_gap'])
+        for index, line in enumerate(layout.lines):
+            y = layout.y + index * (layout.line_height + line_gap)
+            display_text = self._draw_role_text(
+                draw,
+                (layout.x, y),
+                line,
+                layout.font,
+                WHITE,
+                role='title',
+                shadow_layers=((4, 5, 122), (2, 3, 68)),
+                stroke_width=1,
+                stroke_fill='#04070b',
+            )
+            widths.append(
+                int(
+                    self._textlength(
+                        draw,
+                        display_text,
+                        layout.font,
+                        letter_spacing=self._letter_spacing_px(layout.font, title_role.tracking_em),
+                    )
+                )
+            )
+        total_height = len(layout.lines) * layout.line_height + max(0, len(layout.lines) - 1) * line_gap
+        diagnostics.text_payload['title_font_size'] = int(getattr(layout.font, 'size', 0) or layout.line_height)
+        diagnostics.text_payload['title_bounds'] = (
+            layout.x,
+            layout.y,
+            layout.x + (max(widths) if widths else 0),
+            layout.y + total_height,
+        )
+        diagnostics.text_payload['title_max_width'] = int(layout_profile['title_max_width'])
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay), layout
+
+    def _clean_meta_parts(
+        self,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+        primary_signal: str,
+    ) -> list[str]:
+        parts: list[str] = []
+
+        def add(value: str | None) -> None:
+            normalized = self._normalize_display_text(value or '')
+            if not normalized:
+                return
+            if normalized.casefold() == primary_signal.casefold():
+                return
+            if normalized not in parts:
+                parts.append(normalized)
+
+        add(data.deadline)
+        if card_type == YotoCardType.DISCOUNT:
+            if data.current_price and '%' not in data.current_price:
+                add(data.current_price)
+            else:
+                add(data.old_price)
+        else:
+            add(data.current_price)
+            add(data.old_price)
+        if not parts:
+            add(data.platform_badge)
+        if not parts and diagnostics.editorial_phrase:
+            add(diagnostics.editorial_phrase)
+        return parts[:2]
+
+    def _resolve_clean_meta_text(
+        self,
+        draw: ImageDraw.ImageDraw,
+        parts: list[str],
+        diagnostics: YotoCardDiagnostics | None,
+        layout_profile: Mapping[str, Any],
+    ) -> tuple[str | None, ImageFont.FreeTypeFont | ImageFont.ImageFont | None]:
+        if not parts:
+            return None, None
+        role = self._typography_role('meta_secondary')
+        candidates = role.candidates
+        attempts = [' · '.join(parts), parts[0]]
+        if len(parts) > 1:
+            attempts.append(parts[1])
+        for text in attempts:
+            for size in tuple(int(value) for value in layout_profile['meta_font_sizes']):
+                font = self._load_font_for_text(size, candidates, text, diagnostics=diagnostics, layer='meta_secondary')
+                width = self._textlength(draw, text, font, letter_spacing=self._letter_spacing_px(font, role.tracking_em))
+                if width <= int(layout_profile['meta_max_width']):
+                    return text, font
+        fallback_text = attempts[0]
+        fallback_font = self._load_font_for_text(
+            int(tuple(layout_profile['meta_font_sizes'])[-1]),
+            candidates,
+            fallback_text,
+            diagnostics=diagnostics,
+            layer='meta_secondary',
+        )
+        fallback_text = self._ellipsize(
+            draw,
+            fallback_text,
+            fallback_font,
+            int(layout_profile['meta_max_width']),
+            letter_spacing=self._letter_spacing_px(fallback_font, role.tracking_em),
+        )
+        return fallback_text, fallback_font
+
+    def _draw_clean_meta_line(
+        self,
+        canvas: Image.Image,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        card_type: YotoCardType,
+        layout_profile: Mapping[str, Any],
+        title_layout: YotoTitleLayout,
+        primary_signal: str,
+    ) -> tuple[Image.Image, str]:
+        parts = self._clean_meta_parts(data, diagnostics, card_type, primary_signal)
+        if not parts or title_layout.meta_y > int(layout_profile['meta_bottom']):
+            diagnostics.text_payload['meta_parts'] = parts
+            return canvas, 'hidden'
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        meta_text, font = self._resolve_clean_meta_text(draw, parts, diagnostics, layout_profile)
+        if not meta_text or font is None:
+            diagnostics.text_payload['meta_parts'] = parts
+            return canvas, 'hidden'
+        self._draw_role_text(
+            draw,
+            (int(layout_profile['content_left']), title_layout.meta_y),
+            meta_text,
+            font,
+            tuple(int(value) for value in layout_profile['meta_fill']),
+            role='meta_secondary',
+            shadow_layers=((1, 2, 26),),
+            stroke_width=0,
+        )
+        diagnostics.text_payload['meta_parts'] = parts
+        diagnostics.text_payload['meta_line'] = meta_text
+        if data.deadline:
+            diagnostics.text_payload['meta_deadline'] = self._normalize_display_text(data.deadline)
+        if data.old_price:
+            diagnostics.text_payload['meta_old_price'] = self._normalize_display_text(data.old_price)
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay), 'secondary_line'
+
+    def _draw_clean_brand_mark(
+        self,
+        canvas: Image.Image,
+        card_type: YotoCardType,
+        diagnostics: YotoCardDiagnostics,
+        layout_profile: Mapping[str, Any],
+    ) -> Image.Image:
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        role = self._typography_role('brand_wordmark')
+        font = self._load_font_for_text(
+            int(layout_profile['brand_font_size']),
+            role.candidates,
+            'YOTO',
+            diagnostics=diagnostics,
+            layer='brand_wordmark',
+        )
+        text = 'YOTO'
+        width = int(self._textlength(draw, text, font, letter_spacing=self._letter_spacing_px(font, role.tracking_em)))
+        x = CARD_SIZE[0] - int(layout_profile['brand_right']) - width
+        y = int(layout_profile['brand_bottom']) - max(1, draw.textbbox((0, 0), 'Ag', font=font)[3] - draw.textbbox((0, 0), 'Ag', font=font)[1])
+        self._draw_role_text(
+            draw,
+            (x, y),
+            text,
+            font,
+            (255, 255, 255, 164),
+            role='brand_wordmark',
+            shadow_layers=((1, 2, 18),),
+            stroke_width=0,
+        )
+        diagnostics.text_payload['brand_micro'] = 'YOTO'
+        diagnostics.text_payload['brand_bounds'] = (x, y, x + width, int(layout_profile['brand_bottom']))
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay)
 
     def _normalize_card_text_payload(self, data: YotoCardData) -> None:
         for field_name in ('platform_badge', 'sticker_header', 'sticker_text', 'brand_micro_label', 'list_label'):
