@@ -995,6 +995,51 @@ def _download_summary_for_candidates(
     ), errors
 
 
+def ensure_selected_remote_asset_cached(
+    selected_asset: Mapping[str, Any] | None,
+    *,
+    asset_downloader: Callable[..., AssetCacheDownloadResult] | None = None,
+) -> tuple[dict[str, Any] | None, AssetCacheDownloadResult | None]:
+    if not isinstance(selected_asset, Mapping):
+        return None, None
+
+    payload = {
+        str(key): _json_ready(value)
+        for key, value in selected_asset.items()
+    }
+    remote_url = _candidate_remote_url(payload)
+    cache_path = _candidate_cache_path(payload)
+    if not remote_url or not cache_path:
+        return payload, None
+
+    normalized_cache_path, local_cache_status = _evaluate_local_cache(cache_path)
+    if local_cache_status == 'cached':
+        cache_result = AssetCacheDownloadResult(
+            cache_path=normalized_cache_path or cache_path,
+            cache_status='cached',
+            download_attempted=False,
+        )
+        return _apply_download_result_to_candidate(payload, result=cache_result), cache_result
+
+    downloader = asset_downloader or download_remote_asset
+    try:
+        cache_result = downloader(
+            remote_url=remote_url,
+            cache_path=cache_path,
+            timeout_seconds=ASSET_DOWNLOAD_TIMEOUT_SECONDS,
+            max_bytes=ASSET_DOWNLOAD_MAX_BYTES,
+        )
+    except Exception as exc:
+        cache_result = AssetCacheDownloadResult(
+            cache_path=cache_path,
+            cache_status='failed',
+            download_attempted=True,
+            error=f'downloader_exception:{exc.__class__.__name__}',
+        )
+
+    return _apply_download_result_to_candidate(payload, result=cache_result), cache_result
+
+
 @dataclass(slots=True, frozen=True)
 class OfficialAssetSourceResult:
     asset_candidates: list[dict[str, Any]]
@@ -1260,5 +1305,6 @@ __all__ = [
     'OfficialAssetSourceResult',
     'SOURCE_PRIORITY_MAP',
     'SOURCE_PRIORITY_ORDER',
+    'ensure_selected_remote_asset_cached',
     'resolve_official_asset_candidates',
 ]

@@ -16,7 +16,10 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from dealbot.settings import load_rendering_config
-from infrastructure.render.cards.asset_sources.official_asset_source import resolve_official_asset_candidates
+from infrastructure.render.cards.asset_sources.official_asset_source import (
+    ensure_selected_remote_asset_cached,
+    resolve_official_asset_candidates,
+)
 from infrastructure.render.cards.image_providers import ComfyUIImageProvider, ImageResolutionRequest, ResolvedImage
 from infrastructure.render.cards.visual_decision_engine import build_cover_decision, build_visual_rescue_decision
 from infrastructure.render.cards.yoto_card_engine_v4 import CARD_SIZE, YotoCardData, YotoCardEngineV4, YotoCardType
@@ -30,6 +33,12 @@ VALID_GAME_SETS = (DEFAULT_GAME_SET, 'minimal', 'expanded')
 DEFAULT_EVAL_GAME_SET = 'minimal'
 DEFAULT_SEEDS_PER_GAME = 1
 BROKEN_COMFYUI_URL = 'http://127.0.0.1:9/broken-timeout'
+ASSET_POOL_DIAGNOSTIC_VERSION = 'asset_pool_diagnostics_v1'
+SUSPICIOUS_FIXTURE_MARKERS = (
+    'smoke_test',
+    'fallback_game_image',
+    'local_smoke_fixture',
+)
 SMOKE_LOCAL_LANDSCAPE_ASSET = str((REPO_ROOT / 'video_generator' / 'smoke_test' / 'assets' / 'game.png').resolve())
 SMOKE_LOCAL_PORTRAIT_ASSET = str((REPO_ROOT / 'video_generator' / 'assets' / 'fallback_game_image.png').resolve())
 
@@ -95,6 +104,42 @@ def make_local_eval_game(
             ),
         },
     }
+
+
+EXPANDED_REAL_ASSET_STEAM_APP_IDS = {
+    'hades_ii': '1145350',
+    'civilization_vi': '289070',
+    'dave_the_diver': '1868140',
+    'forza_horizon_5': '1551360',
+    'pacific_drive': '1458140',
+    'ghost_of_tsushima': '2215430',
+    'star_wars_outlaws': '2842040',
+    'subnautica': '264710',
+    'no_mans_sky': '275850',
+    'dead_space': '1693980',
+}
+
+
+def make_real_asset_eval_game(
+    base_game: dict[str, Any],
+    *,
+    steam_app_id: str | None = None,
+) -> dict[str, Any]:
+    promoted = dict(base_game)
+    slug = str(promoted.get('slug') or '').strip()
+    resolved_steam_app_id = (
+        str(steam_app_id or '').strip()
+        or str(promoted.get('steam_app_id') or '').strip()
+        or EXPANDED_REAL_ASSET_STEAM_APP_IDS.get(slug)
+        or None
+    )
+    if resolved_steam_app_id is not None:
+        promoted['steam_app_id'] = resolved_steam_app_id
+    promoted['source_hint'] = str(promoted.get('source_hint') or 'steam').strip() or 'steam'
+    # Expanded eval should exercise official sourcing, not inject local smoke fixtures.
+    promoted['local_assets'] = {}
+    promoted['real_asset_eval_expected'] = bool(resolved_steam_app_id)
+    return promoted
 
 
 DEFAULT_SMOKE_GAME = {
@@ -583,8 +628,11 @@ GAME_EVAL_MINIMAL_SMOKE_GAMES = MINIMAL_SMOKE_GAMES[:4] + (
     },
 )
 
-GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
-    make_local_eval_game(
+GAME_EVAL_EXPANDED_SMOKE_GAMES = tuple(
+    make_real_asset_eval_game(dict(game_input))
+    for game_input in GAME_EVAL_MINIMAL_SMOKE_GAMES
+) + (
+    make_real_asset_eval_game(make_local_eval_game(
         slug='ghost_of_tsushima',
         title='Ghost of Tsushima',
         old_price='1499 UAH',
@@ -605,8 +653,8 @@ GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
             'readable_subject': 'samurai and enemy clash',
             'scene_focus': 'open-field duel',
         },
-    ),
-    make_local_eval_game(
+    )),
+    make_real_asset_eval_game(make_local_eval_game(
         slug='star_wars_outlaws',
         title='Star Wars Outlaws',
         old_price='1799 UAH',
@@ -627,8 +675,8 @@ GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
             'readable_subject': 'outlaw in motion',
             'scene_focus': 'frontier action beat',
         },
-    ),
-    make_local_eval_game(
+    )),
+    make_real_asset_eval_game(make_local_eval_game(
         slug='subnautica',
         title='Subnautica',
         old_price='799 UAH',
@@ -649,8 +697,8 @@ GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
             'readable_subject': 'diver and reef path',
             'scene_focus': 'submersible survival route',
         },
-    ),
-    make_local_eval_game(
+    )),
+    make_real_asset_eval_game(make_local_eval_game(
         slug='no_mans_sky',
         title="No Man's Sky",
         old_price='999 UAH',
@@ -671,8 +719,8 @@ GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
             'readable_subject': 'explorer and starship',
             'scene_focus': 'alien-world traversal',
         },
-    ),
-    make_local_eval_game(
+    )),
+    make_real_asset_eval_game(make_local_eval_game(
         slug='dead_space',
         title='Dead Space',
         old_price='1399 UAH',
@@ -693,7 +741,7 @@ GAME_EVAL_EXPANDED_SMOKE_GAMES = GAME_EVAL_MINIMAL_SMOKE_GAMES + (
             'readable_subject': 'engineer facing danger',
             'scene_focus': 'survival horror confrontation',
         },
-    ),
+    )),
 )
 
 
@@ -976,6 +1024,548 @@ def selected_asset_remote_cache_fields(selected_asset: dict[str, Any] | None) ->
     return remote_url, cache_path, cache_status
 
 
+def is_ready_cache_status(value: Any) -> bool:
+    return str(value or '').strip().lower() in {'cached', 'downloaded'}
+
+
+def asset_identity_values(payload: dict[str, Any] | None) -> set[str]:
+    if not isinstance(payload, dict):
+        return set()
+    metadata = dict(payload.get('metadata')) if isinstance(payload.get('metadata'), dict) else {}
+    values = {
+        str(payload.get('path_or_url') or '').strip(),
+        str(payload.get('remote_url') or metadata.get('remote_url') or '').strip(),
+        str(payload.get('cache_path') or metadata.get('cache_path') or '').strip(),
+    }
+    return {value for value in values if value}
+
+
+def asset_identity_matches(left: dict[str, Any] | None, right: dict[str, Any] | None) -> bool:
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    left_source_type = str(left.get('source_type') or '').strip().lower()
+    right_source_type = str(right.get('source_type') or '').strip().lower()
+    if left_source_type and right_source_type and left_source_type != right_source_type:
+        return False
+    return bool(asset_identity_values(left) & asset_identity_values(right))
+
+
+def merge_asset_cache_update(
+    existing_payload: dict[str, Any],
+    updated_payload: dict[str, Any],
+) -> dict[str, Any]:
+    merged = dict(existing_payload)
+    merged_metadata = dict(merged.get('metadata')) if isinstance(merged.get('metadata'), dict) else {}
+    updated_metadata = dict(updated_payload.get('metadata')) if isinstance(updated_payload.get('metadata'), dict) else {}
+    merged_metadata.update(updated_metadata)
+    merged['metadata'] = merged_metadata
+
+    for field_name in (
+        'path_or_url',
+        'remote_url',
+        'cache_path',
+        'cache_status',
+        'asset_download_attempted',
+        'asset_download_error',
+    ):
+        if field_name in updated_payload:
+            merged[field_name] = updated_payload.get(field_name)
+    return merged
+
+
+def update_asset_sequence_cache_fields(
+    values: list[dict[str, Any]],
+    *,
+    original_selected_asset: dict[str, Any],
+    updated_selected_asset: dict[str, Any],
+) -> list[dict[str, Any]]:
+    updated_values: list[dict[str, Any]] = []
+    replaced = False
+    for payload in values:
+        item = dict(payload)
+        if not replaced and asset_identity_matches(item, original_selected_asset):
+            updated_values.append(merge_asset_cache_update(item, updated_selected_asset))
+            replaced = True
+            continue
+        updated_values.append(item)
+    return updated_values
+
+
+def update_selection_ranking_cache_fields(
+    selection_ranking: list[dict[str, Any]],
+    *,
+    original_selected_asset: dict[str, Any],
+    updated_selected_asset: dict[str, Any],
+) -> list[dict[str, Any]]:
+    updated_values: list[dict[str, Any]] = []
+    replaced = False
+    for payload in selection_ranking:
+        item = dict(payload)
+        candidate_shape = {
+            'source_type': item.get('source_type'),
+            'path_or_url': item.get('path_or_url'),
+            'remote_url': item.get('remote_url'),
+            'cache_path': item.get('cache_path'),
+        }
+        if not replaced and asset_identity_matches(candidate_shape, original_selected_asset):
+            merged = merge_asset_cache_update(item, updated_selected_asset)
+            updated_values.append(merged)
+            replaced = True
+            continue
+        updated_values.append(item)
+    return updated_values
+
+
+def cache_selected_remote_asset_for_bridge(
+    *,
+    asset_candidates: list[dict[str, Any]],
+    cover_decision_payload: dict[str, Any],
+    asset_downloader: Any | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any], dict[str, Any] | None]:
+    original_selected_asset = (
+        dict(cover_decision_payload.get('selected_asset'))
+        if isinstance(cover_decision_payload.get('selected_asset'), dict)
+        else None
+    )
+    updated_selected_asset, cache_result = ensure_selected_remote_asset_cached(
+        original_selected_asset,
+        asset_downloader=asset_downloader,
+    )
+    if original_selected_asset is None or updated_selected_asset is None or cache_result is None:
+        return asset_candidates, cover_decision_payload, None
+
+    updated_candidates = update_asset_sequence_cache_fields(
+        [dict(item) for item in asset_candidates],
+        original_selected_asset=original_selected_asset,
+        updated_selected_asset=updated_selected_asset,
+    )
+    updated_cover_decision = dict(cover_decision_payload)
+    updated_cover_decision['selected_asset'] = dict(updated_selected_asset)
+
+    asset_scores = [
+        dict(item)
+        for item in updated_cover_decision.get('asset_scores') or []
+        if isinstance(item, dict)
+    ]
+    if asset_scores:
+        updated_cover_decision['asset_scores'] = update_asset_sequence_cache_fields(
+            asset_scores,
+            original_selected_asset=original_selected_asset,
+            updated_selected_asset=updated_selected_asset,
+        )
+
+    rejected_assets = [
+        dict(item)
+        for item in updated_cover_decision.get('rejected_assets') or []
+        if isinstance(item, dict)
+    ]
+    if rejected_assets:
+        updated_cover_decision['rejected_assets'] = update_asset_sequence_cache_fields(
+            rejected_assets,
+            original_selected_asset=original_selected_asset,
+            updated_selected_asset=updated_selected_asset,
+        )
+
+    decision_trace = (
+        dict(updated_cover_decision.get('decision_trace'))
+        if isinstance(updated_cover_decision.get('decision_trace'), dict)
+        else {}
+    )
+    selection_ranking = [
+        dict(item)
+        for item in decision_trace.get('selection_ranking') or []
+        if isinstance(item, dict)
+    ]
+    if selection_ranking:
+        decision_trace['selection_ranking'] = update_selection_ranking_cache_fields(
+            selection_ranking,
+            original_selected_asset=original_selected_asset,
+            updated_selected_asset=updated_selected_asset,
+        )
+        updated_cover_decision['decision_trace'] = decision_trace
+
+    return updated_candidates, updated_cover_decision, dict(updated_selected_asset)
+
+
+def has_uri_scheme(value: Any) -> bool:
+    raw = str(value or '').strip()
+    scheme, separator, _rest = raw.partition('://')
+    if not separator or not scheme or not scheme[0].isalpha():
+        return False
+    return all(character.isalnum() or character in {'+', '-', '.'} for character in scheme)
+
+
+def is_remote_url(value: Any) -> bool:
+    raw = str(value or '').strip().lower()
+    return raw.startswith('http://') or raw.startswith('https://')
+
+
+def is_local_path(value: Any) -> bool:
+    raw = str(value or '').strip()
+    if not raw:
+        return False
+    if is_remote_url(raw):
+        return False
+    if has_uri_scheme(raw):
+        return raw.startswith('file://')
+    return True
+
+
+def local_file_exists(value: Any) -> bool:
+    raw = str(value or '').strip()
+    if not is_local_path(raw):
+        return False
+    normalized = raw.removeprefix('file://')
+    try:
+        return Path(normalized).exists()
+    except OSError:
+        return False
+
+
+def suspicious_fixture_markers(*, path_or_url: Any, metadata: dict[str, Any] | None = None) -> list[str]:
+    values = [str(path_or_url or '').strip()]
+    if isinstance(metadata, dict):
+        values.extend(
+            str(metadata.get(key) or '').strip()
+            for key in ('cache_path', 'source_origin', 'license_hint')
+        )
+
+    markers: list[str] = []
+    for value in values:
+        if not value:
+            continue
+        normalized = value.replace('\\', '/').lower()
+        for marker in SUSPICIOUS_FIXTURE_MARKERS:
+            if marker in normalized:
+                markers.append(marker)
+        if normalized.endswith('/game.png') or normalized == 'game.png':
+            markers.append('generic_game_png')
+    return sorted(dict.fromkeys(markers))
+
+
+def classify_source_family(
+    *,
+    image_source_type: Any,
+    path_or_url: Any,
+    metadata: dict[str, Any] | None = None,
+    provider: Any = None,
+    final_source: Any = None,
+) -> str:
+    normalized_source_type = str(image_source_type or '').strip().lower()
+    normalized_path = str(path_or_url or '').strip().lower()
+    metadata = dict(metadata or {})
+    source_origin = str(metadata.get('source_origin') or '').strip().lower()
+    license_hint = str(metadata.get('license_hint') or '').strip().lower()
+    remote_url = str(metadata.get('remote_url') or '').strip().lower()
+    cache_path = str(metadata.get('cache_path') or '').strip().lower()
+    provider_value = str(provider or '').strip().lower()
+    final_source_value = str(final_source or '').strip().lower()
+    suspicious_markers = suspicious_fixture_markers(path_or_url=path_or_url, metadata=metadata)
+
+    if (
+        normalized_source_type == 'ai_generated'
+        or normalized_path.startswith('ai://')
+        or provider_value == 'comfyui'
+        or final_source_value == 'ai'
+    ):
+        return 'ai'
+    if (
+        normalized_source_type == 'placeholder'
+        or provider_value == 'placeholder'
+        or 'placeholder' in normalized_path
+        or 'placeholder' in source_origin
+        or 'placeholder' in license_hint
+    ):
+        return 'placeholder'
+    if is_local_path(path_or_url) and bool(suspicious_markers):
+        return 'local_manifest'
+    if is_local_path(path_or_url) and source_origin in {'local_manifest', 'fixture_fallback'}:
+        return 'local_manifest'
+    if (
+        source_origin == 'steam_cdn_manifest'
+        or 'steamstatic.com' in normalized_path
+        or 'steamstatic.com' in remote_url
+        or normalized_source_type.startswith('steam_') and (is_remote_url(path_or_url) or is_remote_url(remote_url))
+        or normalized_source_type.startswith('steam_') and 'steam/apps/' in (remote_url or normalized_path)
+    ):
+        return 'steam_cdn'
+    if source_origin in {'local_manifest', 'fixture_fallback'}:
+        return 'local_manifest'
+    if is_local_path(path_or_url) and (
+        source_origin
+        or license_hint in {'local_manifest_fixture', 'smoke_fixture'}
+        or bool(suspicious_markers)
+        or cache_path
+    ):
+        return 'local_manifest'
+    return 'unknown'
+
+
+def selected_asset_keys(selected_asset: dict[str, Any] | None) -> set[tuple[str, str]]:
+    keys: set[tuple[str, str]] = set()
+
+    def append_keys(payload: dict[str, Any] | None) -> None:
+        if not isinstance(payload, dict):
+            return
+        source_type = str(payload.get('source_type') or '').strip().lower()
+        path_or_url = str(payload.get('path_or_url') or '').strip()
+        if source_type or path_or_url:
+            keys.add((source_type, path_or_url))
+
+    append_keys(selected_asset)
+    nested_assets = selected_asset.get('assets') if isinstance(selected_asset, dict) else []
+    for item in nested_assets or []:
+        append_keys(item if isinstance(item, dict) else None)
+    return keys
+
+
+def selected_asset_primary_value(selected_asset: dict[str, Any] | None, field_name: str) -> str | None:
+    if not isinstance(selected_asset, dict):
+        return None
+    direct_value = str(selected_asset.get(field_name) or '').strip()
+    if direct_value:
+        return direct_value
+    for item in selected_asset.get('assets') or []:
+        if not isinstance(item, dict):
+            continue
+        nested_value = str(item.get(field_name) or '').strip()
+        if nested_value:
+            return nested_value
+    return None
+
+
+def cover_decision_ranking_by_index(result: dict[str, Any]) -> dict[int, dict[str, Any]]:
+    decision_trace = result.get('cover_decision_decision_trace')
+    if not isinstance(decision_trace, dict):
+        cover_decision = result.get('cover_decision')
+        decision_trace = cover_decision.get('decision_trace') if isinstance(cover_decision, dict) else {}
+
+    ranking_lookup: dict[int, dict[str, Any]] = {}
+    ranking_payloads = decision_trace.get('selection_ranking') if isinstance(decision_trace, dict) else []
+    for payload in ranking_payloads or []:
+        if not isinstance(payload, dict):
+            continue
+        try:
+            candidate_index = int(payload.get('candidate_index'))
+        except (TypeError, ValueError):
+            continue
+        ranking_lookup[candidate_index] = json_ready(dict(payload))
+    return ranking_lookup
+
+
+def build_asset_pool_candidate_diagnostic(
+    *,
+    candidate: dict[str, Any],
+    index: int,
+    selected_keys: set[tuple[str, str]],
+    ranking_by_index: dict[int, dict[str, Any]],
+) -> dict[str, Any]:
+    metadata = dict(candidate.get('metadata')) if isinstance(candidate.get('metadata'), dict) else {}
+    path_or_url = str(candidate.get('path_or_url') or '').strip() or None
+    image_source_type = str(candidate.get('source_type') or '').strip() or 'unknown'
+    suspicious_markers = suspicious_fixture_markers(path_or_url=path_or_url, metadata=metadata)
+    local_path = is_local_path(path_or_url)
+    return {
+        'index': int(index),
+        'image_source_type': image_source_type,
+        'source_family': classify_source_family(
+            image_source_type=image_source_type,
+            path_or_url=path_or_url,
+            metadata=metadata,
+        ),
+        'path_or_url': path_or_url,
+        'is_local_path': local_path,
+        'is_remote_url': is_remote_url(path_or_url),
+        'local_file_exists': local_file_exists(path_or_url) if local_path else False,
+        'suspicious_fixture': bool(suspicious_markers),
+        'width': candidate.get('width'),
+        'height': candidate.get('height'),
+        'debug': {
+            'kind': candidate.get('kind'),
+            'source_origin': candidate.get('source_origin') or metadata.get('source_origin'),
+            'license_hint': candidate.get('license_hint') or metadata.get('license_hint'),
+            'remote_url': candidate.get('remote_url') or metadata.get('remote_url'),
+            'cache_path': candidate.get('cache_path') or metadata.get('cache_path'),
+            'cache_status': candidate.get('cache_status') or metadata.get('cache_status'),
+            'manifest_entry_id': metadata.get('manifest_entry_id'),
+            'suspicious_markers': suspicious_markers,
+            'selected_by_cover_decision': (
+                image_source_type.lower(),
+                str(path_or_url or ''),
+            ) in selected_keys,
+            'selection_ranking': ranking_by_index.get(int(index)),
+            'metadata': json_ready(metadata),
+        },
+    }
+
+
+def infer_no_steam_cdn_reason(
+    *,
+    result: dict[str, Any],
+    candidate_diagnostics: list[dict[str, Any]],
+) -> str | None:
+    if any(candidate.get('source_family') == 'steam_cdn' for candidate in candidate_diagnostics):
+        return None
+
+    reasons: list[str] = []
+    steam_app_id = str(result.get('steam_app_id') or '').strip()
+    source_hint = str(result.get('source_hint') or '').strip().lower()
+    asset_source_mode = str(result.get('asset_source_mode') or '').strip()
+    asset_ingestion_mode = str(result.get('asset_ingestion_mode') or '').strip()
+    asset_source_errors = [
+        str(item)
+        for item in result.get('asset_source_errors') or []
+        if str(item).strip()
+    ]
+
+    if not steam_app_id and source_hint == 'steam':
+        reasons.append('missing_steam_app_id')
+    elif steam_app_id:
+        reasons.append(f'steam_app_id={steam_app_id}')
+    if source_hint:
+        reasons.append(f'source_hint={source_hint}')
+    if asset_source_mode:
+        reasons.append(f'asset_source_mode={asset_source_mode}')
+    if asset_ingestion_mode:
+        reasons.append(f'asset_ingestion_mode={asset_ingestion_mode}')
+    if asset_source_errors:
+        reasons.append(f"asset_source_errors={','.join(asset_source_errors)}")
+    if not reasons:
+        reasons.append('no_steam_cdn_candidates_resolved')
+    return '; '.join(reasons)
+
+
+def build_asset_pool_game_diagnostic(result: dict[str, Any]) -> dict[str, Any]:
+    selected_asset = (
+        dict(result.get('cover_decision_selected_asset'))
+        if isinstance(result.get('cover_decision_selected_asset'), dict)
+        else None
+    )
+    asset_candidates = [
+        dict(item)
+        for item in result.get('asset_candidates') or []
+        if isinstance(item, dict)
+    ]
+    ranking_by_index = cover_decision_ranking_by_index(result)
+    selected_keys = selected_asset_keys(selected_asset)
+    candidate_diagnostics = [
+        build_asset_pool_candidate_diagnostic(
+            candidate=candidate,
+            index=index,
+            selected_keys=selected_keys,
+            ranking_by_index=ranking_by_index,
+        )
+        for index, candidate in enumerate(asset_candidates)
+    ]
+    candidate_source_families = sorted(
+        {
+            str(candidate.get('source_family') or '').strip()
+            for candidate in candidate_diagnostics
+            if str(candidate.get('source_family') or '').strip()
+        }
+    )
+    steam_cdn_candidate_count = sum(
+        1
+        for candidate in candidate_diagnostics
+        if candidate.get('source_family') == 'steam_cdn'
+    )
+    local_manifest_candidate_count = sum(
+        1
+        for candidate in candidate_diagnostics
+        if candidate.get('source_family') == 'local_manifest'
+    )
+    suspicious_fixture_candidate_count = sum(
+        1
+        for candidate in candidate_diagnostics
+        if bool(candidate.get('suspicious_fixture'))
+    )
+    cover_decision_source_type = (
+        str(result.get('cover_decision_image_source_type') or '').strip()
+        or selected_asset_primary_value(selected_asset, 'source_type')
+        or None
+    )
+    cover_decision_path_or_url = (
+        selected_asset_primary_value(selected_asset, 'path_or_url')
+        or result.get('actual_image_path_or_url')
+    )
+    selected_metadata = dict(selected_asset.get('metadata')) if isinstance(selected_asset, dict) and isinstance(selected_asset.get('metadata'), dict) else {}
+    selected_remote_url = str(result.get('selected_asset_remote_url') or selected_metadata.get('remote_url') or '').strip() or None
+    selected_cache_path = str(result.get('selected_asset_cache_path') or selected_metadata.get('cache_path') or '').strip() or None
+    selected_cache_status = str(result.get('selected_asset_cache_status') or selected_metadata.get('cache_status') or '').strip() or None
+    selected_source_origin = (
+        str(selected_asset.get('source_origin') or selected_metadata.get('source_origin') or '').strip()
+        if isinstance(selected_asset, dict)
+        else ''
+    ) or None
+
+    return {
+        'game': result.get('game_title'),
+        'slug': result.get('game_slug'),
+        'seed': result.get('seed'),
+        'prompt_variant': result.get('prompt_variant'),
+        'source_hint': result.get('source_hint'),
+        'steam_app_id': result.get('steam_app_id'),
+        'real_asset_eval_expected': bool(result.get('real_asset_eval_expected', False)),
+        'asset_source_mode': result.get('asset_source_mode'),
+        'asset_ingestion_mode': result.get('asset_ingestion_mode'),
+        'candidate_count': len(asset_candidates),
+        'candidate_source_families': candidate_source_families,
+        'steam_cdn_candidate_count': steam_cdn_candidate_count,
+        'local_manifest_candidate_count': local_manifest_candidate_count,
+        'suspicious_fixture_candidate_count': suspicious_fixture_candidate_count,
+        'suspicious_fixture_only': bool(candidate_diagnostics) and suspicious_fixture_candidate_count == len(candidate_diagnostics),
+        'no_steam_cdn_reason': infer_no_steam_cdn_reason(
+            result=result,
+            candidate_diagnostics=candidate_diagnostics,
+        ),
+        'selected': {
+            'image_source_type': cover_decision_source_type,
+            'path_or_url': cover_decision_path_or_url,
+            'remote_url': selected_remote_url,
+            'cache_path': selected_cache_path,
+            'selected_asset_cache_status': selected_cache_status,
+            'local_cached_file_exists': local_file_exists(selected_cache_path),
+            'cache_download_attempted': bool(result.get('selected_asset_cache_download_attempted', False)),
+            'cache_error': result.get('selected_asset_cache_error'),
+            'source_origin': selected_source_origin,
+            'source_family': classify_source_family(
+                image_source_type=cover_decision_source_type,
+                path_or_url=cover_decision_path_or_url,
+                metadata=selected_metadata,
+            ),
+            'provider': result.get('provider'),
+            'final_source': result.get('final_source'),
+            'actual_image_source_type': result.get('actual_image_source_type'),
+            'actual_path_or_url': result.get('actual_image_path_or_url'),
+            'fallback_reason': result.get('fallback_reason'),
+        },
+        'candidates': candidate_diagnostics,
+    }
+
+
+def build_asset_pool_diagnostics_report(
+    *,
+    run_id: str,
+    results: list[dict[str, Any]],
+    errors: list[dict[str, Any]],
+) -> dict[str, Any]:
+    return {
+        'run_id': run_id,
+        'diagnostic_version': ASSET_POOL_DIAGNOSTIC_VERSION,
+        'games': [build_asset_pool_game_diagnostic(result) for result in results],
+        'errors': [
+            {
+                'game': error.get('game_title'),
+                'slug': error.get('game_slug'),
+                'prompt_variant': error.get('prompt_variant'),
+                'seed': error.get('seed'),
+                'message': error.get('message'),
+            }
+            for error in errors
+        ],
+    }
+
+
 def normalize_decision_asset_reject_reason(
     *,
     decision_asset_used: bool,
@@ -985,7 +1575,7 @@ def normalize_decision_asset_reject_reason(
     if decision_asset_used:
         return None
     remote_url, _cache_path, cache_status = selected_asset_remote_cache_fields(selected_asset)
-    if remote_url and str(cache_status or '').strip().lower() != 'cached':
+    if remote_url and not is_ready_cache_status(cache_status):
         return 'remote_not_cached'
     value = str(raw_reason or '').strip()
     return value or None
@@ -1256,6 +1846,10 @@ def run_scenario(
         raise ValueError(f'Unsupported seed: {seed}')
     selected_game = dict(DEFAULT_SMOKE_GAME if game_input is None else game_input)
     game_slug = str(selected_game.get('slug') or 'ai_card_smoke').strip() or 'ai_card_smoke'
+    source_hint = str(selected_game.get('source_hint') or '').strip() or None
+    steam_app_id = str(selected_game.get('steam_app_id') or '').strip() or None
+    epic_slug = str(selected_game.get('epic_slug') or '').strip() or None
+    real_asset_eval_expected = bool(selected_game.get('real_asset_eval_expected', False))
     offer_type = str(selected_game.get('offer_type') or '').strip() or None
     asset_source_payload = resolve_asset_candidates_for_game(
         selected_game,
@@ -1309,6 +1903,10 @@ def run_scenario(
     scenario_metadata['game_eval'] = bool(game_eval)
     scenario_metadata['game_slug'] = game_slug
     scenario_metadata['game_title'] = data.title
+    scenario_metadata['source_hint'] = source_hint
+    scenario_metadata['steam_app_id'] = steam_app_id
+    scenario_metadata['epic_slug'] = epic_slug
+    scenario_metadata['real_asset_eval_expected'] = real_asset_eval_expected
     scenario_metadata['genre'] = data.genre
     scenario_metadata['tags'] = list(game_tags)
     scenario_metadata['short_description'] = data.short_description
@@ -1342,11 +1940,27 @@ def run_scenario(
             old_price=data.old_price,
         ).to_dict()
     )
+    asset_candidates, cover_decision_payload, bridge_cached_selected_asset = cache_selected_remote_asset_for_bridge(
+        asset_candidates=asset_candidates,
+        cover_decision_payload=dict(cover_decision_payload),
+        asset_downloader=asset_downloader,
+    )
+    asset_candidates_count = len(asset_candidates)
+    asset_candidate_source_types = [
+        str(item.get('source_type') or '')
+        for item in asset_candidates
+        if str(item.get('source_type') or '').strip()
+    ]
+    scenario_metadata['asset_candidates_count'] = asset_candidates_count
+    scenario_metadata['asset_candidate_source_types'] = list(asset_candidate_source_types)
+    scenario_metadata['asset_candidates'] = json_ready(asset_candidates)
     cover_decision_selected_asset = (
         dict(cover_decision_payload.get('selected_asset'))
         if isinstance(cover_decision_payload.get('selected_asset'), dict)
         else None
     )
+    if cover_decision_selected_asset is None and bridge_cached_selected_asset is not None:
+        cover_decision_selected_asset = dict(bridge_cached_selected_asset)
     cover_decision_rejected_assets = [
         dict(item)
         for item in cover_decision_payload.get('rejected_assets') or []
@@ -1479,6 +2093,10 @@ def run_scenario(
         'game_eval': bool(game_eval),
         'game_slug': game_slug,
         'game_title': data.title,
+        'source_hint': source_hint,
+        'steam_app_id': steam_app_id,
+        'epic_slug': epic_slug,
+        'real_asset_eval_expected': real_asset_eval_expected,
         'genre': data.genre,
         'tags': list(game_tags),
         'short_description': data.short_description,
@@ -1537,6 +2155,46 @@ def run_scenario(
     selected_asset_remote_url, selected_asset_cache_path, selected_asset_cache_status = (
         selected_asset_remote_cache_fields(cover_decision_selected_asset)
     )
+    selected_asset_metadata = (
+        dict(cover_decision_selected_asset.get('metadata'))
+        if isinstance(cover_decision_selected_asset, dict) and isinstance(cover_decision_selected_asset.get('metadata'), dict)
+        else {}
+    )
+    selected_asset_source_origin = str(
+        (
+            cover_decision_selected_asset.get('source_origin')
+            if isinstance(cover_decision_selected_asset, dict)
+            else None
+        )
+        or selected_asset_metadata.get('source_origin')
+        or ''
+    ).strip() or None
+    selected_asset_source_family = classify_source_family(
+        image_source_type=(
+            cover_decision_selected_asset.get('source_type')
+            if isinstance(cover_decision_selected_asset, dict)
+            else cover_decision_payload.get('image_source_type')
+        ),
+        path_or_url=(
+            cover_decision_selected_asset.get('path_or_url')
+            if isinstance(cover_decision_selected_asset, dict)
+            else None
+        ),
+        metadata=selected_asset_metadata,
+    )
+    selected_asset_cache_download_attempted = bool(
+        selected_asset_metadata.get('asset_download_attempted', False)
+    )
+    selected_asset_cache_error = selected_asset_metadata.get('asset_download_error')
+    selected_asset_local_file_exists = local_file_exists(selected_asset_cache_path)
+    provider_metadata['selected_asset_remote_url'] = selected_asset_remote_url
+    provider_metadata['selected_asset_cache_path'] = selected_asset_cache_path
+    provider_metadata['selected_asset_cache_status'] = selected_asset_cache_status
+    provider_metadata['selected_asset_local_file_exists'] = selected_asset_local_file_exists
+    provider_metadata['selected_asset_cache_download_attempted'] = selected_asset_cache_download_attempted
+    provider_metadata['selected_asset_cache_error'] = selected_asset_cache_error
+    provider_metadata['selected_asset_source_origin'] = selected_asset_source_origin
+    provider_metadata['selected_asset_source_family'] = selected_asset_source_family
     prompt_variant_value = infer_prompt_variant(
         ai_provider=ai_provider,
         resolved_metadata=resolved_metadata,
@@ -1741,6 +2399,10 @@ def run_scenario(
         'game_eval': bool(game_eval),
         'game_slug': game_slug,
         'game_title': data.title,
+        'source_hint': source_hint,
+        'steam_app_id': steam_app_id,
+        'epic_slug': epic_slug,
+        'real_asset_eval_expected': real_asset_eval_expected,
         'genre': data.genre,
         'tags': list(game_tags),
         'short_description': data.short_description,
@@ -1777,6 +2439,11 @@ def run_scenario(
         'selected_asset_remote_url': selected_asset_remote_url,
         'selected_asset_cache_path': selected_asset_cache_path,
         'selected_asset_cache_status': selected_asset_cache_status,
+        'selected_asset_local_file_exists': selected_asset_local_file_exists,
+        'selected_asset_cache_download_attempted': selected_asset_cache_download_attempted,
+        'selected_asset_cache_error': selected_asset_cache_error,
+        'selected_asset_source_origin': selected_asset_source_origin,
+        'selected_asset_source_family': selected_asset_source_family,
         'actual_image_source_type': actual_image_source_type,
         'actual_image_path_or_url': actual_image_path_or_url,
         'decision_asset_used': decision_asset_used,
@@ -1994,6 +2661,11 @@ def run_scenario(
     manifest['provider_metadata']['selected_asset_remote_url'] = selected_asset_remote_url
     manifest['provider_metadata']['selected_asset_cache_path'] = selected_asset_cache_path
     manifest['provider_metadata']['selected_asset_cache_status'] = selected_asset_cache_status
+    manifest['provider_metadata']['selected_asset_local_file_exists'] = selected_asset_local_file_exists
+    manifest['provider_metadata']['selected_asset_cache_download_attempted'] = selected_asset_cache_download_attempted
+    manifest['provider_metadata']['selected_asset_cache_error'] = selected_asset_cache_error
+    manifest['provider_metadata']['selected_asset_source_origin'] = selected_asset_source_origin
+    manifest['provider_metadata']['selected_asset_source_family'] = selected_asset_source_family
     manifest['provider_metadata']['cover_decision'] = cover_decision_payload
     manifest['provider_metadata']['cover_decision_genre_cluster'] = cover_decision_payload.get('genre_cluster')
     manifest['provider_metadata']['cover_decision_visual_type'] = cover_decision_payload.get('visual_type')
@@ -2036,6 +2708,33 @@ def run_scenario(
     manifest['provider_metadata']['output_path'] = str(output_image_path)
     manifest['provider_metadata']['image_path'] = str(output_image_path)
     manifest['provider_metadata']['review_image_path'] = None
+    asset_pool_game_diagnostic = build_asset_pool_game_diagnostic(manifest)
+    manifest['candidate_source_families'] = list(asset_pool_game_diagnostic.get('candidate_source_families') or [])
+    manifest['steam_cdn_candidate_count'] = int(asset_pool_game_diagnostic.get('steam_cdn_candidate_count') or 0)
+    manifest['local_manifest_candidate_count'] = int(
+        asset_pool_game_diagnostic.get('local_manifest_candidate_count') or 0
+    )
+    manifest['suspicious_fixture_candidate_count'] = int(
+        asset_pool_game_diagnostic.get('suspicious_fixture_candidate_count') or 0
+    )
+    manifest['suspicious_fixture_only'] = bool(asset_pool_game_diagnostic.get('suspicious_fixture_only', False))
+    manifest['no_steam_cdn_reason'] = asset_pool_game_diagnostic.get('no_steam_cdn_reason')
+    manifest['provider_metadata']['candidate_source_families'] = list(
+        asset_pool_game_diagnostic.get('candidate_source_families') or []
+    )
+    manifest['provider_metadata']['steam_cdn_candidate_count'] = int(
+        asset_pool_game_diagnostic.get('steam_cdn_candidate_count') or 0
+    )
+    manifest['provider_metadata']['local_manifest_candidate_count'] = int(
+        asset_pool_game_diagnostic.get('local_manifest_candidate_count') or 0
+    )
+    manifest['provider_metadata']['suspicious_fixture_candidate_count'] = int(
+        asset_pool_game_diagnostic.get('suspicious_fixture_candidate_count') or 0
+    )
+    manifest['provider_metadata']['suspicious_fixture_only'] = bool(
+        asset_pool_game_diagnostic.get('suspicious_fixture_only', False)
+    )
+    manifest['provider_metadata']['no_steam_cdn_reason'] = asset_pool_game_diagnostic.get('no_steam_cdn_reason')
     manifest_path = run_root / 'ai_card_smoke_manifest.json'
     manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding='utf-8')
     return {
@@ -2060,6 +2759,12 @@ def print_run_result(result: dict[str, Any], *, run_index: int, total_runs: int,
     print(f"asset_ingestion_mode = {result.get('asset_ingestion_mode') or 'none'}")
     print(f"asset_candidates_count = {int(result.get('asset_candidates_count') or 0)}")
     print(f"asset_candidate_source_types = {','.join(result.get('asset_candidate_source_types') or []) or 'none'}")
+    print(f"candidate_source_families = {','.join(result.get('candidate_source_families') or []) or 'none'}")
+    print(f"steam_cdn_candidate_count = {int(result.get('steam_cdn_candidate_count') or 0)}")
+    print(f"local_manifest_candidate_count = {int(result.get('local_manifest_candidate_count') or 0)}")
+    print(f"suspicious_fixture_candidate_count = {int(result.get('suspicious_fixture_candidate_count') or 0)}")
+    print(f"suspicious_fixture_only = {str(bool(result.get('suspicious_fixture_only', False))).lower()}")
+    print(f"no_steam_cdn_reason = {result.get('no_steam_cdn_reason') or 'none'}")
     print(f"asset_source_errors = {','.join(result.get('asset_source_errors') or []) or 'none'}")
     print(f"asset_download_enabled = {str(bool(result.get('asset_download_enabled', False))).lower()}")
     print(f"asset_download_attempted = {str(bool(result.get('asset_download_attempted', False))).lower()}")
@@ -2171,6 +2876,14 @@ def print_run_result(result: dict[str, Any], *, run_index: int, total_runs: int,
     print(f"selected_asset.remote_url = {result.get('selected_asset_remote_url') or 'none'}")
     print(f"selected_asset.cache_path = {result.get('selected_asset_cache_path') or 'none'}")
     print(f"selected_asset.cache_status = {result.get('selected_asset_cache_status') or 'none'}")
+    print(f"selected_asset.local_cached_file_exists = {str(bool(result.get('selected_asset_local_file_exists', False))).lower()}")
+    print(
+        "selected_asset.cache_download_attempted = "
+        f"{str(bool(result.get('selected_asset_cache_download_attempted', False))).lower()}"
+    )
+    print(f"selected_asset.cache_error = {result.get('selected_asset_cache_error') or 'none'}")
+    print(f"selected_asset.source_origin = {result.get('selected_asset_source_origin') or 'none'}")
+    print(f"selected_asset.source_family = {result.get('selected_asset_source_family') or 'none'}")
     print(f"actual_image_source_type = {result.get('actual_image_source_type') or 'none'}")
     print(f"actual_image_path_or_url = {result.get('actual_image_path_or_url') or 'none'}")
     print(f"decision_asset_used = {str(bool(result.get('decision_asset_used', False))).lower()}")
@@ -2242,6 +2955,17 @@ def print_run_result(result: dict[str, Any], *, run_index: int, total_runs: int,
         print(f"decision_flow.provider_metadata.selected_asset_remote_url = {provider_metadata.get('selected_asset_remote_url')}")
         print(f"decision_flow.provider_metadata.selected_asset_cache_path = {provider_metadata.get('selected_asset_cache_path')}")
         print(f"decision_flow.provider_metadata.selected_asset_cache_status = {provider_metadata.get('selected_asset_cache_status')}")
+        print(
+            "decision_flow.provider_metadata.selected_asset_local_file_exists = "
+            f"{provider_metadata.get('selected_asset_local_file_exists')}"
+        )
+        print(
+            "decision_flow.provider_metadata.selected_asset_cache_download_attempted = "
+            f"{provider_metadata.get('selected_asset_cache_download_attempted')}"
+        )
+        print(f"decision_flow.provider_metadata.selected_asset_cache_error = {provider_metadata.get('selected_asset_cache_error')}")
+        print(f"decision_flow.provider_metadata.selected_asset_source_origin = {provider_metadata.get('selected_asset_source_origin')}")
+        print(f"decision_flow.provider_metadata.selected_asset_source_family = {provider_metadata.get('selected_asset_source_family')}")
         print(f"decision_flow.provider_metadata.actual_image_source_type = {provider_metadata.get('actual_image_source_type')}")
         print(f"decision_flow.provider_metadata.actual_image_path_or_url = {provider_metadata.get('actual_image_path_or_url')}")
         print(f"decision_flow.provider_metadata.decision_asset_used = {provider_metadata.get('decision_asset_used')}")
@@ -2446,6 +3170,7 @@ def render_ai_card_smoke(
     review_cards_dir = batch_root / 'review_cards'
     review_cards_dir.mkdir(parents=True, exist_ok=True)
     batch_manifest_path = batch_root / 'batch_summary.json'
+    asset_pool_diagnostics_path = batch_root / 'asset_pool_diagnostics.json'
 
     run_indices = [1] if game_eval else list(range(1, total_runs + 1))
     seed_values = list(range(1, selected_seeds_per_game + 1)) if game_eval else [None]
@@ -2572,6 +3297,16 @@ def render_ai_card_smoke(
         'results': results,
         'errors': errors,
     }
+    asset_pool_diagnostics = build_asset_pool_diagnostics_report(
+        run_id=batch_root.name,
+        results=results,
+        errors=errors,
+    )
+    asset_pool_diagnostics_path.write_text(
+        json.dumps(asset_pool_diagnostics, indent=2, ensure_ascii=False),
+        encoding='utf-8',
+    )
+    batch_manifest['asset_pool_diagnostics_path'] = str(asset_pool_diagnostics_path)
     batch_manifest_path.write_text(json.dumps(batch_manifest, indent=2, ensure_ascii=False), encoding='utf-8')
 
     print('summary:')
@@ -2602,6 +3337,7 @@ def render_ai_card_smoke(
     print(f"all_ai_attempted_false = {str(summary['all_ai_attempted_false']).lower()}")
     print(f"errors = {summary['errors']}")
     print(f'review_cards_path = {review_cards_dir}')
+    print(f'asset_pool_diagnostics_path = {asset_pool_diagnostics_path}')
     print(f'batch_manifest_path = {batch_manifest_path}')
     return batch_root
 

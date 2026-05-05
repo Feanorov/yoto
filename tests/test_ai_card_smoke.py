@@ -9,13 +9,18 @@ from PIL import Image
 
 from infrastructure.render.cards.asset_sources.asset_cache import AssetCacheDownloadResult
 from infrastructure.render.cards.image_providers import ArtworkImageProvider, ImageResolutionRequest, ResolvedImage, YotoImageResolver
+from infrastructure.render.cards.visual_decision_engine import build_cover_decision
 from tools.ai_card_smoke import (
+    ASSET_POOL_DIAGNOSTIC_VERSION,
+    GAME_EVAL_EXPANDED_SMOKE_GAMES,
     MINIMAL_SMOKE_GAMES,
     SMOKE_LOCAL_LANDSCAPE_ASSET,
     classify_outcome,
     infer_fallback_reason,
     infer_fallback_used,
     infer_final_source,
+    render_ai_card_smoke,
+    resolve_asset_candidates_for_game,
     run_scenario,
 )
 
@@ -60,6 +65,22 @@ def _resolver_request(*, cover_decision: dict[str, object], mode: str = 'ai_firs
 def _write_test_png(path: Path, *, color: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     Image.new('RGB', (1280, 720), color).save(path, format='PNG')
+
+
+def _remote_only_game_input(*, steam_app_id: str, slug: str, title: str) -> dict[str, object]:
+    return {
+        'slug': slug,
+        'store_id': f'steam:{slug}',
+        'source_hint': 'steam',
+        'steam_app_id': steam_app_id,
+        'title': title,
+        'platform': 'STEAM',
+        'offer_type': 'discount',
+        'genre': 'roguelike action',
+        'tags': ['hero', 'combat'],
+        'short_description': 'A remote-only smoke title with CDN-derived assets and no cached local files.',
+        'asset_candidates': [],
+    }
 
 
 def test_ai_card_smoke_current_env_reports_ai_runtime(tmp_path: Path) -> None:
@@ -267,6 +288,116 @@ def test_ai_card_smoke_current_env_supports_game_eval_seed_layout(tmp_path: Path
     assert result['outcome'] == 'official_asset'
 
 
+def test_ai_card_smoke_expanded_game_definitions_include_steam_app_ids_for_real_asset_eval() -> None:
+    missing_steam_ids = [
+        str(game_input.get('slug'))
+        for game_input in GAME_EVAL_EXPANDED_SMOKE_GAMES
+        if not str(game_input.get('steam_app_id') or '').strip()
+    ]
+
+    assert missing_steam_ids == []
+    assert all(bool(game_input.get('real_asset_eval_expected', False)) for game_input in GAME_EVAL_EXPANDED_SMOKE_GAMES)
+    assert all(game_input.get('local_assets') == {} for game_input in GAME_EVAL_EXPANDED_SMOKE_GAMES)
+
+
+def test_ai_card_smoke_expanded_supported_games_resolve_steam_cdn_candidate_pools() -> None:
+    for game_input in GAME_EVAL_EXPANDED_SMOKE_GAMES:
+        payload = resolve_asset_candidates_for_game(dict(game_input))
+        source_origins = {
+            str(
+                candidate.get('source_origin')
+                or (candidate.get('metadata') or {}).get('source_origin')
+                or ''
+            ).strip()
+            for candidate in payload['asset_candidates']
+            if isinstance(candidate, dict)
+        }
+
+        assert payload['asset_source_mode'] == 'steam_cdn_manifest'
+        assert payload['asset_ingestion_mode'] in {'mixed_local_remote', 'remote_templates_only'}
+        assert payload['asset_candidates_count'] > 1
+        assert any(origin == 'steam_cdn_manifest' for origin in source_origins)
+        assert 'steam_screenshot' in payload['asset_candidate_source_types']
+
+
+def test_ai_card_smoke_game_eval_writes_asset_pool_diagnostics(tmp_path: Path) -> None:
+    batch_root = render_ai_card_smoke(
+        scenario='quality_reject',
+        output_root=tmp_path,
+        game_set='minimal',
+        game_eval=True,
+        seeds_per_game=1,
+    )
+    diagnostics_path = batch_root / 'asset_pool_diagnostics.json'
+
+    assert diagnostics_path.exists()
+
+    payload = json.loads(diagnostics_path.read_text(encoding='utf-8'))
+    assert payload['run_id'] == batch_root.name
+    assert payload['diagnostic_version'] == ASSET_POOL_DIAGNOSTIC_VERSION
+    assert payload['errors'] == []
+
+    hades = next(item for item in payload['games'] if item['slug'] == 'hades_ii')
+    hades_suspicious = next(item for item in hades['candidates'] if item['suspicious_fixture'] is True)
+
+    assert hades['asset_source_mode'] == 'steam_cdn_manifest'
+    assert hades['asset_ingestion_mode'] == 'mixed_local_remote'
+    assert hades['candidate_count'] == len(hades['candidates'])
+    assert hades['selected']['image_source_type'] in {'official_press_key_art', 'steam_library_capsule', 'steam_main_capsule'}
+    assert 'remote_url' in hades['selected']
+    assert 'cache_path' in hades['selected']
+    assert 'selected_asset_cache_status' in hades['selected']
+    assert 'local_cached_file_exists' in hades['selected']
+    assert 'fallback_reason' in hades['selected']
+    assert any(item['source_family'] == 'steam_cdn' for item in hades['candidates'])
+    assert hades_suspicious['source_family'] == 'local_manifest'
+    assert hades_suspicious['is_local_path'] is True
+    assert hades_suspicious['local_file_exists'] is True
+    assert hades_suspicious['path_or_url'].endswith('fallback_game_image.png')
+
+    civilization = next(item for item in payload['games'] if item['slug'] == 'civilization_vi')
+    civilization_suspicious = next(item for item in civilization['candidates'] if item['suspicious_fixture'] is True)
+
+    assert civilization_suspicious['source_family'] == 'local_manifest'
+    assert civilization_suspicious['path_or_url'].endswith('game.png')
+    assert civilization_suspicious['debug']['selection_ranking'] is not None
+
+    pacific_drive = next(item for item in payload['games'] if item['slug'] == 'pacific_drive')
+
+    assert pacific_drive['steam_cdn_candidate_count'] == 0
+    assert pacific_drive['local_manifest_candidate_count'] >= 1
+    assert pacific_drive['suspicious_fixture_only'] is True
+    assert 'missing_steam_app_id' in str(pacific_drive['no_steam_cdn_reason'] or '')
+
+
+def test_ai_card_smoke_expanded_game_eval_uses_real_official_candidate_pools(tmp_path: Path) -> None:
+    batch_root = render_ai_card_smoke(
+        scenario='quality_reject',
+        output_root=tmp_path,
+        game_set='expanded',
+        game_eval=True,
+        seeds_per_game=1,
+    )
+    diagnostics_path = batch_root / 'asset_pool_diagnostics.json'
+
+    assert diagnostics_path.exists()
+
+    payload = json.loads(diagnostics_path.read_text(encoding='utf-8'))
+    assert payload['diagnostic_version'] == ASSET_POOL_DIAGNOSTIC_VERSION
+    assert payload['errors'] == []
+    assert len(payload['games']) == len(GAME_EVAL_EXPANDED_SMOKE_GAMES)
+
+    for game in payload['games']:
+        assert str(game.get('steam_app_id') or '').strip()
+        assert game['real_asset_eval_expected'] is True
+        assert game['asset_source_mode'] == 'steam_cdn_manifest'
+        assert game['candidate_count'] > 1
+        assert game['steam_cdn_candidate_count'] >= 1
+        assert game['local_manifest_candidate_count'] == 0
+        assert game['suspicious_fixture_only'] is False
+        assert game['no_steam_cdn_reason'] is None
+
+
 def test_ai_card_smoke_download_assets_rejects_civilization_ui_screenshot(tmp_path: Path) -> None:
     png_bytes = _png_bytes()
     screenshot_cache_path = (
@@ -469,39 +600,65 @@ def test_ai_card_smoke_nonlocal_smoke_selected_official_does_not_silently_fall_t
     assert 'invalid_or_nonlocal_asset_path' in result['rescue_blockers']
 
 
-def test_ai_card_smoke_quality_reject_remote_only_asset_stays_out_of_renderer(tmp_path: Path) -> None:
+def test_ai_card_smoke_quality_reject_remote_only_asset_triggers_bridge_cache_request(tmp_path: Path) -> None:
     _clear_test_cache('999993')
+    png_bytes = _png_bytes()
+    download_calls: list[tuple[str, str]] = []
+
+    def fake_downloader(*, remote_url: str, cache_path: str, timeout_seconds: int, max_bytes: int) -> AssetCacheDownloadResult:
+        download_calls.append((remote_url, cache_path))
+        target = Path(cache_path)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(png_bytes)
+        return AssetCacheDownloadResult(
+            cache_path=str(target),
+            cache_status='downloaded',
+            download_attempted=True,
+            bytes_written=len(png_bytes),
+            content_type='image/png',
+        )
+
+    game_input = _remote_only_game_input(
+        steam_app_id='999993',
+        slug='remote_bridge_cache_request_demo',
+        title='Remote Bridge Cache Request Demo',
+    )
+    asset_payload = resolve_asset_candidates_for_game(dict(game_input))
+    pre_cache_decision = build_cover_decision(
+        game_title=str(game_input['title']),
+        genre=str(game_input['genre']),
+        tags=[str(item) for item in game_input['tags']],
+        short_description=str(game_input['short_description']),
+        offer_type=str(game_input['offer_type']),
+        asset_candidates=asset_payload['asset_candidates'],
+    ).to_dict()
     result = run_scenario(
         scenario='quality_reject',
         output_root=tmp_path,
-        game_input={
-            'slug': 'remote_download_success_demo',
-            'store_id': 'steam:remote_download_success_demo',
-            'source_hint': 'steam',
-            'steam_app_id': '999993',
-            'title': 'Remote Download Success Demo',
-            'platform': 'STEAM',
-            'offer_type': 'discount',
-            'genre': 'roguelike action',
-            'tags': ['hero', 'combat'],
-            'short_description': 'A remote-only smoke title with CDN-derived assets and no cached local files.',
-            'asset_candidates': [],
-        },
+        game_input=game_input,
         game_set='minimal',
+        asset_downloader=fake_downloader,
     )
 
     assert result['asset_source_mode'] == 'steam_cdn_manifest'
     assert result['asset_ingestion_mode'] == 'remote_templates_only'
-    assert result['decision_asset_used'] is False
+    assert len(download_calls) == 1
+    assert result['cover_decision_image_source_type'] == pre_cache_decision['image_source_type']
+    assert result['cover_decision_selected_asset']['source_type'] == pre_cache_decision['selected_asset']['source_type']
     assert result['selected_asset_remote_url'] is not None
     assert result['selected_asset_cache_path'] is not None
-    assert result['selected_asset_cache_status'] == 'not_requested'
-    assert result['decision_asset_reject_reason'] == 'remote_not_cached'
-    assert result['provider'] == 'placeholder'
-    assert result['fallback_used'] is True
-    assert result['fallback_reason'] == 'official_asset_bridge_invalid'
-    assert result['final_source'] == 'fallback'
-    assert result['outcome'] == 'ai_hard_failure'
+    assert result['selected_asset_cache_status'] == 'downloaded'
+    assert result['selected_asset_cache_status'] != 'not_requested'
+    assert result['selected_asset_local_file_exists'] is True
+    assert result['selected_asset_cache_download_attempted'] is True
+    assert result['selected_asset_cache_error'] is None
+    assert result['decision_asset_used'] is True
+    assert result['actual_image_path_or_url'] == result['selected_asset_cache_path']
+    assert Path(str(result['selected_asset_cache_path'])).exists()
+    assert result['provider'] == 'artwork'
+    assert result['fallback_used'] is False
+    assert result['final_source'] == 'asset'
+    assert result['outcome'] == 'official_asset'
 
 
 def test_ai_card_smoke_download_assets_promotes_downloaded_remote_candidate(tmp_path: Path) -> None:
@@ -523,19 +680,11 @@ def test_ai_card_smoke_download_assets_promotes_downloaded_remote_candidate(tmp_
     result = run_scenario(
         scenario='quality_reject',
         output_root=tmp_path,
-        game_input={
-            'slug': 'remote_download_failure_demo',
-            'store_id': 'steam:remote_download_failure_demo',
-            'source_hint': 'steam',
-            'steam_app_id': '999994',
-            'title': 'Remote Download Failure Demo',
-            'platform': 'STEAM',
-            'offer_type': 'discount',
-            'genre': 'roguelike action',
-            'tags': ['hero', 'combat'],
-            'short_description': 'A remote-only smoke title with CDN-derived assets and no cached local files.',
-            'asset_candidates': [],
-        },
+        game_input=_remote_only_game_input(
+            steam_app_id='999994',
+            slug='remote_download_failure_demo',
+            title='Remote Download Failure Demo',
+        ),
         game_set='minimal',
         download_assets=True,
         asset_downloader=fake_downloader,
@@ -547,7 +696,10 @@ def test_ai_card_smoke_download_assets_promotes_downloaded_remote_candidate(tmp_
     assert result['asset_download_error'] is None
     assert 1 <= result['downloaded_asset_count'] <= 3
     assert result['failed_asset_count'] == 0
-    assert result['selected_asset_cache_status'] == 'downloaded'
+    assert result['selected_asset_cache_status'] in {'cached', 'downloaded'}
+    assert result['selected_asset_local_file_exists'] is True
+    assert isinstance(result['selected_asset_cache_download_attempted'], bool)
+    assert result['selected_asset_cache_error'] is None
     assert result['decision_asset_used'] is True
     assert result['provider'] == 'artwork'
     assert result['fallback_used'] is False
@@ -568,19 +720,11 @@ def test_ai_card_smoke_download_assets_failure_keeps_fallback_safe(tmp_path: Pat
     result = run_scenario(
         scenario='quality_reject',
         output_root=tmp_path,
-        game_input={
-            'slug': 'remote_download_failure_demo_retry',
-            'store_id': 'steam:remote_download_failure_demo_retry',
-            'source_hint': 'steam',
-            'steam_app_id': '999995',
-            'title': 'Remote Download Failure Demo Retry',
-            'platform': 'STEAM',
-            'offer_type': 'discount',
-            'genre': 'roguelike action',
-            'tags': ['hero', 'combat'],
-            'short_description': 'A remote-only smoke title with CDN-derived assets and no cached local files.',
-            'asset_candidates': [],
-        },
+        game_input=_remote_only_game_input(
+            steam_app_id='999995',
+            slug='remote_download_failure_demo_retry',
+            title='Remote Download Failure Demo Retry',
+        ),
         game_set='minimal',
         download_assets=True,
         asset_downloader=fake_downloader,
@@ -592,6 +736,47 @@ def test_ai_card_smoke_download_assets_failure_keeps_fallback_safe(tmp_path: Pat
     assert result['asset_download_error'] is not None
     assert 1 <= result['failed_asset_count'] <= 3
     assert result['selected_asset_cache_status'] == 'failed'
+    assert result['selected_asset_local_file_exists'] is False
+    assert result['selected_asset_cache_download_attempted'] is True
+    assert result['selected_asset_cache_error'] == 'offline_guarded_failure'
+    assert result['decision_asset_used'] is False
+    assert result['decision_asset_reject_reason'] == 'remote_not_cached'
+    assert result['provider'] == 'placeholder'
+    assert result['fallback_used'] is True
+    assert result['final_source'] == 'fallback'
+
+
+def test_ai_card_smoke_bridge_cache_failure_keeps_fallback_safe_without_bulk_download(tmp_path: Path) -> None:
+    _clear_test_cache('999996')
+
+    def fake_downloader(*, remote_url: str, cache_path: str, timeout_seconds: int, max_bytes: int) -> AssetCacheDownloadResult:
+        return AssetCacheDownloadResult(
+            cache_path=cache_path,
+            cache_status='failed',
+            download_attempted=True,
+            error='bridge_cache_failure',
+        )
+
+    result = run_scenario(
+        scenario='quality_reject',
+        output_root=tmp_path,
+        game_input=_remote_only_game_input(
+            steam_app_id='999996',
+            slug='remote_bridge_cache_failure_demo',
+            title='Remote Bridge Cache Failure Demo',
+        ),
+        game_set='minimal',
+        asset_downloader=fake_downloader,
+    )
+
+    assert result['asset_download_enabled'] is False
+    assert result['asset_download_attempted'] is False
+    assert result['asset_download_status'] == 'disabled'
+    assert result['selected_asset_cache_status'] == 'failed'
+    assert result['selected_asset_cache_status'] != 'not_requested'
+    assert result['selected_asset_cache_download_attempted'] is True
+    assert result['selected_asset_cache_error'] == 'bridge_cache_failure'
+    assert result['selected_asset_local_file_exists'] is False
     assert result['decision_asset_used'] is False
     assert result['decision_asset_reject_reason'] == 'remote_not_cached'
     assert result['provider'] == 'placeholder'
