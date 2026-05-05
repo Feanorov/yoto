@@ -801,9 +801,359 @@ def test_visual_decision_engine_hero_beats_capsule_with_stable_reasons() -> None
 
     assert decision['image_source_type'] == 'steam_library_hero'
     assert hero_asset['accepted'] is True
+    assert hero_asset['score_breakdown']['asset_type_priority_bonus'] > 0.0
     assert 'select:steam_library_hero' in hero_asset['scoring_reason']
     assert capsule_asset['accepted'] is True
+    assert capsule_asset['score_breakdown']['asset_type_priority_bonus'] < 0.0
     assert 'penalty:branding_surface_capsule' in capsule_asset['scoring_reason']
+
+
+def test_visual_decision_engine_cacheable_remote_screenshot_beats_capsule() -> None:
+    decision = _build_decision(
+        game_title='Iron Vanguard',
+        genre='strategy tactics',
+        tags=['battlefield', 'combat', 'gameplay'],
+        short_description='A readable battle screenshot should beat a capsule fallback when it is cacheable.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero commander',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/424242/ss_template_01.jpg',
+                'metadata': {
+                    'template_only': True,
+                    'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/424242/ss_template_01.jpg',
+                    'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\424242\\steam_screenshot_1.jpg',
+                    'cache_status': 'not_requested',
+                    'gameplay_focus': 'battlefield breach',
+                    'foreground_action': 'frontline clash',
+                    'combat': True,
+                },
+            },
+        ],
+    )
+
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+    capsule_asset = _asset_by_source_type(decision, 'steam_library_capsule')
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert screenshot_asset['accepted'] is True
+    assert 'template_only_screenshot_not_available' not in screenshot_asset['rejection_reasons']
+    assert screenshot_asset['score_breakdown']['asset_type_priority_bonus'] > 0.0
+    assert screenshot_asset['total_score'] > capsule_asset['total_score']
+
+
+def test_imperfect_screenshot_beats_capsule() -> None:
+    decision = _build_decision(
+        game_title='Soft Safety Combat Probe',
+        genre='survival horror action',
+        tags=['night raid', 'official art'],
+        short_description='A meaningful battle frame should survive soft safety penalties and beat a capsule.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/515151/library_600x900_2x.jpg',
+                'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero portrait',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/515151/ss_01.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'not_requested',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'battle': 'frontline battle',
+                    'atmosphere': 'storm breach',
+                },
+            },
+        ],
+    )
+
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_screenshot'
+    assert screenshot_asset['accepted'] is True
+    assert screenshot_asset['score_breakdown']['soft_safety_adjustment'] > 0.0
+    assert screenshot_asset['score_breakdown']['soft_safety_threshold_override_applied'] is True
+    assert 'focus_below_threshold' not in screenshot_asset['rejection_reasons']
+    assert 'missing_readable_focus' not in screenshot_asset['rejection_reasons']
+
+
+def test_unresolved_template_placeholder_screenshot_stays_below_capsule() -> None:
+    decision = _build_decision(
+        game_title='Template Placeholder Probe',
+        genre='action adventure',
+        tags=['hero', 'official art'],
+        short_description='A remote template placeholder without subject signals should not soft-rescue over a cached capsule fallback.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/525252/library_600x900_2x.jpg',
+                'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero portrait',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/525252/ss_template_01.jpg',
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/525252/ss_template_01.jpg',
+                'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\525252\\steam_screenshot_1.jpg',
+                'cache_status': 'not_requested',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'template_only': True,
+                },
+            },
+        ],
+    )
+
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_library_capsule'
+    assert decision['use_ai'] is False
+    assert screenshot_asset['accepted'] is False
+    assert screenshot_asset['score_breakdown']['soft_safety_threshold_override_applied'] is False
+    assert 'template_only_screenshot_not_available' in screenshot_asset['rejection_reasons']
+    assert 'hard_reject:template_only_screenshot_not_available' in screenshot_asset['scoring_reason']
+    assert 'focus_below_threshold' in screenshot_asset['rejection_reasons']
+
+
+def test_banner_like_but_scene_beats_capsule() -> None:
+    decision = _build_decision(
+        game_title='Banner Scene Probe',
+        genre='action rpg',
+        tags=['hero', 'fantasy'],
+        short_description='A wide hero scene should be penalized, not hard rejected, when it still shows the subject.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/616161/library_600x900_2x.jpg',
+                'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero portrait',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 3840,
+                'height': 1240,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/616161/library_hero.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'not_requested',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'atmosphere': 'storm ruins',
+                },
+            },
+        ],
+    )
+
+    hero_asset = _asset_by_source_type(decision, 'steam_library_hero')
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert hero_asset['accepted'] is True
+    assert hero_asset['score_breakdown']['soft_safety_adjustment'] > 0.0
+    assert 'banner_only_for_portrait_intent' not in hero_asset['rejection_reasons']
+
+
+def test_hard_reject_still_blocks_menu_like_remote_screenshot() -> None:
+    decision = _build_decision(
+        game_title='Hard Reject Menu Probe',
+        genre='open-world action',
+        tags=['official art'],
+        short_description='A true menu screenshot must stay blocked even after soft safety changes.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/717171/ss_menu.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'not_requested',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'menu': 'pause menu',
+                    'settings': True,
+                    'interface': 'options panel',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1800,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/717171/library_hero.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'vehicle_focus': 'hero bike',
+                    'foreground': 'rider',
+                },
+            },
+        ],
+    )
+
+    screenshot_asset = _asset_by_source_type(decision, 'steam_screenshot')
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert screenshot_asset['accepted'] is False
+    assert 'menu_like_screenshot' in screenshot_asset['rejection_reasons']
+    assert 'ui_heavy_screenshot_for_single_title' in screenshot_asset['rejection_reasons']
+
+
+def test_capsule_when_all_other_remote_candidates_are_bad() -> None:
+    decision = _build_decision(
+        game_title='Capsule Guard Probe',
+        genre='action adventure',
+        tags=['official art'],
+        short_description='Capsule should remain when every other remote official visual is truly unusable.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/818181/library_600x900_2x.jpg',
+                'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero portrait',
+                },
+            },
+            {
+                'source_type': 'steam_screenshot',
+                'width': 1920,
+                'height': 1080,
+                'kind': 'screenshot',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/818181/ss_menu.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'not_requested',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'menu': 'inventory menu',
+                    'settings': True,
+                    'interface': 'options panel',
+                },
+            },
+        ],
+    )
+
+    assert decision['image_source_type'] == 'steam_library_capsule'
+    assert decision['selected_asset']['source_type'] == 'steam_library_capsule'
+
+
+def test_no_regression_for_clean_remote_hero() -> None:
+    decision = _build_decision(
+        game_title='Clean Hero Probe',
+        genre='racing action',
+        tags=['vehicle', 'speed'],
+        short_description='A clean hero scene should still win without needing soft safety rescue.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/919191/library_600x900_2x.jpg',
+                'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'driver portrait',
+                },
+            },
+            {
+                'source_type': 'steam_library_hero',
+                'width': 1800,
+                'height': 900,
+                'kind': 'library_hero',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'remote_url': 'https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/919191/library_hero.jpg',
+                'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'cache_status': 'cached',
+                'source_origin': 'steam_cdn_manifest',
+                'license_hint': 'steam_store_cdn_template',
+                'metadata': {
+                    'vehicle_focus': 'supercar',
+                    'foreground': 'hero car',
+                },
+            },
+        ],
+    )
+
+    hero_asset = _asset_by_source_type(decision, 'steam_library_hero')
+
+    assert decision['image_source_type'] == 'steam_library_hero'
+    assert hero_asset['accepted'] is True
+    assert hero_asset['score_breakdown']['soft_safety_adjustment'] == 0.0
 
 
 def test_visual_decision_engine_gameplay_beats_logo_with_hard_reject_reason() -> None:
@@ -844,9 +1194,47 @@ def test_visual_decision_engine_gameplay_beats_logo_with_hard_reject_reason() ->
 
     assert decision['image_source_type'] == 'steam_screenshot'
     assert gameplay_asset['accepted'] is True
+    assert gameplay_asset['score_breakdown']['asset_type_priority_bonus'] > 0.0
     assert logo_asset['accepted'] is False
     assert 'standalone_logo_asset' in logo_asset['rejection_reasons']
     assert 'reject:standalone_logo_asset' in logo_asset['rejection_reasons']
+
+
+def test_visual_decision_engine_only_capsule_available_still_blocks_ai() -> None:
+    decision = _build_decision(
+        game_title='Fallback Capsule Demo',
+        genre='action rpg',
+        tags=['hero'],
+        short_description='Only capsule surfaces are available, so the best capsule should still be selected.',
+        asset_candidates=[
+            {
+                'source_type': 'steam_library_capsule',
+                'width': 600,
+                'height': 900,
+                'kind': 'library_capsule',
+                'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                    'subject_focus': 'hero portrait',
+                },
+            },
+            {
+                'source_type': 'steam_header_capsule',
+                'width': 920,
+                'height': 430,
+                'kind': 'header_capsule',
+                'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                'metadata': {
+                    'logo_safe': True,
+                },
+            },
+        ],
+    )
+
+    assert decision['use_ai'] is False
+    assert decision['image_source_type'] == 'steam_library_capsule'
+    assert decision['selected_asset']['accepted'] is True
+    assert decision['selected_asset']['normalized_asset_family'] == 'steam_capsule'
 
 
 def test_visual_decision_engine_library_hero_beats_failed_menu_screenshot() -> None:

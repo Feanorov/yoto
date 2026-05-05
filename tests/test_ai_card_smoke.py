@@ -343,7 +343,13 @@ def test_ai_card_smoke_game_eval_writes_asset_pool_diagnostics(tmp_path: Path) -
     assert hades['asset_source_mode'] == 'steam_cdn_manifest'
     assert hades['asset_ingestion_mode'] == 'mixed_local_remote'
     assert hades['candidate_count'] == len(hades['candidates'])
-    assert hades['selected']['image_source_type'] in {'official_press_key_art', 'steam_library_capsule', 'steam_main_capsule'}
+    assert hades['selected']['image_source_type'] in {
+        'official_press_key_art',
+        'steam_library_hero',
+        'steam_screenshot',
+        'steam_library_capsule',
+        'steam_main_capsule',
+    }
     assert 'remote_url' in hades['selected']
     assert 'cache_path' in hades['selected']
     assert 'selected_asset_cache_status' in hades['selected']
@@ -356,11 +362,17 @@ def test_ai_card_smoke_game_eval_writes_asset_pool_diagnostics(tmp_path: Path) -
     assert hades_suspicious['path_or_url'].endswith('fallback_game_image.png')
 
     civilization = next(item for item in payload['games'] if item['slug'] == 'civilization_vi')
-    civilization_suspicious = next(item for item in civilization['candidates'] if item['suspicious_fixture'] is True)
+    civilization_suspicious = [item for item in civilization['candidates'] if item['suspicious_fixture'] is True]
 
-    assert civilization_suspicious['source_family'] == 'local_manifest'
-    assert civilization_suspicious['path_or_url'].endswith('game.png')
-    assert civilization_suspicious['debug']['selection_ranking'] is not None
+    assert civilization['asset_source_mode'] == 'steam_cdn_manifest'
+    assert civilization['steam_cdn_candidate_count'] >= 1
+    assert civilization['suspicious_fixture_candidate_count'] == len(civilization_suspicious)
+    assert any(item['debug']['selection_ranking'] is not None for item in civilization['candidates'])
+    if civilization_suspicious:
+        civilization_fixture = civilization_suspicious[0]
+        assert civilization_fixture['source_family'] == 'local_manifest'
+        assert civilization_fixture['path_or_url'].endswith('game.png')
+        assert civilization_fixture['debug']['selection_ranking'] is not None
 
     pacific_drive = next(item for item in payload['games'] if item['slug'] == 'pacific_drive')
 
@@ -521,6 +533,9 @@ def test_ai_card_smoke_quality_reject_uses_valid_decision_asset_before_ai(tmp_pa
     selected_asset = result['cover_decision_selected_asset']
     selected_asset_metadata = selected_asset['metadata']
     selected_asset_path = Path(selected_asset['path_or_url'])
+    soft_safety_override_applied = bool(
+        selected_asset['score_breakdown'].get('soft_safety_threshold_override_applied')
+    )
 
     assert result['offer_type'] == game_input['offer_type']
     assert result['asset_source_mode'] == 'steam_cdn_manifest'
@@ -533,9 +548,11 @@ def test_ai_card_smoke_quality_reject_uses_valid_decision_asset_before_ai(tmp_pa
     assert result['cover_decision_official_assets_available'] is True
     assert result['cover_decision_official_assets_rejected_count'] >= 1
     assert result['cover_decision_readability_score'] >= 0.55
-    assert result['cover_decision_focus_score'] >= 0.50
+    assert result['cover_decision_focus_score'] >= 0.50 or soft_safety_override_applied is True
     assert result['cover_decision_image_source_type'] in {
         'official_press_key_art',
+        'steam_library_hero',
+        'steam_screenshot',
         'steam_library_capsule',
         'steam_main_capsule',
     }
@@ -545,6 +562,7 @@ def test_ai_card_smoke_quality_reject_uses_valid_decision_asset_before_ai(tmp_pa
     assert selected_asset['source_type'] == result['cover_decision_image_source_type']
     assert selected_asset['source_type'] != 'placeholder'
     assert selected_asset['accepted'] is True
+    assert 'soft_safety_threshold_override_applied' in selected_asset['score_breakdown']
     assert selected_asset_path.exists()
     assert selected_asset_path == Path(selected_asset_metadata['cache_path'])
     assert selected_asset_metadata['cache_status'] in {'cached', 'downloaded'}

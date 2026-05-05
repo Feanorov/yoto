@@ -232,6 +232,32 @@ NORMALIZED_ASSET_FAMILY_PRIORITY = {
     'invalid': 0,
     'ai_fallback': 0,
 }
+ASSET_TYPE_PRIORITY_BONUS_BY_FAMILY: dict[str, float] = {
+    'steam_library_hero': 0.03,
+    'steam_screenshot': 0.0,
+    'epic_screenshot': 0.0,
+    'trailer_frame': 0.01,
+    'press_key_art': 0.015,
+    'epic_key_art': 0.015,
+    'steam_capsule': -0.025,
+    'steam_header': -0.035,
+    'steam_logo': -0.08,
+}
+REMOTE_CACHE_FAILURE_STATUSES = frozenset({'failed', 'invalid_content_type', 'too_large', 'error'})
+NON_VISUAL_METADATA_SIGNAL_TOKENS = (
+    'app_id',
+    'cache',
+    'entry_id',
+    'file',
+    'license',
+    'manifest',
+    'origin',
+    'path',
+    'priority',
+    'status',
+    'template',
+    'url',
+)
 
 HERO_HINT_KEYWORDS = (
     'character',
@@ -655,6 +681,26 @@ POSITIVE_VISUAL_RESCUE_SCORING_REASONS = frozenset(
         'vdr1_focus_profile_hero_bonus',
     }
 )
+SOFT_SAFETY_RECLASSIFIABLE_REJECTION_REASONS = frozenset(
+    {
+        'banner_only_for_portrait_intent',
+        'environment_only_for_character_intent',
+    }
+)
+SOFT_SAFETY_ELIGIBLE_ASSET_FAMILIES = frozenset(
+    {
+        'steam_library_hero',
+        'press_key_art',
+        'epic_key_art',
+        'steam_screenshot',
+        'epic_screenshot',
+        'trailer_frame',
+    }
+)
+SOFT_SAFETY_MIN_READABILITY_SCORE = 0.42
+SOFT_SAFETY_MIN_FOCUS_SCORE = 0.18
+SOFT_SAFETY_MIN_TOTAL_SCORE = 0.58
+SOFT_SAFETY_MAX_ADJUSTMENT = 0.20
 
 RESCUE_APPLY_REASON_PREFIX = 'rescue_apply'
 RESCUE_SKIP_REASON_PREFIX = 'rescue_skip'
@@ -1295,7 +1341,7 @@ def _metadata_signal_text(metadata: Mapping[str, Any]) -> str:
     values: list[str] = []
     for key, value in metadata.items():
         normalized_key = _normalize_text(key)
-        if any(token in normalized_key for token in ('cache', 'file', 'path', 'url')):
+        if any(token in normalized_key for token in NON_VISUAL_METADATA_SIGNAL_TOKENS):
             continue
         if normalized_key:
             values.append(normalized_key)
@@ -1374,7 +1420,7 @@ class AssetCandidate:
             for part in (
                 self.source_type,
                 self.kind,
-                _metadata_text(self.metadata),
+                _metadata_signal_text(self.metadata),
             )
             if part
         )
@@ -2076,12 +2122,43 @@ class VisualDecisionEngine:
         readability_score = _clamp(readability_score + readability_rule_delta)
         focus_score = _clamp(base_focus_score + focus_enrichment_delta + focus_rule_delta)
 
-        hard_reject_reasons = self._hard_reject_reasons(
+        raw_hard_reject_reasons = self._hard_reject_reasons(
             candidate,
             enrichment=enrichment,
             visual_type=visual_type,
             small_asset_penalty=effective_small_asset_penalty,
             normalized_asset_family=normalized_asset_family,
+        )
+        base_total_score = _clamp((readability_score * 0.45) + (focus_score * 0.55))
+        type_priority_bonus, type_priority_reasons = self._asset_type_priority_bonus(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            base_total_score=base_total_score,
+            visual_type=visual_type,
+        )
+        content_hint_text = self._content_hint_text(candidate)
+        hard_reject_reasons, soft_safety_reclassified_reasons = self._reclassify_soft_safety_rejects(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+            content_hint_text=content_hint_text,
+            hard_reject_reasons=raw_hard_reject_reasons,
+        )
+        pre_soft_total_score = _clamp(base_total_score + type_priority_bonus)
+        soft_safety_adjustment, soft_safety_reasons, soft_safety_threshold_override = self._soft_safety_adjustment(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+            content_hint_text=content_hint_text,
+            rule_reasons=rule_reasons,
+            effective_hard_reject_reasons=hard_reject_reasons,
+            reclassified_hard_reject_reasons=soft_safety_reclassified_reasons,
+            pre_soft_total_score=pre_soft_total_score,
+            readability_score=readability_score,
+            focus_score=focus_score,
         )
         threshold_passed = (
             not hard_reject_reasons
@@ -2092,13 +2169,15 @@ class VisualDecisionEngine:
             and readability_score >= MIN_READABILITY_SCORE
             and focus_score >= MIN_FOCUS_SCORE
         )
-        total_score = _clamp((readability_score * 0.45) + (focus_score * 0.55))
+        if not threshold_passed and soft_safety_threshold_override:
+            threshold_passed = True
+        total_score = _clamp(pre_soft_total_score + soft_safety_adjustment)
         rejection_reasons: list[str] = list(hard_reject_reasons)
         if not candidate.path_or_url:
             rejection_reasons.append('asset_path_or_url_missing')
-        if readability_score < MIN_READABILITY_SCORE:
+        if readability_score < MIN_READABILITY_SCORE and not soft_safety_threshold_override:
             rejection_reasons.append('readability_below_threshold')
-        if focus_score < MIN_FOCUS_SCORE:
+        if focus_score < MIN_FOCUS_SCORE and not soft_safety_threshold_override:
             rejection_reasons.append('focus_below_threshold')
         if effective_small_asset_penalty >= 0.20:
             rejection_reasons.append('asset_too_small')
@@ -2106,7 +2185,7 @@ class VisualDecisionEngine:
             rejection_reasons.append('weak_metadata')
         if candidate.source_type not in KNOWN_SOURCE_TYPES:
             rejection_reasons.append('unknown_source_type')
-        if 'vdr1_missing_readable_focus_penalty' in rule_reasons:
+        if 'vdr1_missing_readable_focus_penalty' in rule_reasons and not soft_safety_threshold_override:
             rejection_reasons.append('missing_readable_focus')
         if 'vdr1_empty_scene_penalty' in rule_reasons:
             rejection_reasons.append('empty_background')
@@ -2120,6 +2199,8 @@ class VisualDecisionEngine:
         scoring_reasons.extend(readability_reasons)
         scoring_reasons.extend(focus_reasons)
         scoring_reasons.extend(rule_reasons)
+        scoring_reasons.extend(type_priority_reasons)
+        scoring_reasons.extend(soft_safety_reasons)
         scoring_reasons.extend(
             self._stable_score_reason_aliases(
                 candidate,
@@ -2131,6 +2212,10 @@ class VisualDecisionEngine:
                 hint_text=hint_text,
             )
         )
+        if soft_safety_reclassified_reasons:
+            scoring_reasons.extend(
+                f'soft_safety_reclassify:{reason}' for reason in soft_safety_reclassified_reasons
+            )
         if hard_reject_reasons:
             scoring_reasons.extend(f'hard_reject:{reason}' for reason in hard_reject_reasons)
         stable_rejection_aliases = self._stable_rejection_aliases(
@@ -2194,6 +2279,11 @@ class VisualDecisionEngine:
                 'quality_tier': quality_tier,
                 'visual_decision_rule_readability_delta': round(readability_rule_delta, 3),
                 'visual_decision_rule_focus_delta': round(focus_rule_delta, 3),
+                'base_total_score': round(base_total_score, 3),
+                'asset_type_priority_bonus': round(type_priority_bonus, 3),
+                'soft_safety_adjustment': round(soft_safety_adjustment, 3),
+                'soft_safety_threshold_override_applied': soft_safety_threshold_override,
+                'soft_safety_reclassified_reasons': list(soft_safety_reclassified_reasons),
                 'scoring_reason_parts': scoring_reasons,
             },
             scoring_reason=scoring_reason,
@@ -2439,7 +2529,7 @@ class VisualDecisionEngine:
             part
             for part in (
                 candidate.signal_text,
-                _normalize_text(candidate.path_or_url),
+                _basename_text(candidate.path_or_url),
             )
             if part
         )
@@ -2449,8 +2539,8 @@ class VisualDecisionEngine:
         return ' '.join(
             part
             for part in (
-                _metadata_text(candidate.metadata),
-                _normalize_text(candidate.path_or_url),
+                _metadata_signal_text(candidate.metadata),
+                _basename_text(candidate.path_or_url),
             )
             if part
         )
@@ -3059,6 +3149,289 @@ class VisualDecisionEngine:
         )
 
     @classmethod
+    def _asset_type_priority_bonus(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        base_total_score: float,
+        visual_type: str,
+    ) -> tuple[float, list[str]]:
+        hint_text = cls._hint_text(candidate)
+        content_hint_text = cls._content_hint_text(candidate)
+        has_subject_signal = cls._has_main_object_signal(content_hint_text) or cls._has_subject_signal(content_hint_text)
+        has_action_signal = cls._has_action_signal(content_hint_text)
+        has_dynamic_action_signal = _contains_any_keyword(content_hint_text, ACTION_HINT_KEYWORDS)
+        is_banner_like = enrichment.composition_bias == 'banner' or enrichment.is_wide_banner
+        is_text_heavy = cls._is_text_heavy_candidate(hint_text)
+        is_title_heavy = cls._is_title_heavy_branding_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+        )
+        is_ui_like = cls._is_ui_heavy_screenshot_candidate(
+            candidate,
+            enrichment=enrichment,
+            hint_text=hint_text,
+        ) or cls._is_menu_like_screenshot_candidate(
+            candidate,
+            hint_text=hint_text,
+        )
+
+        bonus = ASSET_TYPE_PRIORITY_BONUS_BY_FAMILY.get(normalized_asset_family, 0.0)
+        reasons: list[str] = []
+
+        if bonus > 0.0:
+            reasons.append(f'asset_type_priority_bonus:{normalized_asset_family}:{bonus:+.3f}')
+        elif bonus < 0.0:
+            reasons.append(f'asset_type_priority_penalty:{normalized_asset_family}:{bonus:+.3f}')
+
+        if normalized_asset_family in {'steam_library_hero', 'steam_screenshot', 'epic_screenshot', 'trailer_frame'}:
+            if has_subject_signal or has_dynamic_action_signal:
+                bonus += 0.03
+                reasons.append('asset_type_priority_bonus:clear_subject_or_action:+0.030')
+        elif normalized_asset_family in {'press_key_art', 'epic_key_art'} and has_subject_signal:
+            bonus += 0.01
+            reasons.append('asset_type_priority_bonus:readable_subject:+0.010')
+
+        if (
+            normalized_asset_family in {'steam_screenshot', 'epic_screenshot', 'trailer_frame'}
+            and not has_subject_signal
+            and not has_dynamic_action_signal
+            and _contains_any_keyword(content_hint_text, ('map', 'world map', 'city', 'builder', 'strategy', 'armies'))
+        ):
+            bonus -= 0.06
+            reasons.append('asset_type_priority_penalty:macro_overview_without_subject:-0.060')
+
+        if is_banner_like and normalized_asset_family in {'steam_capsule', 'steam_header'}:
+            bonus -= 0.02
+            reasons.append('asset_type_priority_penalty:banner_branding_surface:-0.020')
+        if is_text_heavy:
+            text_penalty = -0.05 if is_banner_like else -0.03
+            bonus += text_penalty
+            reasons.append(f'asset_type_priority_penalty:text_heavy:{text_penalty:+.3f}')
+        if is_title_heavy:
+            bonus -= 0.06
+            reasons.append('asset_type_priority_penalty:title_heavy:-0.060')
+        if is_ui_like:
+            bonus -= 0.06
+            reasons.append('asset_type_priority_penalty:ui_like:-0.060')
+
+        if visual_type in {'character', 'poster_art'} and normalized_asset_family in {'steam_capsule', 'steam_header'}:
+            bonus -= 0.015
+            reasons.append('asset_type_priority_penalty:portrait_branding_surface:-0.015')
+
+        if bonus > 0.0:
+            max_positive_bonus = max(0.0, (1.0 - _clamp(base_total_score)) * 0.5)
+            capped_bonus = min(bonus, max_positive_bonus)
+            if capped_bonus + 0.001 < bonus:
+                reasons.append(f'asset_type_priority_bonus_capped:{bonus:+.3f}->{capped_bonus:+.3f}')
+            bonus = capped_bonus
+
+        return _clamp_range(bonus, -0.12, 0.08), reasons
+
+    @classmethod
+    def _is_soft_safety_eligible_candidate(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        hint_text: str,
+        content_hint_text: str,
+    ) -> bool:
+        if not candidate.is_official:
+            return False
+        if normalized_asset_family not in SOFT_SAFETY_ELIGIBLE_ASSET_FAMILIES:
+            return False
+        source_origin = cls._candidate_source_origin(candidate)
+        if source_origin in LOCAL_FALLBACK_SOURCE_ORIGINS:
+            return False
+        if not cls._candidate_remote_url(candidate) and source_origin == 'unknown':
+            return False
+        if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
+            return False
+        if cls._is_ui_heavy_screenshot_candidate(
+            candidate,
+            enrichment=enrichment,
+            hint_text=hint_text,
+        ):
+            return False
+        if cls._is_standalone_logo_candidate(candidate, hint_text=hint_text):
+            return False
+        if cls._is_title_heavy_branding_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+        ):
+            return False
+
+        has_subject_signal = cls._has_main_object_signal(content_hint_text) or cls._has_subject_signal(content_hint_text)
+        has_action_signal = cls._has_action_signal(content_hint_text)
+        has_remote_visual_structure = (
+            enrichment.composition_bias in {'gameplay', 'hero', 'scene', 'banner'}
+            and enrichment.estimated_subject_scale in {'large', 'medium'}
+            and enrichment.estimated_focus in {'strong', 'medium', 'weak'}
+        )
+        if normalized_asset_family in GAMEPLAY_LIKE_ASSET_FAMILIES:
+            return (
+                enrichment.composition_bias == 'gameplay'
+                and enrichment.estimated_focus in {'strong', 'medium'}
+                and enrichment.estimated_subject_scale in {'large', 'medium'}
+            ) or has_subject_signal or has_action_signal
+        if normalized_asset_family == 'steam_library_hero':
+            return has_remote_visual_structure or has_subject_signal or has_action_signal
+        return has_remote_visual_structure or has_subject_signal
+
+    @classmethod
+    def _reclassify_soft_safety_rejects(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        hint_text: str,
+        content_hint_text: str,
+        hard_reject_reasons: Sequence[str],
+    ) -> tuple[list[str], list[str]]:
+        if not hard_reject_reasons:
+            return [], []
+        if not cls._is_soft_safety_eligible_candidate(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+            content_hint_text=content_hint_text,
+        ):
+            return list(hard_reject_reasons), []
+
+        reclassified: list[str] = []
+        for reason in hard_reject_reasons:
+            if reason not in SOFT_SAFETY_RECLASSIFIABLE_REJECTION_REASONS:
+                continue
+            if reason == 'banner_only_for_portrait_intent' and normalized_asset_family == 'steam_library_hero':
+                reclassified.append(reason)
+            elif (
+                reason == 'environment_only_for_character_intent'
+                and enrichment.estimated_subject_scale in {'large', 'medium'}
+                and enrichment.composition_bias in {'scene', 'banner'}
+            ):
+                reclassified.append(reason)
+
+        effective_hard_reject_reasons = [
+            reason for reason in hard_reject_reasons if reason not in reclassified
+        ]
+        return effective_hard_reject_reasons, reclassified
+
+    @classmethod
+    def _is_unresolved_template_placeholder_candidate(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        normalized_asset_family: str,
+        content_hint_text: str,
+    ) -> bool:
+        if normalized_asset_family not in GAMEPLAY_LIKE_ASSET_FAMILIES:
+            return False
+        if not bool(candidate.metadata.get('template_only')):
+            return False
+        if cls._candidate_has_local_asset_file(candidate):
+            return False
+
+        remote_url = cls._candidate_remote_url(candidate)
+        if not remote_url or 'ss_template_' not in _basename_text(remote_url):
+            return False
+
+        has_subject_signal = cls._has_main_object_signal(content_hint_text) or cls._has_subject_signal(content_hint_text)
+        has_action_signal = cls._has_action_signal(content_hint_text) or _contains_any_keyword(
+            content_hint_text,
+            ACTION_HINT_KEYWORDS,
+        )
+        return not (has_subject_signal or has_action_signal)
+
+    @classmethod
+    def _soft_safety_adjustment(
+        cls,
+        candidate: AssetCandidate,
+        *,
+        enrichment: AssetEnrichment,
+        normalized_asset_family: str,
+        hint_text: str,
+        content_hint_text: str,
+        rule_reasons: Sequence[str],
+        effective_hard_reject_reasons: Sequence[str],
+        reclassified_hard_reject_reasons: Sequence[str],
+        pre_soft_total_score: float,
+        readability_score: float,
+        focus_score: float,
+    ) -> tuple[float, list[str], bool]:
+        if effective_hard_reject_reasons:
+            return 0.0, [], False
+        if not cls._is_soft_safety_eligible_candidate(
+            candidate,
+            enrichment=enrichment,
+            normalized_asset_family=normalized_asset_family,
+            hint_text=hint_text,
+            content_hint_text=content_hint_text,
+        ):
+            return 0.0, [], False
+
+        adjustment = 0.0
+        reasons: list[str] = []
+        has_soft_focus_issue = (
+            'vdr1_missing_readable_focus_penalty' in rule_reasons
+            or focus_score < MIN_FOCUS_SCORE
+        )
+        skip_soft_focus_rescue = has_soft_focus_issue and cls._is_unresolved_template_placeholder_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            content_hint_text=content_hint_text,
+        )
+
+        if has_soft_focus_issue and not skip_soft_focus_rescue:
+            relief = 0.16 if normalized_asset_family in GAMEPLAY_LIKE_ASSET_FAMILIES else 0.14
+            penalty = 0.04
+            adjustment += relief - penalty
+            reasons.append(f'soft_safety_relief:focus_gate:+{relief:.3f}')
+            reasons.append(f'soft_safety_penalty:focus_gate:-{penalty:.3f}')
+        elif skip_soft_focus_rescue:
+            reasons.append('soft_safety_skip:template_placeholder_without_subject_signal')
+
+        if 'banner_only_for_portrait_intent' in reclassified_hard_reject_reasons:
+            relief = 0.09
+            penalty = 0.03
+            adjustment += relief - penalty
+            reasons.append(f'soft_safety_relief:banner_scene:+{relief:.3f}')
+            reasons.append(f'soft_safety_penalty:banner_scene:-{penalty:.3f}')
+
+        if 'environment_only_for_character_intent' in reclassified_hard_reject_reasons:
+            relief = 0.07
+            penalty = 0.03
+            adjustment += relief - penalty
+            reasons.append(f'soft_safety_relief:scene_context:+{relief:.3f}')
+            reasons.append(f'soft_safety_penalty:scene_context:-{penalty:.3f}')
+
+        if readability_score < MIN_READABILITY_SCORE and readability_score >= SOFT_SAFETY_MIN_READABILITY_SCORE:
+            relief = 0.05
+            penalty = 0.02
+            adjustment += relief - penalty
+            reasons.append(f'soft_safety_relief:readability_gate:+{relief:.3f}')
+            reasons.append(f'soft_safety_penalty:readability_gate:-{penalty:.3f}')
+
+        adjustment = _clamp_range(adjustment, 0.0, SOFT_SAFETY_MAX_ADJUSTMENT)
+        adjusted_total_score = _clamp(pre_soft_total_score + adjustment)
+        soft_threshold_override = bool(
+            adjustment > 0.0
+            and adjusted_total_score >= SOFT_SAFETY_MIN_TOTAL_SCORE
+            and readability_score >= SOFT_SAFETY_MIN_READABILITY_SCORE
+            and focus_score >= SOFT_SAFETY_MIN_FOCUS_SCORE
+        )
+        if soft_threshold_override:
+            reasons.append('soft_safety_threshold_override')
+        return adjustment, reasons, soft_threshold_override
+
+    @classmethod
     def _small_size_readability_relief(
         cls,
         candidate: AssetCandidate,
@@ -3239,6 +3612,7 @@ class VisualDecisionEngine:
     ) -> list[str]:
         reasons: list[str] = []
         hint_text = cls._hint_text(candidate)
+        content_hint_text = cls._content_hint_text(candidate)
         if not candidate.path_or_url:
             reasons.append('asset_path_or_url_missing')
         if candidate.source_type in REJECT_ASSET_TYPES or candidate.kind in REJECT_ASSET_TYPES:
@@ -3259,6 +3633,12 @@ class VisualDecisionEngine:
             reasons.append('placeholder_asset')
         if visual_type != 'collage' and normalized_asset_family == 'collage':
             reasons.append('collage_single_title')
+        if cls._is_unresolved_template_placeholder_candidate(
+            candidate,
+            normalized_asset_family=normalized_asset_family,
+            content_hint_text=content_hint_text,
+        ):
+            reasons.append('template_only_screenshot_not_available')
         if cls._is_unresolved_template_only_screenshot_candidate(candidate):
             reasons.append('template_only_screenshot_not_available')
         if cls._is_menu_like_screenshot_candidate(candidate, hint_text=hint_text):
@@ -3441,11 +3821,18 @@ class VisualDecisionEngine:
 
     @classmethod
     def _is_unresolved_template_only_screenshot_candidate(cls, candidate: AssetCandidate) -> bool:
-        return (
-            candidate.source_type == 'steam_screenshot'
-            and bool(candidate.metadata.get('template_only'))
-            and not cls._candidate_has_local_asset_file(candidate)
-        )
+        if candidate.source_type != 'steam_screenshot':
+            return False
+        if not bool(candidate.metadata.get('template_only')):
+            return False
+        if cls._candidate_has_local_asset_file(candidate):
+            return False
+
+        cache_status = cls._candidate_cache_status(candidate)
+        remote_url = cls._candidate_remote_url(candidate)
+        if not remote_url:
+            return True
+        return cache_status in REMOTE_CACHE_FAILURE_STATUSES or cache_status == 'missing'
 
     @classmethod
     def _is_local_placeholder_fixture_candidate(cls, candidate: AssetCandidate) -> bool:
