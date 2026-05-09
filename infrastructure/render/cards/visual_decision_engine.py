@@ -5036,6 +5036,100 @@ def is_official_like_source_type(source_type: str | None) -> bool:
     return _normalize_text(source_type) in OFFICIAL_LIKE_SOURCE_TYPES
 
 
+def _bridge_candidate_key(payload: Mapping[str, Any]) -> tuple[str | None, str | None, str | None]:
+    metadata = payload.get('metadata')
+    cache_path = None
+    if isinstance(metadata, Mapping):
+        cache_path = _safe_text(metadata.get('cache_path')) or None
+    return (
+        _normalize_text(payload.get('source_type')) or None,
+        _safe_text(payload.get('path_or_url')) or None,
+        cache_path,
+    )
+
+
+def _bridge_candidate_normalized_family(payload: Mapping[str, Any]) -> str:
+    normalized_asset_family = _normalize_text(payload.get('normalized_asset_family'))
+    if normalized_asset_family:
+        return normalized_asset_family
+
+    source_type = _normalize_text(payload.get('source_type'))
+    kind = _normalize_text(payload.get('kind'))
+
+    if source_type == AI_SOURCE_TYPE:
+        return 'ai_fallback'
+    if source_type == 'steam_library_hero' or 'library_hero' in kind:
+        return 'steam_library_hero'
+    if source_type == 'official_press_key_art' or 'key_art' in kind:
+        return 'press_key_art'
+    if source_type in {'epic_offer_image', 'epic_library_landscape'}:
+        return 'epic_key_art'
+    if source_type == 'official_trailer_frame' or 'trailer' in kind:
+        return 'trailer_frame'
+    if source_type == 'steam_screenshot' or 'screenshot' in kind:
+        return 'steam_screenshot'
+    if source_type == 'steam_header_capsule' or 'header' in kind:
+        return 'steam_header'
+    if source_type in {'steam_library_capsule', 'steam_main_capsule'} or 'capsule' in kind:
+        return 'steam_capsule'
+    return source_type or kind or 'invalid'
+
+
+def _bridge_candidate_is_accepted(payload: Mapping[str, Any]) -> bool:
+    if bool(payload.get('accepted')):
+        return True
+
+    quality_tier = _normalize_text(payload.get('quality_tier'))
+    rejection_reasons = payload.get('rejection_reasons')
+    has_rejections = any(_safe_text(reason) for reason in rejection_reasons or [])
+    return quality_tier in {'good', 'acceptable'} and not has_rejections
+
+
+def _resolve_cover_decision_fallback_asset(
+    cover_decision: Mapping[str, Any],
+    *,
+    selected_asset: Mapping[str, Any],
+) -> tuple[dict[str, Any], str, str] | None:
+    asset_scores = cover_decision.get('asset_scores')
+    if not isinstance(asset_scores, Sequence):
+        return None
+
+    selected_key = _bridge_candidate_key(selected_asset)
+    preferred_candidates: list[tuple[dict[str, Any], str, str]] = []
+    last_resort_candidates: list[tuple[dict[str, Any], str, str]] = []
+
+    for item in asset_scores:
+        if not isinstance(item, Mapping):
+            continue
+        payload = {str(key): _json_ready(value) for key, value in item.items()}
+        if _bridge_candidate_key(payload) == selected_key:
+            continue
+
+        source_type = _normalize_text(payload.get('source_type')) or None
+        if not is_official_like_source_type(source_type):
+            continue
+        if not _bridge_candidate_is_accepted(payload):
+            continue
+
+        resolved_path = _resolve_selected_asset_local_path(payload)
+        if resolved_path is None:
+            continue
+
+        family = _bridge_candidate_normalized_family(payload)
+        target_group = (
+            last_resort_candidates
+            if family in LAST_RESORT_OFFICIAL_ASSET_FAMILIES
+            else preferred_candidates
+        )
+        target_group.append((payload, source_type, resolved_path))
+
+    if preferred_candidates:
+        return preferred_candidates[0]
+    if last_resort_candidates:
+        return last_resort_candidates[0]
+    return None
+
+
 def resolve_cover_decision_asset_bridge(cover_decision: Mapping[str, Any] | None) -> DecisionAssetBridge:
     if not isinstance(cover_decision, Mapping):
         return DecisionAssetBridge(
@@ -5074,6 +5168,21 @@ def resolve_cover_decision_asset_bridge(cover_decision: Mapping[str, Any] | None
     source_type = _normalize_text(payload.get('source_type')) or None
     resolved_path = _resolve_selected_asset_local_path(payload)
     if resolved_path is None:
+        if is_official_like_source_type(source_type):
+            fallback = _resolve_cover_decision_fallback_asset(
+                cover_decision,
+                selected_asset=payload,
+            )
+            if fallback is not None:
+                fallback_payload, fallback_source_type, fallback_resolved_path = fallback
+                return DecisionAssetBridge(
+                    selected_asset=fallback_payload,
+                    selected_asset_source_type=fallback_source_type,
+                    resolved_local_path=fallback_resolved_path,
+                    candidate_valid=True,
+                    decision_asset_use_reason='cover_decision_fallback_official_asset',
+                    decision_asset_reject_reason=None,
+                )
         return DecisionAssetBridge(
             selected_asset=payload,
             selected_asset_source_type=source_type,

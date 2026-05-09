@@ -347,6 +347,73 @@ def test_visual_decision_engine_bridge_accepts_cached_official_asset_path_from_m
     assert bridge.decision_asset_reject_reason is None
 
 
+def test_visual_decision_engine_bridge_falls_back_to_stronger_local_official_asset() -> None:
+    bridge = resolve_cover_decision_asset_bridge(
+        {
+            'use_ai': False,
+            'image_source_type': 'steam_screenshot',
+            'selected_asset': {
+                'source_type': 'steam_screenshot',
+                'kind': 'screenshot',
+                'path_or_url': 'https://cdn.example.com/steam_screenshot.png',
+                'accepted': True,
+                'quality_tier': 'good',
+                'normalized_asset_family': 'steam_screenshot',
+                'metadata': {
+                    'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\missing\\steam_screenshot_1.jpg',
+                    'cache_status': 'not_requested',
+                },
+            },
+            'asset_scores': [
+                {
+                    'source_type': 'steam_screenshot',
+                    'kind': 'screenshot',
+                    'path_or_url': 'https://cdn.example.com/steam_screenshot.png',
+                    'accepted': True,
+                    'quality_tier': 'good',
+                    'normalized_asset_family': 'steam_screenshot',
+                    'metadata': {
+                        'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\missing\\steam_screenshot_1.jpg',
+                        'cache_status': 'not_requested',
+                    },
+                },
+                {
+                    'source_type': 'steam_library_capsule',
+                    'kind': 'library_capsule',
+                    'path_or_url': SMOKE_LOCAL_PORTRAIT_ASSET,
+                    'accepted': True,
+                    'quality_tier': 'acceptable',
+                    'normalized_asset_family': 'steam_capsule',
+                    'metadata': {
+                        'cache_path': SMOKE_LOCAL_PORTRAIT_ASSET,
+                        'cache_status': 'cached',
+                    },
+                },
+                {
+                    'source_type': 'steam_library_hero',
+                    'kind': 'library_hero',
+                    'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                    'accepted': True,
+                    'quality_tier': 'good',
+                    'normalized_asset_family': 'steam_library_hero',
+                    'metadata': {
+                        'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                        'cache_status': 'cached',
+                    },
+                },
+            ],
+        }
+    )
+
+    assert bridge.candidate_valid is True
+    assert bridge.selected_asset is not None
+    assert bridge.selected_asset['source_type'] == 'steam_library_hero'
+    assert bridge.selected_asset_source_type == 'steam_library_hero'
+    assert bridge.resolved_local_path == str(Path(SMOKE_LOCAL_LANDSCAPE_ASSET).resolve())
+    assert bridge.decision_asset_use_reason == 'cover_decision_fallback_official_asset'
+    assert bridge.decision_asset_reject_reason is None
+
+
 def test_visual_decision_engine_bridge_rejects_nonlocal_or_aggregate_assets() -> None:
     bundle_input = dict(MINIMAL_SMOKE_GAMES[4])
     bundle_decision = build_cover_decision(
