@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 
 from PIL import Image
+import pytest
 
 from infrastructure.render.cards.asset_sources.asset_cache import AssetCacheDownloadResult
 from infrastructure.render.cards.image_providers import ArtworkImageProvider, ImageResolutionRequest, ResolvedImage, YotoImageResolver
@@ -23,6 +25,27 @@ from tools.ai_card_smoke import (
     resolve_asset_candidates_for_game,
     run_scenario,
 )
+
+RENDERING_ENV_KEYS = (
+    'IMAGE_PROVIDER_MODE',
+    'IMAGE_PIPELINE_VERSION',
+    'COMFYUI_ENABLED',
+    'COMFYUI_URL',
+    'COMFYUI_CHECKPOINT',
+)
+
+
+@pytest.fixture(autouse=True)
+def _restore_rendering_env() -> None:
+    original = {key: os.environ.get(key) for key in RENDERING_ENV_KEYS}
+    try:
+        yield
+    finally:
+        for key, value in original.items():
+            if value is None:
+                os.environ.pop(key, None)
+            else:
+                os.environ[key] = value
 
 
 def _png_bytes() -> bytes:
@@ -923,6 +946,101 @@ def test_nonlocal_smoke_selected_official_does_not_silently_fall_to_ai(tmp_path:
     assert fallback_used is True
     assert fallback_reason == 'official_asset_bridge_invalid'
     assert outcome == 'ai_hard_failure'
+    assert ai_provider.calls == 0
+
+
+def test_nonlocal_selected_official_uses_ranked_local_official_bridge_fallback() -> None:
+    ai_provider = _FakeProvider(
+        ResolvedImage(
+            image=Image.new('RGB', (1280, 720), '#22aa55'),
+            metadata={
+                'selected_source': 'ai',
+                'provider_name': 'ai',
+                'asset_path': str(Path(SMOKE_LOCAL_LANDSCAPE_ASSET).resolve()),
+            },
+        )
+    )
+    resolver = YotoImageResolver(
+        artwork_provider=ArtworkImageProvider(),
+        ai_provider=ai_provider,
+        placeholder_provider=_FakeProvider(
+            ResolvedImage(
+                image=Image.new('RGB', (1280, 720), '#111111'),
+                metadata={'selected_source': 'placeholder', 'provider_name': 'placeholder'},
+            )
+        ),
+        mode='ai_first',
+    )
+
+    result = resolver.resolve(
+        _resolver_request(
+            cover_decision={
+                'use_ai': False,
+                'image_source_type': 'steam_screenshot',
+                'selected_asset': {
+                    'source_type': 'steam_screenshot',
+                    'kind': 'screenshot',
+                    'path_or_url': 'https://cdn.example.com/steam_screenshot.png',
+                    'accepted': True,
+                    'quality_tier': 'good',
+                    'normalized_asset_family': 'steam_screenshot',
+                    'metadata': {
+                        'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\missing\\steam_screenshot_1.jpg',
+                        'cache_status': 'not_requested',
+                    },
+                },
+                'asset_scores': [
+                    {
+                        'source_type': 'steam_screenshot',
+                        'kind': 'screenshot',
+                        'path_or_url': 'https://cdn.example.com/steam_screenshot.png',
+                        'accepted': True,
+                        'quality_tier': 'good',
+                        'normalized_asset_family': 'steam_screenshot',
+                        'metadata': {
+                            'cache_path': 'D:\\Telegram_portable_bundle\\output\\cards\\official_asset_cache\\steam\\missing\\steam_screenshot_1.jpg',
+                            'cache_status': 'not_requested',
+                        },
+                    },
+                    {
+                        'source_type': 'steam_main_capsule',
+                        'kind': 'main_capsule',
+                        'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                        'accepted': True,
+                        'quality_tier': 'acceptable',
+                        'normalized_asset_family': 'steam_capsule',
+                        'metadata': {
+                            'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                            'cache_status': 'cached',
+                        },
+                    },
+                    {
+                        'source_type': 'steam_library_hero',
+                        'kind': 'library_hero',
+                        'path_or_url': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                        'accepted': True,
+                        'quality_tier': 'good',
+                        'normalized_asset_family': 'steam_library_hero',
+                        'metadata': {
+                            'cache_path': SMOKE_LOCAL_LANDSCAPE_ASSET,
+                            'cache_status': 'cached',
+                        },
+                    },
+                ],
+            }
+        )
+    )
+
+    final_source = infer_final_source(str(result.metadata.get('selected_source') or ''))
+
+    assert final_source == 'asset'
+    assert result.metadata['selected_source'] == 'artwork'
+    assert result.metadata['decision_asset_used'] is True
+    assert result.metadata['decision_asset_use_reason'] == 'cover_decision_fallback_official_asset'
+    assert result.metadata['decision_asset_reject_reason'] is None
+    assert result.metadata['actual_image_source_type'] == 'steam_library_hero'
+    assert result.metadata['actual_image_path_or_url'] == str(Path(SMOKE_LOCAL_LANDSCAPE_ASSET).resolve())
+    assert result.metadata['decision_asset_matches_actual_source'] is True
     assert ai_provider.calls == 0
 
 
