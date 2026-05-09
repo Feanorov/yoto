@@ -648,7 +648,11 @@ class YotoCardEngineV4:
         diagnostics.hero_fallback_used = hero_selection.fallback_used
         diagnostics.hero_selection = hero_selection.to_snapshot()
 
-        canvas = self._compose_clean_background(artwork, used_placeholder=diagnostics.used_placeholder_artwork).convert('RGBA')
+        background, background_info = self._compose_clean_background(
+            artwork,
+            used_placeholder=diagnostics.used_placeholder_artwork,
+        )
+        canvas = background.convert('RGBA')
         layout_profile = self._clean_layout_profile(data, diagnostics, card_type)
         diagnostics.hero_rect = (0, 0, CARD_SIZE[0], CARD_SIZE[1])
         diagnostics.lower_third_rect = (
@@ -663,6 +667,12 @@ class YotoCardEngineV4:
                 'title_shelf': 'suppressed',
                 'gradient_height': int(layout_profile['gradient_height']),
                 'legacy_chrome_removed': True,
+                'safe_zone': tuple(int(value) for value in layout_profile['safe_zone']),
+                'background_crop_box': tuple(int(value) for value in background_info['crop_box']),
+                'background_source_size': tuple(int(value) for value in background_info['source_size']),
+                'background_target_size': tuple(int(value) for value in background_info['target_size']),
+                'background_bias': tuple(float(value) for value in background_info['bias']),
+                'background_zoom_levels': tuple(float(value) for value in background_info['zoom_levels']),
             }
         )
         canvas = self._apply_clean_bottom_gradient(canvas, layout_profile)
@@ -689,31 +699,63 @@ class YotoCardEngineV4:
         diagnostics.output_path = path
         return YotoCardRenderResult(image_path=path, diagnostics=diagnostics)
 
-    def _compose_clean_background(self, artwork: Image.Image, *, used_placeholder: bool = False) -> Image.Image:
+    def _compose_clean_background(
+        self,
+        artwork: Image.Image,
+        *,
+        used_placeholder: bool = False,
+    ) -> tuple[Image.Image, dict[str, Any]]:
         source = artwork.convert('RGB') if artwork.mode != 'RGB' else artwork
+        bias_x = 0.50
+        bias_y = 0.45
+        zoom_levels = self._cover_zoom_levels(source.size, CARD_SIZE, used_placeholder=used_placeholder)
+        candidate_rows = self._biased_cover_positions(bias_y, step=0.06, lower=0.28, upper=0.66)
+        candidate_cols = self._biased_cover_positions(bias_x, step=0.08, lower=0.34, upper=0.66)
         if used_placeholder:
-            background = self._smart_cover(
+            background, crop_box = self._smart_cover(
                 source,
                 CARD_SIZE,
-                zoom_levels=(0.78, 0.72, 0.66, 0.60),
-                candidate_rows=(0.58, 0.68, 0.78, 0.86),
+                zoom_levels=zoom_levels,
+                candidate_rows=candidate_rows,
+                candidate_cols=candidate_cols,
+                bias_x=bias_x,
+                bias_y=bias_y,
+                return_crop_box=True,
             )
             background = Image.blend(background, Image.new('RGB', CARD_SIZE, '#090c11'), 0.22)
             overlay = Image.new('RGBA', CARD_SIZE, (0, 0, 0, 0))
             draw = ImageDraw.Draw(overlay)
-            draw.rectangle((0, 0, CARD_SIZE[0], 54), fill=(7, 9, 13, 220))
-            fade_height = int(CARD_SIZE[1] * 0.40)
-            for y in range(54, fade_height):
-                ratio = (y - 54) / max(fade_height - 54, 1)
-                alpha = int(208 * ((1.0 - ratio) ** 1.45))
+            draw.rectangle((0, 0, CARD_SIZE[0], 236), fill=(7, 9, 13, 248))
+            fade_height = int(CARD_SIZE[1] * 0.56)
+            for y in range(236, fade_height):
+                ratio = (y - 236) / max(fade_height - 236, 1)
+                alpha = int(228 * ((1.0 - ratio) ** 1.28))
                 draw.line((0, y, CARD_SIZE[0], y), fill=(7, 9, 13, alpha))
-            return Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
-        return self._smart_cover(
+            composed = Image.alpha_composite(background.convert('RGBA'), overlay).convert('RGB')
+            return composed, {
+                'crop_box': crop_box,
+                'source_size': source.size,
+                'target_size': CARD_SIZE,
+                'bias': (bias_x, bias_y),
+                'zoom_levels': zoom_levels,
+            }
+        background, crop_box = self._smart_cover(
             source,
             CARD_SIZE,
-            zoom_levels=(1.0, 0.94, 0.88, 0.82),
-            candidate_rows=(0.22, 0.36, 0.50, 0.64, 0.78),
+            zoom_levels=zoom_levels,
+            candidate_rows=candidate_rows,
+            candidate_cols=candidate_cols,
+            bias_x=bias_x,
+            bias_y=bias_y,
+            return_crop_box=True,
         )
+        return background, {
+            'crop_box': crop_box,
+            'source_size': source.size,
+            'target_size': CARD_SIZE,
+            'bias': (bias_x, bias_y),
+            'zoom_levels': zoom_levels,
+        }
 
     def _clean_layout_profile(
         self,
@@ -723,40 +765,46 @@ class YotoCardEngineV4:
     ) -> dict[str, Any]:
         used_placeholder = diagnostics.used_placeholder_artwork
         primary_signal = self._clean_primary_signal_text(data, diagnostics, card_type)
-        primary_len = len(primary_signal)
-        gradient_height = 320 if card_type == YotoCardType.DISCOUNT else 304
+        safe_left = int(CARD_SIZE[0] * 0.05)
+        safe_right = int(CARD_SIZE[0] * 0.55)
+        safe_top = int(CARD_SIZE[1] * 0.55)
+        safe_bottom = int(CARD_SIZE[1] * 0.95)
+        safe_width = safe_right - safe_left
+        gradient_height = int(CARD_SIZE[1] * (0.47 if card_type == YotoCardType.DISCOUNT else 0.45))
         if used_placeholder:
             gradient_height += 16
+        discount_percent = self._extract_discount_percent(primary_signal if card_type == YotoCardType.DISCOUNT else data.current_price)
         signal_sizes: tuple[int, ...]
         if card_type == YotoCardType.DISCOUNT:
-            signal_sizes = (146, 138, 130, 122, 114, 108) if primary_len <= 5 else (136, 128, 120, 114, 108, 102)
+            signal_sizes = self._discount_signal_font_sizes(discount_percent)
         elif card_type == YotoCardType.FREE_GAME:
-            signal_sizes = (124, 116, 108, 100, 92, 84)
+            signal_sizes = (120, 112, 104, 96, 88, 80)
         else:
-            signal_sizes = (118, 110, 102, 94, 86)
+            signal_sizes = (116, 108, 100, 92, 84)
         return {
             'mode': f"clean_mvp_{card_type.value.lower()}_{'placeholder' if used_placeholder else 'hero'}",
-            'content_left': 60,
-            'content_right': CARD_SIZE[0] - 60,
+            'safe_zone': (safe_left, safe_top, safe_right, safe_bottom),
+            'content_left': safe_left,
+            'content_right': safe_right,
             'gradient_height': gradient_height,
             'gradient_top': CARD_SIZE[1] - gradient_height,
-            'signal_top_offset': 22 if card_type == YotoCardType.DISCOUNT else 28,
+            'signal_top_offset': 24 if card_type == YotoCardType.DISCOUNT else 30,
             'signal_font_sizes': signal_sizes,
-            'signal_max_width': 760 if card_type == YotoCardType.DISCOUNT else 920,
+            'signal_max_width': safe_width,
             'signal_fill': '#ffca3a' if card_type == YotoCardType.DISCOUNT else self._palette(card_type).accent,
             'signal_stroke_fill': '#53240a' if card_type == YotoCardType.DISCOUNT else '#061018',
             'signal_stroke_width': 2 if card_type == YotoCardType.DISCOUNT else 1,
             'signal_shadow_layers': ((4, 5, 108), (2, 3, 54)),
-            'title_gap': 4,
-            'title_max_width': 1020,
-            'title_single_sizes': (82, 78, 74, 70, 64, 60, 56),
-            'title_multi_sizes': (62, 58, 54, 50, 48, 46),
+            'title_gap': 6,
+            'title_max_width': safe_width,
+            'title_single_sizes': (80, 76, 72, 68, 64, 60, 56),
+            'title_multi_sizes': (58, 54, 50, 46, 42, 38),
             'title_line_gap': 4,
-            'title_bottom_padding': 56,
-            'meta_font_sizes': (28, 26, 24, 22, 20),
+            'title_bottom_padding': 44,
+            'meta_font_sizes': (26, 24, 22, 20, 18),
             'meta_gap': 16,
-            'meta_max_width': 980,
-            'meta_bottom': 682,
+            'meta_max_width': safe_width,
+            'meta_bottom': safe_bottom - 4,
             'meta_fill': (255, 255, 255, 194),
             'brand_font_size': 24,
             'brand_right': 42,
@@ -778,8 +826,8 @@ class YotoCardEngineV4:
         for y in range(top, CARD_SIZE[1]):
             ratio = (y - top) / max(CARD_SIZE[1] - top - 1, 1)
             eased = ratio ** 1.45
-            alpha = int(8 + 212 * eased)
-            draw.line((0, y, CARD_SIZE[0], y), fill=(5, 8, 12, max(0, min(alpha, 228))))
+            alpha = int(12 + 228 * eased)
+            draw.line((0, y, CARD_SIZE[0], y), fill=(5, 8, 12, max(0, min(alpha, 236))))
         return Image.alpha_composite(canvas.convert('RGBA'), overlay)
 
     def _draw_clean_platform_label(
@@ -797,7 +845,7 @@ class YotoCardEngineV4:
         draw = ImageDraw.Draw(overlay)
         text = self._normalize_display_text(data.platform_badge)
         default_text = self._default_platform_badge_text(str(data.platform or ''), card_type)
-        if not text or text == default_text:
+        if not text or text == default_text or self._is_generic_platform_label(text, str(data.platform or ''), card_type):
             diagnostics.text_payload['platform_badge_rendered'] = False
             return canvas
         role = self._typography_role('platform_badge')
@@ -837,6 +885,100 @@ class YotoCardEngineV4:
         if card_type == YotoCardType.FESTIVAL:
             return f'{EVENT_LABEL} {normalized_platform}'.strip() if normalized_platform else EVENT_LABEL
         return f'{normalized_platform} {UA_TOP}'.strip() if normalized_platform else UA_TOP
+
+    def _is_generic_platform_label(self, text: str, platform: str, card_type: YotoCardType) -> bool:
+        normalized = self._normalize_display_text(text)
+        if not normalized:
+            return True
+        normalized_fold = normalized.casefold()
+        normalized_platform = self._normalize_display_text(str(platform or '').upper())
+        generic_labels = {
+            self._default_platform_badge_text(platform, card_type).casefold(),
+        }
+        if normalized_platform:
+            generic_labels.update(
+                {
+                    f'{normalized_platform} discount'.casefold(),
+                    f'{normalized_platform} sale'.casefold(),
+                    f'{normalized_platform} free'.casefold(),
+                    f'{normalized_platform} giveaway'.casefold(),
+                    f'{normalized_platform} event'.casefold(),
+                    f'{normalized_platform} top'.casefold(),
+                }
+            )
+        if normalized_fold in generic_labels:
+            return True
+        if normalized_platform and normalized_fold.startswith(normalized_platform.casefold() + ' '):
+            tail = normalized_fold[len(normalized_platform) :].strip()
+            if tail in {'discount', 'sale', 'free', 'giveaway', 'event', 'top', 'роздача', 'знижка', 'подія'}:
+                return True
+        return False
+
+    @staticmethod
+    def _biased_cover_positions(center: float, *, step: float, lower: float, upper: float) -> tuple[float, ...]:
+        values: list[float] = []
+        for offset in (-2, -1, 0, 1, 2):
+            value = max(lower, min(upper, center + step * offset))
+            if value not in values:
+                values.append(value)
+        return tuple(values)
+
+    @staticmethod
+    def _cover_zoom_levels(
+        source_size: tuple[int, int],
+        target_size: tuple[int, int],
+        *,
+        used_placeholder: bool,
+    ) -> tuple[float, ...]:
+        src_w, src_h = source_size
+        target_w, target_h = target_size
+        if src_w <= 0 or src_h <= 0 or target_w <= 0 or target_h <= 0:
+            return (1.0,)
+        resolution_ratio = min(src_w / target_w, src_h / target_h)
+        if resolution_ratio <= 1.0:
+            return (1.0,)
+        if resolution_ratio <= 1.25:
+            return (1.0, 0.98)
+        if used_placeholder:
+            return (1.0, 0.98, 0.95)
+        return (1.0, 0.98, 0.95, 0.92)
+
+    @staticmethod
+    def _extract_discount_percent(value: str | None) -> int | None:
+        if not value:
+            return None
+        match = re.search(r'(\d{1,3})\s*%', str(value))
+        if not match:
+            return None
+        try:
+            return max(0, min(100, int(match.group(1))))
+        except ValueError:
+            return None
+
+    @classmethod
+    def _discount_scale_multiplier(cls, discount_percent: int | None) -> float:
+        if discount_percent is None:
+            return 1.0
+        if discount_percent >= 80:
+            return 1.25
+        if discount_percent >= 70:
+            return 1.15
+        if discount_percent >= 50:
+            return 1.05
+        return 1.0
+
+    @classmethod
+    def _discount_signal_font_sizes(cls, discount_percent: int | None) -> tuple[int, ...]:
+        base_size = 120
+        scaled = int(round(base_size * cls._discount_scale_multiplier(discount_percent)))
+        max_size = int(round(base_size * 1.3))
+        target = max(base_size, min(scaled, max_size))
+        values = [target, max(base_size, target - 10), max(base_size, target - 18), base_size]
+        deduped: list[int] = []
+        for value in values:
+            if value not in deduped:
+                deduped.append(value)
+        return tuple(deduped)
 
     def _clean_primary_signal_text(
         self,
@@ -888,7 +1030,8 @@ class YotoCardEngineV4:
         bbox = draw.textbbox((0, 0), 'Ag', font=layout.font)
         height = max(1, bbox[3] - bbox[1])
         x = int(layout_profile['content_left'])
-        y = int(layout_profile['gradient_top']) + int(layout_profile['signal_top_offset'])
+        safe_left, safe_top, safe_right, safe_bottom = tuple(int(value) for value in layout_profile['safe_zone'])
+        y = max(int(layout_profile['gradient_top']) + int(layout_profile['signal_top_offset']), safe_top + 4)
         self._draw_role_text(
             draw,
             (x, y),
@@ -903,6 +1046,9 @@ class YotoCardEngineV4:
         diagnostics.text_payload['primary_signal'] = display_text
         diagnostics.text_payload['primary_signal_font_size'] = int(getattr(layout.font, 'size', 0) or height)
         diagnostics.text_payload['primary_signal_bounds'] = (x, y, x + width, y + height)
+        diagnostics.text_payload['primary_signal_safe_zone'] = (safe_left, safe_top, safe_right, safe_bottom)
+        diagnostics.text_payload['discount_percent'] = self._extract_discount_percent(display_text if card_type == YotoCardType.DISCOUNT else data.current_price)
+        diagnostics.text_payload['discount_scale_multiplier'] = self._discount_scale_multiplier(diagnostics.text_payload['discount_percent'])
         if card_type == YotoCardType.DISCOUNT:
             diagnostics.text_payload['meta_current_signal'] = display_text
         signal_layout = YotoPrimarySignalLayout(
@@ -927,11 +1073,12 @@ class YotoCardEngineV4:
     ) -> YotoTitleLayout:
         role = self._typography_role('title')
         normalized_title = self._normalize_display_text(title)
-        x = int(layout_profile['content_left'])
+        safe_left, safe_top, safe_right, safe_bottom = tuple(int(value) for value in layout_profile['safe_zone'])
+        x = max(int(layout_profile['content_left']), safe_left)
         y = signal_layout.y + signal_layout.height + int(layout_profile['title_gap'])
         max_width = int(layout_profile['title_max_width'])
         meta_reserve = 42 if reserve_meta else 0
-        max_height = max(48, int(layout_profile['meta_bottom']) - y - meta_reserve)
+        max_height = max(48, min(int(layout_profile['meta_bottom']), safe_bottom) - y - meta_reserve)
         line_gap = int(layout_profile['title_line_gap'])
 
         for size in tuple(int(value) for value in layout_profile['title_single_sizes']):
@@ -1037,6 +1184,7 @@ class YotoCardEngineV4:
             layout.y + total_height,
         )
         diagnostics.text_payload['title_max_width'] = int(layout_profile['title_max_width'])
+        diagnostics.text_payload['title_safe_zone'] = tuple(int(value) for value in layout_profile['safe_zone'])
         return Image.alpha_composite(canvas.convert('RGBA'), overlay), layout
 
     def _clean_meta_parts(
@@ -1173,7 +1321,7 @@ class YotoCardEngineV4:
             (x, y),
             text,
             font,
-            (255, 255, 255, 164),
+            (255, 255, 255, 132),
             role='brand_wordmark',
             shadow_layers=((1, 2, 18),),
             stroke_width=0,
@@ -4896,9 +5044,24 @@ class YotoCardEngineV4:
         *,
         zoom_levels: tuple[float, ...],
         candidate_rows: tuple[float, ...],
-    ) -> Image.Image:
-        crop_box = self._best_crop_box(artwork, target_size, zoom_levels=zoom_levels, candidate_rows=candidate_rows)
-        return artwork.crop(crop_box).resize(target_size, Image.Resampling.LANCZOS)
+        candidate_cols: tuple[float, ...] | None = None,
+        bias_x: float = 0.50,
+        bias_y: float = 0.45,
+        return_crop_box: bool = False,
+    ) -> Image.Image | tuple[Image.Image, tuple[int, int, int, int]]:
+        crop_box = self._best_crop_box(
+            artwork,
+            target_size,
+            zoom_levels=zoom_levels,
+            candidate_rows=candidate_rows,
+            candidate_cols=candidate_cols,
+            bias_x=bias_x,
+            bias_y=bias_y,
+        )
+        covered = artwork.crop(crop_box).resize(target_size, Image.Resampling.LANCZOS)
+        if return_crop_box:
+            return covered, crop_box
+        return covered
 
     def _best_crop_box(
         self,
@@ -4907,6 +5070,9 @@ class YotoCardEngineV4:
         *,
         zoom_levels: tuple[float, ...],
         candidate_rows: tuple[float, ...],
+        candidate_cols: tuple[float, ...] | None = None,
+        bias_x: float = 0.50,
+        bias_y: float = 0.45,
     ) -> tuple[int, int, int, int]:
         img_w, img_h = artwork.size
         target_w, target_h = target_size
@@ -4924,21 +5090,30 @@ class YotoCardEngineV4:
         preview_gray = preview.convert('L')
         preview_edges = preview_gray.filter(ImageFilter.FIND_EDGES)
         preview_sat = preview.convert('HSV').getchannel('S')
-        candidate_cols = (0.22, 0.36, 0.50, 0.64, 0.78)
+        resolved_cols = candidate_cols or self._biased_cover_positions(bias_x, step=0.08, lower=0.28, upper=0.72)
 
         best_score = float('-inf')
         best_box = (0, 0, max_crop_w, max_crop_h)
         for zoom in zoom_levels:
             crop_w = max(1, int(max_crop_w * zoom))
             crop_h = max(1, int(max_crop_h * zoom))
-            for col in candidate_cols:
+            for col in resolved_cols:
                 for row in candidate_rows:
                     left = int(round(col * img_w - crop_w / 2))
                     top = int(round(row * img_h - crop_h / 2))
                     left = max(0, min(left, img_w - crop_w))
                     top = max(0, min(top, img_h - crop_h))
                     box = (left, top, left + crop_w, top + crop_h)
-                    score = self._crop_interest_score(preview_edges, preview_gray, preview_sat, box, artwork.size, zoom)
+                    score = self._crop_interest_score(
+                        preview_edges,
+                        preview_gray,
+                        preview_sat,
+                        box,
+                        artwork.size,
+                        zoom,
+                        bias_x=bias_x,
+                        bias_y=bias_y,
+                    )
                     if score > best_score:
                         best_score = score
                         best_box = box
@@ -4952,6 +5127,9 @@ class YotoCardEngineV4:
         crop_box: tuple[int, int, int, int],
         source_size: tuple[int, int],
         zoom: float,
+        *,
+        bias_x: float = 0.50,
+        bias_y: float = 0.45,
     ) -> float:
         src_w, src_h = source_size
         left, top, right, bottom = crop_box
@@ -4991,11 +5169,13 @@ class YotoCardEngineV4:
 
         preview_center_x = (preview_box[0] + preview_box[2]) / 2
         preview_center_y = (preview_box[1] + preview_box[3]) / 2
-        offset_x = abs(preview_center_x - preview_edges.width / 2) / max(preview_edges.width / 2, 1)
-        offset_y = abs(preview_center_y - preview_edges.height / 2) / max(preview_edges.height / 2, 1)
-        center_bonus = max(0.0, 1.0 - (offset_x * 0.72 + offset_y * 0.98)) * 16
+        preferred_x = preview_edges.width * max(0.0, min(1.0, bias_x))
+        preferred_y = preview_edges.height * max(0.0, min(1.0, bias_y))
+        offset_x = abs(preview_center_x - preferred_x) / max(preview_edges.width / 2, 1)
+        offset_y = abs(preview_center_y - preferred_y) / max(preview_edges.height / 2, 1)
+        center_bonus = max(0.0, 1.0 - (offset_x * 0.86 + offset_y * 1.12)) * 18
         edge_penalty = max(0.0, band_edge - focus_edge * 0.92)
-        zoom_bonus = (1.0 - zoom) * 18
+        zoom_bonus = (1.0 - zoom) * 10
         return edge_mean * 1.82 + upper_edge * 0.74 + focus_edge * 0.64 + variance * 0.34 + saturation * 0.14 + center_bonus - edge_penalty * 0.78 + zoom_bonus
 
     def _resolve_asset_path(self, asset_path: str | Path | None) -> Path | None:
