@@ -109,7 +109,7 @@ def test_steam_caption_has_clickable_title_and_price() -> None:
     caption, hashtags = builder.build(make_offer(), make_decision())
 
     assert '<a href="https://store.steampowered.com/app/10"><b>Test Game</b></a>' in caption
-    assert 'Зараз 112 грн замість 225 грн (-50%, економія 113 грн).' in caption
+    assert 'Зараз <a href="https://store.steampowered.com/app/10">112 грн</a> замість 225 грн (-50%, економія 113 грн).' in caption
     assert '89% позитивних • 1.2к+ відгуків • 42 досягнень • є картки' in caption
     assert 'Спецпропозиція у Steam' not in caption
     assert len(caption) <= 1024
@@ -441,7 +441,7 @@ def test_high_value_discount_uses_indirect_voice_without_explicit_yoto() -> None
 
     assert 'Йото' not in caption
     assert not any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
-    assert 'Зараз 112 грн замість 225 грн (-50%, економія 113 грн).' in caption
+    assert 'Зараз <a href="https://store.steampowered.com/app/10">112 грн</a> замість 225 грн (-50%, економія 113 грн).' in caption
     assert '89% позитивних • 1.2к+ відгуків' in caption
 
 
@@ -456,7 +456,7 @@ def test_backlog_discount_stays_neutral_without_voice_signal() -> None:
 
     assert 'Йото' not in caption
     assert not any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
-    assert 'Зараз 209 грн замість 299 грн (-30%, економія 90 грн).' in caption
+    assert 'Зараз <a href="https://store.steampowered.com/app/10">209 грн</a> замість 299 грн (-30%, економія 90 грн).' in caption
     assert 'Якщо давно була в бажаному — це хороший момент.' in caption
 
 

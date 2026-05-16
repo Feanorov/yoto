@@ -1366,13 +1366,14 @@ class TelegramCaptionBuilder:
     def _build_steam_discount_value_line_v2(self, offer: Offer) -> str:
         now_price = 'Безплатно' if offer.price_after_minor == 0 else self._format_minor(offer.price_after_minor)
         old_price = self._format_minor(offer.price_before_minor)
+        linked_now_price = f'<a href="{self._link(offer.store_url)}">{escape(now_price)}</a>' if now_price != 'невідомо' else now_price
         if now_price != 'невідомо' and old_price != 'невідомо':
             savings = self._format_minor(max((offer.price_before_minor or 0) - (offer.price_after_minor or 0), 0))
             if offer.discount_percent > 0:
-                return f'Зараз {now_price} замість {old_price} (-{offer.discount_percent}%, економія {savings}).'
-            return f'Зараз {now_price} замість {old_price}.'
+                return f'Зараз {linked_now_price} замість {old_price} (-{offer.discount_percent}%, економія {savings}).'
+            return f'Зараз {linked_now_price} замість {old_price}.'
         if now_price != 'невідомо':
-            return f'Зараз {now_price}.'
+            return f'Зараз {linked_now_price}.'
         if old_price != 'невідомо':
             return f'Попередня ціна — {old_price}.'
         return ''
