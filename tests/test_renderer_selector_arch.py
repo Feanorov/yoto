@@ -284,6 +284,17 @@ def test_yoto_card_renderer_adapter_emits_clean_ukrainian_copy(tmp_path: Path) -
     assert adapter._deadline_text(offer, YotoCardType.FREE_GAME) == 'забрати до 19 березня, 15:00'
     assert adapter._old_price_text(offer) == '275 грн'
 
+def test_yoto_card_renderer_adapter_separates_discount_badge_from_current_price(tmp_path: Path) -> None:
+    adapter = YotoCardRendererV42Adapter(tmp_path)
+    offer = make_offer()
+    offer.discount_percent = 85
+    offer.price_before_minor = 91500
+    offer.price_after_minor = 13700
+
+    assert adapter._sticker_text_override(offer, YotoCardType.DISCOUNT) == '-85%'
+    assert adapter._current_price_text(offer, YotoCardType.DISCOUNT) == '137 грн'
+
+
 def test_card_renderer_router_rejects_capsule_like_assets_and_uses_branded_fallback(tmp_path: Path) -> None:
     router = CardRendererRouter(tmp_path, renderer_mode='yoto_v4', fallback_to_legacy=False)
     offer = make_offer()

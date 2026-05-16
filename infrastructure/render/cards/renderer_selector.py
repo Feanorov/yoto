@@ -152,6 +152,7 @@ class YotoCardRendererV42Adapter:
             artwork_path=hero_path,
             slug=f'{template_id}_{offer.offer_id}_{offer.title}',
             platform_badge=self._platform_badge_text(offer, template_id, card_type),
+            sticker_text=self._sticker_text_override(offer, card_type),
             brand_micro_label=self._brand_micro_label(card_type),
             editorial_phrase=editorial_phrase,
             gameplay_images=gameplay_paths or None,
@@ -1610,10 +1611,15 @@ class YotoCardRendererV42Adapter:
 
     def _current_price_text(self, offer: Offer, card_type: YotoCardType) -> str | None:
         if card_type == YotoCardType.DISCOUNT:
-            if offer.discount_percent > 0:
-                return f'-{offer.discount_percent}%'
+            if offer.price_after_minor == 0:
+                return 'Безплатно'
             if offer.price_after_minor is not None and offer.price_after_minor > 0:
                 return self._format_minor(offer.price_after_minor, offer.currency)
+        return None
+
+    def _sticker_text_override(self, offer: Offer, card_type: YotoCardType) -> str | None:
+        if card_type == YotoCardType.DISCOUNT and offer.discount_percent > 0:
+            return f'-{offer.discount_percent}%'
         return None
 
     def _format_minor(self, minor: int, currency: str) -> str:
@@ -1694,6 +1700,5 @@ class CardRendererRouter:
             hero_selection=dict(getattr(source, 'hero_selection', {})),
         )
         return RoutedRenderResult(image_path=result.image_path, assets_used=list(result.assets_used), diagnostics=diagnostics)
-
 
 

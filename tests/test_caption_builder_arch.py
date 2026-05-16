@@ -6,6 +6,7 @@ from datetime import datetime
 from types import SimpleNamespace
 
 from application.use_cases.dry_run_render import DryRunRenderUseCase
+from dealbot.utils.ua import clean_html_text, format_compact_review_count
 from domain.entities.offer import AssetBundle, ConfidenceLevels, Offer, OfferKind, OfferSource
 from infrastructure.telegram.caption_builder import (
     CTA_POOLS,
@@ -108,10 +109,21 @@ def test_steam_caption_has_clickable_title_and_price() -> None:
     caption, hashtags = builder.build(make_offer(), make_decision())
 
     assert '<a href="https://store.steampowered.com/app/10"><b>Test Game</b></a>' in caption
-    assert '<a href="https://store.steampowered.com/app/10"><b>112 грн</b></a>' in caption
+    assert 'Зараз 112 грн замість 225 грн (-50%, економія 113 грн).' in caption
+    assert '89% позитивних • 1.2к+ відгуків • 42 досягнень • є картки' in caption
     assert 'Спецпропозиція у Steam' not in caption
     assert len(caption) <= 1024
-    assert '#steam' in hashtags
+    assert hashtags == ['#steam', '#steamsale']
+
+
+def test_compact_review_count_formatter_floors_without_rounding_up() -> None:
+    assert format_compact_review_count(999) == '999'
+    assert format_compact_review_count(4800) == '4.8к+'
+    assert format_compact_review_count(86444) == '86к+'
+    assert format_compact_review_count(185333) == '185к+'
+    assert format_compact_review_count(1_200_000) == '1.2м+'
+    assert format_compact_review_count(4899) == '4.8к+'
+    assert format_compact_review_count(1_299_999) == '1.2м+'
 
 
 def test_epic_caption_uses_existing_description_when_available() -> None:
@@ -196,6 +208,62 @@ def test_steam_discount_caption_prefers_short_description() -> None:
     assert 'Повний опис, який не має з’явитися' not in caption
 
 
+def test_steam_discount_caption_rewrites_marketing_store_copy_to_compact_editorial_line() -> None:
+    offer = make_offer()
+    offer.title = 'American Truck Simulator'
+    offer.short_description = (
+        'Відчуйте силу легендарних американських вантажівок та доставляйте різноманітні вантажі '
+        'по сонячній Каліфорнії, піщаній Неваді та величному Великому Каньйону штату Аризона.'
+    )
+    offer.description = offer.short_description
+    offer.tags = ['Simulation', 'Driving']
+    offer.genres = ['Simulation']
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision())
+    blocks = [clean_html_text(block).strip() for block in caption.split('\n\n') if block.strip()]
+
+    assert len(blocks) >= 2
+    assert blocks[1] == 'Симулятор дальнобійника про американські траси, вантажі й довгі поїздки між штатами.'
+    assert len(blocks[1]) <= 120
+    assert 'Відчуйте силу легендарних американських вантажівок' not in caption
+
+
+def test_discount_caption_v2_uses_compact_social_proof_and_removes_banned_filler() -> None:
+    offer = make_offer()
+    offer.review_score = 81
+    offer.review_count = 185333
+    offer.achievements_count = 72
+    offer.has_trading_cards = True
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision())
+
+    assert '185333' not in caption
+    assert '81% позитивних • 185к+ відгуків • 72 досягнень • є картки' in caption
+    assert 'Йото радить звернути увагу' not in caption
+    assert 'Йото радить не проходити повз' not in caption
+    assert 'жанровий акцент чіткий' not in caption
+    assert 'пропозиція активна просто зараз' not in caption
+    assert 'цінник уже дає привід повернутися' not in caption
+
+
+def test_discount_caption_v2_omits_missing_optional_meta_cleanly() -> None:
+    offer = make_offer()
+    offer.review_score = 86
+    offer.review_count = 126116
+    offer.achievements_count = None
+    offer.has_trading_cards = False
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision())
+
+    assert '86% позитивних • 126к+ відгуків' in caption
+    assert 'досягнень' not in caption
+    assert 'є картки' not in caption
+    assert '• •' not in caption
+
+
 def test_indirect_recommend_caption_rejects_store_fragments_and_english_dump() -> None:
     offer = make_offer()
     offer.title = 'Hearts of Iron IV'
@@ -213,14 +281,10 @@ def test_indirect_recommend_caption_rejects_store_fragments_and_english_dump() -
     assert 'Expansion Pass 2' not in caption
     assert 'Про гру' not in caption
     assert 'Take charge of history' not in caption
-    assert any(
-        fragment in caption
-        for fragment in (
-            'Ключовий акцент тут —',
-            'Головний інтерес цього тайтлу —',
-            'Тут жанровий акцент чіткий:',
-        )
-    )
+    assert '358990' not in caption
+    assert '358к+ відгуків' in caption
+    assert 'Йото радить звернути увагу' not in caption
+    assert 'жанровий акцент чіткий' not in caption
 
 
 def test_source_summary_keeps_valid_ukrainian_text_after_store_header_cleanup() -> None:
@@ -251,10 +315,10 @@ def test_final_push_caption_uses_alert_signal_urgency_and_finalpush_tag() -> Non
         make_decision(lane='high_value_discount', template_id='steam_discount', is_final_push=True),
     )
 
-    assert 'Фінальний шанс' in lane_caption
-    assert 'Фінальний шанс' in flag_caption
-    assert 'Йото' in lane_caption
-    assert 'Йото' in flag_caption
+    assert 'Якщо хотів(ла) взяти саме в цю акцію — краще не тягнути.' in lane_caption
+    assert 'Якщо хотів(ла) взяти саме в цю акцію — краще не тягнути.' in flag_caption
+    assert 'Йото' not in lane_caption
+    assert 'Йото' not in flag_caption
     assert '#finalpush' in lane_hashtags
     assert '#finalpush' in flag_hashtags
 
@@ -340,9 +404,9 @@ def test_discount_fallback_summary_reads_naturally_for_genre_only_offer() -> Non
     assert any(
         fragment in caption
         for fragment in (
-            'Ключовий акцент тут — стратегія.',
-            'Головний інтерес цього тайтлу — стратегія',
-            'Тут жанровий акцент чіткий: стратегія',
+            'Тут основа — стратегія.',
+            'Найпростіше описати це через стратегія.',
+            'Головне тут — стратегія.',
         )
     )
     assert 'любить стратегія' not in caption
@@ -376,7 +440,9 @@ def test_high_value_discount_uses_indirect_voice_without_explicit_yoto() -> None
     caption, _ = builder.build(make_offer(), make_decision())
 
     assert 'Йото' not in caption
-    assert any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
+    assert not any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
+    assert 'Зараз 112 грн замість 225 грн (-50%, економія 113 грн).' in caption
+    assert '89% позитивних • 1.2к+ відгуків' in caption
 
 
 def test_backlog_discount_stays_neutral_without_voice_signal() -> None:
@@ -390,7 +456,8 @@ def test_backlog_discount_stays_neutral_without_voice_signal() -> None:
 
     assert 'Йото' not in caption
     assert not any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
-    assert 'Ціна зрушила вниз настільки, що сторінку вже має сенс відкрити без поспіху.' in caption
+    assert 'Зараз 209 грн замість 299 грн (-30%, економія 90 грн).' in caption
+    assert 'Якщо давно була в бажаному — це хороший момент.' in caption
 
 
 def test_temporary_free_access_avoids_free_claim_language() -> None:
@@ -432,8 +499,11 @@ def test_first_price_move_uses_special_yoto_mode() -> None:
         ),
     )
 
-    assert any(phrase in caption for phrase in DIRECT_OPENING_POOLS['first_price_move'])
-    assert 'перша помітна знижка по грі' in caption
+    debug = builder.last_debug_snapshot()
+
+    assert debug['style'] == 'first_price_move'
+    assert any(cta in caption for cta in CTA_POOLS['first_price_move'])
+    assert not any(phrase in caption for phrase in DIRECT_OPENING_POOLS['first_price_move'])
 
 
 def test_direct_openings_rotate_across_nearby_posts() -> None:
@@ -498,8 +568,8 @@ def test_indirect_openings_avoid_recent_repetition_when_alternatives_exist() -> 
         offer = make_offer()
         offer.offer_id = f'steam:{200 + offset}'
         offer.title = f'Finder Deal {offset}'
-        caption, _ = builder.build(offer, make_decision())
-        openings.append(next(phrase for phrase in INDIRECT_HOOK_POOLS['finder'] if phrase in caption))
+        builder.build(offer, make_decision())
+        openings.append(builder.last_debug_snapshot()['opening']['selected'])
 
     assert len(set(openings[:3])) == 3
     assert openings[3] != openings[2]
@@ -572,7 +642,7 @@ def test_caption_builder_exposes_opening_debug_snapshot() -> None:
     assert debug['presence'] == 'indirect'
     assert debug['style'] == 'finder'
     assert debug['opening']['selected'] in INDIRECT_HOOK_POOLS['finder']
-    assert debug['opening']['line'] in caption
+    assert debug['opening']['line'] not in caption
     assert debug['opening']['anti_repeat_window'] == 4
     assert debug['selected_opener'] == debug['opening']['line']
     assert 'normalization_applied' in debug

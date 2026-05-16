@@ -9,7 +9,7 @@ from html import escape
 import hashlib
 import re
 
-from dealbot.utils.ua import build_focus_text, build_offer_copy, clean_html_text, contains_cyrillic, format_deadline, truncate_text
+from dealbot.utils.ua import build_focus_text, build_offer_copy, clean_html_text, contains_cyrillic, format_compact_review_count, format_deadline, truncate_text
 from domain.entities.offer import Offer
 from domain.entities.roundup_post import RoundupPost
 
@@ -220,14 +220,14 @@ INDIRECT_HOOK_POOLS: dict[str, tuple[str, ...]] = {
 
 CTA_POOLS: dict[str, tuple[str, ...]] = {
     'finder': (
-        'Тут достатньо швидко звірити цю знижку зі своїм списком бажаного.',
-        'Якщо гра давно маячила на радарі, зараз уже є сенс перевірити її без зайвого розгону.',
-        'Список бажаного тут варто відкрити прямо зараз, навіть якщо рішення буде не миттєвим.',
+        'Якщо давно була в бажаному — це хороший момент.',
+        'Якщо чекав(ла) нижчу ціну — ось вона.',
+        'Нормальна точка входу, якщо давно хотів(ла) спробувати.',
     ),
     'recommend': (
-        'Якщо ця гра давно сидить у беклозі бажаного, вікно вже виглядає робочим.',
-        'Для такого тайтлу достатньо однієї швидкої звірки зі своїм списком.',
-        'Це вже схоже на той цінник, після якого рішення стає помітно простішим.',
+        'Якщо давно хотів(ла) спробувати — це хороший момент.',
+        'Нормальна ціна старту, якщо гра давно була на радарі.',
+        'Якщо чекав(ла) нижчу ціну на великий тайтл — ось вона.',
     ),
     'freebie': (
         'Якщо така гра вам підходить, краще забрати її до закриття роздачі без зайвих відкладань.',
@@ -245,9 +245,9 @@ CTA_POOLS: dict[str, tuple[str, ...]] = {
         'Зайдіть хоча б на основні секції фестивалю: за кілька хвилин стане ясно, чи є тут ваші тайтли.',
     ),
     'first_price_move': (
-        'Рух по ціні вже почався, тож гру варто повернути на радар без поспіху.',
-        'Першу просадку вже видно, і її достатньо, щоб знову тримати гру під оком.',
-        'Це ще не фінальна стеля вниз, але вже хороший момент повернути гру в короткий список.',
+        'Якщо чекав(ла) першу нормальну просадку — гру вже можна повертати в бажане.',
+        'Перший рух ціни вниз уже є, тож гру можна знову тримати на радарі.',
+        'Нормальний момент повернутися до гри, якщо чекав(ла) саме першої просадки.',
     ),
     'roundup': (
         'Починайте з верхівки: порядок тут уже працює як короткий маршрут.',
@@ -287,9 +287,9 @@ TEMPORARY_FREEBIE_GENERIC_SUMMARY_TEMPLATES: tuple[str, ...] = (
 )
 
 DISCOUNT_FOCUS_SUMMARY_TEMPLATES: tuple[str, ...] = (
-    'Ключовий акцент тут — {focus}.',
-    'Головний інтерес цього тайтлу — {focus}, і саме це зараз повертає його на радар.',
-    'Тут жанровий акцент чіткий: {focus}, а цінник уже дає привід повернутися.',
+    'Тут основа — {focus}.',
+    'Найпростіше описати це через {focus}.',
+    'Головне тут — {focus}.',
 )
 
 DISCOUNT_REVIEW_LED_SUMMARY_TEMPLATES: tuple[str, ...] = (
@@ -329,6 +329,19 @@ TEMPORARY_ACCESS_HINTS = (
     'грати безкоштовно',
     'можна пограти',
     'доступ тимчасовий',
+)
+
+DISCOUNT_EDITORIAL_SUMMARY_MAX_LENGTH = 120
+DISCOUNT_MARKETING_OPENING_RE = re.compile(
+    r'^(?:відчуйте|пориньте|відкрийте|станьте|досліджуйте|вирушайте|керуйте|будуйте|створіть|очольте|розкрийте|прокладайте|боріться|підкорюйте)\b',
+    re.IGNORECASE,
+)
+DISCOUNT_EDITORIAL_TITLE_OVERRIDES: tuple[tuple[str, str], ...] = (
+    ('american truck simulator', 'Симулятор дальнобійника про американські траси, вантажі й довгі поїздки між штатами.'),
+    ('euro truck simulator 2', 'Симулятор дальнобійника про європейські маршрути, рейси й довгі поїздки.'),
+    ('far cry 5', 'Шутер у відкритому світі про культ у Монтані, перестрілки й кооп.'),
+    ('assassin s creed origins', 'Екшен-RPG у Стародавньому Єгипті про витоки Братства асасинів.'),
+    ('red dead redemption 2', 'Вестерн з відкритим світом і сильним сюжетним акцентом.'),
 )
 
 RECOMMEND_REASONS = frozenset(
@@ -916,6 +929,8 @@ class TelegramCaptionBuilder:
         if decision_json.get('lane') == 'game_of_the_day':
             prefix = '⭐'
         title_line = f'{prefix} <a href="{self._link(offer.store_url)}"><b>{escape(offer.title)}</b></a>'
+        if not offer.is_freebie:
+            return self._build_steam_discount_caption_v2(title_line, offer, decision_json, copy, hashtags, voice)
         lines: list[str] = [title_line]
         body_lines: list[str] = []
 
@@ -928,6 +943,26 @@ class TelegramCaptionBuilder:
         self._append_body_line(lines, body_lines, self._build_steam_value_line(offer, voice))
         self._append_body_line(lines, body_lines, self._build_improvement_note(offer, decision_json, voice))
         self._append_body_line(lines, body_lines, self._select_urgency_line(offer, decision_json, copy))
+        self._append_body_line(lines, body_lines, self._build_supporting_line(offer))
+        self._append_body_line(lines, body_lines, self._build_cta(offer, decision_json, voice))
+
+        lines.append(' '.join(hashtags))
+        return '\n\n'.join(line for line in lines if line)
+
+    def _build_steam_discount_caption_v2(
+        self,
+        title_line: str,
+        offer: Offer,
+        decision_json: dict,
+        copy: dict[str, str],
+        hashtags: list[str],
+        voice: YotoVoiceDecision,
+    ) -> str:
+        lines: list[str] = [title_line]
+        body_lines: list[str] = []
+
+        self._append_body_line(lines, body_lines, copy.get('summary', ''))
+        self._append_body_line(lines, body_lines, self._build_steam_discount_value_line_v2(offer))
         self._append_body_line(lines, body_lines, self._build_supporting_line(offer))
         self._append_body_line(lines, body_lines, self._build_cta(offer, decision_json, voice))
 
@@ -1057,21 +1092,56 @@ class TelegramCaptionBuilder:
 
     def _pick_source_summary(self, offer: Offer, max_length: int) -> str:
         for value in (offer.short_description, offer.description):
-            summary = self._compact_source_summary(str(value or ''), offer.title, max_length=max_length)
+            summary = self._compact_source_summary(offer, str(value or ''), offer.title, max_length=max_length)
             if summary:
                 return summary
         return ''
 
-    def _compact_source_summary(self, value: str, title: str, *, max_length: int) -> str:
+    def _compact_source_summary(self, offer: Offer, value: str, title: str, *, max_length: int) -> str:
         cleaned = self._sanitize_source_summary(value, title)
         if not cleaned:
             return ''
+        if not offer.is_event and not offer.is_freebie:
+            return self._compact_discount_source_summary(offer, cleaned, max_length=max_length)
         first_sentence = self._first_sentence(cleaned)
         if first_sentence and first_sentence != cleaned and 55 <= len(first_sentence) <= max_length:
             cleaned = first_sentence
         if not contains_cyrillic(cleaned):
             return ''
         return truncate_text(cleaned, max_length=max_length)
+
+    def _compact_discount_source_summary(self, offer: Offer, cleaned: str, *, max_length: int) -> str:
+        override = self._match_discount_editorial_summary(offer.title)
+        if override:
+            return truncate_text(override, max_length=min(max_length, DISCOUNT_EDITORIAL_SUMMARY_MAX_LENGTH))
+
+        first_sentence = self._first_sentence(cleaned)
+        candidate = first_sentence or cleaned
+        if not contains_cyrillic(candidate):
+            return ''
+
+        if len(candidate) > min(max_length, DISCOUNT_EDITORIAL_SUMMARY_MAX_LENGTH):
+            return ''
+        if self._looks_like_discount_marketing_summary(candidate):
+            return ''
+        return candidate
+
+    def _match_discount_editorial_summary(self, title: str) -> str:
+        normalized_title = self._normalize_summary_key(title)
+        for needle, summary in DISCOUNT_EDITORIAL_TITLE_OVERRIDES:
+            if needle in normalized_title:
+                return summary
+        return ''
+
+    def _looks_like_discount_marketing_summary(self, value: str) -> bool:
+        normalized = self._normalize_summary_key(value)
+        if not normalized:
+            return False
+        first_word = normalized.split(' ', 1)[0]
+        return bool(
+            DISCOUNT_MARKETING_OPENING_RE.match(normalized)
+            or first_word.endswith(('йте', 'іть', 'іться', 'ться'))
+        )
 
     def _sanitize_source_summary(self, value: str, title: str) -> str:
         cleaned = clean_html_text(value).strip()
@@ -1116,6 +1186,11 @@ class TelegramCaptionBuilder:
                 break
             cleaned = updated
         return cleaned
+
+    @staticmethod
+    def _normalize_summary_key(value: str) -> str:
+        normalized = re.sub(r'[^0-9a-zа-яіїєґ]+', ' ', str(value or '').casefold())
+        return ' '.join(normalized.split())
 
     @staticmethod
     def _first_sentence(value: str) -> str:
@@ -1288,6 +1363,20 @@ class TelegramCaptionBuilder:
             return value
         return value[0].upper() + value[1:]
 
+    def _build_steam_discount_value_line_v2(self, offer: Offer) -> str:
+        now_price = 'Безплатно' if offer.price_after_minor == 0 else self._format_minor(offer.price_after_minor)
+        old_price = self._format_minor(offer.price_before_minor)
+        if now_price != 'невідомо' and old_price != 'невідомо':
+            savings = self._format_minor(max((offer.price_before_minor or 0) - (offer.price_after_minor or 0), 0))
+            if offer.discount_percent > 0:
+                return f'Зараз {now_price} замість {old_price} (-{offer.discount_percent}%, економія {savings}).'
+            return f'Зараз {now_price} замість {old_price}.'
+        if now_price != 'невідомо':
+            return f'Зараз {now_price}.'
+        if old_price != 'невідомо':
+            return f'Попередня ціна — {old_price}.'
+        return ''
+
     def _build_steam_value_line(self, offer: Offer, voice: YotoVoiceDecision) -> str:
         if offer.is_freebie:
             before = self._format_minor(offer.price_before_minor)
@@ -1360,10 +1449,10 @@ class TelegramCaptionBuilder:
                 return 'Якщо гра давно була на радарі, це вікно краще використати як швидкий тест, а не відкладати.'
             return 'Якщо гра вам підходить, одного швидкого кліку до закриття роздачі тут достатньо.'
         if final_push:
-            return 'Якщо гра давно у списку бажаного, це вже момент не відкладати перевірку.'
+            return 'Якщо хотів(ла) взяти саме в цю акцію — краще не тягнути.'
         if decision_json.get('lane') == 'game_of_the_day':
-            return 'Сторінку варто відкрити зараз, поки цей слот ще тримає головний акцент дня.'
-        return 'Якщо гра давно сиділа у списку бажаного, цю сторінку вже варто звірити без зайвого розгону.'
+            return 'Нормальна точка входу, якщо давно хотів(ла) спробувати.'
+        return 'Якщо давно була в бажаному — це хороший момент.'
     def _build_improvement_note(self, offer: Offer, decision_json: dict, voice: YotoVoiceDecision) -> str:
         if voice.note_line:
             return voice.note_line
@@ -1402,29 +1491,20 @@ class TelegramCaptionBuilder:
 
     @staticmethod
     def _build_review_bit(offer: Offer) -> str:
-        if offer.review_score is not None and offer.review_count:
-            return f'{offer.review_score}% позитивних із {offer.review_count} оцінок'
+        reviews_short = format_compact_review_count(offer.review_count)
+        if offer.review_score is not None and reviews_short:
+            return f'{offer.review_score}% позитивних • {reviews_short} відгуків'
         if offer.review_score is not None:
             return f'{offer.review_score}% позитивних'
-        if offer.review_count:
-            return f'{offer.review_count} оцінок'
+        if reviews_short:
+            return f'{reviews_short} відгуків'
         return ''
 
     @staticmethod
     def _build_achievements_bit(count: int | None) -> str:
         if not count or count <= 0:
             return ''
-        remainder_100 = count % 100
-        remainder_10 = count % 10
-        if 11 <= remainder_100 <= 14:
-            suffix = 'досягнень'
-        elif remainder_10 == 1:
-            suffix = 'досягнення'
-        elif remainder_10 in (2, 3, 4):
-            suffix = 'досягнення'
-        else:
-            suffix = 'досягнень'
-        return f'{count} {suffix}'
+        return f'{count} досягнень'
 
     def _append_body_line(self, lines: list[str], body_lines: list[str], candidate: str) -> None:
         normalized = self._normalize_line(candidate)
@@ -1525,6 +1605,7 @@ class TelegramCaptionBuilder:
         without_space_before = SPACE_BEFORE_CLOSE_RE.sub(r'\1', without_space_before)
         with_space_after = MISSING_SPACE_AFTER_PUNCT_RE.sub(r'\1 ', without_space_before)
         with_space_after = re.sub(r'(?<=\d): (?=\d)', ':', with_space_after)
+        with_space_after = re.sub(r'(?<=\d)\. (?=\d)', '.', with_space_after)
         for placeholder, original in entity_placeholders.items():
             with_space_after = with_space_after.replace(placeholder, original)
         if with_space_after != text:
@@ -1539,14 +1620,22 @@ class TelegramCaptionBuilder:
 
     def _build_hashtags(self, offer: Offer, decision_json: dict) -> list[str]:
         hashtags: list[str] = []
+        lane = decision_json.get('lane')
+        if offer.source.value == 'steam' and not offer.is_freebie:
+            hashtags.extend(['#steam', '#steamsale'])
+            if lane == 'game_of_the_day':
+                hashtags.append('#gameday')
+            if lane == 'final_push' or decision_json.get('is_final_push'):
+                hashtags.append('#finalpush')
+            return hashtags
+
         if offer.source.value == 'steam':
-            hashtags.extend(['#steam', '#freegame' if offer.is_freebie else '#steamsale'])
+            hashtags.extend(['#steam', '#freegame'])
         elif offer.source.value == 'epic':
             hashtags.extend(['#epicgames', '#freegame', '#giveaway'])
         else:
             hashtags.extend(['#steam', '#festival', '#gaming'])
 
-        lane = decision_json.get('lane')
         if lane == 'game_of_the_day':
             hashtags.append('#gameday')
         if lane == 'final_push' or decision_json.get('is_final_push'):

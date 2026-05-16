@@ -228,3 +228,57 @@ def test_yoto_card_engine_v4_suppresses_generic_explicit_platform_label(tmp_path
     )
 
     assert result.diagnostics.text_payload['platform_badge_rendered'] is False
+
+
+def test_yoto_card_engine_v4_renders_discount_price_block_v2_with_crossed_old_price(tmp_path: Path) -> None:
+    artwork_path = tmp_path / 'price_block_v2.png'
+    _make_scene_art(artwork_path)
+    engine = YotoCardEngineV4(tmp_path)
+    result = engine.render_card(
+        {
+            'title': 'Far Cry 5',
+            'platform': 'STEAM',
+            'type': YotoCardType.DISCOUNT,
+            'sticker_text': '-85%',
+            'current_price': '137 грн',
+            'old_price': '915 грн',
+            'artwork_path': artwork_path,
+            'slug': 'far_cry_5',
+        }
+    )
+
+    assert result.diagnostics.text_payload['primary_signal'] == '-85%'
+    assert result.diagnostics.text_payload['meta_current_price'] == '137 грн'
+    assert result.diagnostics.text_payload['meta_old_price'] == '915 грн'
+    assert result.diagnostics.text_payload['meta_old_price_struck'] is True
+    old_bounds = result.diagnostics.text_payload['meta_old_price_bounds']
+    strike_y = result.diagnostics.text_payload['meta_old_price_strike_y']
+    assert result.diagnostics.text_payload['meta_old_price_strike_formula'] == 'glyph_bbox_vertical_center'
+    assert strike_y == round((old_bounds[1] + old_bounds[3]) / 2)
+    assert old_bounds[1] < strike_y < old_bounds[3]
+    assert result.diagnostics.text_payload['meta_price_block_mode'] == 'current_old_strike'
+    assert result.diagnostics.text_payload['meta_line'] == '137 грн ~~915 грн~~'
+    assert result.diagnostics.meta_alignment == 'price_block_v2'
+
+
+def test_yoto_card_engine_v4_handles_discount_price_block_without_old_price(tmp_path: Path) -> None:
+    artwork_path = tmp_path / 'price_block_current_only.png'
+    _make_scene_art(artwork_path)
+    engine = YotoCardEngineV4(tmp_path)
+    result = engine.render_card(
+        {
+            'title': 'Solo Price Probe',
+            'platform': 'STEAM',
+            'type': YotoCardType.DISCOUNT,
+            'sticker_text': '-40%',
+            'current_price': 'Безплатно',
+            'artwork_path': artwork_path,
+            'slug': 'solo_price_probe',
+        }
+    )
+
+    assert result.diagnostics.text_payload['primary_signal'] == '-40%'
+    assert result.diagnostics.text_payload['meta_current_price'] == 'Безплатно'
+    assert result.diagnostics.text_payload['meta_price_block_mode'] == 'current_only'
+    assert result.diagnostics.text_payload['meta_old_price_struck'] is False
+    assert result.diagnostics.meta_alignment == 'price_block_v2'

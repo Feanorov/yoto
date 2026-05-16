@@ -183,6 +183,19 @@ def format_price_uah(value: float | None) -> str:
     return f"{rounded:.2f} грн"
 
 
+def format_compact_review_count(value: int | None) -> str:
+    if value is None:
+        return ""
+    count = max(int(value), 0)
+    if count < 1000:
+        return str(count)
+    if count < 10_000:
+        return f"{count // 100 / 10:.1f}к+"
+    if count < 1_000_000:
+        return f"{count // 1000}к+"
+    return f"{count // 100_000 / 10:.1f}м+"
+
+
 def build_fallback_summary(
     title: str,
     genres: list[str],

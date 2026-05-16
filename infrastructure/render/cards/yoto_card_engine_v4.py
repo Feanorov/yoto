@@ -986,8 +986,14 @@ class YotoCardEngineV4:
         diagnostics: YotoCardDiagnostics,
         card_type: YotoCardType,
     ) -> str:
-        if card_type == YotoCardType.DISCOUNT and data.current_price:
-            return self._normalize_display_text(data.current_price)
+        if card_type == YotoCardType.DISCOUNT:
+            badge_text = self._normalize_display_text(diagnostics.sticker_text or data.sticker_text or '')
+            if badge_text and badge_text != UA_DISCOUNT:
+                return badge_text
+            if data.current_price and '%' in str(data.current_price):
+                return self._normalize_display_text(data.current_price)
+            if data.current_price:
+                return self._normalize_display_text(data.current_price)
         if data.current_price and card_type != YotoCardType.DISCOUNT:
             return self._normalize_display_text(data.current_price)
         if diagnostics.sticker_text:
@@ -1267,7 +1273,21 @@ class YotoCardEngineV4:
         title_layout: YotoTitleLayout,
         primary_signal: str,
     ) -> tuple[Image.Image, str]:
+        if card_type == YotoCardType.DISCOUNT:
+            return self._draw_clean_discount_price_block(canvas, data, diagnostics, layout_profile, title_layout, primary_signal)
         parts = self._clean_meta_parts(data, diagnostics, card_type, primary_signal)
+        return self._draw_clean_meta_parts_line(canvas, diagnostics, layout_profile, title_layout, parts, data=data)
+
+    def _draw_clean_meta_parts_line(
+        self,
+        canvas: Image.Image,
+        diagnostics: YotoCardDiagnostics,
+        layout_profile: Mapping[str, Any],
+        title_layout: YotoTitleLayout,
+        parts: list[str],
+        *,
+        data: YotoCardData | None = None,
+    ) -> tuple[Image.Image, str]:
         if not parts or title_layout.meta_y > int(layout_profile['meta_bottom']):
             diagnostics.text_payload['meta_parts'] = parts
             return canvas, 'hidden'
@@ -1289,11 +1309,157 @@ class YotoCardEngineV4:
         )
         diagnostics.text_payload['meta_parts'] = parts
         diagnostics.text_payload['meta_line'] = meta_text
-        if data.deadline:
+        if data is not None and data.deadline:
             diagnostics.text_payload['meta_deadline'] = self._normalize_display_text(data.deadline)
-        if data.old_price:
+        if data is not None and data.old_price:
             diagnostics.text_payload['meta_old_price'] = self._normalize_display_text(data.old_price)
         return Image.alpha_composite(canvas.convert('RGBA'), overlay), 'secondary_line'
+
+    def _draw_clean_discount_price_block(
+        self,
+        canvas: Image.Image,
+        data: YotoCardData,
+        diagnostics: YotoCardDiagnostics,
+        layout_profile: Mapping[str, Any],
+        title_layout: YotoTitleLayout,
+        primary_signal: str,
+    ) -> tuple[Image.Image, str]:
+        current_text = self._normalize_display_text(str(data.current_price or '')) if data.current_price else ''
+        old_text = self._normalize_display_text(str(data.old_price or '')) if data.old_price else ''
+        if current_text and (current_text.casefold() == primary_signal.casefold() or '%' in current_text):
+            current_text = ''
+        if current_text == '0 грн':
+            current_text = 'Безплатно'
+
+        if not current_text:
+            parts = self._clean_meta_parts(data, diagnostics, YotoCardType.DISCOUNT, primary_signal)
+            return self._draw_clean_meta_parts_line(canvas, diagnostics, layout_profile, title_layout, parts, data=data)
+
+        overlay = Image.new('RGBA', canvas.size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(overlay)
+        current_role = self._typography_role('meta_primary')
+        old_role = self._typography_role('meta_secondary')
+        x = int(layout_profile['content_left'])
+        y = title_layout.meta_y
+        max_width = int(layout_profile['meta_max_width'])
+        current_fill = (255, 244, 235, 236)
+        old_fill = (214, 222, 233, 170)
+        gap = 18
+
+        def text_width(text: str, font: ImageFont.FreeTypeFont | ImageFont.ImageFont, tracking: float) -> int:
+            return int(self._textlength(draw, text, font, letter_spacing=self._letter_spacing_px(font, tracking)))
+
+        if old_text:
+            font_pairs = (
+                (36, 24),
+                (34, 22),
+                (32, 21),
+                (30, 20),
+                (28, 19),
+                (26, 18),
+                (24, 17),
+            )
+            for current_size, old_size in font_pairs:
+                current_font = self._load_font_for_text(current_size, current_role.candidates, current_text, diagnostics=diagnostics, layer='price_current')
+                old_font = self._load_font_for_text(old_size, old_role.candidates, old_text, diagnostics=diagnostics, layer='price_old')
+                current_width = text_width(current_text, current_font, current_role.tracking_em)
+                old_width = text_width(old_text, old_font, old_role.tracking_em)
+                if current_width + gap + old_width <= max_width:
+                    current_y = y - 2
+                    display_current = self._draw_role_text(
+                        draw,
+                        (x, current_y),
+                        current_text,
+                        current_font,
+                        current_fill,
+                        role='meta_primary',
+                        shadow_layers=((1, 2, 26),),
+                        stroke_width=0,
+                    )
+                    old_bbox = draw.textbbox((0, 0), old_text, font=old_font)
+                    old_height = max(1, old_bbox[3] - old_bbox[1])
+                    current_bbox = draw.textbbox((0, 0), current_text, font=current_font)
+                    current_height = max(1, current_bbox[3] - current_bbox[1])
+                    old_x = x + current_width + gap
+                    old_y = current_y + max(0, (current_height - old_height) // 2) + 3
+                    old_letter_spacing = self._letter_spacing_px(old_font, old_role.tracking_em)
+                    display_old = self._draw_role_text(
+                        draw,
+                        (old_x, old_y),
+                        old_text,
+                        old_font,
+                        old_fill,
+                        role='meta_secondary',
+                        shadow_layers=((1, 2, 18),),
+                        stroke_width=0,
+                    )
+                    old_bounds = self._textbbox(
+                        draw,
+                        (old_x, old_y),
+                        display_old,
+                        old_font,
+                        letter_spacing=old_letter_spacing,
+                        stroke_width=0,
+                    )
+                    strike_y = int(round((old_bounds[1] + old_bounds[3]) / 2))
+                    draw.line((old_x, strike_y, old_x + old_width, strike_y), fill=(214, 222, 233, 196), width=2)
+                    diagnostics.text_payload['meta_current_price'] = display_current
+                    diagnostics.text_payload['meta_old_price'] = display_old
+                    diagnostics.text_payload['meta_old_price_struck'] = True
+                    diagnostics.text_payload['meta_old_price_bounds'] = old_bounds
+                    diagnostics.text_payload['meta_old_price_strike_y'] = strike_y
+                    diagnostics.text_payload['meta_old_price_strike_formula'] = 'glyph_bbox_vertical_center'
+                    diagnostics.text_payload['meta_parts'] = [display_current, display_old]
+                    diagnostics.text_payload['meta_line'] = f'{display_current} ~~{display_old}~~'
+                    diagnostics.text_payload['meta_price_block_mode'] = 'current_old_strike'
+                    return Image.alpha_composite(canvas.convert('RGBA'), overlay), 'price_block_v2'
+
+            fallback_text = f'{old_text} → {current_text}'
+            fallback_text, fallback_font = self._resolve_clean_meta_text(draw, [fallback_text], diagnostics, layout_profile)
+            if fallback_text and fallback_font is not None:
+                self._draw_role_text(
+                    draw,
+                    (x, y),
+                    fallback_text,
+                    fallback_font,
+                    tuple(int(value) for value in layout_profile['meta_fill']),
+                    role='meta_secondary',
+                    shadow_layers=((1, 2, 26),),
+                    stroke_width=0,
+                )
+                diagnostics.text_payload['meta_current_price'] = current_text
+                diagnostics.text_payload['meta_old_price'] = old_text
+                diagnostics.text_payload['meta_old_price_struck'] = False
+                diagnostics.text_payload['meta_parts'] = [old_text, current_text]
+                diagnostics.text_payload['meta_line'] = fallback_text
+                diagnostics.text_payload['meta_price_block_mode'] = 'arrow_fallback'
+                return Image.alpha_composite(canvas.convert('RGBA'), overlay), 'price_block_v2'
+
+        current_font = None
+        for current_size in (36, 34, 32, 30, 28, 26, 24):
+            probe_font = self._load_font_for_text(current_size, current_role.candidates, current_text, diagnostics=diagnostics, layer='price_current')
+            if text_width(current_text, probe_font, current_role.tracking_em) <= max_width:
+                current_font = probe_font
+                break
+        if not current_text or current_font is None:
+            diagnostics.text_payload['meta_parts'] = []
+            return canvas, 'hidden'
+        display_current = self._draw_role_text(
+            draw,
+            (x, y - 2),
+            current_text,
+            current_font,
+            current_fill,
+            role='meta_primary',
+            shadow_layers=((1, 2, 26),),
+            stroke_width=0,
+        )
+        diagnostics.text_payload['meta_current_price'] = display_current
+        diagnostics.text_payload['meta_old_price_struck'] = False
+        diagnostics.text_payload['meta_parts'] = [display_current]
+        diagnostics.text_payload['meta_line'] = display_current
+        diagnostics.text_payload['meta_price_block_mode'] = 'current_only'
+        return Image.alpha_composite(canvas.convert('RGBA'), overlay), 'price_block_v2'
 
     def _draw_clean_brand_mark(
         self,
@@ -5782,6 +5948,45 @@ class YotoCardEngineV4:
             x += float(draw.textlength(char, font=font))
             if index < len(text) - 1:
                 x += letter_spacing
+
+    def _textbbox(
+        self,
+        draw: ImageDraw.ImageDraw,
+        position: tuple[int, int],
+        text: str,
+        font: ImageFont.FreeTypeFont | ImageFont.ImageFont,
+        *,
+        letter_spacing: int = 0,
+        stroke_width: int = 0,
+    ) -> tuple[int, int, int, int]:
+        x, y = float(position[0]), int(position[1])
+        if not text:
+            return (int(round(x)), y, int(round(x)), y)
+        if letter_spacing == 0 or len(text) <= 1:
+            return tuple(int(value) for value in draw.textbbox((int(round(x)), y), text, font=font, stroke_width=stroke_width))
+
+        left: int | None = None
+        top: int | None = None
+        right: int | None = None
+        bottom: int | None = None
+        for index, char in enumerate(text):
+            char_x = int(round(x))
+            if char != ' ':
+                char_bbox = draw.textbbox((char_x, y), char, font=font, stroke_width=stroke_width)
+                if left is None:
+                    left, top, right, bottom = (int(value) for value in char_bbox)
+                else:
+                    left = min(left, int(char_bbox[0]))
+                    top = min(top, int(char_bbox[1]))
+                    right = max(right, int(char_bbox[2]))
+                    bottom = max(bottom, int(char_bbox[3]))
+            x += float(draw.textlength(char, font=font))
+            if index < len(text) - 1:
+                x += letter_spacing
+        if left is None or top is None or right is None or bottom is None:
+            end_x = int(round(position[0] + self._textlength(draw, text, font, letter_spacing=letter_spacing)))
+            return (int(round(position[0])), y, end_x, y)
+        return (left, top, right, bottom)
 
     def _draw_role_text(
         self,
