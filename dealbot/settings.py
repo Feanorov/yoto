@@ -3,8 +3,26 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 import os
+import sys
 
-from dotenv import load_dotenv
+from dotenv import dotenv_values
+
+
+class ConfigurationError(RuntimeError):
+    """Raised when required operator configuration is missing or invalid."""
+
+
+@dataclass(frozen=True, slots=True)
+class BootstrapDiagnostics:
+    python_executable: Path
+    project_root: Path
+    env_path: Path
+    env_found: bool
+    env_loaded: bool
+    bot_token_line_found: bool
+    channel_username_line_found: bool
+    bot_token_present: bool
+    channel_username_present: bool
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,8 +96,89 @@ class RenderingConfig:
     comfyui_checkpoint: str = 'auto'
 
 
-def load_rendering_config(root_dir: Path) -> RenderingConfig:
-    load_dotenv(root_dir / '.env')
+def resolve_project_root(root_dir: Path) -> Path:
+    return Path(root_dir).resolve()
+
+
+def _read_dotenv_values(env_path: Path) -> dict[str, str]:
+    parsed = dotenv_values(dotenv_path=env_path, encoding='utf-8-sig')
+    normalized: dict[str, str] = {}
+    for raw_key, raw_value in parsed.items():
+        if raw_key is None:
+            continue
+        key = str(raw_key).lstrip('\ufeff').strip()
+        if not key:
+            continue
+        normalized[key] = '' if raw_value is None else str(raw_value)
+    return normalized
+
+
+def _apply_dotenv_values(values: dict[str, str], *, override: bool) -> None:
+    for key, value in values.items():
+        existing = os.environ.get(key)
+        if override or existing is None or not str(existing).strip():
+            os.environ[key] = value
+
+
+def load_project_env(root_dir: Path, *, override: bool = False) -> BootstrapDiagnostics:
+    project_root = resolve_project_root(root_dir)
+    env_path = project_root / '.env'
+    env_found = env_path.is_file()
+    env_loaded = False
+    parsed_values: dict[str, str] = {}
+    if env_found:
+        parsed_values = _read_dotenv_values(env_path)
+        _apply_dotenv_values(parsed_values, override=override)
+        env_loaded = True
+    return BootstrapDiagnostics(
+        python_executable=Path(sys.executable).resolve(),
+        project_root=project_root,
+        env_path=env_path,
+        env_found=env_found,
+        env_loaded=env_loaded,
+        bot_token_line_found='BOT_TOKEN' in parsed_values,
+        channel_username_line_found='CHANNEL_USERNAME' in parsed_values,
+        bot_token_present=bool(os.getenv('BOT_TOKEN', '').strip()),
+        channel_username_present=bool(os.getenv('CHANNEL_USERNAME', '').strip()),
+    )
+
+
+def render_bootstrap_diagnostics(bootstrap: BootstrapDiagnostics) -> list[str]:
+    return [
+        f'bootstrap :: python_executable={bootstrap.python_executable}',
+        f'bootstrap :: project_root={bootstrap.project_root}',
+        (
+            f'bootstrap :: env_path={bootstrap.env_path} '
+            f':: found={"yes" if bootstrap.env_found else "no"} '
+            f':: loaded={"yes" if bootstrap.env_loaded else "no"}'
+        ),
+        (
+            'bootstrap :: '
+            f'BOT_TOKEN present={"yes" if bootstrap.bot_token_present else "no"} '
+            f':: CHANNEL_USERNAME present={"yes" if bootstrap.channel_username_present else "no"}'
+        ),
+    ]
+
+
+def _format_missing_required_env_message(
+    missing_names: list[str],
+    bootstrap: BootstrapDiagnostics,
+) -> str:
+    missing = ', '.join(missing_names)
+    return (
+        f'Missing required environment variable(s): {missing}. '
+        f'Checked .env path: {bootstrap.env_path} '
+        f'(found={"yes" if bootstrap.env_found else "no"}, '
+        f'loaded={"yes" if bootstrap.env_loaded else "no"}). '
+        'Secret values are not printed.'
+    )
+
+
+def load_rendering_config(root_dir: Path, *, load_env: bool = True) -> RenderingConfig:
+    resolved_root = resolve_project_root(root_dir)
+    if load_env:
+        bootstrap = load_project_env(resolved_root)
+        resolved_root = bootstrap.project_root
     rendering = RenderingConfig(
         card_renderer=os.getenv('CARD_RENDERER_MODE', 'yoto_v4').strip().lower() or 'yoto_v4',
         fallback_to_legacy=os.getenv('CARD_RENDERER_FALLBACK_TO_LEGACY', '1').strip() != '0',
@@ -116,13 +215,18 @@ class AppSettings:
 
     @classmethod
     def from_env(cls, root_dir: Path) -> 'AppSettings':
-        rendering = load_rendering_config(root_dir)
+        bootstrap = load_project_env(root_dir)
+        root_dir = bootstrap.project_root
+        rendering = load_rendering_config(root_dir, load_env=False)
         bot_token = os.getenv('BOT_TOKEN', '').strip()
         channel_username = os.getenv('CHANNEL_USERNAME', '').strip()
+        missing_names = []
         if not bot_token:
-            raise RuntimeError('BOT_TOKEN is not configured.')
+            missing_names.append('BOT_TOKEN')
         if not channel_username:
-            raise RuntimeError('CHANNEL_USERNAME is not configured.')
+            missing_names.append('CHANNEL_USERNAME')
+        if missing_names:
+            raise ConfigurationError(_format_missing_required_env_message(missing_names, bootstrap))
 
         whitelist = frozenset(item.strip().lower() for item in os.getenv('PUBLISHER_WHITELIST', '').split(',') if item.strip())
         degraded = frozenset(item.strip().lower() for item in os.getenv('DEGRADED_SOURCES', '').split(',') if item.strip())

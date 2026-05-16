@@ -7,6 +7,7 @@ from pathlib import Path
 
 from dealbot.operator_cli import (
     LatestArtifacts,
+    _run_dealbot_command,
     build_truth_summary,
     build_voice_package_summary,
     discover_latest_artifacts,
@@ -172,3 +173,31 @@ def test_build_voice_package_summary_marks_ready_and_writes_operator_artifact(tm
     assert 'Reaper dubbing' in summary['next_action']
     assert artifact_payload['status'] == 'ok'
     assert artifact_payload['ready_for_reaper'] is True
+
+
+def test_run_dealbot_command_does_not_reuse_stale_truth_report_when_command_fails(tmp_path: Path) -> None:
+    stale_report = _touch(
+        tmp_path / 'output' / 'analytics' / '20260320T010000Z_operator_truth_report_preview.json',
+        mtime=10,
+        content=json.dumps(
+            {
+                'verdict': {
+                    'verdict': 'telegram_proof_verified',
+                    'truth_ready': True,
+                    'telegram_verified': True,
+                }
+            }
+        ),
+    )
+
+    exit_code, report_path, payload, artifacts = _run_dealbot_command(
+        root_dir=tmp_path,
+        args=['--preview'],
+        command_name='preview',
+        runner=lambda command, cwd: 1,
+    )
+
+    assert exit_code == 1
+    assert report_path is None
+    assert payload is None
+    assert artifacts.operator_truth_report == stale_report

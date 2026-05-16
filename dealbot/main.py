@@ -24,7 +24,7 @@ from application.use_cases.offline_validation_snapshot import OfflineSnapshotBun
 from application.use_cases.operator_truth_report import OperatorTruthReporter
 from application.use_cases.plan_queue import PlanQueueUseCase, PlannedCandidate, QueuePlan
 from application.use_cases.publish_next import PublishNextUseCase
-from dealbot.settings import AppSettings
+from dealbot.settings import AppSettings, ConfigurationError, load_project_env, render_bootstrap_diagnostics
 from domain.policies.content_lane_policy import ContentLanePolicy
 from domain.policies.dedup_policy import DedupPolicy
 from domain.policies.decision_policy import DecisionPolicy
@@ -658,10 +658,16 @@ def _print_auto_golden_status(runtime: BotRuntime) -> None:
     safe_print(f'golden-auto[{source}] :: {bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(bundle)}')
 
 
+def _print_bootstrap_diagnostics(root_dir: Path) -> None:
+    for line in render_bootstrap_diagnostics(load_project_env(root_dir)):
+        safe_print(line)
+
+
 async def async_main() -> None:
     args = parse_args()
     root_dir = Path(__file__).resolve().parents[1]
     _seed_offline_preview_credentials(args)
+    _print_bootstrap_diagnostics(root_dir)
     settings = AppSettings.from_env(root_dir)
     configure_logging()
 
@@ -752,7 +758,11 @@ async def async_main() -> None:
 
 
 def main() -> None:
-    asyncio.run(async_main())
+    try:
+        asyncio.run(async_main())
+    except ConfigurationError as exc:
+        safe_print(f'configuration-error :: {exc}')
+        raise SystemExit(1) from exc
 
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ import time
 from types import SimpleNamespace
 from typing import Any, Callable
 
+from dealbot.settings import load_project_env, render_bootstrap_diagnostics
 from domain.entities.analytics_artifact import AnalyticsArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
 from video_generator.application.use_cases.build_voice_ready_package import BuildVoiceReadyPackageResult
@@ -543,7 +544,7 @@ def _run_dealbot_command(
         '*_operator_truth_report_*.json',
         since_ts=started_at,
     )
-    if report_path is None:
+    if report_path is None and exit_code == 0:
         report_path = artifacts.operator_truth_report
     payload = load_json(report_path)
     summary = build_truth_summary(
@@ -633,6 +634,8 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
         return exit_code
 
     if args.command == 'doctor':
+        for line in render_bootstrap_diagnostics(load_project_env(root_dir)):
+            safe_print(line)
         artifacts = discover_latest_artifacts(root_dir)
         payload = load_json(artifacts.operator_truth_report)
         summary = build_doctor_summary(
@@ -648,6 +651,8 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
         return 0
 
     if args.command == 'latest-artifacts':
+        for line in render_bootstrap_diagnostics(load_project_env(root_dir)):
+            safe_print(line)
         artifacts = discover_latest_artifacts(root_dir)
         summary = build_latest_artifacts_summary(artifacts)
         summary['workflow_artifact_path'] = str(emit_workflow_artifact(root_dir, summary, subject_id='latest_artifacts'))

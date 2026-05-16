@@ -1,9 +1,11 @@
 @echo off
 setlocal
 
-set "ROOT=%~dp0"
-set "BUNDLE_PYTHON=%ROOT%.venv\Scripts\python.exe"
-set "FALLBACK_PYTHON=D:\Telegram\.venv\Scripts\python.exe"
+for %%I in ("%~dp0.") do set "ROOT=%%~fI"
+for %%I in ("%ROOT%") do set "ROOT_DRIVE=%%~dI"
+set "ENV_PATH=%ROOT%\.env"
+set "PROJECT_VENV_PYTHON=%ROOT_DRIVE%\Telegram\.venv\Scripts\python.exe"
+set "BUNDLE_PYTHON=%ROOT%\.venv\Scripts\python.exe"
 
 if defined PYTHONPATH (
     set "PYTHONPATH=%ROOT%;%PYTHONPATH%"
@@ -77,22 +79,19 @@ exit /b %ERRORLEVEL%
 call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli send-test %1 %2 %3 %4 %5 %6 %7 %8 %9
-call :execute_from_root
-exit /b %ERRORLEVEL%
+goto :execute_from_root
 
 :send_test_offline
 call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli send-test --offline-snapshot latest %1 %2 %3 %4 %5 %6 %7 %8 %9
-call :execute_from_root
-exit /b %ERRORLEVEL%
+goto :execute_from_root
 
 :send_test_golden
 call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli send-test --offline-snapshot golden %1 %2 %3 %4 %5 %6 %7 %8 %9
-call :execute_from_root
-exit /b %ERRORLEVEL%
+goto :execute_from_root
 
 :daily_check
 call :resolve_python
@@ -265,28 +264,22 @@ exit /b %ERRORLEVEL%
 :resolve_python
 if defined YOTO_PYTHON exit /b 0
 
+if exist "%PROJECT_VENV_PYTHON%" (
+    set "YOTO_PYTHON=%PROJECT_VENV_PYTHON%"
+    exit /b 0
+)
+
 if exist "%BUNDLE_PYTHON%" (
     set "YOTO_PYTHON=%BUNDLE_PYTHON%"
     exit /b 0
 )
 
-if exist "%FALLBACK_PYTHON%" (
-    set "YOTO_PYTHON=%FALLBACK_PYTHON%"
-    exit /b 0
-)
-
-for /f "usebackq delims=" %%I in (`where python 2^>nul`) do (
-    if not defined YOTO_PYTHON set "YOTO_PYTHON=%%~fI"
-)
-
-if defined YOTO_PYTHON exit /b 0
-
 echo [YOTO] No usable Python interpreter was found.
 echo [YOTO] Checked:
+echo [YOTO]   %PROJECT_VENV_PYTHON%
 echo [YOTO]   %BUNDLE_PYTHON%
-echo [YOTO]   %FALLBACK_PYTHON%
-echo [YOTO]   python on PATH
-echo [YOTO] Restore the bundle venv or the known working interpreter, then retry.
+echo [YOTO] The launcher does not fall back to PATH Python.
+echo [YOTO] Restore the project venv or bundle venv, then retry.
 exit /b 1
 
 :execute_from_root
@@ -378,7 +371,7 @@ echo   yoto.bat video-worker [video args]
 echo   yoto.bat video-loop [video args]
 echo   yoto.bat video-smoke [video args]
 echo.
-echo The launcher prefers %BUNDLE_PYTHON%, then %FALLBACK_PYTHON%, then python on PATH.
+echo The launcher prefers %PROJECT_VENV_PYTHON%, then %BUNDLE_PYTHON%.
 echo See docs\YOTO_COMMAND_INDEX.md for safe vs dangerous commands and docs\YOTO_OPERATOR_WORKFLOW.md for the daily workflow.
 exit /b 0
 
