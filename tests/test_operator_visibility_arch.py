@@ -5,6 +5,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from application.use_cases.offline_validation_snapshot import OfflineSnapshotBundle
 from application.use_cases.operator_truth_report import OperatorTruthReporter
 from application.use_cases.plan_queue import PlannedCandidate, QueuePlan
 from application.use_cases.publish_next import PublishNextUseCase
@@ -156,3 +157,69 @@ def test_operator_truth_report_emits_queue_selection_and_target_details(tmp_path
     assert payload['selection']['eligible_candidates_total'] == 1
     assert payload['send_test_target']['artifact']['image_path'] == str(image_path)
     assert payload['verdict']['truth_ready'] is True
+
+
+def test_operator_truth_report_skips_repository_persistence_for_offline_preview(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    now = datetime(2026, 3, 20, 12, 0)
+
+    offer = make_offer()
+    offer.offer_id = 'steam:offline-preview'
+    offer.game_id = 'offline-preview'
+    offer.franchise_key = 'offline-preview'
+    offer.title = 'Offline Preview Target'
+    decision_json = make_decision_json('high_value_discount', score=130.0)
+    repo.replace_queue('planned', [(130.0, offer, decision_json)], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now)
+    target = asyncio.run(use_case.preview_send_test_target(now, now))
+    plan = QueuePlan(
+        planned=[make_candidate(offer, decision_json, 130.0)],
+        reserve=[],
+        metrics={'offers.ingested_total': 1, 'offers.enriched_total': 1},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': now.isoformat(),
+            'selection_summary': {'solo_post': 1, 'roundup_candidate': 0, 'capacity_hold': 0},
+        },
+    )
+    offline_bundle = OfflineSnapshotBundle(
+        root_dir=tmp_path / 'offline_validation' / 'golden' / 'current',
+        manifest_path=tmp_path / 'offline_validation' / 'golden' / 'current' / 'snapshot_manifest.json',
+        base_db_path=tmp_path / 'offline_validation' / 'golden' / 'current' / 'dealbot.sqlite3',
+        run_key='20260320T120000Z',
+        created_at=now.isoformat(),
+        context={'source': 'current_queue'},
+        metrics={'offers.ingested_total': 1},
+        planned_count=1,
+        reserve_count=0,
+        asset_localization={},
+        quality={'golden_eligible': True, 'blocking_reasons': []},
+        snapshot_role='golden',
+        golden_promoted_at=now.isoformat(),
+        golden_source_run_key='20260320T110000Z',
+    )
+
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    artifact = reporter.emit(
+        now_utc=now,
+        mode='preview_offline',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+        offline_bundle=offline_bundle,
+    )
+
+    assert artifact.json_path is not None and artifact.json_path.exists()
+    with repo.connect() as connection:
+        stored = connection.execute(
+            "SELECT COUNT(*) FROM analytics_artifacts WHERE artifact_type = 'operator_truth_report'"
+        ).fetchone()
+    assert stored is not None
+    assert int(stored[0]) == 0

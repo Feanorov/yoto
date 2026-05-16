@@ -68,5 +68,7 @@ def make_test_settings(
         rendering=RenderingConfig(
             card_renderer='legacy',
             fallback_to_legacy=True,
+            image_provider_mode='ai_first',
+            image_pipeline_version='v1',
         ),
     )

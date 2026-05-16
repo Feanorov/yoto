@@ -127,11 +127,22 @@ class OperatorTruthReporter:
             artifact.json_path = None
             artifact.csv_path = None
             self.logger.warning('Operator truth report write failed: %s', exc)
-        try:
-            self.repositories.save_analytics_artifact(artifact)
-        except Exception as exc:
-            self.logger.warning('Operator truth report persistence failed: %s', exc)
+        if self._should_persist_to_repository(mode=mode, offline_bundle=offline_bundle):
+            try:
+                self.repositories.save_analytics_artifact(artifact)
+            except Exception as exc:
+                self.logger.warning('Operator truth report persistence failed: %s', exc)
         return artifact
+
+    @staticmethod
+    def _should_persist_to_repository(
+        *,
+        mode: str,
+        offline_bundle: OfflineSnapshotBundle | None,
+    ) -> bool:
+        if offline_bundle is None:
+            return True
+        return mode != 'preview_offline'
 
     def _queue_summary(self, plan: QueuePlan) -> dict[str, Any]:
         selection_summary = dict((plan.context or {}).get('selection_summary') or {})
