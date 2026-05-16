@@ -143,9 +143,11 @@ def test_epic_caption_uses_existing_description_when_available() -> None:
     caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='epic_free'))
 
     assert 'Кооперативний roguelite про хаотичні пограбування та втечі.' in caption
+    assert 'Зараз безплатно в Epic Games і після додавання лишається на акаунті.' in caption
+    assert 'Якщо цікаво — можна просто додати в бібліотеку.' in caption
     assert '#epicgames' in caption
-    assert 'лишається на акаунті' in caption
-    assert caption.count('назавжди') <= 1
+    assert '#freegames' in caption
+    assert 'Йото' not in caption
 
 
 def test_epic_caption_ignores_non_cyrillic_store_description() -> None:
@@ -170,6 +172,7 @@ def test_epic_caption_ignores_non_cyrillic_store_description() -> None:
     assert 'Build your crew and rob absurd banks' not in caption
     assert 'Turnip Boy Robs a Bank' in caption
     assert '#epicgames' in caption
+    assert 'Йото' not in caption
 
 
 def test_epic_caption_falls_back_to_non_redundant_summary_without_description() -> None:
@@ -190,9 +193,10 @@ def test_epic_caption_falls_back_to_non_redundant_summary_without_description() 
     caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='epic_free'))
     blocks = [block for block in caption.split('\n\n') if block]
 
-    assert len(blocks) >= 4
+    assert len(blocks) >= 5
     assert 'Turnip Boy Robs a Bank' in blocks[0]
     assert not blocks[1].startswith('Turnip Boy Robs a Bank')
+    assert blocks[2] == 'Зараз безплатно в Epic Games і після додавання лишається на акаунті.'
     assert '#epicgames' in caption
 
 
@@ -378,12 +382,12 @@ def test_freebie_fallback_summary_hides_internal_taxonomy_fragments() -> None:
 
     builder = TelegramCaptionBuilder(1024)
     caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='epic_free'))
+    body = '\n\n'.join(caption.split('\n\n')[:-1])
 
-    assert 'freegames' not in caption.lower()
-    assert 'edition' not in caption.lower()
-    assert '0 грн' in caption
-    assert 'лишається на акаунті' in caption
-    assert caption.count('назавжди') <= 1
+    assert 'freegames' not in body.lower()
+    assert 'edition' not in body.lower()
+    assert 'Зараз безплатно в Epic Games і після додавання лишається на акаунті.' in caption
+    assert '#freegames' in caption
 
 
 
@@ -413,7 +417,7 @@ def test_discount_fallback_summary_reads_naturally_for_genre_only_offer() -> Non
 
 
 
-def test_freebie_caption_uses_direct_yoto_signal_and_forever_language() -> None:
+def test_freebie_caption_v2_stays_compact_and_preserves_forever_language() -> None:
     offer = make_offer()
     offer.title = 'Intravenous'
     offer.offer_kind = OfferKind.FREEBIE
@@ -428,11 +432,10 @@ def test_freebie_caption_uses_direct_yoto_signal_and_forever_language() -> None:
     builder = TelegramCaptionBuilder(1024)
     caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
 
-    assert 'Йото' in caption
-    assert '0 грн' in caption
-    assert 'лишається в бібліотеці' in caption
+    assert 'Йото' not in caption
+    assert 'Зараз безплатно у Steam і після додавання лишається в бібліотеці.' in caption
     assert 'Роздача відкрита до 12 березня 2026, 18:00.' in caption
-    assert caption.count('назавжди') <= 1
+    assert 'Якщо цікаво — можна просто додати гру в бібліотеку.' in caption
 
 
 def test_high_value_discount_uses_indirect_voice_without_explicit_yoto() -> None:
@@ -476,8 +479,9 @@ def test_temporary_free_access_avoids_free_claim_language() -> None:
 
     assert 'Йото вихопив роздачу' not in caption
     assert 'назавжди' not in caption
-    assert 'пограти безкоштовно' in caption
+    assert 'Зараз гру можна спробувати безплатно; доступ тимчасовий.' in caption
     assert 'доступ тимчасовий' in caption
+    assert 'Якщо цікаво — це хороший момент просто перевірити гру без покупки.' in caption
 
 
 def test_first_price_move_uses_special_yoto_mode() -> None:
@@ -525,11 +529,10 @@ def test_direct_openings_rotate_across_nearby_posts() -> None:
     second_offer.price_after_minor = 0
     second_offer.discount_percent = 100
 
-    first_caption, _ = builder.build(first_offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
-    second_caption, _ = builder.build(second_offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
-
-    first_opening = next(phrase for phrase in DIRECT_OPENING_POOLS['freebie'] if phrase in first_caption)
-    second_opening = next(phrase for phrase in DIRECT_OPENING_POOLS['freebie'] if phrase in second_caption)
+    builder.build(first_offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
+    first_opening = builder.last_debug_snapshot()['opening']['selected']
+    builder.build(second_offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
+    second_opening = builder.last_debug_snapshot()['opening']['selected']
 
     assert first_opening != second_opening
 
@@ -696,10 +699,9 @@ def test_freebie_caption_avoids_repeating_keep_forever_semantics() -> None:
     builder = TelegramCaptionBuilder(1024)
     caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
 
-    assert '0 грн' in caption
-    assert 'лишається в бібліотеці' in caption
-    assert caption.count('назавжди') <= 1
-    assert caption.count('забрати') <= 2
+    assert 'Зараз безплатно у Steam і після додавання лишається в бібліотеці.' in caption
+    assert caption.count('назавжди') == 0
+    assert caption.count('забрати') <= 1
 
 
 

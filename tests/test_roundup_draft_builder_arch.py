@@ -56,7 +56,7 @@ def make_roundup(
     )
 
 
-def test_roundup_draft_builder_creates_editorial_hero_discount_caption() -> None:
+def test_roundup_draft_builder_creates_compact_hero_discount_caption() -> None:
     builder = TelegramRoundupDraftBuilder()
     draft = builder.build(
         make_roundup(
@@ -69,18 +69,17 @@ def test_roundup_draft_builder_creates_editorial_hero_discount_caption() -> None
         )
     )
 
-    assert draft.title == 'Що взяти зі знижок просто зараз, частина 2'
-    assert any(phrase in draft.intro for phrase in DIRECT_OPENING_POOLS['roundup'])
-    assert any(fragment in draft.intro for fragment in ('редакторський маршрут', 'окреме відкриття', 'момент входу', 'цінник уже говорить голосніше'))
+    assert draft.title == '🔥 Що взяти зі знижок: коротка добірка, частина 2'
+    assert draft.intro == 'Кілька великих знижок, з яких зручно почати прямо зараз.'
+    assert 'Йото' not in draft.intro
     assert 'резерв' not in draft.intro.lower()
     assert draft.item_lines[0].startswith('1. <a href="https://store.steampowered.com/app/3240220"><b>Grand Theft Auto V Enhanced</b></a> — ')
-    assert '56% до 879 грн' in draft.item_lines[0]
-    assert 'велике ім’я добірки' in draft.item_lines[0]
-    assert 'критичний фаворит' in draft.item_lines[1]
-    assert 'великий хіт' in draft.item_lines[2]
+    assert '-56% до 879 грн, 81% позитивних' in draft.item_lines[0]
+    assert '96% позитивних' in draft.item_lines[1]
+    assert '94% позитивних' in draft.item_lines[2]
     assert 'коментар' not in draft.closing_cta.lower()
-    assert 'верхівки' in draft.closing_cta or 'маршрут' in draft.closing_cta
-    assert draft.caption_html.startswith('<b>Що взяти зі знижок просто зараз, частина 2</b>')
+    assert any(fragment in draft.closing_cta for fragment in ('перших позицій', 'перших пунктів', 'верхніх позицій', 'головне'))
+    assert draft.caption_html.startswith('<b>🔥 Що взяти зі знижок: коротка добірка, частина 2</b>')
     assert '#toplist #steamsale #steam' in draft.caption_html
 
 
@@ -100,24 +99,26 @@ def test_roundup_draft_builder_creates_freebie_caption_lines() -> None:
         )
     )
 
-    assert draft.title == 'Безкоштовні роздачі, які ще можна забрати'
-    assert any(phrase in draft.intro for phrase in DIRECT_OPENING_POOLS['roundup'])
-    assert 'безкоштов' in draft.intro.lower()
+    assert draft.title == '🎁 Безкоштовні ігри: коротка добірка'
+    assert draft.intro == 'Зараз можна забрати 3 безплатні ігри в Epic і Steam.'
     assert 'резерв' not in draft.intro.lower()
     assert ' — ' in draft.item_lines[0]
-    assert 'безкоштовно в Epic' in draft.item_lines[0]
-    assert 'варте швидкої звірки' in draft.item_lines[0]
-    assert 'безкоштовно в Steam' in draft.item_lines[2]
-    assert 'нішевий, але робочий слот' in draft.item_lines[2]
+    assert 'безплатно в Epic' in draft.item_lines[0]
+    assert 'варте швидкої звірки' not in draft.item_lines[0]
+    assert 'безплатно в Steam' in draft.item_lines[2]
+    assert 'нішевий, але робочий слот' not in draft.item_lines[2]
     assert 'коментар' not in draft.closing_cta.lower()
-    assert '#toplist #freegame' in draft.caption_html
+    assert any(fragment in draft.closing_cta for fragment in ('забрати одразу', 'перших позицій', 'перших пунктів', 'верхніх позицій', 'головне'))
+    assert '#toplist #freegames' in draft.caption_html
     assert '#steam' not in draft.caption_html
     assert '#epicgames' not in draft.caption_html
 
 
-def test_roundup_opening_pool_stays_editorial_and_has_room_for_anti_repeat() -> None:
+def test_roundup_opening_pool_stays_compact_and_has_room_for_anti_repeat() -> None:
     assert len(DIRECT_OPENING_POOLS['roundup']) >= 5
-    assert all(any(marker in phrase for marker in ('список', 'добірк', 'верхівк', 'редактор')) for phrase in DIRECT_OPENING_POOLS['roundup'])
+    assert all('Йото' not in phrase for phrase in DIRECT_OPENING_POOLS['roundup'])
+    assert all('редактор' not in phrase for phrase in DIRECT_OPENING_POOLS['roundup'])
+    assert all('відсіяв шум' not in phrase for phrase in DIRECT_OPENING_POOLS['roundup'])
 
 
 def test_roundup_openings_and_ctas_avoid_recent_repetition_when_alternatives_exist() -> None:
@@ -180,14 +181,14 @@ def test_mixed_roundup_keeps_punctuation_clean_and_drops_dump_language() -> None
         )
     )
 
-    assert draft.title == 'Що ще варте швидкої перевірки, частина 2'
+    assert draft.title == '🔥 Що ще подивитися: коротка добірка, частина 2'
     assert 'резерв' not in draft.title.lower()
     assert 'резерв' not in draft.intro.lower()
-    assert 'технічний хвіст' in draft.intro or 'окремий короткий прохід' in draft.intro or 'ще тримається' in draft.intro
+    assert draft.intro == 'Кілька позицій, які ще варто швидко перевірити.'
     assert '  ' not in draft.caption_html
     assert ' , ' not in draft.caption_html
     assert 'коментар' not in draft.closing_cta.lower()
-    assert 'довгому скролі' in draft.closing_cta or 'дорізку' in draft.closing_cta or 'маршрут' in draft.closing_cta
+    assert any(fragment in draft.closing_cta for fragment in ('кілька перших позицій', 'перших пунктів', 'верхніх позицій', 'головне'))
 
 
 def test_tag_roundup_reads_like_editorial_selection_not_plain_list() -> None:
@@ -204,10 +205,9 @@ def test_tag_roundup_reads_like_editorial_selection_not_plain_list() -> None:
         )
     )
 
-    assert draft.title == 'Co-op: короткий редакторський список'
-    assert 'Co-op' in draft.intro
-    assert 'редакторська добірка' in draft.intro or 'редакторський список' in draft.intro or 'точність відбору' in draft.intro
-    assert 'перевірений хіт' in draft.item_lines[1]
+    assert draft.title == '🔥 Co-op: коротка добірка'
+    assert draft.intro == 'Кілька ігор у темі Co-op, які зараз виглядають найцікавіше.'
+    assert '97% позитивних' in draft.item_lines[1]
     assert 'коментар' not in draft.closing_cta.lower()
     assert draft.caption_html.endswith('#toplist #steamsale #steam')
 

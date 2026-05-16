@@ -71,7 +71,8 @@ def test_build_offer_preview_entry_exposes_voice_metadata_and_safe_caption() -> 
     assert entry['direct_mode'] == 'freebie'
     assert entry['caption_limit_safe'] is True
     assert '<a href="https://store.epicgames.com/uk/p/turnip-boy-robs-a-bank"><b>Turnip Boy Robs a Bank</b></a>' in entry['caption_html']
-    assert 'Йото' in entry['caption_html']
+    assert 'Йото' not in entry['caption_html']
+    assert 'Зараз безплатно в Epic Games і після додавання лишається на акаунті.' in entry['caption_html']
     assert '<a href=' not in entry['caption_text']
 
 

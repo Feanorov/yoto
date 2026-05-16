@@ -35,7 +35,7 @@ TAG_MAP = {
     'puzzle': '#puzzle',
 }
 
-EPIC_GENERIC_SUMMARY = 'Не найгучніша роздача тижня, але цілком чесна безкоштовна знахідка, яку варто хоча б мати на радарі.'
+EPIC_GENERIC_SUMMARY = 'Ще одна безплатна гра, яку зараз можна спокійно додати в бібліотеку.'
 EVENT_GENERIC_SUMMARY = 'Фестиваль найкраще проходити точково: кількох хвилин вистачає, щоб перевірити головне й лишити собі кілька знахідок.'
 
 GENERIC_COPY_REPLACEMENTS: tuple[tuple[str, str], ...] = (
@@ -169,11 +169,11 @@ DIRECT_OPENING_POOLS: dict[str, tuple[str, ...]] = {
         '🎁 Йото приніс безкоштовну гру.',
     ),
     'roundup': (
-        '🐱 Йото відсіяв шум і залишив тільки те, що тягне на окремий список.',
-        '🐱 Йото зібрав короткий редакторський список без випадкових позицій.',
-        '🐱 Йото виніс у добірку тільки ті пропозиції, що тримаються самі по собі.',
-        '🐱 Йото склав швидкий список із тих тайтлів, де вибір уже виглядає предметно.',
-        '🐱 Йото зібрав верхівку з того, що справді варте окремого відкриття.',
+        'Коротка добірка на зараз.',
+        'Ще кілька помітних позицій одним списком.',
+        'Швидкий список із головного.',
+        'Кілька тайтлів, які варто відкрити першими.',
+        'Коротко по тому, що зараз виглядає найкраще.',
     ),
     'first_price_move': (
         '🐱 Йото фіксує перший рух ціни вниз.',
@@ -250,11 +250,11 @@ CTA_POOLS: dict[str, tuple[str, ...]] = {
         'Нормальний момент повернутися до гри, якщо чекав(ла) саме першої просадки.',
     ),
     'roundup': (
-        'Починайте з верхівки: порядок тут уже працює як короткий маршрут.',
-        'Цю добірку краще пройти зверху вниз і зупинитися тільки на своєму.',
-        'Якщо часу мало, відкрийте перші позиції, а далі вже відсікайте точково.',
-        'Тут не треба довгого скролу: кілька верхніх сторінок уже дають головну користь.',
-        'Беріть список як готовий маршрут на кілька швидких відкриттів.',
+        'Почніть із перших позицій: там уже зібрано головне.',
+        'Якщо часу мало, відкрийте кілька перших пунктів.',
+        'Кілька верхніх позицій уже дають головну користь.',
+        'Список зручно пройти зверху вниз без довгого скролу.',
+        'Це короткий маршрут, з якого легко забрати головне.',
     ),
 }
 
@@ -263,27 +263,27 @@ FIRST_PRICE_MOVE_NOTE = (
 )
 
 FREEBIE_FOCUS_SUMMARY_TEMPLATES: tuple[str, ...] = (
-    'Ключовий акцент тут — {focus}.',
-    'За відчуттям це гра з акцентом на {focus}.',
-    'Тут жанровий центр ваги — {focus}.',
+    'Головне тут — {focus}.',
+    'Гра з акцентом на {focus}.',
+    'Тут основа — {focus}.',
 )
 
 FREEBIE_GENERIC_SUMMARY_TEMPLATES: tuple[str, ...] = (
-    'Не найгучніша роздача в календарі, але цілком чесна безкоштовна знахідка.',
-    'Такий безкоштовний тайтл беруть радше за шанс спокійно відкрити щось нове, ніж за шум навколо.',
-    'Це спокійна безкоштовна знахідка з тих, що приємно мати під рукою на свій темп.',
+    'Безплатний тайтл, який можна спокійно додати собі без покупки.',
+    'Ще одна безплатна гра без зайвих умов.',
+    'Безплатний реліз, який варто швидко звірити зі своїми смаками.',
 )
 
 TEMPORARY_FREEBIE_FOCUS_SUMMARY_TEMPLATES: tuple[str, ...] = (
-    'Ключовий акцент тут — {focus}, тож безкоштовне вікно виглядає доречно.',
-    'Тут жанровий центр ваги — {focus}, а безкоштовне вікно дає спокійний тест-драйв.',
-    'Безкоштовне вікно тут добре працює там, де вас цікавить саме {focus}.',
+    'Головне тут — {focus}, а доступ зараз відкритий без покупки.',
+    'Це гра з акцентом на {focus}, яку зараз можна просто перевірити.',
+    'Тут основа — {focus}, тож безплатне вікно доречне.',
 )
 
 TEMPORARY_FREEBIE_GENERIC_SUMMARY_TEMPLATES: tuple[str, ...] = (
-    'Такі безкоштовні вікна цінні не для колекції, а для чесної короткої проби.',
-    'Це не постійне поповнення бібліотеки, а нормальний тест-драйв перед рішенням.',
-    'Таке тимчасове відкриття зручне, коли гру давно хотілося перевірити без ризику.',
+    'Це тимчасовий безплатний доступ, щоб перевірити гру без покупки.',
+    'Гру зараз можна спокійно спробувати без оплати.',
+    'Коротке безплатне вікно для швидкої перевірки гри.',
 )
 
 DISCOUNT_FOCUS_SUMMARY_TEMPLATES: tuple[str, ...] = (
@@ -931,23 +931,7 @@ class TelegramCaptionBuilder:
         title_line = f'{prefix} <a href="{self._link(offer.store_url)}"><b>{escape(offer.title)}</b></a>'
         if not offer.is_freebie:
             return self._build_steam_discount_caption_v2(title_line, offer, decision_json, copy, hashtags, voice)
-        lines: list[str] = [title_line]
-        body_lines: list[str] = []
-
-        self._append_body_line(lines, body_lines, copy.get('hook_line', ''))
-        self._append_body_line(lines, body_lines, copy.get('summary', ''))
-
-        if decision_json.get('lane') == 'game_of_the_day':
-            self._append_body_line(lines, body_lines, 'Гра дня: одна з найпомітніших знахідок у Steam просто зараз.')
-
-        self._append_body_line(lines, body_lines, self._build_steam_value_line(offer, voice))
-        self._append_body_line(lines, body_lines, self._build_improvement_note(offer, decision_json, voice))
-        self._append_body_line(lines, body_lines, self._select_urgency_line(offer, decision_json, copy))
-        self._append_body_line(lines, body_lines, self._build_supporting_line(offer))
-        self._append_body_line(lines, body_lines, self._build_cta(offer, decision_json, voice))
-
-        lines.append(' '.join(hashtags))
-        return '\n\n'.join(line for line in lines if line)
+        return self._build_freebie_caption_v2(title_line, offer, decision_json, copy, hashtags, voice)
 
     def _build_steam_discount_caption_v2(
         self,
@@ -978,15 +962,26 @@ class TelegramCaptionBuilder:
         voice: YotoVoiceDecision,
     ) -> str:
         title_line = f'🎁 <a href="{self._link(offer.store_url)}"><b>{escape(offer.title)}</b></a>'
+        return self._build_freebie_caption_v2(title_line, offer, decision_json, copy, hashtags, voice)
+
+    def _build_freebie_caption_v2(
+        self,
+        title_line: str,
+        offer: Offer,
+        decision_json: dict,
+        copy: dict[str, str],
+        hashtags: list[str],
+        voice: YotoVoiceDecision,
+    ) -> str:
         lines: list[str] = [title_line]
         body_lines: list[str] = []
 
-        self._append_body_line(lines, body_lines, copy.get('hook_line', ''))
-        self._append_body_line(lines, body_lines, copy.get('summary', '') or escape(EPIC_GENERIC_SUMMARY))
-        self._append_body_line(lines, body_lines, self._build_epic_claim_line(offer, voice))
-        self._append_body_line(lines, body_lines, self._select_urgency_line(offer, decision_json, copy))
+        fallback_summary = EPIC_GENERIC_SUMMARY if offer.source.value == 'epic' else FREEBIE_GENERIC_SUMMARY_TEMPLATES[0]
+        self._append_body_line(lines, body_lines, copy.get('summary', '') or escape(fallback_summary))
+        self._append_body_line(lines, body_lines, self._build_freebie_claim_line_v2(offer, voice))
         self._append_body_line(lines, body_lines, self._build_supporting_line(offer))
-        self._append_body_line(lines, body_lines, self._build_cta(offer, decision_json, voice))
+        self._append_body_line(lines, body_lines, self._select_urgency_line(offer, decision_json, copy))
+        self._append_body_line(lines, body_lines, self._build_freebie_cta_v2(offer, voice))
 
         lines.append(' '.join(hashtags))
         return '\n\n'.join(line for line in lines if line)
@@ -1413,15 +1408,20 @@ class TelegramCaptionBuilder:
             return f'Зараз <a href="{self._link(offer.store_url)}"><b>{now_price}</b></a>.'
         return ''
 
-    def _build_epic_claim_line(self, offer: Offer, voice: YotoVoiceDecision) -> str:
-        before = self._format_minor(offer.price_before_minor)
+    def _build_freebie_claim_line_v2(self, offer: Offer, voice: YotoVoiceDecision) -> str:
         if voice.access_type == 'temporary_access':
-            if before != 'невідомо':
-                return f'Замість {before} гру зараз можна спокійно спробувати без покупки; доступ тимчасовий.'
-            return 'Гру зараз можна безкоштовно спробувати; доступ тимчасовий.'
-        if before != 'невідомо':
-            return f'Зараз у Epic — 0 грн замість {before}; після додавання гра лишається на акаунті.'
-        return 'Зараз у Epic — 0 грн; після додавання гра лишається на акаунті.'
+            return 'Зараз гру можна спробувати безплатно; доступ тимчасовий.'
+        if offer.source.value == 'epic':
+            return 'Зараз безплатно в Epic Games і після додавання лишається на акаунті.'
+        return 'Зараз безплатно у Steam і після додавання лишається в бібліотеці.'
+
+    @staticmethod
+    def _build_freebie_cta_v2(offer: Offer, voice: YotoVoiceDecision) -> str:
+        if voice.access_type == 'temporary_access':
+            return 'Якщо цікаво — це хороший момент просто перевірити гру без покупки.'
+        if offer.source.value == 'epic':
+            return 'Якщо цікаво — можна просто додати в бібліотеку.'
+        return 'Якщо цікаво — можна просто додати гру в бібліотеку.'
 
     def _select_urgency_line(self, offer: Offer, decision_json: dict, copy: dict[str, str]) -> str:
         if not self._should_use_urgency_line(offer, decision_json):
@@ -1631,9 +1631,9 @@ class TelegramCaptionBuilder:
             return hashtags
 
         if offer.source.value == 'steam':
-            hashtags.extend(['#steam', '#freegame'])
+            hashtags.extend(['#steam', '#freegames'])
         elif offer.source.value == 'epic':
-            hashtags.extend(['#epicgames', '#freegame', '#giveaway'])
+            hashtags.extend(['#epicgames', '#freegames'])
         else:
             hashtags.extend(['#steam', '#festival', '#gaming'])
 

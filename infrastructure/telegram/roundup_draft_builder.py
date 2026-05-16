@@ -14,7 +14,7 @@ class TelegramRoundupDraftBuilder:
     def build(self, roundup: RoundupPost) -> RoundupTelegramDraft:
         title = self._title(roundup)
         voice = self.voice_engine.select_roundup_voice(roundup)
-        intro = f'{voice.opening_line} {self._intro(roundup)}'.strip()
+        intro = self._intro(roundup)
         item_lines = [self._item_line(roundup, item) for item in roundup.items]
         closing_cta = self._closing_cta(roundup, voice.closing_cta)
         hashtags = self._hashtags(roundup)
@@ -35,16 +35,16 @@ class TelegramRoundupDraftBuilder:
     def _title(self, roundup: RoundupPost) -> str:
         part_suffix = self._part_suffix(roundup.title)
         if roundup.group_type == 'hero_discount':
-            return self._with_part('Що взяти зі знижок просто зараз', part_suffix)
+            return self._with_part('🔥 Що взяти зі знижок: коротка добірка', part_suffix)
         if roundup.group_type == 'strong_discount':
-            return self._with_part('Сильні знижки без зайвого шуму', part_suffix)
+            return self._with_part('🔥 Сильні знижки: коротка добірка', part_suffix)
         if roundup.group_type == 'freebie':
-            return self._with_part('Безкоштовні роздачі, які ще можна забрати', part_suffix)
+            return self._with_part('🎁 Безкоштовні ігри: коротка добірка', part_suffix)
         if roundup.group_type == 'genre':
-            return self._with_part(f'{roundup.theme_label}: тематична добірка зі знижок', part_suffix)
+            return self._with_part(f'🔥 {roundup.theme_label}: коротка добірка', part_suffix)
         if roundup.group_type == 'tag':
-            return self._with_part(f'{roundup.theme_label}: короткий редакторський список', part_suffix)
-        return self._with_part('Що ще варте швидкої перевірки', part_suffix)
+            return self._with_part(f'🔥 {roundup.theme_label}: коротка добірка', part_suffix)
+        return self._with_part('🔥 Що ще подивитися: коротка добірка', part_suffix)
 
     @staticmethod
     def _with_part(title: str, part_suffix: str) -> str:
@@ -61,48 +61,25 @@ class TelegramRoundupDraftBuilder:
 
     def _intro(self, roundup: RoundupPost) -> str:
         if roundup.group_type == 'hero_discount':
-            pool = (
-                'Тут не весь сейл підряд, а кілька позицій, де знижка вже сама тягне на окреме відкриття.',
-                'Це короткий зріз по великих тайтлах, у яких цінник уже говорить голосніше за будь-який пітч.',
-                'Цю верхівку зібрано як редакторський маршрут по сильних входах у великий сейл.',
-                'Список із тих тайтлів, де момент входу вже виглядає достатньо сильним без зайвих пояснень.',
-            )
-        elif roundup.group_type == 'strong_discount':
-            pool = (
-                'Це не другий список за інерцією, а щільна добірка позицій, які легко пропустити без окремого проходу.',
-                'Тут зібрані не випадкові залишки сейлу, а міцні ціни, що заслуговують на власне коротке вікно.',
-                'Після головних хедлайнерів саме тут часто ховається найприємніша робоча серія знижок.',
-                'Добірка для тих, хто вже бачив вітрину і хоче ще кілька справді переконливих цін.',
-            )
-        elif roundup.group_type == 'freebie':
-            pool = (
-                'Тут не календар нулів підряд, а кілька безкоштовностей, які мають сенс пройти одним заходом.',
-                'Це короткий список безкоштовних роздач, де є нормальний привід не відкладати швидку звірку.',
-                'Добірка для тих, хто хоче подивитися не все безкоштовне підряд, а тільки робочі слоти.',
-                'Зібрали ті роздачі, які краще перевірити зараз, ніж випадково згадати про них запізно.',
-            )
-        elif roundup.group_type == 'genre':
-            pool = (
-                f'Тут не вся тема {roundup.theme_label} підряд, а короткий список позицій, які найкраще тримають цей напрям зараз.',
-                f'Це тематична добірка по {roundup.theme_label}, зібрана для швидкого проходу без зайвого шуму.',
-                f'Список по {roundup.theme_label}, де зручно відразу відсікти своє, а не тонути в масиві схожих сторінок.',
-                f'{roundup.item_count} позицій по {roundup.theme_label}, які справді варто звести в один короткий маршрут.',
-            )
-        elif roundup.group_type == 'tag':
-            pool = (
-                f'Тема {roundup.theme_label} тут зібрана не для маси, а як короткий редакторський список.',
-                f'Це редакторська добірка по {roundup.theme_label}, яку зручно пройти одним заходом і швидко відсікти своє.',
-                f'Навколо {roundup.theme_label} тут лишили тільки ті позиції, які тягнуть на окрему перевірку.',
-                f'Короткий список по {roundup.theme_label}, де важливі не кількість, а точність відбору.',
-            )
-        else:
-            pool = (
-                'Це не технічний хвіст стрічки, а коротка дорізка з того, що ще тримається без статусу хедлайнера.',
-                'Після головних слотів лишається ще кілька позицій, яким варто дати окремий короткий прохід.',
-                'Тут зібрано не все, що залишилося, а те, що все ще має привід на швидке окреме відкриття.',
-                'Це короткий додатковий список поверх основної вітрини: лише те, що ще тримається.',
-            )
-        return self._stable_variant(pool, f'roundup-intro|{roundup.roundup_id}|{roundup.group_type}')
+            return 'Кілька великих знижок, з яких зручно почати прямо зараз.'
+        if roundup.group_type == 'strong_discount':
+            return 'Кілька помітних знижок, які зараз виглядають найцікавіше.'
+        if roundup.group_type == 'freebie':
+            return f'Зараз можна забрати {roundup.item_count} безплатні ігри{self._freebie_source_suffix(roundup)}.'
+        if roundup.group_type in {'genre', 'tag'}:
+            return f'Кілька ігор у темі {roundup.theme_label}, які зараз виглядають найцікавіше.'
+        return 'Кілька позицій, які ще варто швидко перевірити.'
+
+    @staticmethod
+    def _freebie_source_suffix(roundup: RoundupPost) -> str:
+        sources = {item.source for item in roundup.items if item.source}
+        if sources == {'epic'}:
+            return ' в Epic'
+        if sources == {'steam'}:
+            return ' у Steam'
+        if sources == {'epic', 'steam'}:
+            return ' в Epic і Steam'
+        return ''
 
     def _item_line(self, roundup: RoundupPost, item: RoundupItem) -> str:
         title_html = self._title_html(item)
@@ -121,23 +98,20 @@ class TelegramRoundupDraftBuilder:
     def _value_signal(self, roundup: RoundupPost, item: RoundupItem) -> str:
         if item.is_freebie:
             store_label = 'Epic' if item.source == 'epic' else 'Steam'
-            qualifier = self._editorial_signal(roundup, item)
-            if qualifier:
-                return f'безкоштовно в {store_label}, {qualifier}'
-            return f'безкоштовно в {store_label}'
+            return f'безплатно в {store_label}'
 
         core = self._discount_signal(item)
-        qualifier = self._editorial_signal(roundup, item)
-        if core and qualifier:
-            return f'{core}, {qualifier}'
+        review_signal = self._review_signal(item.review_score)
+        if core and review_signal:
+            return f'{core}, {review_signal}'
         if core:
             return core
-        if qualifier:
-            return qualifier
+        if review_signal:
+            return review_signal
         return 'деталі вже на сторінці'
 
     def _discount_signal(self, item: RoundupItem) -> str:
-        discount = f'{item.discount_percent}%' if item.discount_percent > 0 else ''
+        discount = f'-{item.discount_percent}%' if item.discount_percent > 0 else ''
         price = ''
         if item.price_after_minor is not None:
             price = f'до {self._format_minor(item.price_after_minor)}'
@@ -148,6 +122,12 @@ class TelegramRoundupDraftBuilder:
         if price:
             return price
         return ''
+
+    @staticmethod
+    def _review_signal(review_score: int | None) -> str:
+        if review_score is None:
+            return ''
+        return f'{review_score}% позитивних'
 
     def _editorial_signal(self, roundup: RoundupPost, item: RoundupItem) -> str:
         reasons = set(item.reason_tags)
@@ -197,32 +177,27 @@ class TelegramRoundupDraftBuilder:
     def _closing_cta(self, roundup: RoundupPost, voice_closing: str) -> str:
         if roundup.group_type == 'freebie':
             pool = (
-                'Почніть із верхніх позицій і відмітьте своє, поки вікно ще відкрите.',
-                'Цей список краще пройти одним заходом: у безкоштовностей тут головна цінність саме в таймінгу.',
+                'Якщо щось цікаве — краще забрати одразу, поки роздача активна.',
                 voice_closing,
             )
         elif roundup.group_type == 'hero_discount':
             pool = (
-                'Якщо відкривати лише кілька сторінок, починайте з верхівки: порядок тут не випадковий.',
-                'Верхні позиції тут уже відсіяні як головний маршрут по цій добірці.',
+                'Якщо щось цікаве — почніть із перших позицій.',
                 voice_closing,
             )
         elif roundup.group_type == 'strong_discount':
             pool = (
-                'Силу цього списку краще читати серією: швидко пройдіть усі позиції зверху вниз.',
-                'Тут працює саме щільність добірки, тож не зупиняйтеся на одному тайтлі.',
+                'Якщо щось цікаве — краще відкрити це зараз, поки ціни активні.',
                 voice_closing,
             )
         elif roundup.group_type in {'genre', 'tag'}:
             pool = (
-                'Якщо тема ваша, йдіть зверху вниз і лишайте тільки ті сторінки, що реально потрапляють у смак.',
-                'Цей список найкраще працює як короткий тематичний маршрут без довгого зависання.',
+                'Якщо тема ваша — відкрийте кілька перших позицій і відсійте своє.',
                 voice_closing,
             )
         else:
             pool = (
-                'Пройдіть список зверху вниз як коротку дорізку до основної вітрини.',
-                'Тут сенс у швидких точкових відкриттях, а не в довгому скролі по кожній позиції.',
+                'Якщо щось зачепило — кілька перших позицій уже дають головне.',
                 voice_closing,
             )
         return self._stable_variant(pool, f'roundup-cta|{roundup.roundup_id}|{roundup.group_type}')
@@ -230,7 +205,7 @@ class TelegramRoundupDraftBuilder:
     def _hashtags(self, roundup: RoundupPost) -> list[str]:
         hashtags = ['#toplist']
         if roundup.group_type == 'freebie':
-            hashtags.append('#freegame')
+            hashtags.append('#freegames')
         else:
             hashtags.append('#steamsale')
 

@@ -217,11 +217,11 @@ def test_generate_roundup_artifacts_groups_related_candidates_by_genre(tmp_path:
     assert roundup['theme_label'] == 'Strategy'
     assert roundup['item_count'] == 3
     assert [item['title'] for item in roundup['items']] == ['Strategy One', 'Strategy Two', 'Strategy Three']
-    assert roundup['telegram_draft']['title'].startswith('Strategy: тематична добірка зі знижок')
-    assert roundup['telegram_draft']['item_lines'][0].startswith('1. <a href="https://store.steampowered.com/app/10"><b>Strategy One</b></a> — ')
-    assert 'коментар' not in roundup['telegram_draft']['closing_cta'].lower()
-    assert any(fragment in roundup['telegram_draft']['closing_cta'] for fragment in ('тема ваша', 'маршрут', 'зверху вниз', 'готовий маршрут'))
-    assert roundup['telegram_draft']['caption_html'].startswith('<b>Strategy: тематична добірка зі знижок</b>')
+    assert roundup['telegram_draft']['title'].startswith('🔥 Strategy: коротка добірка')
+    assert roundup['telegram_draft']['item_lines'][0].startswith('1. <a href="https://store.steampowered.com/app/10"><b>Strategy One</b></a> — ')
+    assert 'коментар' not in roundup['telegram_draft']['closing_cta'].lower()
+    assert any(fragment in roundup['telegram_draft']['closing_cta'] for fragment in ('тема ваша', 'перших позицій', 'перших пунктів', 'головне', 'верхніх позицій'))
+    assert roundup['telegram_draft']['caption_html'].startswith('<b>🔥 Strategy: коротка добірка</b>')
     assert use_case.metrics.snapshot() == {
         'roundup.files.success': 1,
         'roundup.db.success': 1,
@@ -231,10 +231,10 @@ def test_generate_roundup_artifacts_groups_related_candidates_by_genre(tmp_path:
     with csv_path.open(encoding='utf-8', newline='') as handle:
         rows = list(csv.DictReader(handle))
     assert len(rows) == 3
-    assert rows[0]['roundup_title'] == 'Roundup: Strategy Picks'
-    assert rows[0]['telegram_title'].startswith('Strategy: тематична добірка зі знижок')
-    assert rows[0]['telegram_item_line'].startswith('1. <a href="https://store.steampowered.com/app/10"><b>Strategy One</b></a> — ')
-    assert '<b>Strategy: тематична добірка зі знижок</b>' in rows[0]['telegram_caption_html']
+    assert rows[0]['roundup_title'] == 'Roundup: Strategy Picks'
+    assert rows[0]['telegram_title'].startswith('🔥 Strategy: коротка добірка')
+    assert rows[0]['telegram_item_line'].startswith('1. <a href="https://store.steampowered.com/app/10"><b>Strategy One</b></a> — ')
+    assert '<b>🔥 Strategy: коротка добірка</b>' in rows[0]['telegram_caption_html']
 
 
 
@@ -269,10 +269,10 @@ def test_generate_roundup_artifacts_falls_back_to_freebie_bundle(tmp_path: Path)
     assert roundup['item_count'] == 3
     assert roundup['items'][0]['callout'] == 'Freebie roundup candidate'
     assert roundup['items'][0]['price_line'] == 'Free claim'
-    assert roundup['telegram_draft']['title'] == 'Безкоштовні роздачі, які ще можна забрати'
-    assert 'безкоштовно в Epic' in roundup['telegram_draft']['item_lines'][0]
-    assert 'коментар' not in roundup['telegram_draft']['closing_cta'].lower()
-    assert any(fragment in roundup['telegram_draft']['closing_cta'] for fragment in ('відмітьте своє', 'таймінгу', 'верхніх позицій', 'готовий маршрут'))
+    assert roundup['telegram_draft']['title'] == '🎁 Безкоштовні ігри: коротка добірка'
+    assert 'безплатно в Epic' in roundup['telegram_draft']['item_lines'][0]
+    assert 'коментар' not in roundup['telegram_draft']['closing_cta'].lower()
+    assert any(fragment in roundup['telegram_draft']['closing_cta'] for fragment in ('забрати одразу', 'перших позицій', 'перших пунктів', 'головне', 'верхніх позицій'))
 
 
 
