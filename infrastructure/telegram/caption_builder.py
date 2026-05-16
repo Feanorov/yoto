@@ -89,6 +89,42 @@ SPACE_AFTER_OPEN_RE = re.compile(r'([([«“„])\s+')
 SPACE_BEFORE_CLOSE_RE = re.compile(r'\s+([)\]»”])')
 MISSING_SPACE_AFTER_PUNCT_RE = re.compile(r'([,.;:!?])(?=[^\s\n<])')
 EM_DASH_SPACING_RE = re.compile(r'\s*[–—−]\s*')
+SOURCE_SUMMARY_SECTION_MARKERS = ('про гру', 'about this game')
+SOURCE_SUMMARY_PREFIX_RE = re.compile(
+    r"""^
+    (?:
+        (?:
+            starter
+            |standard
+            |deluxe
+            |ultimate
+            |complete
+            |definitive
+            |gold
+            |premium
+            |collector(?:'s|’s)?
+            |founder(?:'s|’s)?
+            |director(?:'s|’s)?
+            |game\ of\ the\ year
+            |goty
+            |anniversary
+            |season\ pass(?:\ \d+)?
+            |expansion\ pass(?:\ \d+)?
+            |battle\ pass(?:\ \d+)?
+            |character\ pass(?:\ \d+)?
+            |story\ pass(?:\ \d+)?
+            |supporter\ pack
+            |soundtrack
+            |bundle
+            |pack
+            |collection
+        )
+        (?:\s+[0-9a-z®™'’:+/&()_.-]+){0,6}
+        [\s:—\-|]*
+    )+
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
 OPENING_NEAR_REPEAT_STOPWORDS = frozenset(
     {
         'йото',
@@ -1021,17 +1057,65 @@ class TelegramCaptionBuilder:
 
     def _pick_source_summary(self, offer: Offer, max_length: int) -> str:
         for value in (offer.short_description, offer.description):
-            cleaned = clean_html_text(value)
-            if cleaned and contains_cyrillic(cleaned):
-                return self._compact_source_summary(cleaned, offer.title, max_length=max_length)
+            summary = self._compact_source_summary(str(value or ''), offer.title, max_length=max_length)
+            if summary:
+                return summary
         return ''
 
     def _compact_source_summary(self, value: str, title: str, *, max_length: int) -> str:
-        cleaned = self._strip_redundant_title_prefix(clean_html_text(value), title)
+        cleaned = self._sanitize_source_summary(value, title)
+        if not cleaned:
+            return ''
         first_sentence = self._first_sentence(cleaned)
         if first_sentence and first_sentence != cleaned and 55 <= len(first_sentence) <= max_length:
             cleaned = first_sentence
+        if not contains_cyrillic(cleaned):
+            return ''
         return truncate_text(cleaned, max_length=max_length)
+
+    def _sanitize_source_summary(self, value: str, title: str) -> str:
+        cleaned = clean_html_text(value).strip()
+        if not cleaned:
+            return ''
+        cleaned = self._strip_store_section_prefix(cleaned)
+        cleaned = self._strip_store_summary_prefix(cleaned)
+        cleaned = self._strip_redundant_title_prefix(cleaned, title)
+        if not cleaned:
+            return ''
+        if any(marker in cleaned.casefold() for marker in SOURCE_SUMMARY_SECTION_MARKERS):
+            return ''
+        if not contains_cyrillic(cleaned):
+            return ''
+        return cleaned
+
+    @staticmethod
+    def _strip_store_section_prefix(value: str) -> str:
+        cleaned = value.strip()
+        for _ in range(3):
+            lowered = cleaned.casefold()
+            marker_match: tuple[int, int] | None = None
+            for marker in SOURCE_SUMMARY_SECTION_MARKERS:
+                index = lowered.find(marker)
+                if index == -1 or index > 140:
+                    continue
+                candidate = (index, len(marker))
+                if marker_match is None or candidate[0] < marker_match[0]:
+                    marker_match = candidate
+            if marker_match is None:
+                break
+            start, marker_length = marker_match
+            cleaned = cleaned[start + marker_length :].lstrip(' :-—|')
+        return cleaned
+
+    @staticmethod
+    def _strip_store_summary_prefix(value: str) -> str:
+        cleaned = value.strip()
+        for _ in range(3):
+            updated = SOURCE_SUMMARY_PREFIX_RE.sub('', cleaned, count=1).lstrip(' :-—|')
+            if updated == cleaned:
+                break
+            cleaned = updated
+        return cleaned
 
     @staticmethod
     def _first_sentence(value: str) -> str:
@@ -1189,13 +1273,14 @@ class TelegramCaptionBuilder:
         normalized_title = clean_html_text(title).strip()
         if not normalized_summary or not normalized_title:
             return normalized_summary
-        if not normalized_summary.casefold().startswith(normalized_title.casefold()):
-            return normalized_summary
-
-        remainder = normalized_summary[len(normalized_title):].lstrip(' —-:,.')
-        if not remainder:
-            return normalized_summary
-        return remainder[0].upper() + remainder[1:]
+        for _ in range(3):
+            if not normalized_summary.casefold().startswith(normalized_title.casefold()):
+                break
+            remainder = normalized_summary[len(normalized_title):].lstrip(' —-:,.')
+            if not remainder:
+                return normalized_summary
+            normalized_summary = remainder[0].upper() + remainder[1:]
+        return normalized_summary
 
     @staticmethod
     def _capitalize_fragment(value: str) -> str:

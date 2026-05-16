@@ -196,6 +196,49 @@ def test_steam_discount_caption_prefers_short_description() -> None:
     assert 'Повний опис, який не має з’явитися' not in caption
 
 
+def test_indirect_recommend_caption_rejects_store_fragments_and_english_dump() -> None:
+    offer = make_offer()
+    offer.title = 'Hearts of Iron IV'
+    offer.review_score = 90
+    offer.review_count = 358990
+    offer.short_description = (
+        'Expansion Pass 2 Про гру Take charge of history’s greatest war machines in Hearts of Iron IV, '
+        'a grand strategy wargame that challenges your strategic abilities and political insight.'
+    )
+    offer.description = offer.short_description
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision())
+
+    assert 'Expansion Pass 2' not in caption
+    assert 'Про гру' not in caption
+    assert 'Take charge of history' not in caption
+    assert any(
+        fragment in caption
+        for fragment in (
+            'Ключовий акцент тут —',
+            'Головний інтерес цього тайтлу —',
+            'Тут жанровий акцент чіткий:',
+        )
+    )
+
+
+def test_source_summary_keeps_valid_ukrainian_text_after_store_header_cleanup() -> None:
+    offer = make_offer()
+    offer.title = 'Crusader Kings III'
+    offer.review_score = 91
+    offer.review_count = 137027
+    offer.short_description = ''
+    offer.description = 'Starter Edition Про гру Династична стратегія про союзи, інтриги та довгу гру на століття вперед.'
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision())
+
+    assert 'Starter Edition' not in caption
+    assert 'Про гру' not in caption
+    assert 'Династична стратегія про союзи, інтриги та довгу гру на століття вперед.' in caption
+
+
 def test_final_push_caption_uses_alert_signal_urgency_and_finalpush_tag() -> None:
     builder = TelegramCaptionBuilder(1024)
 
