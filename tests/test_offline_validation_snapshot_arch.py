@@ -160,6 +160,60 @@ def test_offline_snapshot_golden_promotion_copies_snapshot_and_resolves_alias(tm
     assert Path(manifest['base_db_path']) == golden_bundle.base_db_path
 
 
+def test_resolve_golden_repairs_stale_localized_asset_paths(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    now = datetime(2026, 3, 18, 18, 2, 2)
+
+    offer = make_offer()
+    offer.offer_id = 'steam:repair'
+    offer.source_ref = 'repair'
+    offer.game_id = 'repair'
+    offer.franchise_key = 'repair-target'
+    offer.title = 'Repair Target'
+    offer.assets = type(offer.assets)(hero='https://example.com/repair.png', header=None, screenshot=None, fallback=None)
+    decision_json = make_decision_json()
+    repo.replace_queue('planned', [(123.4, offer, decision_json)], created_at=now)
+
+    manager = OfflineValidationSnapshotManager(tmp_path / 'output' / 'offline_validation')
+    bundle = asyncio.run(
+        manager.capture(
+            live_db_path=settings.db_path,
+            run_key='20260318T180202Z',
+            created_at=now,
+            plan=make_plan(now, offer, decision_json),
+            http=StaticHttp({'https://example.com/repair.png': make_png_bytes('#778899')}),
+        )
+    )
+    golden_bundle = manager.promote_golden(bundle)
+    golden_repo = Repositories(golden_bundle.base_db_path)
+    golden_record = golden_repo.list_queue('planned')[0]
+    localized_name = Path(golden_record.offer.assets.hero or '').name
+    stale_root = tmp_path / 'portable-copy' / 'output' / 'offline_validation' / 'snapshots' / bundle.run_key / 'assets' / 'queue'
+    stale_reference = stale_root / localized_name
+    repaired_offer = golden_record.offer
+    repaired_offer.assets = type(repaired_offer.assets)(
+        hero=str(stale_reference),
+        header=repaired_offer.assets.header,
+        screenshot=repaired_offer.assets.screenshot,
+        fallback=repaired_offer.assets.fallback,
+    )
+    golden_repo.replace_queue(
+        'planned',
+        [(golden_record.score, repaired_offer, golden_record.decision_json)],
+        created_at=golden_record.created_at,
+    )
+
+    resolved_bundle = manager.resolve('golden')
+    resolved_offer = Repositories(resolved_bundle.base_db_path).list_queue('planned')[0].offer
+
+    assert resolved_offer.assets.hero is not None
+    assert Path(resolved_offer.assets.hero).exists()
+    assert Path(resolved_offer.assets.hero).parent == resolved_bundle.root_dir / 'assets' / 'queue'
+    assert Path(resolved_offer.assets.hero).name == localized_name
+
+
 def test_offline_snapshot_golden_promotion_rejects_non_publishable_candidate(tmp_path: Path) -> None:
     settings = make_test_settings(tmp_path)
     repo = Repositories(settings.db_path)

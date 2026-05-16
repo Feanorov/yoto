@@ -5,6 +5,7 @@ import asyncio
 from dataclasses import replace
 from datetime import datetime
 import logging
+import os
 from pathlib import Path
 import random
 import sys
@@ -56,6 +57,16 @@ def safe_print(line: str) -> None:
         sys.stdout.write(text)
     except UnicodeEncodeError:
         sys.stdout.write(text.encode(encoding, errors='replace').decode(encoding, errors='replace'))
+
+
+def _seed_offline_preview_credentials(args: argparse.Namespace) -> None:
+    """Offline preview should not require real Telegram publish credentials."""
+    if not (args.preview and args.offline_snapshot is not None):
+        return
+    if not os.getenv('BOT_TOKEN', '').strip():
+        os.environ['BOT_TOKEN'] = 'offline-preview-token'
+    if not os.getenv('CHANNEL_USERNAME', '').strip():
+        os.environ['CHANNEL_USERNAME'] = '@offline_preview'
 
 
 def parse_args() -> argparse.Namespace:
@@ -650,6 +661,7 @@ def _print_auto_golden_status(runtime: BotRuntime) -> None:
 async def async_main() -> None:
     args = parse_args()
     root_dir = Path(__file__).resolve().parents[1]
+    _seed_offline_preview_credentials(args)
     settings = AppSettings.from_env(root_dir)
     configure_logging()
 

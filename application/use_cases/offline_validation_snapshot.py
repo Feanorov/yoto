@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import sqlite3
@@ -333,6 +334,7 @@ class OfflineValidationSnapshotManager:
             fallback_db_path = manifest_path.parent / SNAPSHOT_DB_NAME
             if fallback_db_path.exists():
                 base_db_path = fallback_db_path
+        self._repair_bundle_references(manifest_path.parent, base_db_path)
         quality_payload = payload.get('quality')
         if not isinstance(quality_payload, dict):
             quality_payload = self._build_quality_summary(
@@ -357,6 +359,118 @@ class OfflineValidationSnapshotManager:
             golden_promoted_at=str(payload.get('golden_promoted_at') or '') or None,
             golden_source_run_key=str(payload.get('golden_source_run_key') or '') or None,
         )
+
+    def _repair_bundle_references(self, bundle_root: Path, db_path: Path) -> None:
+        if not db_path.exists() or not os.access(db_path, os.W_OK):
+            return
+        queue_assets_dir = bundle_root / 'assets' / 'queue'
+        roundup_assets_dir = bundle_root / 'assets' / 'roundup'
+        analytics_dir = bundle_root / 'analytics'
+
+        repositories = Repositories(db_path)
+        for bucket in ('planned', 'reserve'):
+            records = repositories.list_queue(bucket)
+            if not records:
+                continue
+            rewritten_rows: list[tuple[float, Offer, dict[str, Any]]] = []
+            bucket_changed = False
+            created_at = records[0].created_at
+            for record in records:
+                repaired_offer, changed = self._repair_offer_asset_references(record.offer, queue_assets_dir)
+                bucket_changed = bucket_changed or changed
+                rewritten_rows.append((record.score, repaired_offer, record.decision_json))
+            if bucket_changed:
+                try:
+                    repositories.replace_queue(bucket, rewritten_rows, created_at=created_at)
+                except sqlite3.OperationalError as exc:
+                    if 'readonly' not in str(exc).lower():
+                        raise
+                    return
+
+        try:
+            self._repair_roundup_snapshot_references(db_path, roundup_assets_dir, analytics_dir)
+        except sqlite3.OperationalError as exc:
+            if 'readonly' not in str(exc).lower():
+                raise
+
+    def _repair_offer_asset_references(self, offer: Offer, assets_dir: Path) -> tuple[Offer, bool]:
+        snapshot = offer.to_snapshot()
+        assets = dict(snapshot.get('assets') or {})
+        changed = False
+        for key in ('hero', 'header', 'screenshot', 'fallback'):
+            repaired = self._repair_localized_asset_reference(assets.get(key), assets_dir)
+            if repaired != assets.get(key):
+                assets[key] = repaired
+                changed = True
+        if not changed:
+            return offer, False
+        snapshot['assets'] = assets
+        return Offer.from_snapshot(snapshot), True
+
+    def _repair_roundup_snapshot_references(self, db_path: Path, assets_dir: Path, analytics_dir: Path) -> None:
+        connection = sqlite3.connect(db_path)
+        connection.row_factory = sqlite3.Row
+        try:
+            rows = connection.execute(
+                """
+                SELECT id, json_path, payload_json
+                FROM analytics_artifacts
+                WHERE artifact_type = 'roundup_snapshot'
+                ORDER BY created_at DESC, id DESC
+                """
+            ).fetchall()
+            for row in rows:
+                try:
+                    payload = json.loads(row['payload_json'])
+                except (TypeError, json.JSONDecodeError):
+                    continue
+                if not isinstance(payload, dict):
+                    continue
+                changed = False
+                roundups = payload.get('roundups') or []
+                if not isinstance(roundups, list):
+                    roundups = []
+                for roundup in roundups:
+                    if not isinstance(roundup, dict):
+                        continue
+                    repaired = self._repair_localized_asset_reference(roundup.get('card_asset_path'), assets_dir)
+                    if repaired != roundup.get('card_asset_path'):
+                        roundup['card_asset_path'] = repaired
+                        changed = True
+                json_path_value = str(row['json_path'] or '').strip()
+                repaired_json_path = json_path_value
+                if json_path_value:
+                    current_json_path = Path(json_path_value)
+                    if not current_json_path.exists():
+                        candidate_json_path = analytics_dir / current_json_path.name
+                        if candidate_json_path.exists():
+                            repaired_json_path = str(candidate_json_path)
+                            changed = True
+                if not changed:
+                    continue
+                connection.execute(
+                    'UPDATE analytics_artifacts SET payload_json = ?, json_path = ? WHERE id = ?',
+                    (json.dumps(payload, ensure_ascii=False, sort_keys=True), repaired_json_path or None, row['id']),
+                )
+            connection.commit()
+        finally:
+            connection.close()
+
+    @staticmethod
+    def _repair_localized_asset_reference(value: str | None, assets_dir: Path) -> str | None:
+        if not value:
+            return value
+        reference = str(value)
+        if resolve_existing_asset_path(reference) is not None:
+            return reference
+        parsed = urlparse(reference)
+        reference_name = Path(unquote(parsed.path or reference)).name
+        if not reference_name:
+            return reference
+        candidate = assets_dir / reference_name
+        if candidate.exists() and candidate.is_file():
+            return str(candidate)
+        return reference
 
     def _build_quality_summary(
         self,

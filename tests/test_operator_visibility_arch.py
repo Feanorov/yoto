@@ -2,8 +2,11 @@
 
 import asyncio
 import json
+import sys
 from datetime import datetime
 from pathlib import Path
+
+import pytest
 
 from application.use_cases.offline_validation_snapshot import OfflineSnapshotBundle
 from application.use_cases.operator_truth_report import OperatorTruthReporter
@@ -223,3 +226,72 @@ def test_operator_truth_report_skips_repository_persistence_for_offline_preview(
         ).fetchone()
     assert stored is not None
     assert int(stored[0]) == 0
+
+
+def test_async_main_allows_offline_preview_without_publish_credentials(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import dealbot.main as main_module
+
+    snapshot_root = tmp_path / 'offline_validation' / 'golden' / 'current'
+    snapshot_root.mkdir(parents=True, exist_ok=True)
+    db_path = snapshot_root / 'dealbot.sqlite3'
+    db_path.write_bytes(b'db')
+    bundle = OfflineSnapshotBundle(
+        root_dir=snapshot_root,
+        manifest_path=snapshot_root / 'snapshot_manifest.json',
+        base_db_path=db_path,
+        run_key='20260320T120000Z',
+        created_at='2026-03-20T12:00:00',
+        context={'source': 'current_queue'},
+        metrics={},
+        planned_count=1,
+        reserve_count=0,
+        asset_localization={},
+        quality={'golden_eligible': True, 'blocking_reasons': []},
+        snapshot_role='golden',
+        golden_promoted_at='2026-03-20T12:00:00',
+        golden_source_run_key='20260320T110000Z',
+    )
+    settings = make_test_settings(tmp_path, dry_run=True)
+    captured: dict[str, object] = {}
+
+    def fake_from_env(root_dir: Path):
+        assert main_module.os.environ['BOT_TOKEN'] == 'offline-preview-token'
+        assert main_module.os.environ['CHANNEL_USERNAME'] == '@offline_preview'
+        return settings
+
+    class FakeSnapshotManager:
+        def __init__(self, root_dir: Path) -> None:
+            self.root_dir = root_dir
+
+        def resolve(self, spec: str | None = None) -> OfflineSnapshotBundle:
+            assert spec == 'golden'
+            return bundle
+
+    class FakeRuntime:
+        def __init__(self, incoming_settings) -> None:
+            self.settings = incoming_settings
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb) -> None:
+            return None
+
+        async def preview_offline(self, incoming_bundle: OfflineSnapshotBundle) -> None:
+            captured['bundle'] = incoming_bundle
+            captured['db_path'] = self.settings.db_path
+
+    monkeypatch.setattr(main_module.AppSettings, 'from_env', staticmethod(fake_from_env))
+    monkeypatch.setattr(main_module, 'OfflineValidationSnapshotManager', FakeSnapshotManager)
+    monkeypatch.setattr(main_module, 'BotRuntime', FakeRuntime)
+    monkeypatch.delenv('BOT_TOKEN', raising=False)
+    monkeypatch.delenv('CHANNEL_USERNAME', raising=False)
+    monkeypatch.setattr(sys, 'argv', ['dealbot.main', '--preview', '--offline-snapshot', 'golden'])
+
+    asyncio.run(main_module.async_main())
+
+    assert captured['bundle'] == bundle
+    assert captured['db_path'] == db_path
