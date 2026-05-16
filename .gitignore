@@ -1,9 +1,33 @@
-﻿.env
+.env
 .pytest_cache/
 __pycache__/
 *.pyc
 *.sqlite3
 *.sqlite3-shm
 *.sqlite3-wal
-output/cards/
+
+# Runtime output and caches
 output/http_cache/
+output/analytics/*
+!output/analytics/.gitkeep
+output/cards/*
+!output/cards/.gitkeep
+output/offline_validation/snapshots/*
+!output/offline_validation/snapshots/.gitkeep
+output/video_manifests/*
+!output/video_manifests/.gitkeep
+output/video_voice_ready/*
+!output/video_voice_ready/.gitkeep
+output/captions/*
+!output/captions/.gitkeep
+
+# Runtime scratch space
+temp/*
+!temp/.gitkeep
+data/steam_cache/*
+!data/steam_cache/.gitkeep
+
+# Local task artifacts
+*.patch
+*_backup.diff
+yoto_*.txt
