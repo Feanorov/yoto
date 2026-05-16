@@ -26,9 +26,48 @@ from PySide6.QtWidgets import (
 
 from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
-from .models import PreviewState, SafetyState, SEND_DISABLED_REASON
+from .models import PreviewState, SafetyState
 from .report_parser import build_preview_state
-from .safety import evaluate_preview_safety
+from .safety import SEND_DISABLED_REASON_RU, evaluate_preview_safety, localize_ui_message
+
+
+_STATUS_TEXT_TRANSLATIONS = {
+    "No preview loaded.": "Нужно собрать превью",
+    "No Preview Loaded": "Нужно собрать превью",
+    "Preview Ready": "Превью готово",
+    "Preview Required": "Нужно собрать превью",
+    "Preview Failed": "Сбой сборки превью",
+    "Preview Blocked": "Превью заблокировано",
+    "Telegram Proof Verified": "Проверка Telegram подтверждена",
+}
+
+_POST_TYPE_TRANSLATIONS = {
+    "Single Discount": "Одиночная скидка",
+    "Freebie": "Раздача",
+    "Roundup": "Подборка",
+    "Roundup / Toplist": "Подборка",
+    "Toplist": "Топ/подборка",
+    "Unknown/Unsupported": "Неизвестный тип",
+}
+
+
+def _translate_status_text(text: str) -> str:
+    normalized = str(text or "").strip()
+    return _STATUS_TEXT_TRANSLATIONS.get(normalized, normalized)
+
+
+def _translate_post_type_label(text: str) -> str:
+    normalized = str(text or "").strip()
+    return _POST_TYPE_TRANSLATIONS.get(normalized, normalized)
+
+
+def _yes_no(value: bool) -> str:
+    return "да" if value else "нет"
+
+
+def _or_none(value: object) -> str:
+    text = str(value or "").strip()
+    return text or "нет"
 
 
 class ScaledImageLabel(QLabel):
@@ -38,7 +77,7 @@ class ScaledImageLabel(QLabel):
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMinimumHeight(360)
         self.setFrameShape(QFrame.Shape.StyledPanel)
-        self.setText("No preview card loaded.")
+        self.setText("Карточка превью не загружена.")
 
     def set_preview_pixmap(self, pixmap: QPixmap | None) -> None:
         self._original_pixmap = pixmap
@@ -51,7 +90,7 @@ class ScaledImageLabel(QLabel):
     def _refresh(self) -> None:
         if self._original_pixmap is None or self._original_pixmap.isNull():
             self.setPixmap(QPixmap())
-            self.setText("No preview card loaded.")
+            self.setText("Карточка превью не загружена.")
             return
         scaled = self._original_pixmap.scaled(
             max(320, self.width() - 24),
@@ -73,7 +112,7 @@ class MainWindow(QMainWindow):
         self.current_safety: SafetyState = evaluate_preview_safety(None)
         self._preview_started_at: float | None = None
 
-        self.setWindowTitle("YOTO Operator Preview")
+        self.setWindowTitle("Пульт YOTO: превью поста")
         self.resize(1560, 920)
         self._build_ui()
         self._connect_signals()
@@ -102,7 +141,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(panel)
         layout.setSpacing(10)
 
-        title = QLabel("YOTO Desktop Operator")
+        title = QLabel("Пульт YOTO")
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         layout.addWidget(title)
 
@@ -111,16 +150,16 @@ class MainWindow(QMainWindow):
         subtitle.setStyleSheet("color: #4b5563;")
         layout.addWidget(subtitle)
 
-        status_group = QGroupBox("Status")
+        status_group = QGroupBox("Статус")
         status_layout = QVBoxLayout(status_group)
-        self.status_label = QLabel("No preview loaded.")
+        self.status_label = QLabel("Нужно собрать превью")
         self.status_label.setWordWrap(True)
         self.status_label.setStyleSheet("font-size: 16px; font-weight: 600;")
-        self.post_type_badge = QLabel("Unknown/Unsupported")
+        self.post_type_badge = QLabel("Неизвестный тип")
         self.post_type_badge.setWordWrap(True)
         self.post_type_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.post_type_badge.setStyleSheet(self._badge_style("unknown"))
-        self.send_reason_label = QLabel(SEND_DISABLED_REASON)
+        self.send_reason_label = QLabel(SEND_DISABLED_REASON_RU)
         self.send_reason_label.setWordWrap(True)
         self.send_reason_label.setStyleSheet("color: #7c2d12;")
         self.safety_label = QLabel("")
@@ -131,16 +170,16 @@ class MainWindow(QMainWindow):
         status_layout.addWidget(self.safety_label)
         layout.addWidget(status_group)
 
-        actions_group = QGroupBox("Actions")
+        actions_group = QGroupBox("Действия")
         actions_layout = QVBoxLayout(actions_group)
-        self.run_preview_button = QPushButton("Run Preview")
-        self.refresh_button = QPushButton("Refresh Local State")
-        self.open_report_button = QPushButton("Open Report")
-        self.open_card_button = QPushButton("Open Card")
-        self.open_output_button = QPushButton("Open Output Folder")
-        self.send_button = QPushButton("Send to Telegram")
+        self.run_preview_button = QPushButton("Собрать превью")
+        self.refresh_button = QPushButton("Обновить состояние")
+        self.open_report_button = QPushButton("Открыть отчёт")
+        self.open_card_button = QPushButton("Открыть карточку")
+        self.open_output_button = QPushButton("Открыть папку output")
+        self.send_button = QPushButton("Отправить в Telegram")
         self.send_button.setEnabled(False)
-        self.send_button.setToolTip(SEND_DISABLED_REASON)
+        self.send_button.setToolTip(SEND_DISABLED_REASON_RU)
         actions_layout.addWidget(self.run_preview_button)
         actions_layout.addWidget(self.refresh_button)
         actions_layout.addWidget(self.open_report_button)
@@ -156,21 +195,21 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(panel)
         layout.setSpacing(10)
 
-        image_group = QGroupBox("Preview")
+        image_group = QGroupBox("Превью")
         image_layout = QVBoxLayout(image_group)
         self.image_label = ScaledImageLabel(image_group)
         image_layout.addWidget(self.image_label)
         layout.addWidget(image_group, stretch=3)
 
-        caption_group = QGroupBox("Caption")
+        caption_group = QGroupBox("Описание")
         caption_layout = QVBoxLayout(caption_group)
         self.caption_tabs = QTabWidget(caption_group)
         self.caption_html_browser = QTextBrowser()
         self.caption_html_browser.setOpenExternalLinks(True)
         self.caption_preview_text = QPlainTextEdit()
         self.caption_preview_text.setReadOnly(True)
-        self.caption_tabs.addTab(self.caption_html_browser, "Caption HTML")
-        self.caption_tabs.addTab(self.caption_preview_text, "Caption Preview")
+        self.caption_tabs.addTab(self.caption_html_browser, "HTML описания")
+        self.caption_tabs.addTab(self.caption_preview_text, "Превью описания")
         caption_layout.addWidget(self.caption_tabs)
         layout.addWidget(caption_group, stretch=2)
         return panel
@@ -182,13 +221,13 @@ class MainWindow(QMainWindow):
 
         splitter = QSplitter(Qt.Orientation.Vertical, panel)
 
-        details_group = QGroupBox("Details")
+        details_group = QGroupBox("Детали")
         details_layout = QVBoxLayout(details_group)
         self.details_text = QPlainTextEdit()
         self.details_text.setReadOnly(True)
         details_layout.addWidget(self.details_text)
 
-        log_group = QGroupBox("Process Log")
+        log_group = QGroupBox("Лог процесса")
         log_layout = QVBoxLayout(log_group)
         self.log_text = QPlainTextEdit()
         self.log_text.setReadOnly(True)
@@ -220,11 +259,11 @@ class MainWindow(QMainWindow):
             return
         self._preview_started_at = time.time()
         self.log_text.clear()
-        self.append_log(f"[ui] Running {self.project_root / 'yoto.bat'} preview")
+        self.append_log(f"[ui] Запуск превью: {self.project_root / 'yoto.bat'}")
         started = self.runner.run_preview(self.project_root)
         if not started:
-            self.append_log("[ui] Failed to start yoto.bat preview")
-            self.status_label.setText("Preview Failed")
+            self.append_log("[ui] Не удалось запустить yoto.bat для сборки превью")
+            self.status_label.setText(_translate_status_text("Preview Failed"))
 
     def refresh_local_state(self, initial: bool = False) -> None:
         if self.current_state and self.current_state.fingerprint:
@@ -234,7 +273,7 @@ class MainWindow(QMainWindow):
         state = build_preview_state(bundle) if bundle.workflow_path or bundle.truth_report_path else PreviewState.empty(self.project_root)
         self._apply_state(state)
         if not initial:
-            self.append_log("[ui] Local preview state refreshed from disk")
+            self.append_log("[ui] Локальное состояние превью обновлено с диска")
 
     def _handle_preview_finished(self, exit_code: int) -> None:
         started_at = self._preview_started_at or 0.0
@@ -242,9 +281,9 @@ class MainWindow(QMainWindow):
         if exit_code != 0 and bundle.workflow_path is None and bundle.truth_report_path is None:
             self.current_state = PreviewState.empty(self.project_root)
             self.current_safety = evaluate_preview_safety(self.current_state)
-            self.status_label.setText("Preview Failed")
-            self.safety_label.setText("No preview artifacts were produced by the latest run.")
-            self.append_log("[ui] Preview command failed before a preview workflow artifact was written")
+            self.status_label.setText(_translate_status_text("Preview Failed"))
+            self.safety_label.setText("Последний запуск не создал артефакты превью.")
+            self.append_log("[ui] Команда превью завершилась с ошибкой до записи артефактов workflow")
             self._sync_buttons()
             return
         state = build_preview_state(bundle)
@@ -253,8 +292,8 @@ class MainWindow(QMainWindow):
     def _apply_state(self, state: PreviewState) -> None:
         self.current_state = state
         self.current_safety = evaluate_preview_safety(state)
-        self.status_label.setText(state.status_text)
-        self.post_type_badge.setText(state.post_type_label)
+        self.status_label.setText(_translate_status_text(state.status_text))
+        self.post_type_badge.setText(_translate_post_type_label(state.post_type_label))
         self.post_type_badge.setStyleSheet(self._badge_style(state.post_type_key))
         self.safety_label.setText(self._format_safety_summary(self.current_safety))
         self._update_preview_content(state)
@@ -271,8 +310,8 @@ class MainWindow(QMainWindow):
         elif state.caption_preview:
             self.caption_html_browser.setPlainText(state.caption_preview)
         else:
-            self.caption_html_browser.setPlainText("No caption loaded.")
-        self.caption_preview_text.setPlainText(state.caption_preview or "No caption preview loaded.")
+            self.caption_html_browser.setPlainText("Описание не загружено.")
+        self.caption_preview_text.setPlainText(state.caption_preview or "Превью описания не загружено.")
 
     def _sync_buttons(self) -> None:
         report_path = self._report_path()
@@ -303,7 +342,7 @@ class MainWindow(QMainWindow):
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.project_root / "output")))
 
     def show_send_disabled_dialog(self) -> None:
-        QMessageBox.information(self, "Send Disabled", SEND_DISABLED_REASON)
+        QMessageBox.information(self, "Отправка отключена", SEND_DISABLED_REASON_RU)
 
     def append_log(self, text: str) -> None:
         stripped = text.rstrip()
@@ -319,45 +358,45 @@ class MainWindow(QMainWindow):
     def _format_details(self, state: PreviewState, safety: SafetyState) -> str:
         lines: list[str] = []
         target = state.selected_target
-        lines.append("Selected Target")
+        lines.append("Выбранный пост")
         if target is None:
-            lines.append("  none")
+            lines.append("  нет")
         else:
-            lines.append(f"  title: {target.title or 'none'}")
-            lines.append(f"  post_type: {state.post_type_label}")
-            lines.append(f"  offer_id: {target.offer_id or 'none'}")
-            lines.append(f"  source: {target.source or 'none'}")
-            lines.append(f"  lane: {target.lane or 'none'}")
-            lines.append(f"  bucket: {target.bucket or 'none'}")
-            lines.append(f"  content_family: {target.content_family or 'none'}")
+            lines.append(f"  title: {_or_none(target.title)}")
+            lines.append(f"  post_type: {_translate_post_type_label(state.post_type_label)}")
+            lines.append(f"  offer_id: {_or_none(target.offer_id)}")
+            lines.append(f"  source: {_or_none(target.source)}")
+            lines.append(f"  lane: {_or_none(target.lane)}")
+            lines.append(f"  bucket: {_or_none(target.bucket)}")
+            lines.append(f"  content_family: {_or_none(target.content_family)}")
         lines.append("")
-        lines.append("Status")
-        lines.append(f"  status_text: {state.status_text}")
-        lines.append(f"  verdict: {state.verdict or 'none'}")
-        lines.append(f"  truth_ready: {'yes' if state.truth_ready else 'no'}")
-        lines.append(f"  telegram_verified: {'yes' if state.telegram_verified else 'no'}")
-        lines.append(f"  blocker_category: {state.blocker_category or 'none'}")
-        lines.append(f"  blocker_reason: {state.blocker_reason or 'none'}")
-        lines.append(f"  blocker_detail: {state.blocker_detail or 'none'}")
-        lines.append(f"  ambiguous: {'yes' if state.ambiguous else 'no'}")
-        lines.append(f"  stale: {'yes' if state.stale else 'no'}")
+        lines.append("Статус")
+        lines.append(f"  status_text: {_translate_status_text(state.status_text)}")
+        lines.append(f"  verdict: {_or_none(state.verdict)}")
+        lines.append(f"  truth_ready: {_yes_no(state.truth_ready)}")
+        lines.append(f"  telegram_verified: {_yes_no(state.telegram_verified)}")
+        lines.append(f"  blocker_category: {_or_none(state.blocker_category)}")
+        lines.append(f"  blocker_reason: {_or_none(state.blocker_reason)}")
+        lines.append(f"  blocker_detail: {_or_none(state.blocker_detail)}")
+        lines.append(f"  ambiguous: {_yes_no(state.ambiguous)}")
+        lines.append(f"  stale: {_yes_no(state.stale)}")
         lines.append("")
-        lines.append("Ingest / Source Health")
+        lines.append("Источники / здоровье данных")
         if not state.ingest_sources:
-            lines.append("  none")
+            lines.append("  нет")
         else:
             for source in state.ingest_sources:
                 offers_text = str(source.offers) if source.offers is not None else "n/a"
                 lines.append(f"  {source.name}: status={source.status} reason={source.reason} offers={offers_text}")
         lines.append("")
-        lines.append("Paths")
-        lines.append(f"  report_path: {self._report_path() or 'none'}")
-        lines.append(f"  image_path: {state.card_path or 'none'}")
-        lines.append(f"  latest_snapshot_manifest: {state.paths.latest_snapshot_manifest_path or 'none'}")
-        lines.append(f"  latest_publish_outcome: {state.paths.latest_publish_outcome_path or 'none'}")
+        lines.append("Пути")
+        lines.append(f"  report_path: {_or_none(self._report_path())}")
+        lines.append(f"  image_path: {_or_none(state.card_path)}")
+        lines.append(f"  latest_snapshot_manifest: {_or_none(state.paths.latest_snapshot_manifest_path)}")
+        lines.append(f"  latest_publish_outcome: {_or_none(state.paths.latest_publish_outcome_path)}")
         lines.append("")
-        lines.append("Safety")
-        lines.append(f"  send_enabled: {'yes' if safety.send_enabled else 'no'}")
+        lines.append("Безопасность")
+        lines.append(f"  send_enabled: {_yes_no(safety.send_enabled)}")
         lines.append(f"  send_disabled_reason: {safety.send_disabled_reason}")
         if safety.blockers:
             lines.append("  blockers:")
@@ -374,8 +413,10 @@ class MainWindow(QMainWindow):
         if safety.blockers:
             return " | ".join(safety.blockers)
         if safety.preview_ready:
-            return "Preview artifacts are loaded. Sending remains disabled in this MVP shell."
-        return "Preview is available but not yet ready for a send-capable UI."
+            return "Превью загружено. Отправка пока отключена в этой MVP-версии пульта."
+        if safety.warnings:
+            return " | ".join(localize_ui_message(item) for item in safety.warnings)
+        return "Нужно собрать превью"
 
     @staticmethod
     def _badge_style(post_type_key: str) -> str:

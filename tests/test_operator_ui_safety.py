@@ -25,8 +25,11 @@ def test_evaluate_preview_safety_keeps_send_disabled_with_exact_reason(tmp_path:
     safety = evaluate_preview_safety(state)
 
     assert safety.send_enabled is False
-    assert safety.send_disabled_reason == "Disabled: send-test is not preview-pinned yet; backend may replan before publish."
-    assert "Preview artifacts are ambiguous." in safety.blockers
-    assert "Preview artifacts are stale." in safety.blockers
-    assert "Selected post type is Unknown/Unsupported." in safety.blockers
-    assert "Backend blocker: queue_empty" in safety.blockers
+    assert (
+        safety.send_disabled_reason
+        == "Отключено: send-test ещё не закреплён за текущим превью; backend может выбрать другой пост перед публикацией."
+    )
+    assert "Артефакты превью неоднозначны." in safety.blockers
+    assert "Артефакты превью устарели." in safety.blockers
+    assert "Выбранный тип поста не определён или не поддерживается." in safety.blockers
+    assert "Блокировка backend: queue_empty" in safety.blockers
