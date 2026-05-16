@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from copy import deepcopy
 from datetime import datetime
+import hashlib
 import logging
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,8 @@ from .ingest_health_controller import RunDiagnostics
 from .offline_validation_snapshot import OfflineSnapshotBundle
 from .plan_queue import PlannedCandidate, QueuePlan
 from .publish_next import PublishResult, SelectionInspection, SendTestTargetPreview
+
+PINNED_PUBLISH_CONTRACT_VERSION = 1
 
 
 class OperatorTruthReporter:
@@ -49,7 +53,7 @@ class OperatorTruthReporter:
             publish_result=publish_result,
             outbox_snapshot=outbox_snapshot,
         )
-        return {
+        payload = {
             'run_key': now_utc.strftime('%Y%m%dT%H%M%SZ'),
             'created_at': now_utc.isoformat(),
             'mode': mode,
@@ -70,6 +74,15 @@ class OperatorTruthReporter:
             'diagnostics': diagnostics.to_payload() if diagnostics is not None else None,
             'verdict': verdict,
         }
+        pinned_publish = self._pinned_publish_snapshot(
+            now_utc=now_utc,
+            report_run_key=str(payload['run_key']),
+            mode=mode,
+            target=target,
+        )
+        if pinned_publish is not None:
+            payload['pinned_publish'] = pinned_publish
+        return payload
 
     def emit(
         self,
@@ -225,6 +238,65 @@ class OperatorTruthReporter:
             'quality': dict(bundle.quality or {}),
         }
 
+    def _pinned_publish_snapshot(
+        self,
+        *,
+        now_utc: datetime,
+        report_run_key: str,
+        mode: str,
+        target: SendTestTargetPreview,
+    ) -> dict[str, Any] | None:
+        if not str(mode).startswith('preview'):
+            return None
+
+        artifact = dict(target.artifact or {})
+        if not artifact:
+            return None
+
+        candidate = deepcopy(dict(target.candidate or {}))
+        offer_snapshot = deepcopy(dict(target.offer_snapshot or {}))
+        decision_snapshot = deepcopy(dict(target.decision_snapshot or {}))
+        if not candidate or not offer_snapshot or not decision_snapshot:
+            return None
+
+        caption_html = str(artifact.get('caption_html') or '')
+        caption_hash = str(artifact.get('caption_hash') or '')
+        image_hash = str(artifact.get('image_hash') or '')
+        image_path_raw = str(artifact.get('image_path') or '').strip()
+        image_path = Path(image_path_raw) if image_path_raw else None
+        image_exists = bool(image_path and image_path.exists())
+        verified_caption_hash = self._sha256_text(caption_html) if caption_html else None
+        verified_image_hash = self._sha256_file(image_path) if image_exists and image_path is not None else None
+
+        return {
+            'contract_version': PINNED_PUBLISH_CONTRACT_VERSION,
+            'source': 'preview',
+            'created_at': now_utc.isoformat(),
+            'report_run_key': report_run_key,
+            'candidate': candidate,
+            'offer_snapshot': offer_snapshot,
+            'decision_snapshot': decision_snapshot,
+            'artifact': {
+                'offer_id': artifact.get('offer_id'),
+                'caption_html': caption_html,
+                'caption_preview': artifact.get('caption_preview'),
+                'caption_hash': caption_hash,
+                'image_path': image_path_raw or None,
+                'image_hash': image_hash,
+                'idempotency_key': artifact.get('idempotency_key'),
+                'template_id': artifact.get('template_id'),
+                'card_family': artifact.get('card_family'),
+                'assets_used': list(artifact.get('assets_used') or []),
+                'render_diagnostics': deepcopy(dict(artifact.get('render_diagnostics') or {})),
+                'caption_debug': deepcopy(dict(artifact.get('caption_debug') or {})),
+            },
+            'validation': {
+                'image_exists': image_exists,
+                'caption_hash_verified': bool(caption_hash and verified_caption_hash == caption_hash),
+                'image_hash_verified': bool(image_hash and verified_image_hash == image_hash),
+            },
+        }
+
     def _verdict(
         self,
         *,
@@ -319,3 +391,18 @@ class OperatorTruthReporter:
         if getattr(item.offer, 'is_freebie', False) or lane == 'breaking_freebie':
             return 'freebie'
         return 'discount'
+
+    @staticmethod
+    def _sha256_text(value: str) -> str:
+        return hashlib.sha256(str(value or '').encode('utf-8')).hexdigest()
+
+    @staticmethod
+    def _sha256_file(path: Path) -> str | None:
+        try:
+            digest = hashlib.sha256()
+            with path.open('rb') as handle:
+                for chunk in iter(lambda: handle.read(8192), b''):
+                    digest.update(chunk)
+            return digest.hexdigest()
+        except OSError:
+            return None

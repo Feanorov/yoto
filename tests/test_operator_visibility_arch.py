@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import sys
 from datetime import datetime
@@ -8,16 +9,18 @@ from pathlib import Path
 
 import pytest
 
+from application.use_cases.dry_run_render import RenderResult
 from application.use_cases.offline_validation_snapshot import OfflineSnapshotBundle
 from application.use_cases.operator_truth_report import OperatorTruthReporter
 from application.use_cases.plan_queue import PlannedCandidate, QueuePlan
 from application.use_cases.publish_next import PublishNextUseCase
+from domain.entities.post_artifact import PostArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
 from infrastructure.db.repositories import Repositories
 
 from .support import make_test_settings
 from .test_caption_builder_arch import make_offer
-from .test_publish_reliability_arch import RecordingPublisher, StaticRenderUseCase
+from .test_publish_reliability_arch import FailingRenderUseCase, RecordingPublisher, StaticRenderUseCase
 
 
 def make_decision_json(
@@ -44,6 +47,30 @@ def make_decision_json(
 
 def make_candidate(offer, decision_json: dict, score: float) -> PlannedCandidate:
     return PlannedCandidate(score=score, offer=offer, decision_json=decision_json)
+
+
+class VerifiedRenderUseCase:
+    def __init__(self, image_path: Path, *, caption_html: str = '<b>verified caption</b>') -> None:
+        self.image_path = image_path
+        self.caption_html = caption_html
+
+    async def execute(self, offer, decision_json):
+        image_bytes = b'verified-card-image'
+        self.image_path.write_bytes(image_bytes)
+        artifact = PostArtifact(
+            offer_id=offer.offer_id,
+            caption_html=self.caption_html,
+            hashtags=['#steam'],
+            template_id='steam_discount',
+            render_inputs={'offer': offer.to_snapshot(), 'decision': decision_json},
+            assets_used=['https://example.com/verified.png'],
+            idempotency_key='verified-key',
+            caption_hash=hashlib.sha256(self.caption_html.encode('utf-8')).hexdigest(),
+            image_hash=hashlib.sha256(image_bytes).hexdigest(),
+            render_diagnostics={'source': 'verified-render'},
+            decision_debug={'caption': {'provider': 'verified-test'}},
+        )
+        return RenderResult(artifact=artifact, image_path=self.image_path)
 
 
 def test_publish_next_inspect_selection_exposes_publishable_and_blocked_rows(tmp_path: Path) -> None:
@@ -104,6 +131,8 @@ def test_publish_next_preview_send_test_target_exposes_selected_artifact_details
     assert target.would_send is True
     assert target.candidate is not None
     assert target.candidate['offer_id'] == 'steam:preview'
+    assert target.offer_snapshot['offer_id'] == 'steam:preview'
+    assert target.decision_snapshot['lane'] == 'high_value_discount'
     assert target.artifact['template_id'] == 'steam_discount'
     assert target.artifact['image_path'] == str(image_path)
     assert target.artifact['caption_preview']
@@ -160,6 +189,109 @@ def test_operator_truth_report_emits_queue_selection_and_target_details(tmp_path
     assert payload['selection']['eligible_candidates_total'] == 1
     assert payload['send_test_target']['artifact']['image_path'] == str(image_path)
     assert payload['verdict']['truth_ready'] is True
+
+
+def test_operator_truth_report_includes_verified_pinned_publish_payload(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'verified-card.png'
+    now = datetime(2026, 3, 20, 12, 0)
+
+    offer = make_offer()
+    offer.offer_id = 'steam:pinned'
+    offer.game_id = 'pinned'
+    offer.franchise_key = 'pinned'
+    offer.title = 'Pinned Target'
+    decision_json = make_decision_json('high_value_discount', score=135.0)
+    repo.replace_queue('planned', [(135.0, offer, decision_json)], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, VerifiedRenderUseCase(image_path), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now)
+    target = asyncio.run(use_case.preview_send_test_target(now, now))
+    plan = QueuePlan(
+        planned=[make_candidate(offer, decision_json, 135.0)],
+        reserve=[],
+        metrics={'offers.ingested_total': 1, 'offers.enriched_total': 1},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': now.isoformat(),
+            'selection_summary': {'solo_post': 1, 'roundup_candidate': 0, 'capacity_hold': 0},
+        },
+    )
+
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    artifact = reporter.emit(
+        now_utc=now,
+        mode='preview',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+    )
+
+    assert artifact.json_path is not None and artifact.json_path.exists()
+    payload = json.loads(artifact.json_path.read_text(encoding='utf-8'))
+    pinned_publish = payload['pinned_publish']
+    assert pinned_publish['contract_version'] == 1
+    assert pinned_publish['source'] == 'preview'
+    assert pinned_publish['report_run_key'] == payload['run_key']
+    assert pinned_publish['candidate']['offer_id'] == 'steam:pinned'
+    assert pinned_publish['offer_snapshot']['offer_id'] == 'steam:pinned'
+    assert pinned_publish['decision_snapshot']['lane'] == 'high_value_discount'
+    assert pinned_publish['artifact']['caption_html'] == '<b>verified caption</b>'
+    assert pinned_publish['artifact']['caption_hash'] == hashlib.sha256(
+        pinned_publish['artifact']['caption_html'].encode('utf-8')
+    ).hexdigest()
+    assert pinned_publish['artifact']['image_path'] == str(image_path)
+    assert pinned_publish['artifact']['image_hash'] == hashlib.sha256(image_path.read_bytes()).hexdigest()
+    assert pinned_publish['artifact']['idempotency_key'] == 'verified-key'
+    assert pinned_publish['validation']['caption_hash_verified'] is True
+    assert pinned_publish['validation']['image_exists'] is True
+    assert pinned_publish['validation']['image_hash_verified'] is True
+
+
+def test_operator_truth_report_omits_pinned_publish_when_target_has_no_artifact(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    now = datetime(2026, 3, 20, 12, 0)
+
+    offer = make_offer()
+    offer.offer_id = 'steam:no-artifact'
+    offer.game_id = 'no-artifact'
+    offer.franchise_key = 'no-artifact'
+    offer.title = 'No Artifact Target'
+    decision_json = make_decision_json('high_value_discount', score=120.0)
+    repo.replace_queue('planned', [(120.0, offer, decision_json)], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, FailingRenderUseCase(), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now)
+    target = asyncio.run(use_case.preview_send_test_target(now, now))
+    plan = QueuePlan(
+        planned=[make_candidate(offer, decision_json, 120.0)],
+        reserve=[],
+        metrics={'offers.ingested_total': 1, 'offers.enriched_total': 1},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': now.isoformat(),
+            'selection_summary': {'solo_post': 1, 'roundup_candidate': 0, 'capacity_hold': 0},
+        },
+    )
+
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    artifact = reporter.emit(
+        now_utc=now,
+        mode='preview',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+    )
+
+    assert artifact.json_path is not None and artifact.json_path.exists()
+    payload = json.loads(artifact.json_path.read_text(encoding='utf-8'))
+    assert 'pinned_publish' not in payload
 
 
 def test_operator_truth_report_skips_repository_persistence_for_offline_preview(tmp_path: Path) -> None:

@@ -130,6 +130,8 @@ class SendTestTargetPreview:
     blocker_reason: str | None
     blocker_detail: str | None
     candidate: dict[str, Any] | None = None
+    offer_snapshot: dict[str, Any] = field(default_factory=dict)
+    decision_snapshot: dict[str, Any] = field(default_factory=dict)
     artifact: dict[str, Any] = field(default_factory=dict)
     outbox_status: str | None = None
     outbox_message_id: int | None = None
@@ -380,6 +382,8 @@ class PublishNextUseCase:
                 blocker_reason=blocker_reason,
                 blocker_detail=blocker_detail,
                 candidate=inspection.selected_candidate.to_snapshot(),
+                offer_snapshot=record.offer.to_snapshot(),
+                decision_snapshot=dict(record.decision_json),
                 artifact=self._artifact_preview(artifact, image_path),
                 outbox_status=outbox.status if outbox is not None else None,
                 outbox_message_id=outbox.telegram_message_id if outbox is not None else None,
@@ -395,6 +399,8 @@ class PublishNextUseCase:
                 blocker_reason='render_failed',
                 blocker_detail=self._failure_detail(exc),
                 candidate=inspection.selected_candidate.to_snapshot(),
+                offer_snapshot=record.offer.to_snapshot(),
+                decision_snapshot=dict(record.decision_json),
             )
 
         artifact = render_result.artifact
@@ -413,6 +419,8 @@ class PublishNextUseCase:
             blocker_reason=blocker_reason,
             blocker_detail=blocker_detail,
             candidate=inspection.selected_candidate.to_snapshot(),
+            offer_snapshot=record.offer.to_snapshot(),
+            decision_snapshot=dict(record.decision_json),
             artifact=self._artifact_preview(artifact, render_result.image_path),
             outbox_status=outbox.status if outbox is not None else None,
             outbox_message_id=outbox.telegram_message_id if outbox is not None else None,
