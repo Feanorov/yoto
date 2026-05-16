@@ -1,0 +1,113 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+
+SEND_DISABLED_REASON = "Disabled: send-test is not preview-pinned yet; backend may replan before publish."
+
+
+@dataclass(slots=True)
+class SourceHealth:
+    name: str
+    status: str
+    reason: str
+    offers: int | None = None
+    details: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
+class SelectedTarget:
+    title: str = ""
+    offer_id: str = ""
+    source: str = ""
+    lane: str = ""
+    bucket: str = ""
+    content_family: str = ""
+    recommended_post_mode: str = ""
+    store_url: str = ""
+
+
+@dataclass(slots=True)
+class PreviewPaths:
+    workflow_path: Path | None = None
+    truth_report_path: Path | None = None
+    image_path: Path | None = None
+    latest_snapshot_manifest_path: Path | None = None
+    latest_publish_outcome_path: Path | None = None
+    output_dir: Path | None = None
+
+
+@dataclass(slots=True)
+class PreviewFingerprint:
+    workflow_path: Path | None = None
+    truth_report_path: Path | None = None
+    run_key: str | None = None
+    selected_offer_id: str | None = None
+    caption_hash: str | None = None
+    image_path: Path | None = None
+
+
+@dataclass(slots=True)
+class ArtifactBundle:
+    project_root: Path
+    output_dir: Path
+    workflow_path: Path | None = None
+    truth_report_path: Path | None = None
+    workflow_payload: dict[str, Any] | None = None
+    truth_payload: dict[str, Any] | None = None
+    latest_snapshot_manifest_path: Path | None = None
+    latest_publish_outcome_path: Path | None = None
+    ambiguous: bool = False
+    stale: bool = False
+    warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class PreviewState:
+    project_root: Path
+    status_text: str
+    verdict: str = ""
+    truth_ready: bool = False
+    telegram_verified: bool = False
+    post_type_key: str = "unknown"
+    post_type_label: str = "Unknown/Unsupported"
+    selected_target: SelectedTarget | None = None
+    caption_html: str = ""
+    caption_preview: str = ""
+    caption_hash: str | None = None
+    card_path: Path | None = None
+    card_exists: bool = False
+    blocker_category: str | None = None
+    blocker_reason: str | None = None
+    blocker_detail: str | None = None
+    ingest_sources: list[SourceHealth] = field(default_factory=list)
+    paths: PreviewPaths = field(default_factory=PreviewPaths)
+    ambiguous: bool = False
+    stale: bool = False
+    warnings: list[str] = field(default_factory=list)
+    run_key: str | None = None
+    created_at: str | None = None
+    command_status: str = ""
+    report_exists: bool = False
+    fingerprint: PreviewFingerprint | None = None
+
+    @classmethod
+    def empty(cls, project_root: Path) -> PreviewState:
+        output_dir = project_root / "output"
+        return cls(
+            project_root=project_root,
+            status_text="No preview loaded.",
+            paths=PreviewPaths(output_dir=output_dir),
+            warnings=["Run Preview or Refresh Local State to load the latest operator artifacts."],
+        )
+
+
+@dataclass(slots=True)
+class SafetyState:
+    send_enabled: bool
+    send_disabled_reason: str
+    blockers: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    preview_ready: bool = False
