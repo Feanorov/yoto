@@ -2,6 +2,52 @@
 
 Use the repo-normalized operator layer through `yoto.bat`. It wraps existing repo commands only and keeps the current execution model unchanged.
 
+## Launcher Resolution
+
+- `yoto.bat` resolves Python in this order:
+  - `D:\Telegram_portable_bundle\.venv\Scripts\python.exe`
+  - `D:\Telegram\.venv\Scripts\python.exe`
+  - `python` on `PATH`
+- If none of those interpreters exist, the launcher stops with a clear error instead of falling through to a broken `python` call.
+- The batch file enters the bundle root before every command, so operators can run `D:\Telegram_portable_bundle\yoto.bat ...` without manual `cd` or path hacks.
+
+## Safe vs Dangerous
+
+- Safe commands:
+  - `doctor`
+  - `latest-artifacts`
+  - `preview`
+  - `preview-offline`
+  - `preview-golden`
+  - `daily-check`
+  - `snapshot-offline`
+  - `build-voice-package`
+  - `generate-captions`
+  - `generate-captions-offline`
+  - `generate-captions-golden`
+  - `generate-cards`
+  - `generate-cards-offline`
+  - `generate-cards-golden`
+  - `test-planner`
+  - `test-caption`
+  - `test-cards`
+  - `test-publish`
+  - `test-video`
+  - `video-smoke`
+- Dangerous or state-changing commands:
+  - `send-test`, `send-test-offline`, `send-test-golden`
+    - publish-capable; can send to Telegram
+  - `run-once`, `run-once-offline`, `run-once-golden`
+    - execute the publish decision path and mutate runtime state
+  - `run`
+    - long-running publish loop
+  - `snapshot-golden`
+    - replaces the preserved golden snapshot when the candidate is eligible
+  - `video-worker`, `video-loop`
+    - background or repeated processing commands, not day-to-day operator checks
+
+For MVP operator verification, prefer the safe commands unless you explicitly intend to publish or overwrite preserved state.
+
 ## Core Bot Commands
 
 - `yoto.bat preview`

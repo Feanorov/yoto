@@ -7,6 +7,7 @@ from datetime import datetime
 import logging
 from pathlib import Path
 import random
+import sys
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import httpx
@@ -46,6 +47,15 @@ from infrastructure.video.manifest_writer import VideoManifestWriter
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def safe_print(line: str) -> None:
+    text = f'{line}\n'
+    encoding = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    try:
+        sys.stdout.write(text)
+    except UnicodeEncodeError:
+        sys.stdout.write(text.encode(encoding, errors='replace').decode(encoding, errors='replace'))
 
 
 def parse_args() -> argparse.Namespace:
@@ -496,19 +506,19 @@ class BotRuntime:
         publish_result = telegram.get('publish_result') or {}
         outbox = telegram.get('outbox') or {}
 
-        print(f'operator-truth[{payload.get("mode")}/{payload.get("scope")}] :: verdict={verdict.get("verdict")} :: truth_ready={"yes" if verdict.get("truth_ready") else "no"}')
+        safe_print(f'operator-truth[{payload.get("mode")}/{payload.get("scope")}] :: verdict={verdict.get("verdict")} :: truth_ready={"yes" if verdict.get("truth_ready") else "no"}')
         ingest_sources = dict(payload.get('ingest_sources') or {})
         if ingest_sources:
             for source_name, snapshot in ingest_sources.items():
                 details = dict(snapshot or {})
-                print(
+                safe_print(
                     f'ingest[{source_name}] :: status={details.get("status") or "unknown"} '
                     f':: offers={int(details.get("offers") or 0)} :: reason={details.get("reason") or "unknown"}'
                 )
         else:
-            print('ingest :: unavailable')
+            safe_print('ingest :: unavailable')
 
-        print(
+        safe_print(
             'queue :: '
             f'planned={int(planned.get("total") or 0)} '
             f'reserve={int(reserve.get("total") or 0)} '
@@ -516,7 +526,7 @@ class BotRuntime:
             f':: planned_families={BotRuntime._format_counts(planned.get("by_family") or {})} '
             f':: reserve_families={BotRuntime._format_counts(reserve.get("by_family") or {})}'
         )
-        print(
+        safe_print(
             'selector :: '
             f'eligible={int(selection.get("eligible_candidates_total") or 0)} '
             f'blocked={int(selection.get("blocked_candidates_total") or 0)} '
@@ -527,7 +537,7 @@ class BotRuntime:
         )
 
         if target_candidate:
-            print(
+            safe_print(
                 'selected :: '
                 f'row={target_candidate.get("row_id")} '
                 f'[{target_candidate.get("bucket")}] '
@@ -535,28 +545,28 @@ class BotRuntime:
                 f'{target_candidate.get("source")} :: {target_candidate.get("offer_id")} :: {target_candidate.get("title")}'
             )
         else:
-            print('selected :: none')
+            safe_print('selected :: none')
 
-        print(
+        safe_print(
             'target :: '
             f'would_send={"yes" if target.get("would_send") else "no"} '
             f':: blocker_category={target.get("blocker_category") or "none"} '
             f':: blocker_reason={target.get("blocker_reason") or "none"}'
         )
         if target_artifact:
-            print(
+            safe_print(
                 'artifact :: '
                 f'template={target_artifact.get("template_id") or "n/a"} '
                 f':: card_family={target_artifact.get("card_family") or "n/a"} '
                 f':: image={target_artifact.get("image_path") or "n/a"} '
                 f':: outbox_status={target.get("outbox_status") or "none"}'
             )
-            print(
+            safe_print(
                 'caption :: '
                 f'len={int(target_artifact.get("caption_length") or 0)} '
                 f':: {target_artifact.get("caption_preview") or "n/a"}'
             )
-            print(f'assets :: {BotRuntime._format_assets(target_artifact.get("assets_used") or [])}')
+            safe_print(f'assets :: {BotRuntime._format_assets(target_artifact.get("assets_used") or [])}')
 
         BotRuntime._print_candidate_rows('publishable-row', selection.get('eligible_candidates') or [])
         BotRuntime._print_candidate_rows('blocked-row', selection.get('blocked_candidates') or [], include_blocker=True)
@@ -565,7 +575,7 @@ class BotRuntime:
         if offline_snapshot:
             quality = dict(offline_snapshot.get('quality') or {})
             blockers = quality.get('blocking_reasons') or []
-            print(
+            safe_print(
                 'offline :: '
                 f'role={offline_snapshot.get("snapshot_role")} '
                 f':: manifest={offline_snapshot.get("manifest_path")} '
@@ -573,7 +583,7 @@ class BotRuntime:
             )
 
         if publish_result:
-            print(
+            safe_print(
                 'send-test :: '
                 f'published={"yes" if publish_result.get("published") else "no"} '
                 f':: reason={publish_result.get("reason") or "none"} '
@@ -582,8 +592,8 @@ class BotRuntime:
             )
 
         if artifact.json_path is not None:
-            print(f'report :: {artifact.json_path}')
-        print(
+            safe_print(f'report :: {artifact.json_path}')
+        safe_print(
             'operator-verdict :: '
             f'category={verdict.get("blocker_category") or "none"} '
             f':: reason={verdict.get("blocker_reason") or "none"} '
@@ -613,12 +623,12 @@ class BotRuntime:
                 suffix = f' :: blocker={row.get("blocker_reason") or "none"} :: detail={row.get("blocker_detail") or "none"}'
             else:
                 suffix = f' :: total={row.get("total_priority") if row.get("total_priority") is not None else "n/a"}'
-            print(
+            safe_print(
                 f'{label} :: row={row.get("row_id")} :: [{row.get("bucket")}] '
                 f'[{row.get("content_family")}/{row.get("lane")}] :: {row.get("offer_id")} :: {row.get("title")}{suffix}'
             )
         if len(rows) > limit:
-            print(f'{label} :: +{len(rows) - limit} more')
+            safe_print(f'{label} :: +{len(rows) - limit} more')
 
     @staticmethod
     def _load_timezone(name: str):
@@ -634,7 +644,7 @@ def _print_auto_golden_status(runtime: BotRuntime) -> None:
     if bundle is None:
         return
     source = runtime.last_auto_golden_source or 'live_cycle'
-    print(f'golden-auto[{source}] :: {bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(bundle)}')
+    safe_print(f'golden-auto[{source}] :: {bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(bundle)}')
 
 
 async def async_main() -> None:
@@ -664,25 +674,25 @@ async def async_main() -> None:
         if args.capture_offline_snapshot:
             bundle = await runtime.capture_current_queue_snapshot()
             if bundle is None:
-                print('Offline snapshot capture failed.')
+                safe_print('Offline snapshot capture failed.')
                 raise SystemExit(1)
-            print(f'{bundle.run_key} :: {bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(bundle)}')
+            safe_print(f'{bundle.run_key} :: {bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(bundle)}')
             if args.promote_offline_snapshot is not None:
                 try:
                     golden_bundle = runtime.promote_offline_snapshot(bundle)
                 except ValueError as exc:
-                    print(f'Golden snapshot not updated: {exc}')
+                    safe_print(f'Golden snapshot not updated: {exc}')
                     raise SystemExit(1)
-                print(f'golden :: {golden_bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(golden_bundle)}')
+                safe_print(f'golden :: {golden_bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(golden_bundle)}')
             return
         if args.promote_offline_snapshot is not None:
             try:
                 promote_source = offline_bundle if offline_bundle is not None else args.promote_offline_snapshot
                 golden_bundle = runtime.promote_offline_snapshot(promote_source)
             except (FileNotFoundError, ValueError) as exc:
-                print(str(exc))
+                safe_print(str(exc))
                 raise SystemExit(1)
-            print(f'golden :: {golden_bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(golden_bundle)}')
+            safe_print(f'golden :: {golden_bundle.base_db_path} :: {runtime.snapshot_manager.format_summary(golden_bundle)}')
             return
         if args.preview:
             if offline_bundle is not None:
@@ -710,20 +720,20 @@ async def async_main() -> None:
             if offline_bundle is not None:
                 result = await runtime.publish_from_existing_queue(offline_bundle, force_publish=False)
                 if result is None:
-                    print('No publishable items found.')
+                    safe_print('No publishable items found.')
                 else:
-                    print(f'{result.title} :: {result.reason} :: {result.message_id}')
+                    safe_print(f'{result.title} :: {result.reason} :: {result.message_id}')
                 return
             result = await runtime.plan_and_publish_once(force_publish=False, capture_offline_snapshot=True)
             if result is None:
                 if runtime.last_run_diagnostics is not None and runtime.last_run_diagnostics.should_stop_pipeline:
-                    print('Fatal ingest detected. Pipeline stopped.')
+                    safe_print('Fatal ingest detected. Pipeline stopped.')
                 elif runtime.last_run_diagnostics is not None and runtime.last_run_diagnostics.empty_window:
-                    print('Planner window is empty.')
+                    safe_print('Planner window is empty.')
                 else:
-                    print('No publishable items found.')
+                    safe_print('No publishable items found.')
             else:
-                print(f'{result.title} :: {result.reason} :: {result.message_id}')
+                safe_print(f'{result.title} :: {result.reason} :: {result.message_id}')
             _print_auto_golden_status(runtime)
             return
         await runtime.run_forever()
