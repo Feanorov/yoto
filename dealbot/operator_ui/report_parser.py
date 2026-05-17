@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from .models import (
     ArtifactBundle,
+    LastPublishState,
     PinnedPublishState,
     PreviewFingerprint,
     PreviewPaths,
@@ -24,6 +26,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
     pinned_candidate = _as_dict(pinned_publish_payload.get("candidate"))
     artifact = _as_dict(target.get("artifact"))
     pinned_publish = _build_pinned_publish(pinned_publish_payload, pinned_candidate)
+    last_publish = _build_last_publish_state(bundle)
     candidate = _select_candidate(workflow, selection, target, pinned_candidate)
     card_path = _path_or_none(artifact.get("image_path") or pinned_publish.image_path or workflow.get("card_path"))
     caption_html = _text(artifact.get("caption_html") or pinned_publish.caption_html)
@@ -84,6 +87,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         command_status=_text(workflow.get("status")),
         report_exists=bool(bundle.truth_report_path and bundle.truth_report_path.exists()),
         pinned_publish=pinned_publish,
+        last_publish=last_publish,
     )
     fingerprint_report_path = state.paths.truth_report_path
     fingerprint_offer_id = pinned_publish.offer_id or (state.selected_target.offer_id if state.selected_target else None)
@@ -169,6 +173,37 @@ def _build_selected_target(candidate: dict[str, Any]) -> SelectedTarget | None:
     )
 
 
+def _build_last_publish_state(bundle: ArtifactBundle) -> LastPublishState:
+    workflow_path = bundle.latest_publish_workflow_path
+    workflow = _as_dict(bundle.latest_publish_workflow_payload)
+    if workflow_path is None or not workflow:
+        return LastPublishState()
+    selected = _as_dict(workflow.get("selected"))
+    publish_outcome = _as_dict(bundle.latest_publish_outcome_payload)
+    publish_outcome_details = _as_dict(publish_outcome.get("publish_outcome"))
+    message_id = _int_or_none(workflow.get("message_id"))
+    if message_id is None:
+        message_id = _int_or_none(publish_outcome.get("message_id") or publish_outcome_details.get("message_id"))
+    source_report_path = _path_or_none(workflow.get("source_report_path"))
+    return LastPublishState(
+        workflow_path=workflow_path,
+        publish_outcome_path=bundle.latest_publish_outcome_path,
+        created_at=_text(workflow.get("created_at")) or None,
+        workflow_modified_at=_path_modified_at(workflow_path),
+        publish_outcome_modified_at=_path_modified_at(bundle.latest_publish_outcome_path),
+        command=_text(workflow.get("command")),
+        workflow_status=_text(workflow.get("status")),
+        title=_text(selected.get("title") or publish_outcome.get("title")),
+        offer_id=_text(selected.get("offer_id") or publish_outcome.get("offer_id")),
+        message_id=message_id,
+        published=bool(workflow.get("published")),
+        telegram_verified=bool(workflow.get("telegram_verified")),
+        outbox_status=_text(workflow.get("outbox_status") or publish_outcome_details.get("outbox_status")),
+        reason=_text(workflow.get("reason") or publish_outcome.get("reason") or publish_outcome_details.get("reason")),
+        source_report_path=source_report_path,
+    )
+
+
 def _build_ingest_sources(truth: dict[str, Any]) -> list[SourceHealth]:
     ingest_sources = _as_dict(truth.get("ingest_sources"))
     if not ingest_sources:
@@ -251,6 +286,12 @@ def _int_or_none(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _path_modified_at(path: Path | None) -> str | None:
+    if path is None or not path.exists():
+        return None
+    return datetime.fromtimestamp(path.stat().st_mtime).isoformat(timespec="seconds")
 
 
 def _dedupe(values: list[str]) -> list[str]:

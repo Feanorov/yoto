@@ -62,6 +62,8 @@ class ArtifactBundle:
     latest_snapshot_manifest_path: Path | None = None
     latest_publish_outcome_path: Path | None = None
     latest_publish_workflow_path: Path | None = None
+    latest_publish_workflow_payload: dict[str, Any] | None = None
+    latest_publish_outcome_payload: dict[str, Any] | None = None
     ambiguous: bool = False
     stale: bool = False
     warnings: list[str] = field(default_factory=list)
@@ -100,6 +102,33 @@ class PinnedPublishState:
 
 
 @dataclass(slots=True)
+class LastPublishState:
+    workflow_path: Path | None = None
+    publish_outcome_path: Path | None = None
+    created_at: str | None = None
+    workflow_modified_at: str | None = None
+    publish_outcome_modified_at: str | None = None
+    command: str = ""
+    workflow_status: str = ""
+    title: str = ""
+    offer_id: str = ""
+    message_id: int | None = None
+    published: bool = False
+    telegram_verified: bool = False
+    outbox_status: str = ""
+    reason: str = ""
+    source_report_path: Path | None = None
+
+    @property
+    def present(self) -> bool:
+        return self.workflow_path is not None
+
+    @property
+    def success(self) -> bool:
+        return self.published and self.telegram_verified and self.message_id is not None
+
+
+@dataclass(slots=True)
 class PreviewState:
     project_root: Path
     status_text: str
@@ -127,6 +156,7 @@ class PreviewState:
     command_status: str = ""
     report_exists: bool = False
     pinned_publish: PinnedPublishState = field(default_factory=PinnedPublishState)
+    last_publish: LastPublishState = field(default_factory=LastPublishState)
     fingerprint: PreviewFingerprint | None = None
 
     @classmethod

@@ -108,14 +108,18 @@ class PreviewArtifactResolver:
             self.output_dir / "offline_validation" / "snapshots",
             ("snapshot_manifest.json",),
         )
-        latest_publish_outcome_path = self._find_newest(
-            self.analytics_dir,
-            ("*_publish_outcome_*.json",),
-        )
         latest_publish_workflow_path = self._find_newest(
             self.analytics_dir,
             ("*_operator_workflow_publish-previewed.json",),
         )
+        latest_publish_workflow_payload = self._load_json(latest_publish_workflow_path)
+        latest_publish_outcome_path = self._resolve_publish_outcome_path(latest_publish_workflow_payload)
+        if latest_publish_outcome_path is None:
+            latest_publish_outcome_path = self._find_newest(
+                self.analytics_dir,
+                ("*_publish_outcome_*.json",),
+            )
+        latest_publish_outcome_payload = self._load_json(latest_publish_outcome_path)
         return ArtifactBundle(
             project_root=self.project_root,
             output_dir=self.output_dir,
@@ -126,6 +130,8 @@ class PreviewArtifactResolver:
             latest_snapshot_manifest_path=latest_snapshot_manifest_path,
             latest_publish_outcome_path=latest_publish_outcome_path,
             latest_publish_workflow_path=latest_publish_workflow_path,
+            latest_publish_workflow_payload=latest_publish_workflow_payload,
+            latest_publish_outcome_payload=latest_publish_outcome_payload,
             ambiguous=ambiguous,
             stale=stale,
             warnings=list(warnings or ()),
@@ -139,6 +145,16 @@ class PreviewArtifactResolver:
         if not report_path.is_absolute():
             report_path = self.project_root / report_path
         return report_path if report_path.exists() else None
+
+    def _resolve_publish_outcome_path(self, workflow_payload: dict[str, Any] | None) -> Path | None:
+        payload = dict(workflow_payload or {})
+        outcome_path_raw = str(payload.get("publish_outcome_path") or "").strip()
+        if not outcome_path_raw:
+            return None
+        outcome_path = Path(outcome_path_raw)
+        if not outcome_path.is_absolute():
+            outcome_path = self.project_root / outcome_path
+        return outcome_path if outcome_path.exists() else None
 
     def _load_json(self, path: Path | None) -> dict[str, Any] | None:
         if path is None or not path.exists():

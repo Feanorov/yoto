@@ -151,3 +151,97 @@ def test_preview_artifact_resolver_marks_ambiguous_preview_run(tmp_path: Path) -
     assert bundle.ambiguous is True
     assert bundle.workflow_path is not None
     assert any("ambiguous" in warning.lower() for warning in bundle.warnings)
+
+
+def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Path) -> None:
+    workflow_path = tmp_path / "output" / "analytics" / "20260517T075955Z_operator_workflow_publish-previewed.json"
+    publish_outcome_path = tmp_path / "output" / "analytics" / "20260517T075954Z_publish_outcome_steam_264710.json"
+    state = build_preview_state(
+        ArtifactBundle(
+            project_root=tmp_path,
+            output_dir=tmp_path / "output",
+            latest_publish_workflow_path=workflow_path,
+            latest_publish_outcome_path=publish_outcome_path,
+            latest_publish_workflow_payload={
+                "command": "publish-previewed",
+                "status": "ok",
+                "published": True,
+                "telegram_verified": True,
+                "message_id": 182,
+                "outbox_status": "published",
+                "reason": "published",
+                "source_report_path": str(tmp_path / "output" / "analytics" / "truth.json"),
+                "publish_outcome_path": str(publish_outcome_path),
+                "selected": {
+                    "title": "Subnautica",
+                    "offer_id": "steam:264710",
+                },
+            },
+            latest_publish_outcome_payload={
+                "offer_id": "steam:264710",
+                "title": "Subnautica",
+                "message_id": 182,
+                "publish_outcome": {
+                    "outbox_status": "published",
+                    "reason": "published",
+                },
+            },
+        )
+    )
+
+    assert state.last_publish.present is True
+    assert state.last_publish.success is True
+    assert state.last_publish.title == "Subnautica"
+    assert state.last_publish.offer_id == "steam:264710"
+    assert state.last_publish.message_id == 182
+    assert state.last_publish.published is True
+    assert state.last_publish.telegram_verified is True
+    assert state.last_publish.outbox_status == "published"
+    assert state.last_publish.reason == "published"
+    assert state.last_publish.workflow_path == workflow_path
+    assert state.last_publish.publish_outcome_path == publish_outcome_path
+
+
+def test_build_preview_state_handles_missing_last_publish_workflow(tmp_path: Path) -> None:
+    state = build_preview_state(
+        ArtifactBundle(
+            project_root=tmp_path,
+            output_dir=tmp_path / "output",
+        )
+    )
+
+    assert state.last_publish.present is False
+    assert state.last_publish.workflow_path is None
+    assert state.last_publish.publish_outcome_path is None
+
+
+def test_build_preview_state_maps_failed_last_publish_workflow(tmp_path: Path) -> None:
+    workflow_path = tmp_path / "output" / "analytics" / "20260517T075955Z_operator_workflow_publish-previewed.json"
+    state = build_preview_state(
+        ArtifactBundle(
+            project_root=tmp_path,
+            output_dir=tmp_path / "output",
+            latest_publish_workflow_path=workflow_path,
+            latest_publish_workflow_payload={
+                "command": "publish-previewed",
+                "status": "failed",
+                "published": False,
+                "telegram_verified": False,
+                "message_id": None,
+                "outbox_status": "failed",
+                "reason": "image_missing",
+                "selected": {
+                    "title": "Subnautica",
+                    "offer_id": "steam:264710",
+                },
+            },
+        )
+    )
+
+    assert state.last_publish.present is True
+    assert state.last_publish.success is False
+    assert state.last_publish.workflow_status == "failed"
+    assert state.last_publish.published is False
+    assert state.last_publish.telegram_verified is False
+    assert state.last_publish.reason == "image_missing"
+    assert state.last_publish.outbox_status == "failed"

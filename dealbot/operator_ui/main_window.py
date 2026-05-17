@@ -28,7 +28,7 @@ from PySide6.QtWidgets import (
 
 from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
-from .models import PreviewState, SafetyState
+from .models import LastPublishState, PreviewState, SafetyState
 from .report_parser import build_preview_state
 from .safety import SEND_DISABLED_REASON_RU, evaluate_preview_safety, localize_ui_message
 
@@ -74,6 +74,10 @@ def _translate_post_type_label(text: str) -> str:
 
 def _yes_no(value: bool) -> str:
     return "да" if value else "нет"
+
+
+def _yes_no_en(value: bool) -> str:
+    return "yes" if value else "no"
 
 
 def _or_none(value: object) -> str:
@@ -144,6 +148,10 @@ def _extract_publish_reason(output_text: str) -> str:
     if line_match:
         return line_match[-1]
     return ""
+
+
+def _last_publish_status(last_publish: LastPublishState) -> str:
+    return _text(last_publish.outbox_status or last_publish.reason or last_publish.workflow_status) or "none"
 
 
 class ScaledImageLabel(QLabel):
@@ -264,6 +272,20 @@ class MainWindow(QMainWindow):
         actions_layout.addWidget(self.open_output_button)
         actions_layout.addWidget(self.send_button)
         layout.addWidget(actions_group)
+
+        publish_group = QGroupBox("Последняя публикация")
+        publish_layout = QVBoxLayout(publish_group)
+        self.last_publish_label = QLabel("Публикаций через UI пока нет.")
+        self.last_publish_label.setWordWrap(True)
+        self.last_publish_label.setStyleSheet("color: #374151;")
+        self.open_publish_proof_button = QPushButton("Открыть proof")
+        self.open_publish_outcome_button = QPushButton("Открыть publish outcome")
+        self.open_analytics_button = QPushButton("Открыть папку analytics")
+        publish_layout.addWidget(self.last_publish_label)
+        publish_layout.addWidget(self.open_publish_proof_button)
+        publish_layout.addWidget(self.open_publish_outcome_button)
+        publish_layout.addWidget(self.open_analytics_button)
+        layout.addWidget(publish_group)
         layout.addStretch(1)
         return panel
 
@@ -326,6 +348,9 @@ class MainWindow(QMainWindow):
         self.open_report_button.clicked.connect(self.open_report)
         self.open_card_button.clicked.connect(self.open_card)
         self.open_output_button.clicked.connect(self.open_output_folder)
+        self.open_publish_proof_button.clicked.connect(self.open_publish_proof)
+        self.open_publish_outcome_button.clicked.connect(self.open_publish_outcome)
+        self.open_analytics_button.clicked.connect(self.open_analytics_folder)
         self.send_button.clicked.connect(self.handle_send_clicked)
         self.runner.output_ready.connect(self.append_log)
         self.runner.running_changed.connect(self._set_running)
@@ -386,7 +411,11 @@ class MainWindow(QMainWindow):
             bundle = self.resolver.reload_bound_state(self.current_state.fingerprint)
         else:
             bundle = self.resolver.load_latest_local_state()
-        state = build_preview_state(bundle) if bundle.workflow_path or bundle.truth_report_path else PreviewState.empty(self.project_root)
+        state = (
+            build_preview_state(bundle)
+            if bundle.workflow_path or bundle.truth_report_path or bundle.latest_publish_workflow_path
+            else PreviewState.empty(self.project_root)
+        )
         self._apply_state(state)
         if not initial:
             self.append_log("[ui] Локальное состояние превью обновлено с диска")
@@ -447,6 +476,7 @@ class MainWindow(QMainWindow):
         self.send_reason_label.setStyleSheet("color: #166534;" if self.current_safety.send_enabled else "color: #7c2d12;")
         self.send_button.setToolTip(self.current_safety.send_disabled_reason)
         self.safety_label.setText(self._format_safety_summary(self.current_safety))
+        self._update_last_publish_panel(state.last_publish)
         self._update_preview_content(state)
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
         self._sync_buttons()
@@ -467,9 +497,15 @@ class MainWindow(QMainWindow):
     def _sync_buttons(self) -> None:
         report_path = self._report_path()
         card_path = self.current_state.card_path if self.current_state else None
+        last_publish = self.current_state.last_publish if self.current_state else LastPublishState()
         self.open_report_button.setEnabled(bool(report_path and report_path.exists()))
         self.open_card_button.setEnabled(bool(card_path and card_path.exists()))
         self.open_output_button.setEnabled(True)
+        self.open_publish_proof_button.setEnabled(bool(last_publish.workflow_path and last_publish.workflow_path.exists()))
+        self.open_publish_outcome_button.setEnabled(
+            bool(last_publish.publish_outcome_path and last_publish.publish_outcome_path.exists())
+        )
+        self.open_analytics_button.setEnabled(True)
         self.send_button.setEnabled(bool(self.current_safety.send_enabled and not self.runner.is_running))
 
     def _set_running(self, running: bool) -> None:
@@ -478,6 +514,23 @@ class MainWindow(QMainWindow):
         self.open_report_button.setEnabled(not running and bool(self._report_path() and self._report_path().exists()))
         self.open_card_button.setEnabled(not running and bool(self.current_state and self.current_state.card_exists))
         self.open_output_button.setEnabled(not running)
+        self.open_publish_proof_button.setEnabled(
+            not running
+            and bool(
+                self.current_state
+                and self.current_state.last_publish.workflow_path
+                and self.current_state.last_publish.workflow_path.exists()
+            )
+        )
+        self.open_publish_outcome_button.setEnabled(
+            not running
+            and bool(
+                self.current_state
+                and self.current_state.last_publish.publish_outcome_path
+                and self.current_state.last_publish.publish_outcome_path.exists()
+            )
+        )
+        self.open_analytics_button.setEnabled(not running)
         self.send_button.setEnabled(not running and self.current_safety.send_enabled)
 
     def open_report(self) -> None:
@@ -491,6 +544,17 @@ class MainWindow(QMainWindow):
 
     def open_output_folder(self) -> None:
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.project_root / "output")))
+
+    def open_publish_proof(self) -> None:
+        if self.current_state and self.current_state.last_publish.workflow_path is not None:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.current_state.last_publish.workflow_path)))
+
+    def open_publish_outcome(self) -> None:
+        if self.current_state and self.current_state.last_publish.publish_outcome_path is not None:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.current_state.last_publish.publish_outcome_path)))
+
+    def open_analytics_folder(self) -> None:
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.project_root / "output" / "analytics")))
 
     def show_send_disabled_dialog(self) -> None:
         QMessageBox.information(self, "Отправка отключена", self.current_safety.send_disabled_reason)
@@ -513,6 +577,17 @@ class MainWindow(QMainWindow):
         if report_path is None or not report_path.exists():
             return None
         return report_path
+
+    def _update_last_publish_panel(self, last_publish: LastPublishState) -> None:
+        self.last_publish_label.setText(self._format_last_publish_summary(last_publish))
+        if not last_publish.present:
+            self.last_publish_label.setStyleSheet("color: #374151;")
+        elif last_publish.success:
+            self.last_publish_label.setStyleSheet("color: #166534;")
+        elif last_publish.workflow_status == "failed" or not last_publish.published:
+            self.last_publish_label.setStyleSheet("color: #991b1b;")
+        else:
+            self.last_publish_label.setStyleSheet("color: #374151;")
 
     def _format_details(self, state: PreviewState, safety: SafetyState) -> str:
         lines: list[str] = []
@@ -567,6 +642,23 @@ class MainWindow(QMainWindow):
         lines.append(f"  caption_hash_verified: {_yes_no(state.pinned_publish.caption_hash_verified)}")
         lines.append(f"  image_hash_verified: {_yes_no(state.pinned_publish.image_hash_verified)}")
         lines.append("")
+        lines.append("Последняя публикация")
+        if not state.last_publish.present:
+            lines.append("  нет")
+        else:
+            lines.append(f"  title: {_or_none(state.last_publish.title)}")
+            lines.append(f"  offer_id: {_or_none(state.last_publish.offer_id)}")
+            lines.append(f"  message_id: {_or_none(state.last_publish.message_id)}")
+            lines.append(f"  published: {_yes_no(state.last_publish.published)}")
+            lines.append(f"  telegram_verified: {_yes_no(state.last_publish.telegram_verified)}")
+            lines.append(f"  outbox_status: {_or_none(state.last_publish.outbox_status)}")
+            lines.append(f"  reason: {_or_none(state.last_publish.reason)}")
+            lines.append(f"  source_report_path: {_or_none(state.last_publish.source_report_path)}")
+            lines.append(f"  publish_outcome_path: {_or_none(state.last_publish.publish_outcome_path)}")
+            lines.append(f"  workflow_path: {_or_none(state.last_publish.workflow_path)}")
+            lines.append(f"  workflow_modified_at: {_or_none(state.last_publish.workflow_modified_at)}")
+            lines.append(f"  publish_outcome_modified_at: {_or_none(state.last_publish.publish_outcome_modified_at)}")
+        lines.append("")
         lines.append("Безопасность")
         lines.append(f"  send_enabled: {_yes_no(safety.send_enabled)}")
         lines.append(f"  send_disabled_reason: {safety.send_disabled_reason}")
@@ -589,6 +681,33 @@ class MainWindow(QMainWindow):
         if safety.warnings:
             return " | ".join(localize_ui_message(item) for item in safety.warnings)
         return "Нужно собрать превью"
+
+    @staticmethod
+    def _format_last_publish_summary(last_publish: LastPublishState) -> str:
+        if not last_publish.present:
+            return "Публикаций через UI пока нет."
+        lines: list[str] = []
+        if last_publish.success:
+            lines.append("Последняя публикация:")
+        elif last_publish.workflow_status == "failed" or not last_publish.published:
+            lines.append(f"Последняя публикация не выполнена: {_text(last_publish.reason) or 'unknown'}")
+        else:
+            lines.append("Последняя публикация:")
+        lines.append(f"{_text(last_publish.title) or 'unknown'} / {_text(last_publish.offer_id) or 'none'}")
+        lines.append(f"message_id: {_text(last_publish.message_id) or 'none'}")
+        lines.append(f"published: {_yes_no_en(last_publish.published)}")
+        lines.append(f"telegram_verified: {_yes_no_en(last_publish.telegram_verified)}")
+        lines.append(f"status: {_last_publish_status(last_publish)}")
+        lines.append(f"outbox_status: {_text(last_publish.outbox_status) or 'none'}")
+        lines.append(f"reason: {_text(last_publish.reason) or 'none'}")
+        lines.append(f"source_report: {_text(last_publish.source_report_path) or 'none'}")
+        lines.append(f"publish_outcome: {_text(last_publish.publish_outcome_path) or 'none'}")
+        lines.append(f"workflow: {_text(last_publish.workflow_path) or 'none'}")
+        if last_publish.workflow_modified_at:
+            lines.append(f"workflow_time: {last_publish.workflow_modified_at}")
+        if last_publish.publish_outcome_modified_at:
+            lines.append(f"publish_outcome_time: {last_publish.publish_outcome_modified_at}")
+        return "\n".join(lines)
 
     @staticmethod
     def _badge_style(post_type_key: str) -> str:
