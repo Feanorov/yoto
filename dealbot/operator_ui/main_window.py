@@ -30,7 +30,7 @@ from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
 from .models import LastPublishState, PreviewState, SafetyState
 from .report_parser import build_preview_state
-from .safety import SEND_DISABLED_REASON_RU, evaluate_preview_safety, localize_ui_message
+from .safety import SEND_DISABLED_REASON_RU, build_operator_status, evaluate_preview_safety, localize_ui_message
 
 
 _STATUS_TEXT_TRANSLATIONS = {
@@ -234,6 +234,18 @@ class MainWindow(QMainWindow):
         subtitle.setWordWrap(True)
         subtitle.setStyleSheet("color: #4b5563;")
         layout.addWidget(subtitle)
+
+        self.operator_status_group = QGroupBox("Операторский статус")
+        operator_status_layout = QVBoxLayout(self.operator_status_group)
+        self.operator_status_summary_label = QLabel("Статус: готов к работе\nСледующее действие: соберите новое превью.")
+        self.operator_status_summary_label.setWordWrap(True)
+        self.operator_status_summary_label.setStyleSheet("font-size: 14px; font-weight: 600; color: #1f2937;")
+        self.operator_status_facts_label = QLabel("")
+        self.operator_status_facts_label.setWordWrap(True)
+        self.operator_status_facts_label.setStyleSheet("color: #374151;")
+        operator_status_layout.addWidget(self.operator_status_summary_label)
+        operator_status_layout.addWidget(self.operator_status_facts_label)
+        layout.addWidget(self.operator_status_group)
 
         status_group = QGroupBox("Статус")
         status_layout = QVBoxLayout(status_group)
@@ -476,6 +488,7 @@ class MainWindow(QMainWindow):
         self.send_reason_label.setStyleSheet("color: #166534;" if self.current_safety.send_enabled else "color: #7c2d12;")
         self.send_button.setToolTip(self.current_safety.send_disabled_reason)
         self.safety_label.setText(self._format_safety_summary(self.current_safety))
+        self._update_operator_status_banner(state, self.current_safety)
         self._update_last_publish_panel(state.last_publish)
         self._update_preview_content(state)
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
@@ -588,6 +601,55 @@ class MainWindow(QMainWindow):
             self.last_publish_label.setStyleSheet("color: #991b1b;")
         else:
             self.last_publish_label.setStyleSheet("color: #374151;")
+
+    def _update_operator_status_banner(self, state: PreviewState, safety: SafetyState) -> None:
+        operator_status = build_operator_status(state, safety)
+        self.operator_status_summary_label.setText(
+            f"Статус: {operator_status.status_text}\n"
+            f"Следующее действие: {operator_status.next_action}"
+        )
+        fact_lines: list[str] = []
+        if operator_status.last_publish_title or operator_status.last_publish_offer_id:
+            fact_lines.append(
+                f"Последняя публикация: {_text(operator_status.last_publish_title) or 'unknown'} / "
+                f"{_text(operator_status.last_publish_offer_id) or 'none'}"
+            )
+        if operator_status.last_publish_message_id is not None:
+            fact_lines.append(f"message_id: {operator_status.last_publish_message_id}")
+        if operator_status.last_publish_telegram_verified is not None:
+            fact_lines.append(f"telegram_verified: {_yes_no_en(operator_status.last_publish_telegram_verified)}")
+        if operator_status.current_preview_title or operator_status.current_preview_offer_id:
+            fact_lines.append(
+                f"Текущий preview: {_text(operator_status.current_preview_title) or 'unknown'} / "
+                f"{_text(operator_status.current_preview_offer_id) or 'none'}"
+            )
+        if operator_status.current_post_type_label:
+            fact_lines.append(f"Тип: {_translate_post_type_label(operator_status.current_post_type_label)}")
+        self.operator_status_facts_label.setText("\n".join(fact_lines))
+        palette = {
+            "ready": ("#1f2937", "#f3f4f6"),
+            "preview_ready": ("#166534", "#dcfce7"),
+            "preview_blocked": ("#92400e", "#fef3c7"),
+            "published": ("#1d4ed8", "#dbeafe"),
+            "failed": ("#991b1b", "#fee2e2"),
+        }
+        foreground, background = palette.get(operator_status.kind, palette["ready"])
+        self.operator_status_group.setStyleSheet(
+            "QGroupBox {"
+            f" color: {foreground};"
+            " font-weight: 600;"
+            " border: 1px solid #d1d5db;"
+            " border-radius: 8px;"
+            f" background-color: {background};"
+            " margin-top: 8px;"
+            " padding-top: 10px;"
+            "}"
+            "QGroupBox::title {"
+            " subcontrol-origin: margin;"
+            " left: 10px;"
+            " padding: 0 4px 0 4px;"
+            "}"
+        )
 
     def _format_details(self, state: PreviewState, safety: SafetyState) -> str:
         lines: list[str] = []

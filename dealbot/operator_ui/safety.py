@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from .models import PreviewState, SafetyState
+from pathlib import Path
+
+from .models import OperatorStatusState, PreviewState, SafetyState
 
 
 SEND_DISABLED_REASON_RU = "Отключено: нужно собрать превью."
@@ -151,10 +153,107 @@ def evaluate_preview_safety(state: PreviewState | None) -> SafetyState:
     )
 
 
+def build_operator_status(state: PreviewState | None, safety: SafetyState) -> OperatorStatusState:
+    if _is_no_preview_loaded(state):
+        if state is not None and _is_last_publish_failed(state):
+            return OperatorStatusState(
+                kind="failed",
+                status_text="последняя публикация не выполнена",
+                next_action="Проверьте причину ошибки и соберите новое превью при необходимости.",
+                last_publish_title=state.last_publish.title,
+                last_publish_offer_id=state.last_publish.offer_id,
+                last_publish_message_id=state.last_publish.message_id,
+                last_publish_telegram_verified=state.last_publish.telegram_verified,
+            )
+        return OperatorStatusState(
+            kind="ready",
+            status_text="готов к работе",
+            next_action="Соберите новое превью.",
+            last_publish_title=state.last_publish.title if state is not None else "",
+            last_publish_offer_id=state.last_publish.offer_id if state is not None else "",
+            last_publish_message_id=state.last_publish.message_id if state is not None else None,
+            last_publish_telegram_verified=state.last_publish.telegram_verified if state is not None and state.last_publish.present else None,
+        )
+
+    assert state is not None
+    if _is_preview_already_published(state):
+        return OperatorStatusState(
+            kind="published",
+            status_text="последний preview уже опубликован",
+            next_action="Соберите новое превью для следующего поста.",
+            last_publish_title=state.last_publish.title,
+            last_publish_offer_id=state.last_publish.offer_id,
+            last_publish_message_id=state.last_publish.message_id,
+            last_publish_telegram_verified=state.last_publish.telegram_verified,
+            current_preview_title=state.selected_target.title if state.selected_target else "",
+            current_preview_offer_id=state.selected_target.offer_id if state.selected_target else "",
+            current_post_type_label=state.post_type_label,
+        )
+    if safety.send_enabled:
+        return OperatorStatusState(
+            kind="preview_ready",
+            status_text="превью готово к публикации",
+            next_action="Проверьте карточку и описание, затем отправьте в Telegram.",
+            last_publish_title=state.last_publish.title,
+            last_publish_offer_id=state.last_publish.offer_id,
+            last_publish_message_id=state.last_publish.message_id,
+            last_publish_telegram_verified=state.last_publish.telegram_verified if state.last_publish.present else None,
+            current_preview_title=state.selected_target.title if state.selected_target else "",
+            current_preview_offer_id=state.selected_target.offer_id if state.selected_target else "",
+            current_post_type_label=state.post_type_label,
+        )
+    return OperatorStatusState(
+        kind="preview_blocked",
+        status_text="превью не готово к публикации",
+        next_action=safety.send_disabled_reason,
+        last_publish_title=state.last_publish.title,
+        last_publish_offer_id=state.last_publish.offer_id,
+        last_publish_message_id=state.last_publish.message_id,
+        last_publish_telegram_verified=state.last_publish.telegram_verified if state.last_publish.present else None,
+        current_preview_title=state.selected_target.title if state.selected_target else "",
+        current_preview_offer_id=state.selected_target.offer_id if state.selected_target else "",
+        current_post_type_label=state.post_type_label,
+    )
+
+
 def _first_disabled_reason(current: str, candidate: str) -> str:
     if current == SEND_DISABLED_REASON_RU:
         return candidate
     return current
+
+
+def _is_no_preview_loaded(state: PreviewState | None) -> bool:
+    if state is None:
+        return True
+    has_target = state.selected_target is not None and bool(state.selected_target.offer_id or state.selected_target.title)
+    has_report = bool(state.paths.truth_report_path and state.report_exists)
+    has_preview_payload = bool(state.truth_ready or state.pinned_publish.present or state.caption_html or state.caption_preview or state.card_path)
+    return not (has_target or has_report or has_preview_payload)
+
+
+def _is_preview_already_published(state: PreviewState) -> bool:
+    if not state.last_publish.success:
+        return False
+    report_path = _normalized_path(state.paths.truth_report_path)
+    publish_report_path = _normalized_path(state.last_publish.source_report_path)
+    return bool(report_path and publish_report_path and report_path == publish_report_path)
+
+
+def _is_last_publish_failed(state: PreviewState) -> bool:
+    return bool(
+        state.last_publish.present
+        and not state.last_publish.success
+        and (state.last_publish.workflow_status == "failed" or not state.last_publish.published)
+    )
+
+
+def _normalized_path(path: Path | None) -> str:
+    if path is None:
+        return ""
+    try:
+        return str(path.resolve())
+    except OSError:
+        return str(path)
 
 
 def _dedupe(values: list[str]) -> list[str]:

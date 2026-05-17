@@ -129,6 +129,20 @@ class LastPublishState:
 
 
 @dataclass(slots=True)
+class OperatorStatusState:
+    kind: str
+    status_text: str
+    next_action: str
+    last_publish_title: str = ""
+    last_publish_offer_id: str = ""
+    last_publish_message_id: int | None = None
+    last_publish_telegram_verified: bool | None = None
+    current_preview_title: str = ""
+    current_preview_offer_id: str = ""
+    current_post_type_label: str = ""
+
+
+@dataclass(slots=True)
 class PreviewState:
     project_root: Path
     status_text: str
