@@ -97,8 +97,15 @@ goto :execute_from_root
 :publish_previewed
 call :resolve_python
 if errorlevel 1 exit /b 1
-set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli publish-previewed %1 %2 %3 %4 %5 %6 %7 %8 %9
-goto :execute_from_root
+pushd "%ROOT%" >nul
+if errorlevel 1 (
+    echo [YOTO] Failed to enter bundle root: %ROOT%
+    exit /b 1
+)
+call "%YOTO_PYTHON%" -m dealbot.operator_cli publish-previewed %1 %2 %3 %4 %5 %6 %7 %8 %9
+set "EXIT_CODE=%ERRORLEVEL%"
+popd >nul
+exit /b %EXIT_CODE%
 
 :daily_check
 call :resolve_python
@@ -331,6 +338,7 @@ echo   yoto.bat test-video
 echo   yoto.bat video-smoke
 echo.
 echo Publish-capable or state-changing commands:
+echo   yoto.bat publish-previewed --from-report [truth report path]
 echo   yoto.bat send-test
 echo   yoto.bat send-test-offline
 echo   yoto.bat send-test-golden
