@@ -5,6 +5,7 @@ from typing import Any
 
 from .models import (
     ArtifactBundle,
+    PinnedPublishState,
     PreviewFingerprint,
     PreviewPaths,
     PreviewState,
@@ -19,13 +20,16 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
     verdict = _as_dict(truth.get("verdict"))
     selection = _as_dict(truth.get("selection"))
     target = _as_dict(truth.get("send_test_target"))
+    pinned_publish_payload = _as_dict(truth.get("pinned_publish"))
+    pinned_candidate = _as_dict(pinned_publish_payload.get("candidate"))
     artifact = _as_dict(target.get("artifact"))
-    candidate = _select_candidate(workflow, selection, target)
-    card_path = _path_or_none(artifact.get("image_path") or workflow.get("card_path"))
-    caption_html = _text(artifact.get("caption_html"))
-    caption_preview = _text(artifact.get("caption_preview") or workflow.get("caption_preview"))
-    card_family = _text(artifact.get("card_family")).upper()
-    template_id = _text(artifact.get("template_id"))
+    pinned_publish = _build_pinned_publish(pinned_publish_payload, pinned_candidate)
+    candidate = _select_candidate(workflow, selection, target, pinned_candidate)
+    card_path = _path_or_none(artifact.get("image_path") or pinned_publish.image_path or workflow.get("card_path"))
+    caption_html = _text(artifact.get("caption_html") or pinned_publish.caption_html)
+    caption_preview = _text(artifact.get("caption_preview") or pinned_publish.caption_preview or workflow.get("caption_preview"))
+    card_family = _text(artifact.get("card_family") or pinned_publish.card_family).upper()
+    template_id = _text(artifact.get("template_id") or pinned_publish.template_id)
     post_type_key, post_type_label = _derive_post_type(candidate, card_family, template_id)
     warnings = list(bundle.warnings)
     if card_path is None:
@@ -44,7 +48,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         command_status=_text(workflow.get("status")),
     )
     selected_target = _build_selected_target(candidate)
-    report_path = bundle.truth_report_path or bundle.workflow_path
+    report_path = bundle.truth_report_path
     state = PreviewState(
         project_root=bundle.project_root,
         status_text=status_text,
@@ -56,7 +60,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         selected_target=selected_target,
         caption_html=caption_html,
         caption_preview=caption_preview,
-        caption_hash=_text(artifact.get("caption_hash")) or None,
+        caption_hash=_text(artifact.get("caption_hash") or pinned_publish.caption_hash) or None,
         card_path=card_path,
         card_exists=bool(card_path and card_path.exists()),
         blocker_category=_text(verdict.get("blocker_category")) or None,
@@ -65,10 +69,11 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         ingest_sources=_build_ingest_sources(truth),
         paths=PreviewPaths(
             workflow_path=bundle.workflow_path,
-            truth_report_path=report_path,
+            truth_report_path=bundle.truth_report_path,
             image_path=card_path,
             latest_snapshot_manifest_path=bundle.latest_snapshot_manifest_path,
             latest_publish_outcome_path=bundle.latest_publish_outcome_path,
+            latest_publish_workflow_path=bundle.latest_publish_workflow_path,
             output_dir=bundle.output_dir,
         ),
         ambiguous=bundle.ambiguous,
@@ -77,15 +82,24 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         run_key=_text(truth.get("run_key")) or None,
         created_at=_text(truth.get("created_at")) or None,
         command_status=_text(workflow.get("status")),
-        report_exists=bool(report_path and report_path.exists()),
+        report_exists=bool(bundle.truth_report_path and bundle.truth_report_path.exists()),
+        pinned_publish=pinned_publish,
     )
+    fingerprint_report_path = state.paths.truth_report_path
+    fingerprint_offer_id = pinned_publish.offer_id or (state.selected_target.offer_id if state.selected_target else None)
+    fingerprint_caption_hash = pinned_publish.caption_hash or state.caption_hash
+    fingerprint_image_path = pinned_publish.image_path or state.card_path
     state.fingerprint = PreviewFingerprint(
         workflow_path=bundle.workflow_path,
         truth_report_path=state.paths.truth_report_path,
+        report_path=fingerprint_report_path,
         run_key=state.run_key,
-        selected_offer_id=state.selected_target.offer_id if state.selected_target else None,
-        caption_hash=state.caption_hash,
-        image_path=state.card_path,
+        offer_id=fingerprint_offer_id,
+        selected_offer_id=fingerprint_offer_id,
+        idempotency_key=pinned_publish.idempotency_key,
+        caption_hash=fingerprint_caption_hash,
+        image_hash=pinned_publish.image_hash,
+        image_path=fingerprint_image_path,
     )
     return state
 
@@ -94,14 +108,46 @@ def _select_candidate(
     workflow: dict[str, Any],
     selection: dict[str, Any],
     target: dict[str, Any],
+    pinned_candidate: dict[str, Any],
 ) -> dict[str, Any]:
     candidate = _as_dict(target.get("candidate"))
     if candidate:
         return candidate
+    if pinned_candidate:
+        return pinned_candidate
     candidate = _as_dict(selection.get("selected_candidate"))
     if candidate:
         return candidate
     return _as_dict(workflow.get("selected"))
+
+
+def _build_pinned_publish(payload: dict[str, Any], candidate: dict[str, Any]) -> PinnedPublishState:
+    if not payload:
+        return PinnedPublishState()
+    artifact = _as_dict(payload.get("artifact"))
+    validation = _as_dict(payload.get("validation"))
+    return PinnedPublishState(
+        contract_version=_int_or_none(payload.get("contract_version")),
+        source=_text(payload.get("source")),
+        created_at=_text(payload.get("created_at")) or None,
+        report_run_key=_text(payload.get("report_run_key")) or None,
+        offer_id=_text(artifact.get("offer_id") or candidate.get("offer_id")) or None,
+        title=_text(candidate.get("title")),
+        idempotency_key=_text(artifact.get("idempotency_key")) or None,
+        caption_html=_text(artifact.get("caption_html")),
+        caption_preview=_text(artifact.get("caption_preview")),
+        caption_hash=_text(artifact.get("caption_hash")) or None,
+        image_path=_path_or_none(artifact.get("image_path")),
+        image_hash=_text(artifact.get("image_hash")) or None,
+        template_id=_text(artifact.get("template_id")) or None,
+        card_family=_text(artifact.get("card_family")) or None,
+        assets_used=[_text(item) for item in list(artifact.get("assets_used") or []) if _text(item)],
+        render_diagnostics=_as_dict(artifact.get("render_diagnostics")),
+        caption_debug=_as_dict(artifact.get("caption_debug")),
+        image_exists=bool(validation.get("image_exists")),
+        caption_hash_verified=bool(validation.get("caption_hash_verified")),
+        image_hash_verified=bool(validation.get("image_hash_verified")),
+    )
 
 
 def _build_selected_target(candidate: dict[str, Any]) -> SelectedTarget | None:

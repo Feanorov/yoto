@@ -51,12 +51,50 @@ def test_build_preview_state_maps_discount_preview_payload(tmp_path: Path) -> No
                     "store_url": "https://store.steampowered.com/app/227300/Euro_Truck_Simulator_2/",
                 },
                 "artifact": {
+                    "offer_id": "steam:227300",
                     "image_path": str(card_path),
                     "caption_html": "<b>Euro Truck Simulator 2</b>",
                     "caption_preview": "Euro Truck Simulator 2 preview",
                     "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
                     "card_family": "DISCOUNT",
                     "template_id": "steam_discount",
+                },
+            },
+            "pinned_publish": {
+                "contract_version": 1,
+                "source": "preview",
+                "created_at": "2026-05-16T16:26:37",
+                "report_run_key": "20260516T162637Z",
+                "candidate": {
+                    "title": "Euro Truck Simulator 2",
+                    "offer_id": "steam:227300",
+                },
+                "offer_snapshot": {
+                    "offer_id": "steam:227300",
+                },
+                "decision_snapshot": {
+                    "lane": "high_value_discount",
+                },
+                "artifact": {
+                    "offer_id": "steam:227300",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Euro Truck Simulator 2</b>",
+                    "caption_preview": "Euro Truck Simulator 2 preview",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
+                    "template_id": "steam_discount",
+                    "card_family": "DISCOUNT",
+                    "assets_used": ["https://example.com/hero.png"],
+                    "render_diagnostics": {"source": "test"},
+                    "caption_debug": {"provider": "test"},
+                },
+                "validation": {
+                    "image_exists": True,
+                    "caption_hash_verified": True,
+                    "image_hash_verified": True,
                 },
             },
             "verdict": {
@@ -76,6 +114,20 @@ def test_build_preview_state_maps_discount_preview_payload(tmp_path: Path) -> No
     assert state.card_exists is True
     assert state.caption_html == "<b>Euro Truck Simulator 2</b>"
     assert [item.name for item in state.ingest_sources] == ["steam", "epic"]
+    assert state.pinned_publish.contract_version == 1
+    assert state.pinned_publish.idempotency_key == "preview-key"
+    assert state.pinned_publish.caption_hash == "caption-hash"
+    assert state.pinned_publish.image_hash == "image-hash"
+    assert state.pinned_publish.image_exists is True
+    assert state.pinned_publish.caption_hash_verified is True
+    assert state.pinned_publish.image_hash_verified is True
+    assert state.fingerprint is not None
+    assert state.fingerprint.report_path == bundle.truth_report_path
+    assert state.fingerprint.offer_id == "steam:227300"
+    assert state.fingerprint.idempotency_key == "preview-key"
+    assert state.fingerprint.caption_hash == "caption-hash"
+    assert state.fingerprint.image_hash == "image-hash"
+    assert state.fingerprint.image_path == card_path
 
 
 def test_preview_artifact_resolver_marks_ambiguous_preview_run(tmp_path: Path) -> None:

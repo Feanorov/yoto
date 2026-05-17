@@ -53,6 +53,31 @@ class PreviewArtifactResolver:
             warnings=warnings,
         )
 
+    def load_publish_previewed_workflow(
+        self,
+        *,
+        started_at: float,
+        source_report_path: Path | None = None,
+    ) -> tuple[Path | None, dict[str, Any] | None]:
+        candidates = self._find_since(self.analytics_dir, "*_operator_workflow_publish-previewed.json", started_at)
+        if not candidates:
+            return None, None
+        if source_report_path is not None:
+            expected_report_path = str(source_report_path.resolve())
+            matching: list[tuple[Path, dict[str, Any]]] = []
+            for path in candidates:
+                payload = self._load_json(path)
+                if payload is None:
+                    continue
+                actual_report_path = str(payload.get("source_report_path") or "").strip()
+                if actual_report_path == expected_report_path:
+                    matching.append((path, payload))
+            if matching:
+                workflow_path, payload = max(matching, key=lambda item: self._sort_key(item[0]))
+                return workflow_path, payload
+        workflow_path = max(candidates, key=self._sort_key)
+        return workflow_path, self._load_json(workflow_path)
+
     def is_preview_stale(self, fingerprint: PreviewFingerprint | None) -> bool:
         if fingerprint is None or fingerprint.workflow_path is None:
             return False
@@ -87,6 +112,10 @@ class PreviewArtifactResolver:
             self.analytics_dir,
             ("*_publish_outcome_*.json",),
         )
+        latest_publish_workflow_path = self._find_newest(
+            self.analytics_dir,
+            ("*_operator_workflow_publish-previewed.json",),
+        )
         return ArtifactBundle(
             project_root=self.project_root,
             output_dir=self.output_dir,
@@ -96,6 +125,7 @@ class PreviewArtifactResolver:
             truth_payload=truth_payload,
             latest_snapshot_manifest_path=latest_snapshot_manifest_path,
             latest_publish_outcome_path=latest_publish_outcome_path,
+            latest_publish_workflow_path=latest_publish_workflow_path,
             ambiguous=ambiguous,
             stale=stale,
             warnings=list(warnings or ()),

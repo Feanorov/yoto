@@ -5,9 +5,6 @@ from pathlib import Path
 from typing import Any
 
 
-SEND_DISABLED_REASON = "Disabled: send-test is not preview-pinned yet; backend may replan before publish."
-
-
 @dataclass(slots=True)
 class SourceHealth:
     name: str
@@ -36,6 +33,7 @@ class PreviewPaths:
     image_path: Path | None = None
     latest_snapshot_manifest_path: Path | None = None
     latest_publish_outcome_path: Path | None = None
+    latest_publish_workflow_path: Path | None = None
     output_dir: Path | None = None
 
 
@@ -43,9 +41,13 @@ class PreviewPaths:
 class PreviewFingerprint:
     workflow_path: Path | None = None
     truth_report_path: Path | None = None
+    report_path: Path | None = None
     run_key: str | None = None
+    offer_id: str | None = None
     selected_offer_id: str | None = None
+    idempotency_key: str | None = None
     caption_hash: str | None = None
+    image_hash: str | None = None
     image_path: Path | None = None
 
 
@@ -59,9 +61,42 @@ class ArtifactBundle:
     truth_payload: dict[str, Any] | None = None
     latest_snapshot_manifest_path: Path | None = None
     latest_publish_outcome_path: Path | None = None
+    latest_publish_workflow_path: Path | None = None
     ambiguous: bool = False
     stale: bool = False
     warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class PinnedPublishState:
+    contract_version: int | None = None
+    source: str = ""
+    created_at: str | None = None
+    report_run_key: str | None = None
+    offer_id: str | None = None
+    title: str = ""
+    idempotency_key: str | None = None
+    caption_html: str = ""
+    caption_preview: str = ""
+    caption_hash: str | None = None
+    image_path: Path | None = None
+    image_hash: str | None = None
+    template_id: str | None = None
+    card_family: str | None = None
+    assets_used: list[str] = field(default_factory=list)
+    render_diagnostics: dict[str, Any] = field(default_factory=dict)
+    caption_debug: dict[str, Any] = field(default_factory=dict)
+    image_exists: bool = False
+    caption_hash_verified: bool = False
+    image_hash_verified: bool = False
+
+    @property
+    def present(self) -> bool:
+        return self.contract_version is not None
+
+    @property
+    def supported_contract(self) -> bool:
+        return self.contract_version == 1
 
 
 @dataclass(slots=True)
@@ -91,6 +126,7 @@ class PreviewState:
     created_at: str | None = None
     command_status: str = ""
     report_exists: bool = False
+    pinned_publish: PinnedPublishState = field(default_factory=PinnedPublishState)
     fingerprint: PreviewFingerprint | None = None
 
     @classmethod
