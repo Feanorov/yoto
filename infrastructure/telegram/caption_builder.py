@@ -947,7 +947,8 @@ class TelegramCaptionBuilder:
 
         self._append_body_line(lines, body_lines, copy.get('summary', ''))
         self._append_body_line(lines, body_lines, self._build_steam_discount_value_line_v2(offer))
-        self._append_body_line(lines, body_lines, self._build_supporting_line(offer))
+        for meta_line in self._build_discount_meta_lines(offer):
+            self._append_body_line(lines, body_lines, meta_line)
         self._append_body_line(lines, body_lines, self._build_cta(offer, decision_json, voice))
 
         lines.append(' '.join(hashtags))
@@ -1489,6 +1490,53 @@ class TelegramCaptionBuilder:
         if offer.has_trading_cards:
             bits.append('є картки')
         return ' • '.join(bits[:3])
+
+    def _build_discount_meta_lines(self, offer: Offer) -> list[str]:
+        meta_lines: list[str] = []
+        review_line = self._build_discount_review_line(offer)
+        if review_line:
+            meta_lines.append(review_line)
+        meta_lines.append(self._build_discount_achievements_cards_line(offer))
+        return meta_lines
+
+    def _build_discount_achievements_cards_line(self, offer: Offer) -> str:
+        achievements_label = self._build_discount_achievements_label(offer.achievements_count)
+        cards_label = self._build_discount_cards_label(offer.has_trading_cards)
+        return f'{achievements_label} • {cards_label}'
+
+    @staticmethod
+    def _build_discount_review_line(offer: Offer) -> str:
+        reviews_short = format_compact_review_count(offer.review_count)
+        if reviews_short and offer.review_score is not None:
+            return f'{reviews_short} відгуків • {offer.review_score}% позитивних'
+        if reviews_short:
+            return f'{reviews_short} відгуків'
+        if offer.review_score is not None:
+            return f'{offer.review_score}% позитивних'
+        return ''
+
+    @staticmethod
+    def _build_discount_achievements_label(count: object) -> str:
+        parsed_count = TelegramCaptionBuilder._parse_positive_int(count)
+        if parsed_count is None:
+            return 'досягнень немає'
+        return f'{parsed_count} досягнень'
+
+    @staticmethod
+    def _build_discount_cards_label(has_cards: object) -> str:
+        return 'є картки' if has_cards is True else 'карток немає'
+
+    @staticmethod
+    def _parse_positive_int(value: object) -> int | None:
+        if isinstance(value, bool):
+            return None
+        try:
+            parsed = int(value)
+        except (TypeError, ValueError):
+            return None
+        if parsed <= 0:
+            return None
+        return parsed
 
     @staticmethod
     def _build_review_bit(offer: Offer) -> str:

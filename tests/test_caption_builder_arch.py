@@ -104,13 +104,19 @@ def make_festival_offer(
     return offer
 
 
+def split_caption_blocks(caption: str) -> list[str]:
+    return [clean_html_text(block).strip() for block in caption.split('\n\n') if block.strip()]
+
+
 def test_steam_caption_has_clickable_title_and_price() -> None:
     builder = TelegramCaptionBuilder(1024)
     caption, hashtags = builder.build(make_offer(), make_decision())
+    blocks = split_caption_blocks(caption)
 
     assert '<a href="https://store.steampowered.com/app/10"><b>Test Game</b></a>' in caption
     assert 'Зараз <a href="https://store.steampowered.com/app/10">112 грн</a> замість 225 грн (-50%, економія 113 грн).' in caption
-    assert '89% позитивних • 1.2к+ відгуків • 42 досягнень • є картки' in caption
+    assert blocks[3] == '1.2к+ відгуків • 89% позитивних'
+    assert blocks[4] == '42 досягнень • є картки'
     assert 'Спецпропозиція у Steam' not in caption
     assert len(caption) <= 1024
     assert hashtags == ['#steam', '#steamsale']
@@ -242,9 +248,11 @@ def test_discount_caption_v2_uses_compact_social_proof_and_removes_banned_filler
 
     builder = TelegramCaptionBuilder(1024)
     caption, _ = builder.build(offer, make_decision())
+    blocks = split_caption_blocks(caption)
 
     assert '185333' not in caption
-    assert '81% позитивних • 185к+ відгуків • 72 досягнень • є картки' in caption
+    assert blocks[3] == '185к+ відгуків • 81% позитивних'
+    assert blocks[4] == '72 досягнень • є картки'
     assert 'Йото радить звернути увагу' not in caption
     assert 'Йото радить не проходити повз' not in caption
     assert 'жанровий акцент чіткий' not in caption
@@ -252,7 +260,7 @@ def test_discount_caption_v2_uses_compact_social_proof_and_removes_banned_filler
     assert 'цінник уже дає привід повернутися' not in caption
 
 
-def test_discount_caption_v2_omits_missing_optional_meta_cleanly() -> None:
+def test_discount_caption_v2_renders_explicit_absence_when_optional_meta_is_missing() -> None:
     offer = make_offer()
     offer.review_score = 86
     offer.review_count = 126116
@@ -261,11 +269,69 @@ def test_discount_caption_v2_omits_missing_optional_meta_cleanly() -> None:
 
     builder = TelegramCaptionBuilder(1024)
     caption, _ = builder.build(offer, make_decision())
+    blocks = split_caption_blocks(caption)
 
-    assert '86% позитивних • 126к+ відгуків' in caption
-    assert 'досягнень' not in caption
-    assert 'є картки' not in caption
+    assert blocks[3] == '126к+ відгуків • 86% позитивних'
+    assert blocks[4] == 'досягнень немає • карток немає'
     assert '• •' not in caption
+    assert ' • \n' not in caption
+
+
+def test_discount_caption_v2_handles_all_achievement_and_card_combinations() -> None:
+    builder = TelegramCaptionBuilder(1024)
+    cases = [
+        (17, True, '17 досягнень • є картки'),
+        (0, True, 'досягнень немає • є картки'),
+        (42, False, '42 досягнень • карток немає'),
+        (None, None, 'досягнень немає • карток немає'),
+    ]
+
+    for achievements_count, has_trading_cards, expected_meta_line in cases:
+        offer = make_offer()
+        offer.achievements_count = achievements_count
+        offer.has_trading_cards = has_trading_cards
+
+        caption, _ = builder.build(offer, make_decision())
+        blocks = split_caption_blocks(caption)
+
+        assert blocks[3] == '1.2к+ відгуків • 89% позитивних'
+        assert blocks[4] == expected_meta_line
+        assert '• •' not in caption
+        assert ' • \n' not in caption
+        assert not any(line.endswith('•') for line in caption.splitlines())
+
+
+def test_discount_caption_v2_treats_zero_string_and_invalid_achievements_as_absent() -> None:
+    builder = TelegramCaptionBuilder(1024)
+
+    zero_offer = make_offer()
+    zero_offer.achievements_count = '0'
+    zero_offer.has_trading_cards = True
+    zero_caption, _ = builder.build(zero_offer, make_decision())
+    zero_blocks = split_caption_blocks(zero_caption)
+
+    invalid_offer = make_offer()
+    invalid_offer.achievements_count = 'unknown'
+    invalid_offer.has_trading_cards = None
+    invalid_caption, _ = builder.build(invalid_offer, make_decision())
+    invalid_blocks = split_caption_blocks(invalid_caption)
+
+    assert zero_blocks[4] == 'досягнень немає • є картки'
+    assert invalid_blocks[4] == 'досягнень немає • карток немає'
+
+
+def test_freebie_caption_keeps_existing_supporting_line_layout() -> None:
+    offer = make_offer()
+    offer.offer_kind = OfferKind.FREEBIE
+    offer.price_before_minor = 22500
+    offer.price_after_minor = 0
+    offer.discount_percent = 100
+
+    builder = TelegramCaptionBuilder(1024)
+    caption, _ = builder.build(offer, make_decision(lane='breaking_freebie', template_id='steam_free'))
+
+    assert '89% позитивних • 1.2к+ відгуків • 42 досягнень • є картки' in caption
+    assert '1.2к+ відгуків • 89% позитивних' not in caption
 
 
 def test_indirect_recommend_caption_rejects_store_fragments_and_english_dump() -> None:
@@ -445,7 +511,7 @@ def test_high_value_discount_uses_indirect_voice_without_explicit_yoto() -> None
     assert 'Йото' not in caption
     assert not any(phrase in caption for phrase in INDIRECT_HOOK_POOLS['finder'])
     assert 'Зараз <a href="https://store.steampowered.com/app/10">112 грн</a> замість 225 грн (-50%, економія 113 грн).' in caption
-    assert '89% позитивних • 1.2к+ відгуків' in caption
+    assert '1.2к+ відгуків • 89% позитивних' in caption
 
 
 def test_backlog_discount_stays_neutral_without_voice_signal() -> None:
