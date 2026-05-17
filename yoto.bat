@@ -24,6 +24,7 @@ if /I "%ACTION%"=="preview-golden" goto :preview_golden
 if /I "%ACTION%"=="send-test" goto :send_test
 if /I "%ACTION%"=="send-test-offline" goto :send_test_offline
 if /I "%ACTION%"=="send-test-golden" goto :send_test_golden
+if /I "%ACTION%"=="publish-previewed" goto :publish_previewed
 if /I "%ACTION%"=="daily-check" goto :daily_check
 if /I "%ACTION%"=="doctor" goto :doctor
 if /I "%ACTION%"=="status" goto :doctor
@@ -91,6 +92,12 @@ goto :execute_from_root
 call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli send-test --offline-snapshot golden %1 %2 %3 %4 %5 %6 %7 %8 %9
+goto :execute_from_root
+
+:publish_previewed
+call :resolve_python
+if errorlevel 1 exit /b 1
+set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli publish-previewed %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto :execute_from_root
 
 :daily_check

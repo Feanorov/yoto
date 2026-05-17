@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import argparse
+import asyncio
 from dataclasses import asdict, dataclass
 from datetime import datetime
 import json
@@ -11,9 +12,12 @@ import time
 from types import SimpleNamespace
 from typing import Any, Callable
 
-from dealbot.settings import load_project_env, render_bootstrap_diagnostics
+from application.use_cases.publish_previewed import PublishPreviewedResult, PublishPreviewedUseCase
+from dealbot.settings import AppSettings, load_project_env, render_bootstrap_diagnostics
 from domain.entities.analytics_artifact import AnalyticsArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
+from infrastructure.db.repositories import Repositories
+from infrastructure.telegram.publisher import TelegramPublisher
 from video_generator.application.use_cases.build_voice_ready_package import BuildVoiceReadyPackageResult
 from video_generator.cli import build_voice_ready_use_case
 
@@ -64,6 +68,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         const='latest',
         default=None,
         help='Replay send-test from an offline snapshot instead of live ingest.',
+    )
+
+    publish_previewed_parser = subparsers.add_parser(
+        'publish-previewed',
+        help='Publish exactly the pinned preview payload from an explicit preview truth report.',
+    )
+    publish_previewed_parser.add_argument(
+        '--from-report',
+        required=True,
+        help='Path to the explicit preview truth report that contains pinned_publish.',
     )
 
     daily_check_parser = subparsers.add_parser(
@@ -470,6 +484,37 @@ def build_voice_package_summary(
     }
 
 
+def build_publish_previewed_summary(
+    *,
+    result: PublishPreviewedResult,
+    artifacts: LatestArtifacts,
+) -> dict[str, Any]:
+    next_action = 'Inspect the failure reason and refresh preview truth before retrying.'
+    if result.published:
+        next_action = 'Review the Telegram post and the publish outcome report.'
+    elif result.reason in {'publish_failed', 'db_claim_failed', 'db_mark_sent_failed', 'db_finalize_failed'}:
+        next_action = 'Inspect Telegram/outbox state, then retry publish-previewed with the same report if it is still current.'
+    return {
+        'command': 'publish-previewed',
+        'status': 'ok' if result.published else 'failed',
+        'source_report_path': str(result.source_report_path) if result.source_report_path is not None else None,
+        'source_report_run_key': result.source_report_run_key,
+        'selected': dict(result.selected or {}),
+        'idempotency_key': result.idempotency_key,
+        'caption_hash': result.caption_hash,
+        'image_hash': result.image_hash,
+        'image_path': str(result.image_path) if result.image_path is not None else None,
+        'published': result.published,
+        'message_id': result.message_id,
+        'outbox_status': result.outbox_status,
+        'reason': result.reason,
+        'publish_outcome_path': str(result.publish_outcome_path) if result.publish_outcome_path is not None else None,
+        'telegram_verified': result.published,
+        'next_action': next_action,
+        'latest_artifacts': build_latest_artifacts_payload(artifacts),
+    }
+
+
 def render_voice_package_summary(summary: dict[str, Any]) -> list[str]:
     return [
         '',
@@ -482,6 +527,29 @@ def render_voice_package_summary(summary: dict[str, Any]) -> list[str]:
         f'review: {summary.get("review_path") or "none"}',
         f'ready_for_reaper: {"yes" if summary.get("ready_for_reaper") else "no"}',
         f'warnings: {", ".join(summary.get("warnings") or []) or "none"}',
+        f'workflow_artifact: {summary.get("workflow_artifact_path") or "none"}',
+        f'next: {summary.get("next_action")}',
+    ]
+
+
+def render_publish_previewed_summary(summary: dict[str, Any]) -> list[str]:
+    selected = dict(summary.get('selected') or {})
+    return [
+        '',
+        '=== Publish Previewed Verdict ===',
+        f'status: {summary.get("status")}',
+        f'reason: {summary.get("reason") or "none"}',
+        f'source_report: {summary.get("source_report_path") or "none"}',
+        f'source_run_key: {summary.get("source_report_run_key") or "none"}',
+        f'selected_offer_id: {selected.get("offer_id") or "none"}',
+        f'idempotency_key: {summary.get("idempotency_key") or "none"}',
+        f'caption_hash: {summary.get("caption_hash") or "none"}',
+        f'image_hash: {summary.get("image_hash") or "none"}',
+        f'image_path: {summary.get("image_path") or "none"}',
+        f'published: {"yes" if summary.get("published") else "no"}',
+        f'message_id: {summary.get("message_id") or "none"}',
+        f'outbox_status: {summary.get("outbox_status") or "none"}',
+        f'publish_outcome: {summary.get("publish_outcome_path") or "none"}',
         f'workflow_artifact: {summary.get("workflow_artifact_path") or "none"}',
         f'next: {summary.get("next_action")}',
     ]
@@ -527,6 +595,13 @@ def emit_workflow_artifact(root_dir: Path, payload: dict[str, Any], *, subject_i
     if json_path is None:
         raise RuntimeError('Operator workflow artifact could not be written.')
     return json_path
+
+
+def resolve_report_path(root_dir: Path, report_value: str) -> Path:
+    candidate = Path(str(report_value or '').strip())
+    if not candidate.is_absolute():
+        candidate = root_dir / candidate
+    return candidate
 
 
 def _run_dealbot_command(
@@ -672,6 +747,31 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
         for line in render_voice_package_summary(summary):
             safe_print(line)
         return 0 if summary.get('status') == 'ok' else 1
+
+    if args.command == 'publish-previewed':
+        for line in render_bootstrap_diagnostics(load_project_env(root_dir)):
+            safe_print(line)
+        settings = AppSettings.from_env(root_dir)
+        repositories = Repositories(settings.db_path)
+        repositories.initialize()
+        use_case = PublishPreviewedUseCase(
+            repositories,
+            TelegramPublisher(settings),
+            AnalyticsArtifactWriter(settings.analytics_output_dir),
+        )
+        result = asyncio.run(
+            use_case.execute(
+                report_path=resolve_report_path(root_dir, args.from_report),
+            )
+        )
+        artifacts = discover_latest_artifacts(root_dir)
+        summary = build_publish_previewed_summary(result=result, artifacts=artifacts)
+        summary['workflow_artifact_path'] = str(
+            emit_workflow_artifact(root_dir, summary, subject_id='publish-previewed')
+        )
+        for line in render_publish_previewed_summary(summary):
+            safe_print(line)
+        return 0 if result.published else 1
 
     raise RuntimeError(f'Unknown command: {args.command}')
 

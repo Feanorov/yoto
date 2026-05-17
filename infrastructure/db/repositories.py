@@ -43,6 +43,10 @@ class OutboxRecord:
     updated_at: datetime
 
 
+class OutboxPayloadConflictError(RuntimeError):
+    """Raised when an existing outbox row does not match the requested exact payload."""
+
+
 class Repositories:
     def __init__(self, path: Path) -> None:
         self.path = path
@@ -421,6 +425,86 @@ class Repositories:
             raise RuntimeError('Outbox record was not created.')
         return record
 
+    def stage_pinned_outbox_delivery(
+        self,
+        *,
+        artifact: PostArtifact,
+        image_path: Path,
+        offer_snapshot: dict,
+        decision_json: dict,
+        meta: dict | None = None,
+    ) -> OutboxRecord:
+        now = datetime.utcnow().isoformat()
+        lane = str(decision_json.get('lane') or '').strip()
+        if not lane:
+            raise RuntimeError('Pinned decision lane is missing.')
+        payload = self._build_outbox_payload(artifact, offer_snapshot, decision_json, meta=meta)
+        with self.connect() as connection:
+            row = connection.execute(
+                'SELECT * FROM publish_outbox WHERE idempotency_key = ?',
+                (artifact.idempotency_key,),
+            ).fetchone()
+            existing = self._row_to_outbox_record(row)
+            if existing is not None:
+                self._assert_outbox_payload_matches(
+                    existing,
+                    artifact=artifact,
+                    image_path=image_path,
+                    payload=payload,
+                )
+                return existing
+
+            self._save_post_artifact(connection, artifact, lane, now)
+            try:
+                connection.execute(
+                    """
+                    INSERT INTO publish_outbox(
+                        idempotency_key, caption_hash, image_hash, image_path, telegram_message_id, published_at,
+                        payload_json, status, attempt_count, last_error, next_attempt_at, claimed_at, created_at, updated_at
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        artifact.idempotency_key,
+                        artifact.caption_hash,
+                        artifact.image_hash,
+                        str(image_path),
+                        artifact.telegram_message_id,
+                        None,
+                        json.dumps(payload, ensure_ascii=False, sort_keys=True),
+                        'pending',
+                        0,
+                        None,
+                        None,
+                        None,
+                        now,
+                        now,
+                    ),
+                )
+            except sqlite3.IntegrityError as exc:
+                row = connection.execute(
+                    'SELECT * FROM publish_outbox WHERE idempotency_key = ?',
+                    (artifact.idempotency_key,),
+                ).fetchone()
+                existing = self._row_to_outbox_record(row)
+                if existing is None:
+                    raise
+                self._assert_outbox_payload_matches(
+                    existing,
+                    artifact=artifact,
+                    image_path=image_path,
+                    payload=payload,
+                )
+                return existing
+            row = connection.execute(
+                'SELECT * FROM publish_outbox WHERE idempotency_key = ?',
+                (artifact.idempotency_key,),
+            ).fetchone()
+
+        record = self._row_to_outbox_record(row)
+        if record is None:
+            raise RuntimeError('Pinned outbox record was not staged.')
+        return record
+
     def stage_outbox_delivery(
         self,
         queue_row_id: int,
@@ -685,17 +769,48 @@ class Repositories:
         artifact: PostArtifact,
         offer_snapshot: dict | None,
         decision_json: dict | None,
+        meta: dict | None = None,
     ) -> dict:
         render_inputs = artifact.render_inputs or {}
         stable_offer = offer_snapshot or render_inputs.get('offer')
         stable_decision = decision_json or render_inputs.get('decision')
-        return {
+        payload = {
             'schema_version': 1,
             'offer_id': artifact.offer_id,
             'artifact': asdict(artifact),
             'offer': stable_offer,
             'decision': stable_decision,
         }
+        if isinstance(meta, dict) and meta:
+            payload['meta'] = dict(meta)
+        return payload
+
+    @staticmethod
+    def _normalize_outbox_payload_for_compare(payload: dict | None) -> dict:
+        normalized = json.loads(json.dumps(dict(payload or {}), ensure_ascii=False, sort_keys=True))
+        normalized.pop('meta', None)
+        return normalized
+
+    def _assert_outbox_payload_matches(
+        self,
+        existing: OutboxRecord,
+        *,
+        artifact: PostArtifact,
+        image_path: Path,
+        payload: dict,
+    ) -> None:
+        existing_image_path = str(existing.image_path) if existing.image_path else None
+        requested_image_path = str(image_path)
+        if existing.caption_hash != artifact.caption_hash:
+            raise OutboxPayloadConflictError('idempotency_conflict')
+        if existing.image_hash != artifact.image_hash:
+            raise OutboxPayloadConflictError('idempotency_conflict')
+        if existing_image_path != requested_image_path:
+            raise OutboxPayloadConflictError('idempotency_conflict')
+        existing_payload = self._normalize_outbox_payload_for_compare(existing.payload_json)
+        requested_payload = self._normalize_outbox_payload_for_compare(payload)
+        if existing_payload != requested_payload:
+            raise OutboxPayloadConflictError('idempotency_conflict')
 
     def _record_publication(
         self,
