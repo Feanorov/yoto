@@ -8,10 +8,13 @@ from pathlib import Path
 from dealbot.operator_cli import (
     LatestArtifacts,
     _run_dealbot_command,
+    build_doctor_summary,
     build_truth_summary,
     build_voice_package_summary,
     discover_latest_artifacts,
     emit_workflow_artifact,
+    load_json,
+    render_doctor_summary,
 )
 from video_generator.application.use_cases.build_voice_ready_package import BuildVoiceReadyPackageResult
 
@@ -23,10 +26,18 @@ def _touch(path: Path, *, mtime: int, content: str = '{}') -> Path:
     return path
 
 
+def _write_json(path: Path, payload: dict, *, mtime: int) -> Path:
+    return _touch(path, mtime=mtime, content=json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
+
+
 def test_discover_latest_artifacts_prefers_newest_paths(tmp_path: Path) -> None:
     root = tmp_path
     older_truth = _touch(root / 'output' / 'analytics' / '20260320T010000Z_operator_truth_report_preview.json', mtime=10)
     newer_truth = _touch(root / 'output' / 'analytics' / '20260320T020000Z_operator_truth_report_preview.json', mtime=20)
+    publish_previewed_workflow = _touch(
+        root / 'output' / 'analytics' / '20260320T020500Z_operator_workflow_publish-previewed.json',
+        mtime=25,
+    )
     older_card = _touch(root / 'output' / 'cards' / 'older.png', mtime=10)
     newer_card = _touch(root / 'output' / 'cards' / 'nested' / 'newer.png', mtime=30)
     caption_review = _touch(root / 'output' / 'captions' / 'freeze_review_1' / 'review.md', mtime=25)
@@ -39,6 +50,7 @@ def test_discover_latest_artifacts_prefers_newest_paths(tmp_path: Path) -> None:
     artifacts = discover_latest_artifacts(root)
 
     assert artifacts.operator_truth_report == newer_truth
+    assert artifacts.latest_publish_previewed_workflow == publish_previewed_workflow
     assert artifacts.latest_card == newer_card
     assert artifacts.latest_caption_review == caption_review
     assert artifacts.latest_video_manifest == video_manifest
@@ -48,6 +60,207 @@ def test_discover_latest_artifacts_prefers_newest_paths(tmp_path: Path) -> None:
     assert artifacts.latest_operator_workflow == workflow
     assert artifacts.operator_truth_report != older_truth
     assert artifacts.latest_card != older_card
+
+
+def test_build_doctor_summary_still_reports_preview_truth_without_publish_previewed(tmp_path: Path) -> None:
+    report_path = _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075511Z_operator_truth_report_preview.json',
+        {
+            'mode': 'preview',
+            'created_at': '2026-05-17T07:55:11',
+            'verdict': {
+                'verdict': 'truthful_send_test_ready',
+                'truth_ready': True,
+                'telegram_verified': False,
+            },
+            'send_test_target': {
+                'would_send': True,
+                'candidate': {
+                    'offer_id': 'steam:264710',
+                    'title': 'Subnautica',
+                    'bucket': 'planned',
+                    'lane': 'high_value_discount',
+                    'content_family': 'discount',
+                    'source': 'steam',
+                    'row_id': 1307,
+                },
+                'artifact': {
+                    'image_path': 'D:\\Telegram_portable_bundle\\output\\cards\\subnautica.png',
+                    'caption_preview': 'Subnautica preview caption',
+                },
+            },
+        },
+        mtime=10,
+    )
+    artifacts = discover_latest_artifacts(tmp_path)
+    summary = build_doctor_summary(
+        report_path=report_path,
+        payload=load_json(report_path),
+        artifacts=artifacts,
+    )
+    lines = render_doctor_summary(summary)
+
+    assert summary['truth_ready'] is True
+    assert summary['telegram_verified'] is False
+    assert summary['published'] is False
+    assert summary['next_action'] == 'The latest truth looks send-test ready. Review the selected target, then run yoto.bat send-test.'
+    assert summary['latest_publish_previewed'] == {}
+    assert all('latest_publish_previewed:' not in line for line in lines)
+
+
+def test_build_doctor_summary_detects_successful_bound_publish_previewed(tmp_path: Path) -> None:
+    report_path = _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075511Z_operator_truth_report_preview.json',
+        {
+            'mode': 'preview',
+            'created_at': '2026-05-17T07:55:11',
+            'verdict': {
+                'verdict': 'truthful_send_test_ready',
+                'truth_ready': True,
+                'telegram_verified': False,
+            },
+            'send_test_target': {
+                'would_send': True,
+                'candidate': {
+                    'offer_id': 'steam:264710',
+                    'title': 'Subnautica',
+                    'bucket': 'planned',
+                    'lane': 'high_value_discount',
+                    'content_family': 'discount',
+                    'source': 'steam',
+                    'row_id': 1307,
+                },
+                'artifact': {
+                    'image_path': 'D:\\Telegram_portable_bundle\\output\\cards\\subnautica.png',
+                    'caption_preview': 'Subnautica preview caption',
+                },
+            },
+        },
+        mtime=10,
+    )
+    publish_outcome_path = _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075954Z_publish_outcome_steam_264710.json',
+        {
+            'offer_id': 'steam:264710',
+            'message_id': 182,
+            'published': True,
+        },
+        mtime=20,
+    )
+    _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075955Z_operator_workflow_publish-previewed.json',
+        {
+            'command': 'publish-previewed',
+            'status': 'ok',
+            'reason': 'published',
+            'published': True,
+            'telegram_verified': True,
+            'message_id': 182,
+            'source_report_path': str(report_path.resolve()),
+            'publish_outcome_path': str(publish_outcome_path.resolve()),
+            'selected': {
+                'offer_id': 'steam:264710',
+                'title': 'Subnautica',
+                'bucket': 'planned',
+                'lane': 'high_value_discount',
+                'source': 'steam',
+                'row_id': 1307,
+            },
+        },
+        mtime=21,
+    )
+
+    artifacts = discover_latest_artifacts(tmp_path)
+    summary = build_doctor_summary(
+        report_path=report_path,
+        payload=load_json(report_path),
+        artifacts=artifacts,
+    )
+    lines = render_doctor_summary(summary)
+    rendered = '\n'.join(lines)
+
+    assert summary['published'] is True
+    assert summary['telegram_verified'] is True
+    assert summary['message_id'] == 182
+    assert summary['next_action'] == 'Review the Telegram post, then run preview for the next post.'
+    assert summary['latest_publish_previewed']['success'] is True
+    assert summary['latest_publish_previewed']['bound_to_latest_report'] is True
+    assert 'run yoto.bat send-test' not in summary['next_action']
+    assert 'latest_publish_previewed: yes' in rendered
+    assert 'published: yes' in rendered
+    assert 'telegram_verified: yes' in rendered
+    assert 'message_id: 182' in rendered
+    assert f'source_report: {report_path.resolve()}' in rendered
+    assert f'publish_outcome: {publish_outcome_path.resolve()}' in rendered
+    assert 'selected: Subnautica / steam:264710' in rendered
+
+
+def test_build_doctor_summary_reports_failed_publish_previewed_without_hiding_preview_state(tmp_path: Path) -> None:
+    report_path = _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075511Z_operator_truth_report_preview.json',
+        {
+            'mode': 'preview',
+            'created_at': '2026-05-17T07:55:11',
+            'verdict': {
+                'verdict': 'truthful_send_test_ready',
+                'truth_ready': True,
+                'telegram_verified': False,
+            },
+            'send_test_target': {
+                'would_send': True,
+                'candidate': {
+                    'offer_id': 'steam:264710',
+                    'title': 'Subnautica',
+                    'bucket': 'planned',
+                    'lane': 'high_value_discount',
+                    'content_family': 'discount',
+                    'source': 'steam',
+                    'row_id': 1307,
+                },
+                'artifact': {
+                    'image_path': 'D:\\Telegram_portable_bundle\\output\\cards\\subnautica.png',
+                    'caption_preview': 'Subnautica preview caption',
+                },
+            },
+        },
+        mtime=10,
+    )
+    _write_json(
+        tmp_path / 'output' / 'analytics' / '20260517T075955Z_operator_workflow_publish-previewed.json',
+        {
+            'command': 'publish-previewed',
+            'status': 'failed',
+            'reason': 'image_missing',
+            'published': False,
+            'telegram_verified': False,
+            'message_id': None,
+            'source_report_path': str(report_path.resolve()),
+            'publish_outcome_path': None,
+            'selected': {
+                'offer_id': 'steam:264710',
+                'title': 'Subnautica',
+            },
+        },
+        mtime=21,
+    )
+
+    artifacts = discover_latest_artifacts(tmp_path)
+    summary = build_doctor_summary(
+        report_path=report_path,
+        payload=load_json(report_path),
+        artifacts=artifacts,
+    )
+    rendered = '\n'.join(render_doctor_summary(summary))
+
+    assert summary['published'] is False
+    assert summary['telegram_verified'] is False
+    assert summary['next_action'] == 'The latest truth looks send-test ready. Review the selected target, then run yoto.bat send-test.'
+    assert summary['latest_publish_previewed']['success'] is False
+    assert 'latest_publish_previewed: yes' in rendered
+    assert 'status: failed' in rendered
+    assert 'reason: image_missing' in rendered
+    assert 'published: no' in rendered
+    assert 'telegram_verified: no' in rendered
 
 
 def test_build_truth_summary_reports_blocked_preview_with_next_step(tmp_path: Path) -> None:

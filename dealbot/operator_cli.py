@@ -31,6 +31,7 @@ class LatestArtifacts:
     planning_snapshot: Path | None = None
     run_diagnostics: Path | None = None
     publish_outcome: Path | None = None
+    latest_publish_previewed_workflow: Path | None = None
     latest_card: Path | None = None
     latest_caption_review: Path | None = None
     latest_video_manifest: Path | None = None
@@ -134,6 +135,7 @@ def discover_latest_artifacts(root_dir: Path) -> LatestArtifacts:
         planning_snapshot=_find_newest(analytics_dir, '*_planning_snapshot_*.json'),
         run_diagnostics=_find_newest(analytics_dir, '*_run_diagnostics_pipeline.json'),
         publish_outcome=_find_newest(analytics_dir, '*_publish_outcome_*.json'),
+        latest_publish_previewed_workflow=_find_newest(analytics_dir, '*_operator_workflow_publish-previewed.json'),
         latest_card=_find_newest(root_dir / 'output' / 'cards', ('*.png', '*.jpg', '*.jpeg', '*.webp')),
         latest_caption_review=_find_newest(root_dir / 'output' / 'captions', 'review.md'),
         latest_video_manifest=_find_newest(root_dir / 'output' / 'video_manifests', '*.json'),
@@ -381,6 +383,16 @@ def build_doctor_summary(
     summary['status'] = 'ok'
     summary['latest_truth_mode'] = payload.get('mode') if payload else None
     summary['latest_truth_created_at'] = payload.get('created_at') if payload else None
+    publish_previewed_summary = _build_publish_previewed_doctor_summary(
+        workflow_path=artifacts.latest_publish_previewed_workflow,
+        latest_report_path=report_path,
+    )
+    summary['latest_publish_previewed'] = publish_previewed_summary
+    if publish_previewed_summary.get('bound_to_latest_report') and publish_previewed_summary.get('success'):
+        summary['published'] = True
+        summary['telegram_verified'] = True
+        summary['message_id'] = publish_previewed_summary.get('message_id')
+        summary['next_action'] = 'Review the Telegram post, then run preview for the next post.'
     return summary
 
 
@@ -390,6 +402,27 @@ def render_doctor_summary(summary: dict[str, Any]) -> list[str]:
         f'latest_truth_mode: {summary.get("latest_truth_mode") or "none"}',
         f'latest_truth_created_at: {summary.get("latest_truth_created_at") or "none"}',
     ]
+    publish_previewed = dict(summary.get('latest_publish_previewed') or {})
+    if publish_previewed:
+        selected = dict(publish_previewed.get('selected') or {})
+        selected_text = 'none'
+        if selected:
+            selected_text = f'{selected.get("title") or "unknown"} / {selected.get("offer_id") or "none"}'
+        lines.extend(
+            [
+                '=== Publish-Previewed Proof ===',
+                f'latest_publish_previewed: {"yes" if publish_previewed.get("exists") else "no"}',
+                f'status: {publish_previewed.get("status") or "none"}',
+                f'reason: {publish_previewed.get("reason") or "none"}',
+                f'published: {"yes" if publish_previewed.get("published") else "no"}',
+                f'telegram_verified: {"yes" if publish_previewed.get("telegram_verified") else "no"}',
+                f'message_id: {publish_previewed.get("message_id") or "none"}',
+                f'selected: {selected_text}',
+                f'source_report: {publish_previewed.get("source_report_path") or "none"}',
+                f'publish_outcome: {publish_previewed.get("publish_outcome_path") or "none"}',
+                f'workflow: {publish_previewed.get("workflow_path") or "none"}',
+            ]
+        )
     lines.extend(render_truth_summary(summary)[1:])
     return lines
 
@@ -414,6 +447,7 @@ def render_latest_artifacts_summary(summary: dict[str, Any]) -> list[str]:
         'planning_snapshot',
         'run_diagnostics',
         'publish_outcome',
+        'latest_publish_previewed_workflow',
         'latest_card',
         'latest_caption_review',
         'latest_video_manifest',
@@ -602,6 +636,55 @@ def resolve_report_path(root_dir: Path, report_value: str) -> Path:
     if not candidate.is_absolute():
         candidate = root_dir / candidate
     return candidate
+
+
+def _normalize_path_str(value: Any) -> str | None:
+    raw = str(value or '').strip()
+    if not raw:
+        return None
+    try:
+        return str(Path(raw).resolve())
+    except OSError:
+        return str(Path(raw))
+
+
+def _build_publish_previewed_doctor_summary(
+    *,
+    workflow_path: Path | None,
+    latest_report_path: Path | None,
+) -> dict[str, Any]:
+    payload = load_json(workflow_path)
+    if payload is None or str(payload.get('command') or '').strip() != 'publish-previewed':
+        return {}
+    selected = dict(payload.get('selected') or {})
+    source_report_path = _normalize_path_str(payload.get('source_report_path'))
+    latest_report_path_str = _normalize_path_str(latest_report_path)
+    message_id = payload.get('message_id')
+    success = bool(
+        str(payload.get('status') or '').strip() == 'ok'
+        and payload.get('published') is True
+        and payload.get('telegram_verified') is True
+        and message_id not in (None, '')
+    )
+    return {
+        'exists': True,
+        'workflow_path': str(workflow_path) if workflow_path is not None else None,
+        'status': payload.get('status'),
+        'reason': payload.get('reason'),
+        'published': bool(payload.get('published')),
+        'telegram_verified': bool(payload.get('telegram_verified')),
+        'message_id': message_id,
+        'selected': selected,
+        'source_report_path': source_report_path,
+        'publish_outcome_path': payload.get('publish_outcome_path'),
+        'success': success,
+        'bound_to_latest_report': bool(
+            success
+            and source_report_path is not None
+            and latest_report_path_str is not None
+            and source_report_path == latest_report_path_str
+        ),
+    }
 
 
 def _run_dealbot_command(
