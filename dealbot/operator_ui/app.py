@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QStyleFactory
 
 from .main_window import MainWindow
 
@@ -15,6 +15,9 @@ def resolve_project_root() -> Path:
 
 def create_application(argv: Sequence[str] | None = None) -> QApplication:
     app = QApplication(list(argv or sys.argv))
+    fusion_style = QStyleFactory.create("Fusion")
+    if fusion_style is not None:
+        app.setStyle(fusion_style)
     app.setApplicationName("YOTO Operator Preview")
     app.setOrganizationName("YOTO")
     return app

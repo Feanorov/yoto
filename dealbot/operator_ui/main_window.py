@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from PySide6.QtCore import Qt, QUrl
-from PySide6.QtGui import QDesktopServices, QPixmap
+from PySide6.QtGui import QColor, QDesktopServices, QPixmap
 from PySide6.QtWidgets import (
     QFrame,
     QGroupBox,
@@ -167,6 +167,7 @@ class ScaledImageLabel(QLabel):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._original_pixmap: QPixmap | None = None
+        self.setObjectName("previewCanvas")
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.setMinimumHeight(360)
         self.setFrameShape(QFrame.Shape.StyledPanel)
@@ -209,16 +210,19 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Пульт YOTO: превью поста")
         self.resize(1560, 920)
         self._build_ui()
+        self._apply_theme()
         self._connect_signals()
         self.refresh_local_state(initial=True)
 
     def _build_ui(self) -> None:
         root = QWidget(self)
+        root.setObjectName("appRoot")
         layout = QHBoxLayout(root)
-        layout.setContentsMargins(10, 10, 10, 10)
-        layout.setSpacing(10)
+        layout.setContentsMargins(14, 14, 14, 14)
+        layout.setSpacing(14)
 
         splitter = QSplitter(Qt.Orientation.Horizontal, root)
+        splitter.setObjectName("mainSplitter")
         splitter.addWidget(self._build_left_panel())
         splitter.addWidget(self._build_center_panel())
         splitter.addWidget(self._build_right_panel())
@@ -232,26 +236,28 @@ class MainWindow(QMainWindow):
 
     def _build_left_panel(self) -> QWidget:
         panel = QWidget(self)
+        panel.setObjectName("leftPanel")
         layout = QVBoxLayout(panel)
-        layout.setSpacing(10)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
         title = QLabel("Пульт YOTO")
-        title.setStyleSheet("font-size: 20px; font-weight: 600;")
+        title.setObjectName("appTitle")
         layout.addWidget(title)
 
         subtitle = QLabel(str(self.project_root))
+        subtitle.setObjectName("appSubtitle")
         subtitle.setWordWrap(True)
-        subtitle.setStyleSheet("color: #4b5563;")
         layout.addWidget(subtitle)
 
         self.operator_status_group = QGroupBox("Операторский статус")
         operator_status_layout = QVBoxLayout(self.operator_status_group)
         self.operator_status_summary_label = QLabel("Статус: готов к работе\nСледующее действие: соберите новое превью.")
+        self.operator_status_summary_label.setObjectName("operatorStatusSummary")
         self.operator_status_summary_label.setWordWrap(True)
-        self.operator_status_summary_label.setStyleSheet("font-size: 14px; font-weight: 600; color: #1f2937;")
         self.operator_status_facts_label = QLabel("")
+        self.operator_status_facts_label.setObjectName("operatorStatusFacts")
         self.operator_status_facts_label.setWordWrap(True)
-        self.operator_status_facts_label.setStyleSheet("color: #374151;")
         operator_status_layout.addWidget(self.operator_status_summary_label)
         operator_status_layout.addWidget(self.operator_status_facts_label)
         layout.addWidget(self.operator_status_group)
@@ -259,16 +265,18 @@ class MainWindow(QMainWindow):
         status_group = QGroupBox("Статус")
         status_layout = QVBoxLayout(status_group)
         self.status_label = QLabel("Нужно собрать превью")
+        self.status_label.setObjectName("statusHeadline")
         self.status_label.setWordWrap(True)
-        self.status_label.setStyleSheet("font-size: 16px; font-weight: 600;")
         self.post_type_badge = QLabel("Неизвестный тип")
+        self.post_type_badge.setObjectName("postTypeBadge")
         self.post_type_badge.setWordWrap(True)
         self.post_type_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.post_type_badge.setStyleSheet(self._badge_style("unknown"))
         self.send_reason_label = QLabel(SEND_DISABLED_REASON_RU)
+        self.send_reason_label.setObjectName("sendReasonLabel")
         self.send_reason_label.setWordWrap(True)
-        self.send_reason_label.setStyleSheet("color: #7c2d12;")
         self.safety_label = QLabel("")
+        self.safety_label.setObjectName("safetySummaryLabel")
         self.safety_label.setWordWrap(True)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.post_type_badge)
@@ -279,11 +287,17 @@ class MainWindow(QMainWindow):
         actions_group = QGroupBox("Действия")
         actions_layout = QVBoxLayout(actions_group)
         self.run_preview_button = QPushButton("Собрать превью")
+        self._set_button_role(self.run_preview_button, "primary")
         self.refresh_button = QPushButton("Обновить состояние")
+        self._set_button_role(self.refresh_button, "secondary")
         self.open_report_button = QPushButton("Открыть отчёт")
+        self._set_button_role(self.open_report_button, "utility")
         self.open_card_button = QPushButton("Открыть карточку")
+        self._set_button_role(self.open_card_button, "utility")
         self.open_output_button = QPushButton("Открыть папку output")
+        self._set_button_role(self.open_output_button, "utility")
         self.send_button = QPushButton("Отправить в Telegram")
+        self._set_button_role(self.send_button, "danger")
         self.send_button.setEnabled(False)
         self.send_button.setToolTip(SEND_DISABLED_REASON_RU)
         actions_layout.addWidget(self.run_preview_button)
@@ -297,11 +311,14 @@ class MainWindow(QMainWindow):
         publish_group = QGroupBox("Последняя публикация")
         publish_layout = QVBoxLayout(publish_group)
         self.last_publish_label = QLabel("Публикаций через UI пока нет.")
+        self.last_publish_label.setObjectName("lastPublishLabel")
         self.last_publish_label.setWordWrap(True)
-        self.last_publish_label.setStyleSheet("color: #374151;")
         self.open_publish_proof_button = QPushButton("Открыть proof")
+        self._set_button_role(self.open_publish_proof_button, "utility")
         self.open_publish_outcome_button = QPushButton("Открыть publish outcome")
+        self._set_button_role(self.open_publish_outcome_button, "utility")
         self.open_analytics_button = QPushButton("Открыть папку analytics")
+        self._set_button_role(self.open_analytics_button, "utility")
         publish_layout.addWidget(self.last_publish_label)
         publish_layout.addWidget(self.open_publish_proof_button)
         publish_layout.addWidget(self.open_publish_outcome_button)
@@ -311,9 +328,12 @@ class MainWindow(QMainWindow):
         history_group = QGroupBox("История публикаций")
         history_layout = QVBoxLayout(history_group)
         self.publish_history_list = QListWidget()
+        self.publish_history_list.setObjectName("publishHistoryList")
         self.publish_history_list.setMinimumHeight(220)
         self.open_history_workflow_button = QPushButton("Открыть workflow")
+        self._set_button_role(self.open_history_workflow_button, "utility")
         self.open_history_outcome_button = QPushButton("Открыть publish outcome")
+        self._set_button_role(self.open_history_outcome_button, "utility")
         history_layout.addWidget(self.publish_history_list)
         history_layout.addWidget(self.open_history_workflow_button)
         history_layout.addWidget(self.open_history_outcome_button)
@@ -323,8 +343,10 @@ class MainWindow(QMainWindow):
 
     def _build_center_panel(self) -> QWidget:
         panel = QWidget(self)
+        panel.setObjectName("centerPanel")
         layout = QVBoxLayout(panel)
-        layout.setSpacing(10)
+        layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
         image_group = QGroupBox("Превью")
         image_layout = QVBoxLayout(image_group)
@@ -335,9 +357,12 @@ class MainWindow(QMainWindow):
         caption_group = QGroupBox("Описание")
         caption_layout = QVBoxLayout(caption_group)
         self.caption_tabs = QTabWidget(caption_group)
+        self.caption_tabs.setObjectName("captionTabs")
         self.caption_html_browser = QTextBrowser()
+        self.caption_html_browser.setObjectName("captionHtmlBrowser")
         self.caption_html_browser.setOpenExternalLinks(True)
         self.caption_preview_text = QPlainTextEdit()
+        self.caption_preview_text.setObjectName("captionPreviewText")
         self.caption_preview_text.setReadOnly(True)
         self.caption_tabs.addTab(self.caption_html_browser, "HTML описания")
         self.caption_tabs.addTab(self.caption_preview_text, "Превью описания")
@@ -347,20 +372,24 @@ class MainWindow(QMainWindow):
 
     def _build_right_panel(self) -> QWidget:
         panel = QWidget(self)
+        panel.setObjectName("rightPanel")
         layout = QVBoxLayout(panel)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(16, 16, 16, 16)
 
         splitter = QSplitter(Qt.Orientation.Vertical, panel)
+        splitter.setObjectName("sideSplitter")
 
         details_group = QGroupBox("Детали")
         details_layout = QVBoxLayout(details_group)
         self.details_text = QPlainTextEdit()
+        self.details_text.setObjectName("detailsText")
         self.details_text.setReadOnly(True)
         details_layout.addWidget(self.details_text)
 
         log_group = QGroupBox("Лог процесса")
         log_layout = QVBoxLayout(log_group)
         self.log_text = QPlainTextEdit()
+        self.log_text.setObjectName("logText")
         self.log_text.setReadOnly(True)
         self.log_text.setMaximumBlockCount(2000)
         log_layout.addWidget(self.log_text)
@@ -373,6 +402,193 @@ class MainWindow(QMainWindow):
 
         layout.addWidget(splitter)
         return panel
+
+    @staticmethod
+    def _set_button_role(button: QPushButton, role: str) -> None:
+        button.setProperty("buttonRole", role)
+
+    def _apply_theme(self) -> None:
+        self.setStyleSheet(
+            """
+            QMainWindow, QWidget#appRoot {
+                background-color: #070b16;
+                color: #edf0ff;
+            }
+            QWidget#leftPanel {
+                background-color: #0d1224;
+                border: 1px solid #242d50;
+                border-radius: 18px;
+            }
+            QWidget#centerPanel {
+                background-color: #091022;
+                border: 1px solid #27315d;
+                border-radius: 18px;
+            }
+            QWidget#rightPanel {
+                background-color: #0b1126;
+                border: 1px solid #242d50;
+                border-radius: 18px;
+            }
+            QSplitter#mainSplitter::handle, QSplitter#sideSplitter::handle {
+                background-color: #151c38;
+                border-radius: 4px;
+            }
+            QGroupBox {
+                background-color: #141a33;
+                border: 1px solid #2a3561;
+                border-radius: 14px;
+                margin-top: 12px;
+                padding: 14px 14px 12px 14px;
+                color: #e7ebff;
+                font-weight: 600;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 12px;
+                padding: 0 6px 0 6px;
+                color: #bfaeff;
+            }
+            QLabel {
+                color: #e8ecff;
+            }
+            QLabel#appTitle {
+                font-size: 24px;
+                font-weight: 700;
+                color: #f7f8ff;
+            }
+            QLabel#appSubtitle {
+                color: #8893c8;
+            }
+            QLabel#statusHeadline {
+                font-size: 18px;
+                font-weight: 700;
+                color: #ffffff;
+            }
+            QLabel#operatorStatusSummary {
+                font-size: 15px;
+                font-weight: 700;
+                color: #f8f9ff;
+            }
+            QLabel#operatorStatusFacts, QLabel#safetySummaryLabel, QLabel#sendReasonLabel, QLabel#lastPublishLabel {
+                color: #c8d1ff;
+            }
+            QLabel#postTypeBadge {
+                border: 1px solid #404b83;
+            }
+            QPushButton {
+                background-color: #182043;
+                border: 1px solid #33407b;
+                border-radius: 10px;
+                padding: 10px 12px;
+                color: #eef2ff;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background-color: #232e5e;
+                border-color: #7b75ff;
+            }
+            QPushButton:pressed {
+                background-color: #131b39;
+            }
+            QPushButton:disabled {
+                background-color: #0f1430;
+                border-color: #252d52;
+                color: #67719d;
+            }
+            QPushButton[buttonRole="primary"] {
+                background-color: #5a49f6;
+                border-color: #9184ff;
+                color: #ffffff;
+            }
+            QPushButton[buttonRole="primary"]:hover {
+                background-color: #6a59ff;
+                border-color: #b1a8ff;
+            }
+            QPushButton[buttonRole="danger"] {
+                background-color: #8d2553;
+                border-color: #ff7aa4;
+                color: #fff8fb;
+            }
+            QPushButton[buttonRole="danger"]:hover {
+                background-color: #a72d62;
+                border-color: #ff9ab8;
+            }
+            QPushButton[buttonRole="secondary"] {
+                background-color: #20305e;
+                border-color: #5064b8;
+            }
+            QPushButton[buttonRole="utility"] {
+                background-color: #151b37;
+                border-color: #2d3768;
+                color: #d6ddff;
+            }
+            QPlainTextEdit, QTextBrowser, QListWidget {
+                background-color: #0b1025;
+                border: 1px solid #2d3768;
+                border-radius: 12px;
+                color: #edf1ff;
+                selection-background-color: #5c55ff;
+                selection-color: #ffffff;
+                padding: 8px;
+            }
+            QTextBrowser a {
+                color: #8ea0ff;
+            }
+            QTabWidget::pane {
+                border: 1px solid #2d3768;
+                border-radius: 12px;
+                top: -1px;
+                background-color: #0b1025;
+            }
+            QTabBar::tab {
+                background-color: #121938;
+                color: #aeb9ee;
+                padding: 9px 14px;
+                margin-right: 4px;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+            }
+            QTabBar::tab:selected {
+                background-color: #1c2550;
+                color: #ffffff;
+            }
+            QLabel#previewCanvas {
+                background-color: #080d1d;
+                border: 1px solid #324078;
+                border-radius: 16px;
+                color: #7e88b9;
+                padding: 12px;
+            }
+            QListWidget#publishHistoryList::item {
+                border: 1px solid #202850;
+                border-radius: 10px;
+                margin: 4px 2px;
+                padding: 10px;
+                background-color: #101734;
+            }
+            QListWidget#publishHistoryList::item:selected {
+                background-color: #232d60;
+                border-color: #7a74ff;
+            }
+            QScrollBar:vertical {
+                background: #0d1228;
+                width: 12px;
+                margin: 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: #2d396e;
+                min-height: 24px;
+                border-radius: 6px;
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical,
+            QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical,
+            QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal,
+            QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+                background: none;
+                border: none;
+            }
+            """
+        )
 
     def _connect_signals(self) -> None:
         self.run_preview_button.clicked.connect(self.run_preview)
@@ -634,13 +850,13 @@ class MainWindow(QMainWindow):
     def _update_last_publish_panel(self, last_publish: LastPublishState) -> None:
         self.last_publish_label.setText(self._format_last_publish_summary(last_publish))
         if not last_publish.present:
-            self.last_publish_label.setStyleSheet("color: #374151;")
+            self.last_publish_label.setStyleSheet("color: #c5cdee;")
         elif last_publish.success:
-            self.last_publish_label.setStyleSheet("color: #166534;")
+            self.last_publish_label.setStyleSheet("color: #7ef2a8;")
         elif last_publish.workflow_status == "failed" or not last_publish.published:
-            self.last_publish_label.setStyleSheet("color: #991b1b;")
+            self.last_publish_label.setStyleSheet("color: #ff9aa8;")
         else:
-            self.last_publish_label.setStyleSheet("color: #374151;")
+            self.last_publish_label.setStyleSheet("color: #d6ddff;")
 
     def _update_publish_history_panel(self, publish_history: list[LastPublishState]) -> None:
         self.publish_history_list.clear()
@@ -658,9 +874,11 @@ class MainWindow(QMainWindow):
                 str(entry.publish_outcome_path) if entry.publish_outcome_path is not None else "",
             )
             if entry.success:
-                item.setForeground(Qt.GlobalColor.darkGreen)
+                item.setForeground(QColor("#dbffe7"))
+                item.setBackground(QColor("#132b24"))
             elif entry.workflow_status == "failed" or not entry.published:
-                item.setForeground(Qt.GlobalColor.darkRed)
+                item.setForeground(QColor("#ffe1e7"))
+                item.setBackground(QColor("#32141e"))
             self.publish_history_list.addItem(item)
         self.publish_history_list.setCurrentRow(0)
         self._sync_publish_history_buttons()
@@ -705,18 +923,18 @@ class MainWindow(QMainWindow):
             fact_lines.append(f"Тип: {_translate_post_type_label(operator_status.current_post_type_label)}")
         self.operator_status_facts_label.setText("\n".join(fact_lines))
         palette = {
-            "ready": ("#1f2937", "#f3f4f6"),
-            "preview_ready": ("#166534", "#dcfce7"),
-            "preview_blocked": ("#92400e", "#fef3c7"),
-            "published": ("#1d4ed8", "#dbeafe"),
-            "failed": ("#991b1b", "#fee2e2"),
+            "ready": ("#dbe3ff", "#111833", "#324071"),
+            "preview_ready": ("#eafff3", "#112c21", "#31c36b"),
+            "preview_blocked": ("#fff4d8", "#352510", "#e3a33c"),
+            "published": ("#edf3ff", "#122044", "#5f8dff"),
+            "failed": ("#ffe8ed", "#351420", "#ff5f82"),
         }
-        foreground, background = palette.get(operator_status.kind, palette["ready"])
+        foreground, background, border = palette.get(operator_status.kind, palette["ready"])
         self.operator_status_group.setStyleSheet(
             "QGroupBox {"
             f" color: {foreground};"
             " font-weight: 600;"
-            " border: 1px solid #d1d5db;"
+            f" border: 1px solid {border};"
             " border-radius: 8px;"
             f" background-color: {background};"
             " margin-top: 8px;"
@@ -726,6 +944,10 @@ class MainWindow(QMainWindow):
             " subcontrol-origin: margin;"
             " left: 10px;"
             " padding: 0 4px 0 4px;"
+            f" color: {foreground};"
+            "}"
+            "QLabel {"
+            f" color: {foreground};"
             "}"
         )
 
@@ -870,17 +1092,18 @@ class MainWindow(QMainWindow):
     @staticmethod
     def _badge_style(post_type_key: str) -> str:
         palette = {
-            "single_discount": ("#065f46", "#d1fae5"),
-            "freebie": ("#1d4ed8", "#dbeafe"),
-            "roundup": ("#7c3aed", "#ede9fe"),
-            "roundup_toplist": ("#7c3aed", "#ede9fe"),
-            "toplist": ("#7c3aed", "#ede9fe"),
-            "unknown": ("#374151", "#e5e7eb"),
+            "single_discount": ("#94ffd0", "#123426", "#2a8c64"),
+            "freebie": ("#cfe3ff", "#12284b", "#4380ff"),
+            "roundup": ("#edd9ff", "#2a1647", "#8a5cff"),
+            "roundup_toplist": ("#edd9ff", "#2a1647", "#8a5cff"),
+            "toplist": ("#edd9ff", "#2a1647", "#8a5cff"),
+            "unknown": ("#d7def7", "#1b223f", "#525d87"),
         }
-        foreground, background = palette.get(post_type_key, palette["unknown"])
+        foreground, background, border = palette.get(post_type_key, palette["unknown"])
         return (
-            "padding: 8px 10px; "
-            "border-radius: 8px; "
+            "padding: 9px 10px; "
+            "border-radius: 10px; "
+            f"border: 1px solid {border}; "
             f"color: {foreground}; "
             f"background-color: {background}; "
             "font-weight: 600;"
