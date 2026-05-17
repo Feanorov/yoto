@@ -32,7 +32,13 @@ from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
 from .models import LastPublishState, PreviewState, SafetyState
 from .report_parser import build_preview_state
-from .safety import SEND_DISABLED_REASON_RU, build_operator_status, evaluate_preview_safety, localize_ui_message
+from .safety import (
+    SEND_DISABLED_REASON_RU,
+    build_operator_status,
+    build_preview_action_copy,
+    evaluate_preview_safety,
+    localize_ui_message,
+)
 
 
 _STATUS_TEXT_TRANSLATIONS = {
@@ -300,6 +306,7 @@ class MainWindow(QMainWindow):
         self._set_button_role(self.send_button, "danger")
         self.send_button.setEnabled(False)
         self.send_button.setToolTip(SEND_DISABLED_REASON_RU)
+        self._sync_preview_action_button()
         actions_layout.addWidget(self.run_preview_button)
         actions_layout.addWidget(self.refresh_button)
         actions_layout.addWidget(self.open_report_button)
@@ -749,6 +756,7 @@ class MainWindow(QMainWindow):
         self.caption_preview_text.setPlainText(state.caption_preview or "Превью описания не загружено.")
 
     def _sync_buttons(self) -> None:
+        self._sync_preview_action_button()
         report_path = self._report_path()
         card_path = self.current_state.card_path if self.current_state else None
         last_publish = self.current_state.last_publish if self.current_state else LastPublishState()
@@ -762,6 +770,11 @@ class MainWindow(QMainWindow):
         self.open_analytics_button.setEnabled(True)
         self._sync_publish_history_buttons()
         self.send_button.setEnabled(bool(self.current_safety.send_enabled and not self.runner.is_running))
+
+    def _sync_preview_action_button(self) -> None:
+        label, tooltip = build_preview_action_copy(self.current_state)
+        self.run_preview_button.setText(label)
+        self.run_preview_button.setToolTip(tooltip)
 
     def _set_running(self, running: bool) -> None:
         self.run_preview_button.setEnabled(not running)

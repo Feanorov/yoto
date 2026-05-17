@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from dealbot.operator_ui.command_runner import PreviewCommandRunner
 from dealbot.operator_ui.models import LastPublishState, PinnedPublishState, PreviewPaths, PreviewState, SelectedTarget
-from dealbot.operator_ui.safety import build_operator_status, evaluate_preview_safety
+from dealbot.operator_ui.safety import build_operator_status, build_preview_action_copy, evaluate_preview_safety
 
 
 def test_evaluate_preview_safety_enables_send_for_verified_pinned_preview(tmp_path: Path) -> None:
@@ -131,6 +132,13 @@ def test_build_operator_status_ready_to_work_without_preview(tmp_path: Path) -> 
     assert operator_status.next_action == "Соберите новое превью."
 
 
+def test_build_preview_action_copy_defaults_to_preview(tmp_path: Path) -> None:
+    label, tooltip = build_preview_action_copy(PreviewState.empty(tmp_path))
+
+    assert label == "Собрать превью"
+    assert tooltip == "Запускает preview и подбирает следующий кандидат для публикации."
+
+
 def test_build_operator_status_marks_preview_ready_when_send_enabled(tmp_path: Path) -> None:
     report_path = tmp_path / "output" / "analytics" / "truth.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -222,10 +230,34 @@ def test_build_operator_status_marks_preview_as_already_published(tmp_path: Path
     safety = evaluate_preview_safety(state)
 
     operator_status = build_operator_status(state, safety)
+    label, tooltip = build_preview_action_copy(state)
 
     assert operator_status.status_text == "последний preview уже опубликован"
     assert operator_status.next_action == "Соберите новое превью для следующего поста."
     assert operator_status.last_publish_message_id == 182
+    assert label == "Собрать следующий пост"
+    assert tooltip == "Запускает preview и подбирает следующий кандидат для публикации."
+
+
+def test_build_preview_action_copy_uses_next_post_after_successful_last_publish_without_preview(tmp_path: Path) -> None:
+    state = PreviewState.empty(tmp_path)
+    state.last_publish = LastPublishState(
+        workflow_path=tmp_path / "output" / "analytics" / "publish.json",
+        title="Subnautica",
+        offer_id="steam:264710",
+        message_id=182,
+        published=True,
+        telegram_verified=True,
+    )
+    safety = evaluate_preview_safety(state)
+
+    operator_status = build_operator_status(state, safety)
+    label, tooltip = build_preview_action_copy(state)
+
+    assert operator_status.status_text == "готов к работе"
+    assert operator_status.next_action == "Соберите новое превью для следующего поста."
+    assert label == "Собрать следующий пост"
+    assert tooltip == "Запускает preview и подбирает следующий кандидат для публикации."
 
 
 def test_build_operator_status_marks_failed_last_publish(tmp_path: Path) -> None:
@@ -245,3 +277,25 @@ def test_build_operator_status_marks_failed_last_publish(tmp_path: Path) -> None
 
     assert operator_status.status_text == "последняя публикация не выполнена"
     assert operator_status.next_action == "Проверьте причину ошибки и соберите новое превью при необходимости."
+
+
+def test_preview_command_runner_still_invokes_preview(monkeypatch, tmp_path: Path) -> None:
+    runner = PreviewCommandRunner()
+    captured: dict[str, object] = {}
+
+    def fake_start_command(project_root: Path, command_name: str, arguments: list[str]) -> bool:
+        captured["project_root"] = project_root
+        captured["command_name"] = command_name
+        captured["arguments"] = arguments
+        return True
+
+    monkeypatch.setattr(runner, "_start_command", fake_start_command)
+
+    started = runner.run_preview(tmp_path)
+
+    assert started is True
+    assert captured == {
+        "project_root": tmp_path,
+        "command_name": "preview",
+        "arguments": ["preview"],
+    }

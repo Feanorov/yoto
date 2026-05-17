@@ -20,6 +20,12 @@ SEND_DISABLED_TRUTH_NOT_READY_RU = "Отключено: превью не гот
 SEND_DISABLED_BACKEND_BLOCKER_RU = "Отключено: backend заблокировал отправку."
 SEND_ENABLED_READY_RU = "Превью готово к безопасной публикации."
 
+PREVIEW_ACTION_DEFAULT_RU = "Собрать превью"
+PREVIEW_ACTION_NEXT_POST_RU = "Собрать следующий пост"
+PREVIEW_ACTION_TOOLTIP_RU = "Запускает preview и подбирает следующий кандидат для публикации."
+DEFAULT_PREVIEW_BANNER_ACTION_RU = "Соберите новое превью."
+NEXT_PREVIEW_BANNER_ACTION_RU = "Соберите новое превью для следующего поста."
+
 _UI_TEXT_TRANSLATIONS = {
     "No preview state is loaded.": "Состояние превью не загружено.",
     "Preview report path is missing.": "Путь к preview report отсутствует.",
@@ -48,8 +54,7 @@ _UI_TEXT_TRANSLATIONS = {
         "Артефакты превью устарели: на диске есть более новый workflow preview."
     ),
     "Run Preview or Refresh Local State to load the latest operator artifacts.": (
-        "Соберите превью или обновите локальное состояние, "
-        "чтобы загрузить последние артефакты оператора."
+        "Соберите превью или обновите локальное состояние, чтобы загрузить последние артефакты оператора."
     ),
 }
 
@@ -62,6 +67,11 @@ def localize_ui_message(text: str) -> str:
         reason = normalized.removeprefix("Backend blocker:").strip()
         return f"Блокировка backend: {reason}" if reason else "Блокировка backend."
     return _UI_TEXT_TRANSLATIONS.get(normalized, normalized)
+
+
+def build_preview_action_copy(state: PreviewState | None) -> tuple[str, str]:
+    label = PREVIEW_ACTION_NEXT_POST_RU if _should_prepare_next_post(state) else PREVIEW_ACTION_DEFAULT_RU
+    return label, PREVIEW_ACTION_TOOLTIP_RU
 
 
 def evaluate_preview_safety(state: PreviewState | None) -> SafetyState:
@@ -168,11 +178,13 @@ def build_operator_status(state: PreviewState | None, safety: SafetyState) -> Op
         return OperatorStatusState(
             kind="ready",
             status_text="готов к работе",
-            next_action="Соберите новое превью.",
+            next_action=NEXT_PREVIEW_BANNER_ACTION_RU if _should_prepare_next_post(state) else DEFAULT_PREVIEW_BANNER_ACTION_RU,
             last_publish_title=state.last_publish.title if state is not None else "",
             last_publish_offer_id=state.last_publish.offer_id if state is not None else "",
             last_publish_message_id=state.last_publish.message_id if state is not None else None,
-            last_publish_telegram_verified=state.last_publish.telegram_verified if state is not None and state.last_publish.present else None,
+            last_publish_telegram_verified=state.last_publish.telegram_verified
+            if state is not None and state.last_publish.present
+            else None,
         )
 
     assert state is not None
@@ -180,7 +192,7 @@ def build_operator_status(state: PreviewState | None, safety: SafetyState) -> Op
         return OperatorStatusState(
             kind="published",
             status_text="последний preview уже опубликован",
-            next_action="Соберите новое превью для следующего поста.",
+            next_action=NEXT_PREVIEW_BANNER_ACTION_RU,
             last_publish_title=state.last_publish.title,
             last_publish_offer_id=state.last_publish.offer_id,
             last_publish_message_id=state.last_publish.message_id,
@@ -237,6 +249,14 @@ def _is_preview_already_published(state: PreviewState) -> bool:
     report_path = _normalized_path(state.paths.truth_report_path)
     publish_report_path = _normalized_path(state.last_publish.source_report_path)
     return bool(report_path and publish_report_path and report_path == publish_report_path)
+
+
+def _should_prepare_next_post(state: PreviewState | None) -> bool:
+    if state is None:
+        return False
+    if _is_preview_already_published(state):
+        return True
+    return _is_no_preview_loaded(state) and state.last_publish.success
 
 
 def _is_last_publish_failed(state: PreviewState) -> bool:
