@@ -104,22 +104,21 @@ class PreviewArtifactResolver:
         if resolved_truth_report is None:
             resolved_truth_report = self._find_newest(self.analytics_dir, ("*_operator_truth_report_preview.json",))
         truth_payload = self._load_json(resolved_truth_report)
+        publish_history_records = self._load_publish_history(limit=5)
         latest_snapshot_manifest_path = self._find_newest(
             self.output_dir / "offline_validation" / "snapshots",
             ("snapshot_manifest.json",),
         )
-        latest_publish_workflow_path = self._find_newest(
-            self.analytics_dir,
-            ("*_operator_workflow_publish-previewed.json",),
-        )
-        latest_publish_workflow_payload = self._load_json(latest_publish_workflow_path)
-        latest_publish_outcome_path = self._resolve_publish_outcome_path(latest_publish_workflow_payload)
-        if latest_publish_outcome_path is None:
-            latest_publish_outcome_path = self._find_newest(
-                self.analytics_dir,
-                ("*_publish_outcome_*.json",),
-            )
-        latest_publish_outcome_payload = self._load_json(latest_publish_outcome_path)
+        latest_publish_workflow_path = None
+        latest_publish_workflow_payload = None
+        latest_publish_outcome_path = None
+        latest_publish_outcome_payload = None
+        if publish_history_records:
+            latest_record = publish_history_records[0]
+            latest_publish_workflow_path = latest_record.get("workflow_path")
+            latest_publish_workflow_payload = latest_record.get("workflow_payload")
+            latest_publish_outcome_path = latest_record.get("publish_outcome_path")
+            latest_publish_outcome_payload = latest_record.get("publish_outcome_payload")
         return ArtifactBundle(
             project_root=self.project_root,
             output_dir=self.output_dir,
@@ -132,6 +131,7 @@ class PreviewArtifactResolver:
             latest_publish_workflow_path=latest_publish_workflow_path,
             latest_publish_workflow_payload=latest_publish_workflow_payload,
             latest_publish_outcome_payload=latest_publish_outcome_payload,
+            publish_history_records=publish_history_records,
             ambiguous=ambiguous,
             stale=stale,
             warnings=list(warnings or ()),
@@ -163,6 +163,31 @@ class PreviewArtifactResolver:
             return json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             return None
+
+    def _load_publish_history(self, *, limit: int) -> list[dict[str, Any]]:
+        if not self.analytics_dir.exists():
+            return []
+        workflow_paths = [
+            path
+            for path in self.analytics_dir.rglob("*_operator_workflow_publish-previewed.json")
+            if path.is_file()
+        ]
+        workflow_paths.sort(key=self._sort_key, reverse=True)
+        records: list[dict[str, Any]] = []
+        for workflow_path in workflow_paths[:limit]:
+            workflow_payload = self._load_json(workflow_path)
+            if workflow_payload is None:
+                continue
+            publish_outcome_path = self._resolve_publish_outcome_path(workflow_payload)
+            records.append(
+                {
+                    "workflow_path": workflow_path,
+                    "workflow_payload": workflow_payload,
+                    "publish_outcome_path": publish_outcome_path,
+                    "publish_outcome_payload": self._load_json(publish_outcome_path),
+                }
+            )
+        return records
 
     def _find_since(self, base_dir: Path, pattern: str, started_at: float) -> list[Path]:
         if not base_dir.exists():

@@ -245,3 +245,118 @@ def test_build_preview_state_maps_failed_last_publish_workflow(tmp_path: Path) -
     assert state.last_publish.telegram_verified is False
     assert state.last_publish.reason == "image_missing"
     assert state.last_publish.outbox_status == "failed"
+
+
+def test_publish_history_is_sorted_newest_first_and_limited_to_five(tmp_path: Path) -> None:
+    analytics_dir = tmp_path / "output" / "analytics"
+    expected_offer_ids: list[str] = []
+    for index in range(6):
+        offer_id = f"steam:{200 + index}"
+        expected_offer_ids.insert(0, offer_id)
+        publish_outcome_path = analytics_dir / f"20260517T0800{index}Z_publish_outcome_{offer_id.replace(':', '_')}.json"
+        _write_json(
+            publish_outcome_path,
+            {
+                "offer_id": offer_id,
+                "title": f"Title {index}",
+                "message_id": 100 + index,
+                "publish_outcome": {
+                    "outbox_status": "published",
+                    "reason": "published",
+                },
+            },
+            mtime=20 + index,
+        )
+        _write_json(
+            analytics_dir / f"20260517T0800{index}Z_operator_workflow_publish-previewed.json",
+            {
+                "command": "publish-previewed",
+                "status": "ok",
+                "published": True,
+                "telegram_verified": True,
+                "message_id": 100 + index,
+                "outbox_status": "published",
+                "reason": "published",
+                "created_at": f"2026-05-17T08:00:0{index}",
+                "publish_outcome_path": str(publish_outcome_path),
+                "selected": {
+                    "title": f"Title {index}",
+                    "offer_id": offer_id,
+                },
+            },
+            mtime=30 + index,
+        )
+
+    resolver = PreviewArtifactResolver(tmp_path)
+    bundle = resolver.load_latest_local_state()
+    state = build_preview_state(bundle)
+
+    assert len(state.publish_history) == 5
+    assert [entry.offer_id for entry in state.publish_history] == expected_offer_ids[:5]
+    assert state.last_publish.offer_id == expected_offer_ids[0]
+    assert state.last_publish.message_id == 105
+
+
+def test_publish_history_normalizes_successful_and_failed_workflows(tmp_path: Path) -> None:
+    analytics_dir = tmp_path / "output" / "analytics"
+    failed_workflow = analytics_dir / "20260517T090001Z_operator_workflow_publish-previewed.json"
+    success_workflow = analytics_dir / "20260517T090000Z_operator_workflow_publish-previewed.json"
+    success_outcome = analytics_dir / "20260517T090000Z_publish_outcome_steam_264710.json"
+    _write_json(
+        success_outcome,
+        {
+            "offer_id": "steam:264710",
+            "title": "Subnautica",
+            "message_id": 182,
+            "publish_outcome": {
+                "outbox_status": "published",
+                "reason": "published",
+            },
+        },
+        mtime=40,
+    )
+    _write_json(
+        success_workflow,
+        {
+            "command": "publish-previewed",
+            "status": "ok",
+            "published": True,
+            "telegram_verified": True,
+            "message_id": 182,
+            "outbox_status": "published",
+            "reason": "published",
+            "publish_outcome_path": str(success_outcome),
+            "selected": {
+                "title": "Subnautica",
+                "offer_id": "steam:264710",
+            },
+        },
+        mtime=50,
+    )
+    _write_json(
+        failed_workflow,
+        {
+            "command": "publish-previewed",
+            "status": "failed",
+            "published": False,
+            "telegram_verified": False,
+            "reason": "report_not_found",
+            "selected": {},
+        },
+        mtime=60,
+    )
+
+    resolver = PreviewArtifactResolver(tmp_path)
+    state = build_preview_state(resolver.load_latest_local_state())
+
+    assert len(state.publish_history) == 2
+    failed_entry = state.publish_history[0]
+    success_entry = state.publish_history[1]
+    assert failed_entry.offer_id == ""
+    assert failed_entry.title == ""
+    assert failed_entry.reason == "report_not_found"
+    assert failed_entry.success is False
+    assert success_entry.offer_id == "steam:264710"
+    assert success_entry.title == "Subnautica"
+    assert success_entry.message_id == 182
+    assert success_entry.success is True

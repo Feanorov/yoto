@@ -64,6 +64,7 @@ class ArtifactBundle:
     latest_publish_workflow_path: Path | None = None
     latest_publish_workflow_payload: dict[str, Any] | None = None
     latest_publish_outcome_payload: dict[str, Any] | None = None
+    publish_history_records: list[dict[str, Any]] = field(default_factory=list)
     ambiguous: bool = False
     stale: bool = False
     warnings: list[str] = field(default_factory=list)
@@ -171,6 +172,7 @@ class PreviewState:
     report_exists: bool = False
     pinned_publish: PinnedPublishState = field(default_factory=PinnedPublishState)
     last_publish: LastPublishState = field(default_factory=LastPublishState)
+    publish_history: list[LastPublishState] = field(default_factory=list)
     fingerprint: PreviewFingerprint | None = None
 
     @classmethod

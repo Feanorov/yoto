@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QHBoxLayout,
     QLabel,
+    QListWidget,
+    QListWidgetItem,
     QMainWindow,
     QMessageBox,
     QPushButton,
@@ -152,6 +154,13 @@ def _extract_publish_reason(output_text: str) -> str:
 
 def _last_publish_status(last_publish: LastPublishState) -> str:
     return _text(last_publish.outbox_status or last_publish.reason or last_publish.workflow_status) or "none"
+
+
+def _path_from_item_data(item: QListWidgetItem | None, offset: int) -> Path | None:
+    if item is None:
+        return None
+    raw = _text(item.data(Qt.ItemDataRole.UserRole + offset))
+    return Path(raw) if raw else None
 
 
 class ScaledImageLabel(QLabel):
@@ -298,6 +307,17 @@ class MainWindow(QMainWindow):
         publish_layout.addWidget(self.open_publish_outcome_button)
         publish_layout.addWidget(self.open_analytics_button)
         layout.addWidget(publish_group)
+
+        history_group = QGroupBox("История публикаций")
+        history_layout = QVBoxLayout(history_group)
+        self.publish_history_list = QListWidget()
+        self.publish_history_list.setMinimumHeight(220)
+        self.open_history_workflow_button = QPushButton("Открыть workflow")
+        self.open_history_outcome_button = QPushButton("Открыть publish outcome")
+        history_layout.addWidget(self.publish_history_list)
+        history_layout.addWidget(self.open_history_workflow_button)
+        history_layout.addWidget(self.open_history_outcome_button)
+        layout.addWidget(history_group)
         layout.addStretch(1)
         return panel
 
@@ -363,6 +383,10 @@ class MainWindow(QMainWindow):
         self.open_publish_proof_button.clicked.connect(self.open_publish_proof)
         self.open_publish_outcome_button.clicked.connect(self.open_publish_outcome)
         self.open_analytics_button.clicked.connect(self.open_analytics_folder)
+        self.open_history_workflow_button.clicked.connect(self.open_selected_history_workflow)
+        self.open_history_outcome_button.clicked.connect(self.open_selected_history_outcome)
+        self.publish_history_list.itemSelectionChanged.connect(self._sync_publish_history_buttons)
+        self.publish_history_list.itemDoubleClicked.connect(self._open_history_workflow_item)
         self.send_button.clicked.connect(self.handle_send_clicked)
         self.runner.output_ready.connect(self.append_log)
         self.runner.running_changed.connect(self._set_running)
@@ -490,6 +514,7 @@ class MainWindow(QMainWindow):
         self.safety_label.setText(self._format_safety_summary(self.current_safety))
         self._update_operator_status_banner(state, self.current_safety)
         self._update_last_publish_panel(state.last_publish)
+        self._update_publish_history_panel(state.publish_history)
         self._update_preview_content(state)
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
         self._sync_buttons()
@@ -519,6 +544,7 @@ class MainWindow(QMainWindow):
             bool(last_publish.publish_outcome_path and last_publish.publish_outcome_path.exists())
         )
         self.open_analytics_button.setEnabled(True)
+        self._sync_publish_history_buttons()
         self.send_button.setEnabled(bool(self.current_safety.send_enabled and not self.runner.is_running))
 
     def _set_running(self, running: bool) -> None:
@@ -544,6 +570,7 @@ class MainWindow(QMainWindow):
             )
         )
         self.open_analytics_button.setEnabled(not running)
+        self._sync_publish_history_buttons()
         self.send_button.setEnabled(not running and self.current_safety.send_enabled)
 
     def open_report(self) -> None:
@@ -568,6 +595,19 @@ class MainWindow(QMainWindow):
 
     def open_analytics_folder(self) -> None:
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.project_root / "output" / "analytics")))
+
+    def open_selected_history_workflow(self) -> None:
+        item = self.publish_history_list.currentItem()
+        if item is not None:
+            self._open_history_workflow_item(item)
+
+    def open_selected_history_outcome(self) -> None:
+        item = self.publish_history_list.currentItem()
+        if item is None:
+            return
+        publish_outcome_path = _path_from_item_data(item, 1)
+        if publish_outcome_path is not None:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(publish_outcome_path)))
 
     def show_send_disabled_dialog(self) -> None:
         QMessageBox.information(self, "Отправка отключена", self.current_safety.send_disabled_reason)
@@ -601,6 +641,44 @@ class MainWindow(QMainWindow):
             self.last_publish_label.setStyleSheet("color: #991b1b;")
         else:
             self.last_publish_label.setStyleSheet("color: #374151;")
+
+    def _update_publish_history_panel(self, publish_history: list[LastPublishState]) -> None:
+        self.publish_history_list.clear()
+        if not publish_history:
+            placeholder = QListWidgetItem("Публикаций через UI пока нет.")
+            placeholder.setFlags(Qt.ItemFlag.ItemIsEnabled)
+            self.publish_history_list.addItem(placeholder)
+            self._sync_publish_history_buttons()
+            return
+        for entry in publish_history:
+            item = QListWidgetItem(self._format_publish_history_entry(entry))
+            item.setData(Qt.ItemDataRole.UserRole, str(entry.workflow_path) if entry.workflow_path is not None else "")
+            item.setData(
+                Qt.ItemDataRole.UserRole + 1,
+                str(entry.publish_outcome_path) if entry.publish_outcome_path is not None else "",
+            )
+            if entry.success:
+                item.setForeground(Qt.GlobalColor.darkGreen)
+            elif entry.workflow_status == "failed" or not entry.published:
+                item.setForeground(Qt.GlobalColor.darkRed)
+            self.publish_history_list.addItem(item)
+        self.publish_history_list.setCurrentRow(0)
+        self._sync_publish_history_buttons()
+
+    def _sync_publish_history_buttons(self) -> None:
+        running = self.runner.is_running
+        item = self.publish_history_list.currentItem()
+        workflow_path = _path_from_item_data(item, 0) if item is not None else None
+        publish_outcome_path = _path_from_item_data(item, 1) if item is not None else None
+        self.open_history_workflow_button.setEnabled(not running and workflow_path is not None and workflow_path.exists())
+        self.open_history_outcome_button.setEnabled(
+            not running and publish_outcome_path is not None and publish_outcome_path.exists()
+        )
+
+    def _open_history_workflow_item(self, item: QListWidgetItem) -> None:
+        workflow_path = _path_from_item_data(item, 0)
+        if workflow_path is not None:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(workflow_path)))
 
     def _update_operator_status_banner(self, state: PreviewState, safety: SafetyState) -> None:
         operator_status = build_operator_status(state, safety)
@@ -770,6 +848,24 @@ class MainWindow(QMainWindow):
         if last_publish.publish_outcome_modified_at:
             lines.append(f"publish_outcome_time: {last_publish.publish_outcome_modified_at}")
         return "\n".join(lines)
+
+    @staticmethod
+    def _format_publish_history_entry(entry: LastPublishState) -> str:
+        title = _text(entry.title) or "unknown"
+        offer_id = _text(entry.offer_id) or "none"
+        parts = [f"{title} / {offer_id}"]
+        if entry.success:
+            parts.append(
+                f"message_id: {_text(entry.message_id) or 'none'} · "
+                f"published: {_yes_no_en(entry.published)} · "
+                f"telegram_verified: {_yes_no_en(entry.telegram_verified)}"
+            )
+        else:
+            parts.append(f"failed · reason: {_text(entry.reason) or 'unknown'}")
+        timestamp = _text(entry.created_at or entry.workflow_modified_at)
+        if timestamp:
+            parts.append(timestamp)
+        return "\n".join(parts)
 
     @staticmethod
     def _badge_style(post_type_key: str) -> str:
