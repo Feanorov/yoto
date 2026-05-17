@@ -5,10 +5,9 @@ Use the repo-normalized operator layer through `yoto.bat`. It wraps existing rep
 ## Launcher Resolution
 
 - `yoto.bat` resolves Python in this order:
-  - `D:\Telegram_portable_bundle\.venv\Scripts\python.exe`
   - `D:\Telegram\.venv\Scripts\python.exe`
-  - `python` on `PATH`
-- If none of those interpreters exist, the launcher stops with a clear error instead of falling through to a broken `python` call.
+  - `D:\Telegram_portable_bundle\.venv\Scripts\python.exe`
+- If none of those interpreters exist, the launcher stops with a clear error instead of falling through to `python` on `PATH`.
 - The batch file enters the bundle root before every command, so operators can run `D:\Telegram_portable_bundle\yoto.bat ...` without manual `cd` or path hacks.
 
 ## Safe vs Dangerous
@@ -20,6 +19,8 @@ Use the repo-normalized operator layer through `yoto.bat`. It wraps existing rep
   - `preview-offline`
   - `preview-golden`
   - `daily-check`
+  - `ui`
+  - `operator-ui`
   - `snapshot-offline`
   - `build-voice-package`
   - `generate-captions`
@@ -75,6 +76,14 @@ For MVP operator verification, prefer the safe commands unless you explicitly in
 - `yoto.bat send-test-golden`
   - runs `python -m dealbot.main --send-test --offline-snapshot golden`
   - replays the publish path from the preserved golden snapshot working copy without live ingest
+
+- `yoto.bat ui`
+  - runs `python -m dealbot.operator_ui`
+  - opens the desktop Operator UI from the bundle root without triggering preview, send-test, publish-previewed, or Telegram activity
+
+- `yoto.bat operator-ui`
+  - alias for `yoto.bat ui`
+  - opens the same desktop Operator UI entrypoint with the same safe behavior
 
 - `yoto.bat snapshot-offline`
   - runs `python -m dealbot.main --capture-offline-snapshot`
@@ -214,6 +223,11 @@ For MVP operator verification, prefer the safe commands unless you explicitly in
   - or `yoto.bat send-test`
   - or `yoto.bat run-once`
   - when the first live candidate becomes `golden_eligible=yes`, the runtime prints `golden-auto[...]` and preserves `output/offline_validation/golden/current/` automatically
+
+- Daily operator desktop launch:
+  - `yoto.bat ui`
+  - or `yoto.bat operator-ui`
+  - use this when you want the PySide6 Operator UI without triggering any preview or publish path automatically
 
 - Intentional golden refresh after the first one already exists:
   - `yoto.bat preview`

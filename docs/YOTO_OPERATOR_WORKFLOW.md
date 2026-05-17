@@ -4,6 +4,10 @@ Use `yoto.bat` as the operator entrypoint. The new launcher layer keeps the exis
 
 ## Recommended Daily Commands
 
+- `yoto.bat ui`
+  - opens the desktop Operator UI only
+  - uses the same launcher Python resolution and project-root bootstrap as the other safe operator commands
+
 - `yoto.bat daily-check`
   - safest default start of day
   - runs the existing preview path, keeps live logs visible, then prints the operator verdict plus the newest artifact pointers

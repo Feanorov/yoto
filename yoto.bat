@@ -28,6 +28,8 @@ if /I "%ACTION%"=="publish-previewed" goto :publish_previewed
 if /I "%ACTION%"=="daily-check" goto :daily_check
 if /I "%ACTION%"=="doctor" goto :doctor
 if /I "%ACTION%"=="status" goto :doctor
+if /I "%ACTION%"=="ui" goto :operator_ui
+if /I "%ACTION%"=="operator-ui" goto :operator_ui
 if /I "%ACTION%"=="latest-artifacts" goto :latest_artifacts
 if /I "%ACTION%"=="build-voice-package" goto :build_voice_package
 if /I "%ACTION%"=="run" goto :run
@@ -118,6 +120,13 @@ exit /b %ERRORLEVEL%
 call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli doctor %1 %2 %3 %4 %5 %6 %7 %8 %9
+call :execute_from_root
+exit /b %ERRORLEVEL%
+
+:operator_ui
+call :resolve_python
+if errorlevel 1 exit /b 1
+set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_ui
 call :execute_from_root
 exit /b %ERRORLEVEL%
 
@@ -322,6 +331,8 @@ echo   yoto.bat preview
 echo   yoto.bat preview-offline
 echo   yoto.bat preview-golden
 echo   yoto.bat daily-check
+echo   yoto.bat ui
+echo   yoto.bat operator-ui
 echo   yoto.bat snapshot-offline
 echo   yoto.bat build-voice-package
 echo   yoto.bat generate-captions [tool args]
@@ -352,6 +363,8 @@ echo   yoto.bat video-worker
 echo.
 echo Daily operator surface:
 echo   yoto.bat daily-check
+echo   yoto.bat ui
+echo   yoto.bat operator-ui
 echo   yoto.bat preview
 echo   yoto.bat send-test
 echo   yoto.bat build-voice-package
