@@ -68,7 +68,18 @@ class ArtifactBundle:
     ambiguous: bool = False
     stale: bool = False
     reused_latest_preview: bool = False
+    current_run_missing_artifact: bool = False
     warnings: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True, slots=True)
+class OperatorPostTypeMode:
+    key: str
+    label: str
+    allowed_post_types: frozenset[str]
+
+    def allows(self, post_type_key: str) -> bool:
+        return post_type_key in self.allowed_post_types
 
 
 @dataclass(slots=True)
@@ -170,6 +181,8 @@ class PreviewState:
     paths: PreviewPaths = field(default_factory=PreviewPaths)
     ambiguous: bool = False
     stale: bool = False
+    current_run_missing_artifact: bool = False
+    current_run_backend_reason: str | None = None
     selection_diagnostics: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     run_key: str | None = None
@@ -199,3 +212,41 @@ class SafetyState:
     blockers: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     preview_ready: bool = False
+
+
+SUPPORTED_OPERATOR_POST_TYPES = frozenset({"single_discount", "freebie", "roundup", "roundup_toplist", "toplist"})
+
+OPERATOR_POST_TYPE_MODES = (
+    OperatorPostTypeMode(
+        key="single_discount",
+        label="Одиночные скидки",
+        allowed_post_types=frozenset({"single_discount"}),
+    ),
+    OperatorPostTypeMode(
+        key="freebie",
+        label="Раздачи",
+        allowed_post_types=frozenset({"freebie"}),
+    ),
+    OperatorPostTypeMode(
+        key="roundup",
+        label="Подборки",
+        allowed_post_types=frozenset({"roundup", "roundup_toplist", "toplist"}),
+    ),
+    OperatorPostTypeMode(
+        key="any",
+        label="Любой тип",
+        allowed_post_types=SUPPORTED_OPERATOR_POST_TYPES,
+    ),
+)
+
+
+def default_operator_post_type_mode() -> OperatorPostTypeMode:
+    return OPERATOR_POST_TYPE_MODES[0]
+
+
+def get_operator_post_type_mode(key: str | None) -> OperatorPostTypeMode:
+    normalized = str(key or "").strip()
+    for mode in OPERATOR_POST_TYPE_MODES:
+        if mode.key == normalized:
+            return mode
+    return default_operator_post_type_mode()

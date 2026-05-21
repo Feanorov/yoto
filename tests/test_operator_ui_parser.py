@@ -153,9 +153,9 @@ def test_preview_artifact_resolver_marks_ambiguous_preview_run(tmp_path: Path) -
     assert any("ambiguous" in warning.lower() for warning in bundle.warnings)
 
 
-def test_preview_artifact_resolver_marks_reused_latest_preview_when_no_new_artifact_exists(tmp_path: Path) -> None:
+def test_preview_artifact_resolver_does_not_reuse_old_preview_when_current_run_has_no_new_artifact(tmp_path: Path) -> None:
     analytics_dir = tmp_path / "output" / "analytics"
-    truth_path = analytics_dir / "truth.json"
+    truth_path = analytics_dir / "20260516T160001Z_operator_truth_report_preview.json"
     _write_json(truth_path, {"verdict": {"truth_ready": True}}, mtime=15)
     _write_json(
         analytics_dir / "20260516T160001Z_operator_workflow_preview.json",
@@ -166,9 +166,11 @@ def test_preview_artifact_resolver_marks_reused_latest_preview_when_no_new_artif
     resolver = PreviewArtifactResolver(tmp_path)
     bundle = resolver.load_preview_run(started_at=999999)
 
-    assert bundle.workflow_path is not None
-    assert bundle.reused_latest_preview is True
-    assert any("latest known preview" in warning.lower() for warning in bundle.warnings)
+    assert bundle.workflow_path is None
+    assert bundle.truth_report_path is None
+    assert bundle.current_run_missing_artifact is True
+    assert bundle.stale is True
+    assert any("no new preview workflow or truth artifact" in warning.lower() for warning in bundle.warnings)
 
 
 def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Path) -> None:

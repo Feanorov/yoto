@@ -82,6 +82,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         ),
         ambiguous=bundle.ambiguous,
         stale=bundle.stale,
+        current_run_missing_artifact=bundle.current_run_missing_artifact,
         selection_diagnostics=_build_selection_diagnostics(truth),
         warnings=_dedupe(warnings),
         run_key=_text(truth.get("run_key")) or None,

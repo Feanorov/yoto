@@ -13,10 +13,12 @@ from dealbot.operator_ui.main_window import MainWindow
 from dealbot.operator_ui.models import (
     ArtifactBundle,
     LastPublishState,
+    OPERATOR_POST_TYPE_MODES,
     PinnedPublishState,
     PreviewPaths,
     PreviewState,
     SelectedTarget,
+    get_operator_post_type_mode,
 )
 from dealbot.operator_ui.safety import build_operator_status, build_preview_action_copy, evaluate_preview_safety
 
@@ -66,6 +68,98 @@ def test_evaluate_preview_safety_enables_send_for_verified_pinned_preview(tmp_pa
     assert safety.send_disabled_reason == "Превью готово к безопасной публикации."
     assert safety.blockers == []
     assert safety.preview_ready is True
+
+
+def test_evaluate_preview_safety_disables_send_for_post_type_mismatch(tmp_path: Path) -> None:
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="roundup",
+        post_type_label="Roundup",
+        selected_target=SelectedTarget(title="Roundup: Weekly Picks", offer_id="roundup:weekly"),
+        caption_html="<b>Roundup</b>",
+        caption_preview="Roundup",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="roundup:weekly",
+            idempotency_key="roundup-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(
+            truth_report_path=report_path,
+            image_path=card_path,
+            output_dir=tmp_path / "output",
+        ),
+    )
+
+    safety = evaluate_preview_safety(state)
+
+    assert safety.send_enabled is False
+    assert safety.send_disabled_reason == "Отключено: тип поста не выбран в текущем режиме."
+    assert "Отключено: тип поста не выбран в текущем режиме." in safety.blockers
+
+
+def test_evaluate_preview_safety_allows_supported_roundup_in_any_type_mode(tmp_path: Path) -> None:
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="roundup_toplist",
+        post_type_label="Roundup / Toplist",
+        selected_target=SelectedTarget(title="Roundup: Weekly Picks", offer_id="roundup:weekly"),
+        caption_html="<b>Roundup</b>",
+        caption_preview="Roundup",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="roundup:weekly",
+            idempotency_key="roundup-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(
+            truth_report_path=report_path,
+            image_path=card_path,
+            output_dir=tmp_path / "output",
+        ),
+    )
+
+    safety = evaluate_preview_safety(state, get_operator_post_type_mode("any"))
+
+    assert safety.send_enabled is True
+    assert safety.send_disabled_reason == "Превью готово к безопасной публикации."
+    assert safety.blockers == []
 
 
 def test_evaluate_preview_safety_keeps_send_disabled_when_pinned_publish_missing(tmp_path: Path) -> None:
@@ -133,7 +227,7 @@ def test_evaluate_preview_safety_blocks_ambiguous_and_stale_preview(tmp_path: Pa
     assert "Артефакты превью неоднозначны." in safety.blockers
     assert "Артефакты превью устарели." in safety.blockers
     assert "Выбранный тип поста не определён или не поддерживается." in safety.blockers
-    assert "Блокировка backend: queue_empty" in safety.blockers
+    assert "Блокировка backend: Нет готового поста для публикации." in safety.blockers
 
 
 def test_build_operator_status_ready_to_work_without_preview(tmp_path: Path) -> None:
@@ -246,7 +340,7 @@ def test_build_operator_status_marks_preview_as_already_published(tmp_path: Path
     operator_status = build_operator_status(state, safety)
     label, tooltip = build_preview_action_copy(state)
 
-    assert operator_status.status_text == "последний preview уже опубликован"
+    assert operator_status.status_text == "Этот оффер уже опубликован."
     assert operator_status.next_action == "Соберите новое превью для следующего поста."
     assert operator_status.last_publish_message_id == 182
     assert label == "Собрать следующий пост"
@@ -303,8 +397,8 @@ def test_evaluate_preview_safety_disables_send_for_already_published_preview_by_
     safety = evaluate_preview_safety(state)
 
     assert safety.send_enabled is False
-    assert safety.send_disabled_reason == "Отключено: этот preview уже опубликован в Telegram."
-    assert "Этот preview уже опубликован в Telegram." in safety.blockers
+    assert safety.send_disabled_reason == "Этот оффер уже опубликован."
+    assert "Этот оффер уже опубликован." in safety.blockers
 
 
 def test_build_preview_action_copy_uses_next_post_after_successful_last_publish_without_preview(tmp_path: Path) -> None:
@@ -513,19 +607,22 @@ def test_main_window_refresh_local_state_disables_send_for_latest_already_publis
     window = MainWindow(tmp_path)
 
     assert window.current_state is not None
-    assert window.current_state.selected_target is not None
-    assert window.current_state.selected_target.offer_id == "steam:413150"
     assert window.current_safety.send_enabled is False
     assert window.send_button.isEnabled() is False
     assert window.send_button.property("buttonRole") == "disabled"
     assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
-    assert window.send_reason_label.text() == "Отключено: этот preview уже опубликован в Telegram."
+    assert window.status_label.text() == "Этот оффер уже опубликован."
+    assert window.send_reason_label.text() == "Этот оффер уже опубликован."
+    assert window.current_preview_title_label.text() == "Активное превью не загружено."
+    assert window.caption_preview_text.toPlainText() == "Превью описания не загружено."
+    assert window.caption_html_browser.toPlainText() == "Описание не загружено."
+    assert window.open_card_button.isEnabled() is False
 
     window.close()
     app.processEvents()
 
 
-def test_main_window_hides_reused_already_published_preview_after_preview_run(tmp_path: Path) -> None:
+def test_main_window_clears_preview_when_current_run_creates_no_new_artifact(tmp_path: Path) -> None:
     app = QApplication.instance() or QApplication([])
     window = MainWindow(tmp_path)
     report_path = tmp_path / "output" / "analytics" / "truth.json"
@@ -622,22 +719,31 @@ def test_main_window_hides_reused_already_published_preview_after_preview_run(tm
                 "publish_outcome_payload": {},
             }
         ],
-        reused_latest_preview=True,
-        warnings=["No new preview workflow artifact was created after the current run; showing the latest known preview."],
+        current_run_missing_artifact=True,
+        stale=True,
+        warnings=["No new preview workflow or truth artifact was created after the current run."],
     )
 
     window._preview_started_at = 1.0
     window.resolver.load_preview_run = lambda started_at: bundle
+    window.runner._output_buffer = [
+        "operator-verdict :: category=queue_state :: reason=already_published\n"
+        "blocked-row :: row=42 :: [planned] [discount/high_value_discount] :: steam:413150 :: Stardew Valley :: blocker=already_published :: detail=blocked:already_published_recently\n"
+    ]
     window._handle_preview_finished(0)
 
     assert window.current_state is not None
-    assert window.current_state.selected_target is None
-    assert window.current_state.truth_ready is False
-    assert any("already published" in warning for warning in window.current_state.warnings)
+    assert window.current_state.current_run_missing_artifact is True
+    assert window.current_state.current_run_backend_reason == "blocked:already_published_recently"
     assert window.send_button.isEnabled() is False
     assert window.send_button.property("buttonRole") == "disabled"
     assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
+    assert window.status_label.text() == "Новый preview не создан."
+    assert window.send_reason_label.text() == "Новый preview не создан."
     assert window.current_preview_title_label.text() == "Активное превью не загружено."
+    assert window.caption_preview_text.toPlainText() == "Превью описания не загружено."
+    assert window.caption_html_browser.toPlainText() == "Описание не загружено."
+    assert window.open_card_button.isEnabled() is False
 
     window.close()
     app.processEvents()
@@ -688,6 +794,10 @@ def test_main_window_keeps_send_button_visually_disabled_for_stale_preview(tmp_p
     assert window.send_button.property("buttonRole") == "disabled"
     assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
     assert window.send_reason_label.text() == "Отключено: превью устарело."
+    assert window.current_preview_title_label.text() == "Активное превью не загружено."
+    assert window.caption_preview_text.toPlainText() == "Превью описания не загружено."
+    assert window.caption_html_browser.toPlainText() == "Описание не загружено."
+    assert window.open_card_button.isEnabled() is False
 
     window.close()
     app.processEvents()
@@ -717,6 +827,172 @@ def test_main_window_keeps_send_button_visually_disabled_for_unknown_blocked_pre
     assert window.send_button.isEnabled() is False
     assert window.send_button.property("buttonRole") == "disabled"
     assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_defaults_post_type_mode_to_single_discounts(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+
+    assert window.post_type_mode_combo.currentData() == OPERATOR_POST_TYPE_MODES[0].key
+    assert window.post_type_mode_combo.currentText() == OPERATOR_POST_TYPE_MODES[0].label
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_disables_roundup_preview_in_single_discount_mode(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="roundup_toplist",
+        post_type_label="Roundup / Toplist",
+        selected_target=SelectedTarget(title="Roundup: Weekly Picks", offer_id="roundup:weekly"),
+        caption_html="<b>Roundup</b>",
+        caption_preview="Roundup",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="roundup:weekly",
+            idempotency_key="roundup-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is False
+    assert window.send_button.isEnabled() is False
+    assert window.send_reason_label.text() == "Отключено: тип поста не выбран в текущем режиме."
+    assert window.status_label.text() == "Доступна подборка, но текущий режим ожидает одиночную скидку."
+    assert window.current_preview_title_label.text() == "Roundup: Weekly Picks"
+    assert window.open_card_button.isEnabled() is True
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_allows_supported_preview_in_any_type_mode(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="roundup",
+        post_type_label="Roundup",
+        selected_target=SelectedTarget(title="Roundup: Weekly Picks", offer_id="roundup:weekly"),
+        caption_html="<b>Roundup</b>",
+        caption_preview="Roundup",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="roundup:weekly",
+            idempotency_key="roundup-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window.post_type_mode_combo.setCurrentIndex(window.post_type_mode_combo.findData("any"))
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is True
+    assert window.send_button.isEnabled() is True
+    assert window.send_button.property("buttonRole") == "danger"
+    assert window.status_label.text() == "Превью готово"
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_does_not_invoke_send_for_post_type_mismatch(tmp_path: Path, monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="roundup",
+        post_type_label="Roundup",
+        selected_target=SelectedTarget(title="Roundup: Weekly Picks", offer_id="roundup:weekly"),
+        caption_html="<b>Roundup</b>",
+        caption_preview="Roundup",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="roundup:weekly",
+            idempotency_key="roundup-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+    window._apply_state(state)
+
+    flags = {"disabled_dialog": 0}
+    monkeypatch.setattr(window, "show_send_disabled_dialog", lambda: flags.__setitem__("disabled_dialog", flags["disabled_dialog"] + 1))
+    monkeypatch.setattr(
+        window.runner,
+        "run_publish_previewed",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("publish command must not run")),
+    )
+
+    window.handle_send_clicked()
+
+    assert window.current_safety.send_enabled is False
+    assert flags["disabled_dialog"] == 1
+    assert window.send_button.isEnabled() is False
 
     window.close()
     app.processEvents()

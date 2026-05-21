@@ -9,6 +9,7 @@ from typing import Any
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QPixmap
 from PySide6.QtWidgets import (
+    QComboBox,
     QFrame,
     QGroupBox,
     QHBoxLayout,
@@ -30,14 +31,26 @@ from PySide6.QtWidgets import (
 
 from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
-from .models import LastPublishState, PinnedPublishState, PreviewState, SafetyState
+from .models import (
+    LastPublishState,
+    OperatorPostTypeMode,
+    OPERATOR_POST_TYPE_MODES,
+    PreviewState,
+    SafetyState,
+    default_operator_post_type_mode,
+    get_operator_post_type_mode,
+)
 from .report_parser import build_preview_state
 from .safety import (
     SEND_DISABLED_ALREADY_PUBLISHED_RU,
+    SEND_DISABLED_NO_NEW_PREVIEW_RU,
+    SEND_DISABLED_POST_TYPE_MODE_RU,
     SEND_DISABLED_REASON_RU,
     build_operator_status,
     build_preview_action_copy,
     evaluate_preview_safety,
+    is_post_type_mode_mismatch,
+    is_preview_already_published,
     localize_ui_message,
 )
 
@@ -69,11 +82,6 @@ _PUBLISH_IDENTITY_MISMATCH_TEXT = "ОШИБКА: опубликованный pa
 _PUBLISH_IDENTITY_MISMATCH_FULL_TEXT = (
     "ОШИБКА: опубликованный payload не совпадает с превью. Проверь workflow/report вручную."
 )
-_REUSED_PUBLISHED_PREVIEW_WARNING = (
-    "Current run produced no new preview artifact; the latest known preview is already published."
-)
-
-
 def _translate_status_text(text: str) -> str:
     normalized = str(text or "").strip()
     return _STATUS_TEXT_TRANSLATIONS.get(normalized, normalized)
@@ -213,7 +221,7 @@ class MainWindow(QMainWindow):
         self.resolver = PreviewArtifactResolver(self.project_root)
         self.runner = PreviewCommandRunner(self)
         self.current_state: PreviewState | None = None
-        self.current_safety: SafetyState = evaluate_preview_safety(None)
+        self.current_safety: SafetyState = evaluate_preview_safety(None, default_operator_post_type_mode())
         self._preview_started_at: float | None = None
         self._publish_started_at: float | None = None
 
@@ -277,6 +285,13 @@ class MainWindow(QMainWindow):
         self.status_label = QLabel("Нужно собрать превью")
         self.status_label.setObjectName("statusHeadline")
         self.status_label.setWordWrap(True)
+        self.post_type_mode_label = QLabel("Тип поста")
+        self.post_type_mode_label.setObjectName("postTypeModeLabel")
+        self.post_type_mode_combo = QComboBox(status_group)
+        self.post_type_mode_combo.setObjectName("postTypeModeCombo")
+        for mode in OPERATOR_POST_TYPE_MODES:
+            self.post_type_mode_combo.addItem(mode.label, mode.key)
+        self.post_type_mode_combo.setCurrentIndex(0)
         self.post_type_badge = QLabel("Неизвестный тип")
         self.post_type_badge.setObjectName("postTypeBadge")
         self.post_type_badge.setWordWrap(True)
@@ -289,6 +304,8 @@ class MainWindow(QMainWindow):
         self.safety_label.setObjectName("safetySummaryLabel")
         self.safety_label.setWordWrap(True)
         status_layout.addWidget(self.status_label)
+        status_layout.addWidget(self.post_type_mode_label)
+        status_layout.addWidget(self.post_type_mode_combo)
         status_layout.addWidget(self.post_type_badge)
         status_layout.addWidget(self.send_reason_label)
         status_layout.addWidget(self.safety_label)
@@ -666,9 +683,17 @@ class MainWindow(QMainWindow):
         self.publish_history_list.itemSelectionChanged.connect(self._sync_publish_history_buttons)
         self.publish_history_list.itemDoubleClicked.connect(self._open_history_workflow_item)
         self.send_button.clicked.connect(self.handle_send_clicked)
+        self.post_type_mode_combo.currentIndexChanged.connect(self._handle_post_type_mode_changed)
         self.runner.output_ready.connect(self.append_log)
         self.runner.running_changed.connect(self._set_running)
         self.runner.finished.connect(self._handle_command_finished)
+
+    def _current_post_type_mode(self) -> OperatorPostTypeMode:
+        return get_operator_post_type_mode(self.post_type_mode_combo.currentData())
+
+    def _handle_post_type_mode_changed(self, _index: int) -> None:
+        if self.current_state is not None:
+            self._apply_state(self.current_state)
 
     def run_preview(self) -> None:
         if self.runner.is_running:
@@ -729,17 +754,16 @@ class MainWindow(QMainWindow):
     def _handle_preview_finished(self, exit_code: int) -> None:
         started_at = self._preview_started_at or 0.0
         bundle = self.resolver.load_preview_run(started_at)
-        if exit_code != 0 and bundle.workflow_path is None and bundle.truth_report_path is None:
-            self.current_state = PreviewState.empty(self.project_root)
-            self.current_safety = evaluate_preview_safety(self.current_state)
-            self.status_label.setText(_translate_status_text("Preview Failed"))
-            self.safety_label.setText("Последний запуск не создал артефакты превью.")
-            self.append_log("[ui] Команда превью завершилась с ошибкой до записи артефактов workflow")
-            self._sync_buttons()
-            return
-        state = build_preview_state(bundle)
-        if bundle.reused_latest_preview:
-            state = self._normalize_reused_published_preview_state(state)
+        state = (
+            build_preview_state(bundle)
+            if bundle.workflow_path or bundle.truth_report_path or bundle.latest_publish_workflow_path
+            else PreviewState.empty(self.project_root)
+        )
+        if bundle.current_run_missing_artifact:
+            state.current_run_missing_artifact = True
+            state.current_run_backend_reason = self._extract_preview_backend_reason(self.runner.last_output)
+            if exit_code != 0:
+                self.append_log("[ui] Команда превью завершилась без новых workflow/truth артефактов")
         self._apply_state(state)
 
     def _handle_publish_finished(self, exit_code: int) -> None:
@@ -782,8 +806,8 @@ class MainWindow(QMainWindow):
 
     def _apply_state(self, state: PreviewState) -> None:
         self.current_state = state
-        self.current_safety = evaluate_preview_safety(state)
-        self.status_label.setText(_translate_status_text(state.status_text))
+        self.current_safety = evaluate_preview_safety(state, self._current_post_type_mode())
+        self.status_label.setText(self._build_status_headline(state, self.current_safety))
         self.post_type_badge.setText(_translate_post_type_label(state.post_type_label))
         self.post_type_badge.setStyleSheet(self._badge_style(state.post_type_key))
         self.send_reason_label.setText(self.current_safety.send_disabled_reason)
@@ -797,38 +821,70 @@ class MainWindow(QMainWindow):
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
         self._sync_buttons()
 
-    def _normalize_reused_published_preview_state(self, state: PreviewState) -> PreviewState:
-        preview_safety = evaluate_preview_safety(state)
-        if preview_safety.send_disabled_reason != SEND_DISABLED_ALREADY_PUBLISHED_RU:
-            return state
-        state.status_text = "Preview Blocked"
-        state.truth_ready = False
-        state.telegram_verified = False
-        state.selected_target = None
-        state.post_type_key = "unknown"
-        state.post_type_label = "Unknown/Unsupported"
-        state.caption_html = ""
-        state.caption_preview = ""
-        state.caption_hash = None
-        state.card_path = None
-        state.card_exists = False
-        state.blocker_category = None
-        state.blocker_reason = None
-        state.blocker_detail = None
-        state.stale = True
-        state.report_exists = bool(state.paths.truth_report_path and state.paths.truth_report_path.exists())
-        state.pinned_publish = PinnedPublishState()
-        state.fingerprint = None
-        if _REUSED_PUBLISHED_PREVIEW_WARNING not in state.warnings:
-            state.warnings.append(_REUSED_PUBLISHED_PREVIEW_WARNING)
-        return state
+    def _has_active_preview(self, state: PreviewState) -> bool:
+        return bool(
+            state.truth_ready
+            and not state.current_run_missing_artifact
+            and not state.stale
+            and not is_preview_already_published(state)
+        )
+
+    def _build_status_headline(self, state: PreviewState, safety: SafetyState) -> str:
+        mode = self._current_post_type_mode()
+        if state.current_run_missing_artifact:
+            return SEND_DISABLED_NO_NEW_PREVIEW_RU
+        if is_post_type_mode_mismatch(state, mode):
+            return self._mode_mismatch_status_text(state, mode)
+        if not self._has_active_preview(state):
+            return self._inactive_preview_status_text(state, safety)
+        return _translate_status_text(state.status_text)
+
+    @staticmethod
+    def _mode_mismatch_status_text(state: PreviewState, mode: OperatorPostTypeMode) -> str:
+        if mode.key == "single_discount" and state.post_type_key in {"roundup", "roundup_toplist", "toplist"}:
+            return "Доступна подборка, но текущий режим ожидает одиночную скидку."
+        return SEND_DISABLED_POST_TYPE_MODE_RU
+
+    @staticmethod
+    def _inactive_preview_status_text(state: PreviewState, safety: SafetyState) -> str:
+        if is_preview_already_published(state) or safety.send_disabled_reason == SEND_DISABLED_ALREADY_PUBLISHED_RU:
+            return "Этот оффер уже опубликован."
+        if state.blocker_reason and state.selected_target is None:
+            return "Нет готового поста для публикации."
+        if state.stale:
+            return "Новый preview не создан."
+        return _translate_status_text(state.status_text)
+
+    @staticmethod
+    def _extract_preview_backend_reason(output_text: str) -> str | None:
+        text = str(output_text or "")
+        detail_matches = re.findall(r"blocked-row :: .*?:: detail=([^\r\n]+)", text)
+        for detail in reversed(detail_matches):
+            normalized = str(detail).strip()
+            if normalized and normalized != "none":
+                return normalized
+        reason_matches = re.findall(r"operator-verdict :: .*?:: reason=([^\s]+)", text)
+        for reason in reversed(reason_matches):
+            normalized = str(reason).strip()
+            if normalized and normalized != "none":
+                return normalized
+        blocker_matches = re.findall(r"target :: .*?:: blocker_reason=([^\s]+)", text)
+        for reason in reversed(blocker_matches):
+            normalized = str(reason).strip()
+            if normalized and normalized != "none":
+                return normalized
+        return None
 
     def _update_preview_content(self, state: PreviewState) -> None:
         self._update_current_preview_summary(state)
-        if state.card_path and state.card_exists:
+        if self._has_active_preview(state) and state.card_path and state.card_exists:
             self.image_label.set_preview_pixmap(QPixmap(str(state.card_path)))
         else:
             self.image_label.set_preview_pixmap(None)
+        if not self._has_active_preview(state):
+            self.caption_html_browser.setPlainText("Описание не загружено.")
+            self.caption_preview_text.setPlainText("Превью описания не загружено.")
+            return
         if state.caption_html:
             self.caption_html_browser.setHtml(state.caption_html)
         elif state.caption_preview:
@@ -839,7 +895,7 @@ class MainWindow(QMainWindow):
 
     def _update_current_preview_summary(self, state: PreviewState) -> None:
         target = state.selected_target
-        if target is not None and (_text(target.title) or _text(target.offer_id)):
+        if self._has_active_preview(state) and target is not None and (_text(target.title) or _text(target.offer_id)):
             self.current_preview_title_label.setText(_text(target.title) or "Без названия")
             meta_parts = [
                 f"Тип: {_translate_post_type_label(state.post_type_label)}",
@@ -851,16 +907,21 @@ class MainWindow(QMainWindow):
             return
 
         self.current_preview_title_label.setText("Активное превью не загружено.")
-        meta_parts = [f"Статус: {_translate_status_text(state.status_text)}"]
+        meta_parts = [f"Статус: {self._build_status_headline(state, self.current_safety)}"]
         translated_post_type = _translate_post_type_label(state.post_type_label)
         if translated_post_type:
             meta_parts.append(f"Тип: {translated_post_type}")
+        meta_parts.append(f"Режим: {self._current_post_type_mode().label}")
         self.current_preview_meta_label.setText(" · ".join(meta_parts))
 
     def _sync_buttons(self) -> None:
         self._sync_preview_action_button()
         report_path = self._report_path()
-        card_path = self.current_state.card_path if self.current_state else None
+        card_path = (
+            self.current_state.card_path
+            if self.current_state is not None and self._has_active_preview(self.current_state)
+            else None
+        )
         last_publish = self.current_state.last_publish if self.current_state else LastPublishState()
         self.open_report_button.setEnabled(bool(report_path and report_path.exists()))
         self.open_card_button.setEnabled(bool(card_path and card_path.exists()))
@@ -882,7 +943,9 @@ class MainWindow(QMainWindow):
         self.run_preview_button.setEnabled(not running)
         self.refresh_button.setEnabled(not running)
         self.open_report_button.setEnabled(not running and bool(self._report_path() and self._report_path().exists()))
-        self.open_card_button.setEnabled(not running and bool(self.current_state and self.current_state.card_exists))
+        self.open_card_button.setEnabled(
+            not running and bool(self.current_state and self._has_active_preview(self.current_state) and self.current_state.card_exists)
+        )
         self.open_output_button.setEnabled(not running)
         self.open_publish_proof_button.setEnabled(
             not running
@@ -1188,6 +1251,9 @@ class MainWindow(QMainWindow):
         lines.append("")
         lines.append("Статус")
         lines.append(f"  status_text: {_translate_status_text(state.status_text)}")
+        lines.append(f"  ui_status_headline: {self._build_status_headline(state, safety)}")
+        lines.append(f"  operator_mode: {self._current_post_type_mode().label}")
+        lines.append(f"  active_preview_visible: {_yes_no(self._has_active_preview(state))}")
         lines.append(f"  verdict: {_or_none(state.verdict)}")
         lines.append(f"  truth_ready: {_yes_no(state.truth_ready)}")
         lines.append(f"  telegram_verified: {_yes_no(state.telegram_verified)}")
@@ -1196,6 +1262,8 @@ class MainWindow(QMainWindow):
         lines.append(f"  blocker_detail: {_or_none(state.blocker_detail)}")
         lines.append(f"  ambiguous: {_yes_no(state.ambiguous)}")
         lines.append(f"  stale: {_yes_no(state.stale)}")
+        lines.append(f"  current_run_missing_artifact: {_yes_no(state.current_run_missing_artifact)}")
+        lines.append(f"  current_run_backend_reason: {_or_none(state.current_run_backend_reason)}")
         lines.append("")
         lines.append("Выбор кандидата")
         if not state.selection_diagnostics:

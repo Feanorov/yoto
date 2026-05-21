@@ -21,23 +21,30 @@ class PreviewArtifactResolver:
         return self._build_bundle(workflow_path=workflow_path, warnings=warnings)
 
     def load_preview_run(self, started_at: float) -> ArtifactBundle:
-        candidates = self._find_since(self.analytics_dir, "*_operator_workflow_preview.json", started_at)
+        workflow_candidates = self._find_since(self.analytics_dir, "*_operator_workflow_preview.json", started_at)
+        truth_candidates = self._find_since(self.analytics_dir, "*_operator_truth_report_preview.json", started_at)
         warnings: list[str] = []
-        ambiguous = len(candidates) > 1
-        reused_latest_preview = False
+        ambiguous = len(workflow_candidates) > 1 or (not workflow_candidates and len(truth_candidates) > 1)
         if ambiguous:
-            warnings.append("Preview artifacts are ambiguous; multiple preview workflow reports were created.")
-        workflow_path = max(candidates, key=self._sort_key) if candidates else self._find_newest(
-            self.analytics_dir,
-            ("*_operator_workflow_preview.json",),
-        )
-        if not candidates:
-            reused_latest_preview = workflow_path is not None
-            warnings.append("No new preview workflow artifact was created after the current run; showing the latest known preview.")
+            warnings.append("Preview artifacts are ambiguous; multiple preview artifacts were created.")
+        workflow_path = max(workflow_candidates, key=self._sort_key) if workflow_candidates else None
+        truth_report_path = max(truth_candidates, key=self._sort_key) if truth_candidates else None
+        current_run_missing_artifact = workflow_path is None and truth_report_path is None
+        stale = False
+        if current_run_missing_artifact:
+            latest_preview_artifact = self._find_newest(
+                self.analytics_dir,
+                ("*_operator_workflow_preview.json", "*_operator_truth_report_preview.json"),
+            )
+            stale = latest_preview_artifact is not None and self._sort_key(latest_preview_artifact)[0] < started_at
+            warnings.append("No new preview workflow or truth artifact was created after the current run.")
         return self._build_bundle(
             workflow_path=workflow_path,
+            truth_report_path=truth_report_path,
             ambiguous=ambiguous,
-            reused_latest_preview=reused_latest_preview,
+            stale=stale,
+            current_run_missing_artifact=current_run_missing_artifact,
+            allow_latest_truth_fallback=not current_run_missing_artifact,
             warnings=warnings,
         )
 
@@ -103,13 +110,15 @@ class PreviewArtifactResolver:
         ambiguous: bool = False,
         stale: bool = False,
         reused_latest_preview: bool = False,
+        current_run_missing_artifact: bool = False,
+        allow_latest_truth_fallback: bool = True,
         warnings: list[str] | None = None,
     ) -> ArtifactBundle:
         workflow_payload = self._load_json(workflow_path)
         resolved_truth_report = truth_report_path
         if resolved_truth_report is None and workflow_payload:
             resolved_truth_report = self._resolve_truth_report_path(workflow_payload)
-        if resolved_truth_report is None:
+        if resolved_truth_report is None and allow_latest_truth_fallback:
             resolved_truth_report = self._find_newest(self.analytics_dir, ("*_operator_truth_report_preview.json",))
         truth_payload = self._load_json(resolved_truth_report)
         publish_history_records = self._load_publish_history(limit=5)
@@ -143,6 +152,7 @@ class PreviewArtifactResolver:
             ambiguous=ambiguous,
             stale=stale,
             reused_latest_preview=reused_latest_preview,
+            current_run_missing_artifact=current_run_missing_artifact,
             warnings=list(warnings or ()),
         )
 
