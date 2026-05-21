@@ -314,37 +314,6 @@ class MainWindow(QMainWindow):
         actions_layout.addWidget(self.open_output_button)
         actions_layout.addWidget(self.send_button)
         layout.addWidget(actions_group)
-
-        publish_group = QGroupBox("Последняя публикация")
-        publish_layout = QVBoxLayout(publish_group)
-        self.last_publish_label = QLabel("Публикаций через UI пока нет.")
-        self.last_publish_label.setObjectName("lastPublishLabel")
-        self.last_publish_label.setWordWrap(True)
-        self.open_publish_proof_button = QPushButton("Открыть proof")
-        self._set_button_role(self.open_publish_proof_button, "utility")
-        self.open_publish_outcome_button = QPushButton("Открыть publish outcome")
-        self._set_button_role(self.open_publish_outcome_button, "utility")
-        self.open_analytics_button = QPushButton("Открыть папку analytics")
-        self._set_button_role(self.open_analytics_button, "utility")
-        publish_layout.addWidget(self.last_publish_label)
-        publish_layout.addWidget(self.open_publish_proof_button)
-        publish_layout.addWidget(self.open_publish_outcome_button)
-        publish_layout.addWidget(self.open_analytics_button)
-        layout.addWidget(publish_group)
-
-        history_group = QGroupBox("История публикаций")
-        history_layout = QVBoxLayout(history_group)
-        self.publish_history_list = QListWidget()
-        self.publish_history_list.setObjectName("publishHistoryList")
-        self.publish_history_list.setMinimumHeight(220)
-        self.open_history_workflow_button = QPushButton("Открыть workflow")
-        self._set_button_role(self.open_history_workflow_button, "utility")
-        self.open_history_outcome_button = QPushButton("Открыть publish outcome")
-        self._set_button_role(self.open_history_outcome_button, "utility")
-        history_layout.addWidget(self.publish_history_list)
-        history_layout.addWidget(self.open_history_workflow_button)
-        history_layout.addWidget(self.open_history_outcome_button)
-        layout.addWidget(history_group)
         layout.addStretch(1)
         return panel
 
@@ -354,6 +323,18 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
+
+        preview_group = QGroupBox("Текущее превью")
+        preview_layout = QVBoxLayout(preview_group)
+        self.current_preview_title_label = QLabel("Активное превью не загружено.")
+        self.current_preview_title_label.setObjectName("currentPreviewTitle")
+        self.current_preview_title_label.setWordWrap(True)
+        self.current_preview_meta_label = QLabel("Соберите превью, чтобы увидеть карточку, тип поста и offer_id.")
+        self.current_preview_meta_label.setObjectName("currentPreviewMeta")
+        self.current_preview_meta_label.setWordWrap(True)
+        preview_layout.addWidget(self.current_preview_title_label)
+        preview_layout.addWidget(self.current_preview_meta_label)
+        layout.addWidget(preview_group)
 
         image_group = QGroupBox("Превью")
         image_layout = QVBoxLayout(image_group)
@@ -371,8 +352,9 @@ class MainWindow(QMainWindow):
         self.caption_preview_text = QPlainTextEdit()
         self.caption_preview_text.setObjectName("captionPreviewText")
         self.caption_preview_text.setReadOnly(True)
-        self.caption_tabs.addTab(self.caption_html_browser, "HTML описания")
         self.caption_tabs.addTab(self.caption_preview_text, "Превью описания")
+        self.caption_tabs.addTab(self.caption_html_browser, "HTML описания")
+        self.caption_tabs.setCurrentWidget(self.caption_preview_text)
         caption_layout.addWidget(self.caption_tabs)
         layout.addWidget(caption_group, stretch=2)
         return panel
@@ -382,11 +364,55 @@ class MainWindow(QMainWindow):
         panel.setObjectName("rightPanel")
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(16, 16, 16, 16)
+        layout.setSpacing(12)
 
-        splitter = QSplitter(Qt.Orientation.Vertical, panel)
+        self.side_tabs = QTabWidget(panel)
+        self.side_tabs.setObjectName("sideTabs")
+
+        publish_tab = QWidget(self.side_tabs)
+        publish_layout = QVBoxLayout(publish_tab)
+        publish_layout.setContentsMargins(0, 0, 0, 0)
+        publish_layout.setSpacing(12)
+
+        publish_group = QGroupBox("Последняя публикация")
+        publish_group_layout = QVBoxLayout(publish_group)
+        self.last_publish_label = QLabel("Публикаций через UI пока нет.")
+        self.last_publish_label.setObjectName("lastPublishLabel")
+        self.last_publish_label.setWordWrap(True)
+        self.open_publish_proof_button = QPushButton("Открыть proof")
+        self._set_button_role(self.open_publish_proof_button, "utility")
+        self.open_publish_outcome_button = QPushButton("Открыть publish outcome")
+        self._set_button_role(self.open_publish_outcome_button, "utility")
+        self.open_analytics_button = QPushButton("Открыть папку analytics")
+        self._set_button_role(self.open_analytics_button, "utility")
+        publish_group_layout.addWidget(self.last_publish_label)
+        publish_group_layout.addWidget(self.open_publish_proof_button)
+        publish_group_layout.addWidget(self.open_publish_outcome_button)
+        publish_group_layout.addWidget(self.open_analytics_button)
+        publish_layout.addWidget(publish_group)
+
+        history_group = QGroupBox("История публикаций")
+        history_layout = QVBoxLayout(history_group)
+        self.publish_history_list = QListWidget()
+        self.publish_history_list.setObjectName("publishHistoryList")
+        self.publish_history_list.setMinimumHeight(220)
+        self.open_history_workflow_button = QPushButton("Открыть workflow")
+        self._set_button_role(self.open_history_workflow_button, "utility")
+        self.open_history_outcome_button = QPushButton("Открыть publish outcome")
+        self._set_button_role(self.open_history_outcome_button, "utility")
+        history_layout.addWidget(self.publish_history_list)
+        history_layout.addWidget(self.open_history_workflow_button)
+        history_layout.addWidget(self.open_history_outcome_button)
+        publish_layout.addWidget(history_group, stretch=1)
+
+        technical_tab = QWidget(self.side_tabs)
+        technical_layout = QVBoxLayout(technical_tab)
+        technical_layout.setContentsMargins(0, 0, 0, 0)
+
+        splitter = QSplitter(Qt.Orientation.Vertical, technical_tab)
         splitter.setObjectName("sideSplitter")
 
-        details_group = QGroupBox("Детали")
+        details_group = QGroupBox("Технические детали")
         details_layout = QVBoxLayout(details_group)
         self.details_text = QPlainTextEdit()
         self.details_text.setObjectName("detailsText")
@@ -407,7 +433,11 @@ class MainWindow(QMainWindow):
         splitter.setStretchFactor(1, 1)
         splitter.setSizes([420, 260])
 
-        layout.addWidget(splitter)
+        technical_layout.addWidget(splitter)
+
+        self.side_tabs.addTab(publish_tab, "Публикации")
+        self.side_tabs.addTab(technical_tab, "Техническое")
+        layout.addWidget(self.side_tabs)
         return panel
 
     @staticmethod
@@ -475,6 +505,14 @@ class MainWindow(QMainWindow):
                 font-size: 15px;
                 font-weight: 700;
                 color: #f8f9ff;
+            }
+            QLabel#currentPreviewTitle {
+                font-size: 18px;
+                font-weight: 700;
+                color: #ffffff;
+            }
+            QLabel#currentPreviewMeta {
+                color: #b8c2f4;
             }
             QLabel#operatorStatusFacts, QLabel#safetySummaryLabel, QLabel#sendReasonLabel, QLabel#lastPublishLabel {
                 color: #c8d1ff;
@@ -743,6 +781,7 @@ class MainWindow(QMainWindow):
         self._sync_buttons()
 
     def _update_preview_content(self, state: PreviewState) -> None:
+        self._update_current_preview_summary(state)
         if state.card_path and state.card_exists:
             self.image_label.set_preview_pixmap(QPixmap(str(state.card_path)))
         else:
@@ -754,6 +793,26 @@ class MainWindow(QMainWindow):
         else:
             self.caption_html_browser.setPlainText("Описание не загружено.")
         self.caption_preview_text.setPlainText(state.caption_preview or "Превью описания не загружено.")
+
+    def _update_current_preview_summary(self, state: PreviewState) -> None:
+        target = state.selected_target
+        if target is not None and (_text(target.title) or _text(target.offer_id)):
+            self.current_preview_title_label.setText(_text(target.title) or "Без названия")
+            meta_parts = [
+                f"Тип: {_translate_post_type_label(state.post_type_label)}",
+                f"offer_id: {_text(target.offer_id) or 'нет'}",
+            ]
+            if _text(target.source):
+                meta_parts.append(f"Источник: {_text(target.source)}")
+            self.current_preview_meta_label.setText(" · ".join(meta_parts))
+            return
+
+        self.current_preview_title_label.setText("Активное превью не загружено.")
+        meta_parts = [f"Статус: {_translate_status_text(state.status_text)}"]
+        translated_post_type = _translate_post_type_label(state.post_type_label)
+        if translated_post_type:
+            meta_parts.append(f"Тип: {translated_post_type}")
+        self.current_preview_meta_label.setText(" · ".join(meta_parts))
 
     def _sync_buttons(self) -> None:
         self._sync_preview_action_button()
