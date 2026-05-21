@@ -1302,8 +1302,13 @@ class PublishNextUseCase:
         dedup = self.dedup_policy.evaluate(record.offer, game_history, None, now_utc)
         if dedup.accepted:
             return None, None
+        blocker_code = (
+            'blocked:already_published_recently'
+            if dedup.reason == 'duplicate_within_game_cooldown'
+            else 'blocked:not_meaningfully_improved_since_publication'
+        )
         detail = (
-            f'game_id={game_id} posted_at={game_history.posted_at.isoformat()} '
+            f'{blocker_code} game_id={game_id} posted_at={game_history.posted_at.isoformat()} '
             f'lane={game_history.lane or "unknown"} dedup_reason={dedup.reason}'
         )
         return 'already_published', detail

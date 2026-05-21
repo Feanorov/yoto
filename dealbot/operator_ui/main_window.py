@@ -30,9 +30,10 @@ from PySide6.QtWidgets import (
 
 from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
-from .models import LastPublishState, PreviewState, SafetyState
+from .models import LastPublishState, PinnedPublishState, PreviewState, SafetyState
 from .report_parser import build_preview_state
 from .safety import (
+    SEND_DISABLED_ALREADY_PUBLISHED_RU,
     SEND_DISABLED_REASON_RU,
     build_operator_status,
     build_preview_action_copy,
@@ -67,6 +68,9 @@ _PUBLISH_CONFIRMATION_WARNING = (
 _PUBLISH_IDENTITY_MISMATCH_TEXT = "ОШИБКА: опубликованный payload не совпадает с превью."
 _PUBLISH_IDENTITY_MISMATCH_FULL_TEXT = (
     "ОШИБКА: опубликованный payload не совпадает с превью. Проверь workflow/report вручную."
+)
+_REUSED_PUBLISHED_PREVIEW_WARNING = (
+    "Current run produced no new preview artifact; the latest known preview is already published."
 )
 
 
@@ -721,6 +725,8 @@ class MainWindow(QMainWindow):
             self._sync_buttons()
             return
         state = build_preview_state(bundle)
+        if bundle.reused_latest_preview:
+            state = self._normalize_reused_published_preview_state(state)
         self._apply_state(state)
 
     def _handle_publish_finished(self, exit_code: int) -> None:
@@ -777,6 +783,32 @@ class MainWindow(QMainWindow):
         self._update_preview_content(state)
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
         self._sync_buttons()
+
+    def _normalize_reused_published_preview_state(self, state: PreviewState) -> PreviewState:
+        preview_safety = evaluate_preview_safety(state)
+        if preview_safety.send_disabled_reason != SEND_DISABLED_ALREADY_PUBLISHED_RU:
+            return state
+        state.status_text = "Preview Blocked"
+        state.truth_ready = False
+        state.telegram_verified = False
+        state.selected_target = None
+        state.post_type_key = "unknown"
+        state.post_type_label = "Unknown/Unsupported"
+        state.caption_html = ""
+        state.caption_preview = ""
+        state.caption_hash = None
+        state.card_path = None
+        state.card_exists = False
+        state.blocker_category = None
+        state.blocker_reason = None
+        state.blocker_detail = None
+        state.stale = True
+        state.report_exists = bool(state.paths.truth_report_path and state.paths.truth_report_path.exists())
+        state.pinned_publish = PinnedPublishState()
+        state.fingerprint = None
+        if _REUSED_PUBLISHED_PREVIEW_WARNING not in state.warnings:
+            state.warnings.append(_REUSED_PUBLISHED_PREVIEW_WARNING)
+        return state
 
     def _update_preview_content(self, state: PreviewState) -> None:
         self._update_current_preview_summary(state)
@@ -1144,6 +1176,13 @@ class MainWindow(QMainWindow):
         lines.append(f"  blocker_detail: {_or_none(state.blocker_detail)}")
         lines.append(f"  ambiguous: {_yes_no(state.ambiguous)}")
         lines.append(f"  stale: {_yes_no(state.stale)}")
+        lines.append("")
+        lines.append("Выбор кандидата")
+        if not state.selection_diagnostics:
+            lines.append("  нет")
+        else:
+            for diagnostic in state.selection_diagnostics:
+                lines.append(f"  {diagnostic}")
         lines.append("")
         lines.append("Источники / здоровье данных")
         if not state.ingest_sources:

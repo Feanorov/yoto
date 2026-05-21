@@ -172,10 +172,12 @@ def test_publish_next_inspect_selection_skips_already_published_queue_rows(tmp_p
 
     assert inspection.selected_candidate is not None
     assert inspection.selected_candidate.offer_id == 'steam:264710'
-    assert any(
-        candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
+    blocked_stardew = next(
+        candidate
         for candidate in inspection.blocked_candidates
+        if candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
     )
+    assert 'blocked:already_published_recently' in str(blocked_stardew.blocker_detail)
     assert target.candidate is not None
     assert target.candidate['offer_id'] == 'steam:264710'
 
@@ -218,6 +220,43 @@ def test_publish_next_allows_repeat_same_game_when_price_improves_meaningfully(t
     assert all(candidate.offer_id != 'steam:413150' for candidate in inspection.blocked_candidates)
     assert target.candidate is not None
     assert target.candidate['offer_id'] == 'steam:413150'
+
+
+def test_publish_next_blocks_only_already_published_candidate_when_no_alternative_exists(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+
+    published_offer = make_offer()
+    published_offer.offer_id = 'steam:413150'
+    published_offer.game_id = '413150'
+    published_offer.franchise_key = '413150'
+    published_offer.title = 'Stardew Valley'
+
+    repo.replace_queue(
+        'planned',
+        [(150.0, published_offer, make_decision_json('high_value_discount', score=150.0))],
+    )
+    repo.record_publication(published_offer, 'high_value_discount', 183)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    inspection = use_case.inspect_selection(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0))
+    target = asyncio.run(use_case.preview_send_test_target(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0)))
+
+    assert inspection.selected_candidate is None
+    assert inspection.blocker_reason == 'already_published'
+    assert any(
+        candidate.offer_id == 'steam:413150'
+        and candidate.blocker_reason == 'already_published'
+        and 'blocked:already_published_recently' in str(candidate.blocker_detail)
+        for candidate in inspection.blocked_candidates
+    )
+    assert target.truth_ready is False
+    assert target.would_send is False
+    assert target.blocker_reason == 'already_published'
+    assert target.candidate is None
 
 
 def test_operator_truth_report_emits_queue_selection_and_target_details(tmp_path: Path) -> None:

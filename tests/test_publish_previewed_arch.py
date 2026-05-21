@@ -449,10 +449,12 @@ def test_publish_previewed_success_suppresses_same_offer_from_selection_when_ano
 
     assert inspection.selected_candidate is not None
     assert inspection.selected_candidate.offer_id == 'steam:264710'
-    assert any(
-        candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
+    blocked_stardew = next(
+        candidate
         for candidate in inspection.blocked_candidates
+        if candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
     )
+    assert 'blocked:already_published_recently' in str(blocked_stardew.blocker_detail)
     assert target.candidate is not None
     assert target.candidate['offer_id'] == 'steam:264710'
     assert target.would_send is True

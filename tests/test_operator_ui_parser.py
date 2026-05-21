@@ -153,6 +153,24 @@ def test_preview_artifact_resolver_marks_ambiguous_preview_run(tmp_path: Path) -
     assert any("ambiguous" in warning.lower() for warning in bundle.warnings)
 
 
+def test_preview_artifact_resolver_marks_reused_latest_preview_when_no_new_artifact_exists(tmp_path: Path) -> None:
+    analytics_dir = tmp_path / "output" / "analytics"
+    truth_path = analytics_dir / "truth.json"
+    _write_json(truth_path, {"verdict": {"truth_ready": True}}, mtime=15)
+    _write_json(
+        analytics_dir / "20260516T160001Z_operator_workflow_preview.json",
+        {"command": "preview", "report_path": str(truth_path)},
+        mtime=20,
+    )
+
+    resolver = PreviewArtifactResolver(tmp_path)
+    bundle = resolver.load_preview_run(started_at=999999)
+
+    assert bundle.workflow_path is not None
+    assert bundle.reused_latest_preview is True
+    assert any("latest known preview" in warning.lower() for warning in bundle.warnings)
+
+
 def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Path) -> None:
     workflow_path = tmp_path / "output" / "analytics" / "20260517T075955Z_operator_workflow_publish-previewed.json"
     publish_outcome_path = tmp_path / "output" / "analytics" / "20260517T075954Z_publish_outcome_steam_264710.json"
@@ -211,6 +229,48 @@ def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Pat
     assert state.last_publish.image_path == tmp_path / "output" / "cards" / "card.png"
     assert state.last_publish.workflow_path == workflow_path
     assert state.last_publish.publish_outcome_path == publish_outcome_path
+
+
+def test_build_preview_state_exposes_blocked_selection_diagnostics(tmp_path: Path) -> None:
+    state = build_preview_state(
+        ArtifactBundle(
+            project_root=tmp_path,
+            output_dir=tmp_path / "output",
+            truth_payload={
+                "selection": {
+                    "blocked_candidates": [
+                        {
+                            "offer_id": "steam:413150",
+                            "title": "Stardew Valley",
+                            "blocker_reason": "already_published",
+                            "blocker_detail": (
+                                "blocked:already_published_recently "
+                                "game_id=413150 dedup_reason=duplicate_within_game_cooldown"
+                            ),
+                        }
+                    ],
+                    "blocker_reason": "already_published",
+                    "blocker_detail": "blocked:already_published_recently",
+                },
+                "verdict": {
+                    "verdict": "truthful_send_test_blocked",
+                    "truth_ready": False,
+                    "telegram_verified": False,
+                    "blocker_reason": "already_published",
+                },
+            },
+        )
+    )
+
+    assert any(
+        "blocked:already_published offer_id=steam:413150" in diagnostic
+        and "blocked:already_published_recently" in diagnostic
+        for diagnostic in state.selection_diagnostics
+    )
+    assert any(
+        diagnostic == "selection_blocker:already_published detail=blocked:already_published_recently"
+        for diagnostic in state.selection_diagnostics
+    )
 
 
 def test_build_preview_state_handles_missing_last_publish_workflow(tmp_path: Path) -> None:

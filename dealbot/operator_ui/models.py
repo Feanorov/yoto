@@ -67,6 +67,7 @@ class ArtifactBundle:
     publish_history_records: list[dict[str, Any]] = field(default_factory=list)
     ambiguous: bool = False
     stale: bool = False
+    reused_latest_preview: bool = False
     warnings: list[str] = field(default_factory=list)
 
 
@@ -169,6 +170,7 @@ class PreviewState:
     paths: PreviewPaths = field(default_factory=PreviewPaths)
     ambiguous: bool = False
     stale: bool = False
+    selection_diagnostics: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     run_key: str | None = None
     created_at: str | None = None

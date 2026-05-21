@@ -82,6 +82,7 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         ),
         ambiguous=bundle.ambiguous,
         stale=bundle.stale,
+        selection_diagnostics=_build_selection_diagnostics(truth),
         warnings=_dedupe(warnings),
         run_key=_text(truth.get("run_key")) or None,
         created_at=_text(truth.get("created_at")) or None,
@@ -286,6 +287,53 @@ def _build_ingest_sources(truth: dict[str, Any]) -> list[SourceHealth]:
             )
         )
     return result
+
+
+def _build_selection_diagnostics(truth: dict[str, Any]) -> list[str]:
+    selection = _as_dict(truth.get("selection"))
+    if not selection:
+        return []
+    diagnostics: list[str] = []
+    selected_candidate = _as_dict(selection.get("selected_candidate"))
+    if selected_candidate:
+        parts = ["selected_candidate"]
+        offer_id = _text(selected_candidate.get("offer_id"))
+        title = _text(selected_candidate.get("title"))
+        lane = _text(selected_candidate.get("lane"))
+        bucket = _text(selected_candidate.get("bucket"))
+        if offer_id:
+            parts.append(f"offer_id={offer_id}")
+        if title:
+            parts.append(f"title={title}")
+        if lane:
+            parts.append(f"lane={lane}")
+        if bucket:
+            parts.append(f"bucket={bucket}")
+        diagnostics.append(" ".join(parts))
+
+    for candidate in list(selection.get("blocked_candidates") or []):
+        if not isinstance(candidate, dict):
+            continue
+        parts = [f"blocked:{_text(candidate.get('blocker_reason')) or 'unknown'}"]
+        offer_id = _text(candidate.get("offer_id"))
+        title = _text(candidate.get("title"))
+        detail = _text(candidate.get("blocker_detail"))
+        if offer_id:
+            parts.append(f"offer_id={offer_id}")
+        if title:
+            parts.append(f"title={title}")
+        if detail:
+            parts.append(f"detail={detail}")
+        diagnostics.append(" ".join(parts))
+
+    blocker_reason = _text(selection.get("blocker_reason"))
+    blocker_detail = _text(selection.get("blocker_detail"))
+    if blocker_reason:
+        parts = [f"selection_blocker:{blocker_reason}"]
+        if blocker_detail:
+            parts.append(f"detail={blocker_detail}")
+        diagnostics.append(" ".join(parts))
+    return diagnostics
 
 
 def _derive_post_type(candidate: dict[str, Any], card_family: str, template_id: str) -> tuple[str, str]:

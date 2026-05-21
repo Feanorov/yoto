@@ -24,6 +24,7 @@ class PreviewArtifactResolver:
         candidates = self._find_since(self.analytics_dir, "*_operator_workflow_preview.json", started_at)
         warnings: list[str] = []
         ambiguous = len(candidates) > 1
+        reused_latest_preview = False
         if ambiguous:
             warnings.append("Preview artifacts are ambiguous; multiple preview workflow reports were created.")
         workflow_path = max(candidates, key=self._sort_key) if candidates else self._find_newest(
@@ -31,8 +32,14 @@ class PreviewArtifactResolver:
             ("*_operator_workflow_preview.json",),
         )
         if not candidates:
+            reused_latest_preview = workflow_path is not None
             warnings.append("No new preview workflow artifact was created after the current run; showing the latest known preview.")
-        return self._build_bundle(workflow_path=workflow_path, ambiguous=ambiguous, warnings=warnings)
+        return self._build_bundle(
+            workflow_path=workflow_path,
+            ambiguous=ambiguous,
+            reused_latest_preview=reused_latest_preview,
+            warnings=warnings,
+        )
 
     def reload_bound_state(self, fingerprint: PreviewFingerprint | None) -> ArtifactBundle:
         if fingerprint is None or fingerprint.workflow_path is None:
@@ -95,6 +102,7 @@ class PreviewArtifactResolver:
         truth_report_path: Path | None = None,
         ambiguous: bool = False,
         stale: bool = False,
+        reused_latest_preview: bool = False,
         warnings: list[str] | None = None,
     ) -> ArtifactBundle:
         workflow_payload = self._load_json(workflow_path)
@@ -134,6 +142,7 @@ class PreviewArtifactResolver:
             publish_history_records=publish_history_records,
             ambiguous=ambiguous,
             stale=stale,
+            reused_latest_preview=reused_latest_preview,
             warnings=list(warnings or ()),
         )
 

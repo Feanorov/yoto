@@ -9,7 +9,14 @@ from PySide6.QtWidgets import QApplication, QMessageBox
 
 from dealbot.operator_ui.command_runner import PreviewCommandRunner
 from dealbot.operator_ui.main_window import MainWindow
-from dealbot.operator_ui.models import LastPublishState, PinnedPublishState, PreviewPaths, PreviewState, SelectedTarget
+from dealbot.operator_ui.models import (
+    ArtifactBundle,
+    LastPublishState,
+    PinnedPublishState,
+    PreviewPaths,
+    PreviewState,
+    SelectedTarget,
+)
 from dealbot.operator_ui.safety import build_operator_status, build_preview_action_copy, evaluate_preview_safety
 
 
@@ -404,6 +411,227 @@ def test_main_window_does_not_invoke_send_for_already_published_preview(tmp_path
     assert window.current_safety.send_enabled is False
     assert flags["disabled_dialog"] == 1
     assert window.send_button.isEnabled() is False
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_refresh_local_state_disables_send_for_latest_already_published_preview(tmp_path: Path) -> None:
+    analytics_dir = tmp_path / "output" / "analytics"
+    cards_dir = tmp_path / "output" / "cards"
+    analytics_dir.mkdir(parents=True, exist_ok=True)
+    cards_dir.mkdir(parents=True, exist_ok=True)
+    card_path = cards_dir / "card.png"
+    card_path.write_bytes(b"card")
+    truth_path = analytics_dir / "20260517T084940Z_operator_truth_report_preview.json"
+    truth_path.write_text(
+        """
+        {
+          "run_key": "20260517T084940Z",
+          "created_at": "2026-05-17T08:49:40",
+          "send_test_target": {
+            "candidate": {
+              "title": "Stardew Valley",
+              "offer_id": "steam:413150",
+              "source": "steam",
+              "lane": "high_value_discount",
+              "bucket": "planned",
+              "content_family": "discount"
+            },
+            "artifact": {
+              "offer_id": "steam:413150",
+              "image_path": "%s",
+              "caption_html": "<b>Caption</b>",
+              "caption_preview": "Caption",
+              "caption_hash": "caption-hash",
+              "image_hash": "image-hash",
+              "idempotency_key": "preview-key",
+              "card_family": "DISCOUNT",
+              "template_id": "steam_discount"
+            }
+          },
+          "pinned_publish": {
+            "contract_version": 1,
+            "source": "preview",
+            "report_run_key": "20260517T084940Z",
+            "candidate": {
+              "title": "Stardew Valley",
+              "offer_id": "steam:413150"
+            },
+            "artifact": {
+              "offer_id": "steam:413150",
+              "image_path": "%s",
+              "caption_html": "<b>Caption</b>",
+              "caption_preview": "Caption",
+              "caption_hash": "caption-hash",
+              "image_hash": "image-hash",
+              "idempotency_key": "preview-key",
+              "card_family": "DISCOUNT",
+              "template_id": "steam_discount"
+            },
+            "validation": {
+              "image_exists": true,
+              "caption_hash_verified": true,
+              "image_hash_verified": true
+            }
+          },
+          "verdict": {
+            "verdict": "truthful_send_test_ready",
+            "truth_ready": true,
+            "telegram_verified": false
+          }
+        }
+        """
+        % (str(card_path).replace("\\", "\\\\"), str(card_path).replace("\\", "\\\\")),
+        encoding="utf-8",
+    )
+    workflow_path = analytics_dir / "20260517T085019Z_operator_workflow_preview.json"
+    workflow_path.write_text(
+        '{"status": "ok", "command": "preview", "report_path": "%s"}'
+        % str(truth_path).replace("\\", "\\\\"),
+        encoding="utf-8",
+    )
+    publish_outcome_path = analytics_dir / "20260521T140649Z_publish_outcome_steam_413150.json"
+    publish_outcome_path.write_text(
+        '{"offer_id": "steam:413150", "title": "Stardew Valley", "message_id": 183, "publish_outcome": {"reason": "already_published", "outbox_status": "published", "idempotency_key": "preview-key", "caption_hash": "caption-hash", "image_hash": "image-hash"}}',
+        encoding="utf-8",
+    )
+    publish_workflow_path = analytics_dir / "20260521T140650Z_operator_workflow_publish-previewed.json"
+    publish_workflow_path.write_text(
+        '{"command": "publish-previewed", "status": "ok", "published": true, "telegram_verified": true, "message_id": 183, "reason": "already_published", "outbox_status": "published", "source_report_path": "%s", "idempotency_key": "preview-key", "caption_hash": "caption-hash", "image_hash": "image-hash", "image_path": "%s", "publish_outcome_path": "%s", "selected": {"title": "Stardew Valley", "offer_id": "steam:413150"}}'
+        % (
+            str(truth_path).replace("\\", "\\\\"),
+            str(card_path).replace("\\", "\\\\"),
+            str(publish_outcome_path).replace("\\", "\\\\"),
+        ),
+        encoding="utf-8",
+    )
+
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+
+    assert window.current_state is not None
+    assert window.current_state.selected_target is not None
+    assert window.current_state.selected_target.offer_id == "steam:413150"
+    assert window.current_safety.send_enabled is False
+    assert window.send_button.isEnabled() is False
+    assert window.send_reason_label.text() == "Отключено: этот preview уже опубликован в Telegram."
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_hides_reused_already_published_preview_after_preview_run(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    bundle = ArtifactBundle(
+        project_root=tmp_path,
+        output_dir=tmp_path / "output",
+        workflow_path=tmp_path / "output" / "analytics" / "workflow.json",
+        truth_report_path=report_path,
+        workflow_payload={
+            "status": "ok",
+            "command": "preview",
+            "report_path": str(report_path),
+        },
+        truth_payload={
+            "send_test_target": {
+                "candidate": {
+                    "title": "Stardew Valley",
+                    "offer_id": "steam:413150",
+                    "source": "steam",
+                    "lane": "high_value_discount",
+                    "bucket": "planned",
+                    "content_family": "discount",
+                },
+                "artifact": {
+                    "offer_id": "steam:413150",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Caption</b>",
+                    "caption_preview": "Caption",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
+                    "card_family": "DISCOUNT",
+                    "template_id": "steam_discount",
+                },
+            },
+            "pinned_publish": {
+                "contract_version": 1,
+                "source": "preview",
+                "candidate": {
+                    "title": "Stardew Valley",
+                    "offer_id": "steam:413150",
+                },
+                "artifact": {
+                    "offer_id": "steam:413150",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Caption</b>",
+                    "caption_preview": "Caption",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
+                    "card_family": "DISCOUNT",
+                    "template_id": "steam_discount",
+                },
+                "validation": {
+                    "image_exists": True,
+                    "caption_hash_verified": True,
+                    "image_hash_verified": True,
+                },
+            },
+            "verdict": {
+                "verdict": "truthful_send_test_ready",
+                "truth_ready": True,
+                "telegram_verified": False,
+            },
+        },
+        publish_history_records=[
+            {
+                "workflow_path": tmp_path / "output" / "analytics" / "publish.json",
+                "workflow_payload": {
+                    "command": "publish-previewed",
+                    "status": "ok",
+                    "published": True,
+                    "telegram_verified": True,
+                    "message_id": 183,
+                    "reason": "already_published",
+                    "outbox_status": "published",
+                    "source_report_path": str(report_path),
+                    "idempotency_key": "preview-key",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "image_path": str(card_path),
+                    "selected": {
+                        "title": "Stardew Valley",
+                        "offer_id": "steam:413150",
+                    },
+                },
+                "publish_outcome_path": None,
+                "publish_outcome_payload": {},
+            }
+        ],
+        reused_latest_preview=True,
+        warnings=["No new preview workflow artifact was created after the current run; showing the latest known preview."],
+    )
+
+    window._preview_started_at = 1.0
+    window.resolver.load_preview_run = lambda started_at: bundle
+    window._handle_preview_finished(0)
+
+    assert window.current_state is not None
+    assert window.current_state.selected_target is None
+    assert window.current_state.truth_ready is False
+    assert any("already published" in warning for warning in window.current_state.warnings)
+    assert window.send_button.isEnabled() is False
+    assert window.current_preview_title_label.text() == "Активное превью не загружено."
+
     window.close()
     app.processEvents()
 

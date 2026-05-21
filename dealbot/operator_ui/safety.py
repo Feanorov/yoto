@@ -60,6 +60,9 @@ _UI_TEXT_TRANSLATIONS = {
     "Run Preview or Refresh Local State to load the latest operator artifacts.": (
         "Соберите превью или обновите локальное состояние, чтобы загрузить последние артефакты оператора."
     ),
+    "Current run produced no new preview artifact; the latest known preview is already published.": (
+        "Текущий запуск не создал новое превью; последнее известное превью уже опубликовано."
+    ),
 }
 
 
