@@ -308,8 +308,8 @@ class MainWindow(QMainWindow):
         self._set_button_role(self.open_output_button, "utility")
         self.send_button = QPushButton("Отправить в Telegram")
         self._set_button_role(self.send_button, "danger")
-        self.send_button.setEnabled(False)
         self.send_button.setToolTip(SEND_DISABLED_REASON_RU)
+        self._apply_send_button_state(False)
         self._sync_preview_action_button()
         actions_layout.addWidget(self.run_preview_button)
         actions_layout.addWidget(self.refresh_button)
@@ -446,7 +446,12 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _set_button_role(button: QPushButton, role: str) -> None:
+        if button.property("buttonRole") == role:
+            return
         button.setProperty("buttonRole", role)
+        button.style().unpolish(button)
+        button.style().polish(button)
+        button.update()
 
     def _apply_theme(self) -> None:
         self.setStyleSheet(
@@ -557,6 +562,14 @@ class MainWindow(QMainWindow):
                 background-color: #8d2553;
                 border-color: #ff7aa4;
                 color: #fff8fb;
+            }
+            QPushButton[buttonRole="danger"]:disabled,
+            QPushButton[buttonRole="disabled"],
+            QPushButton[buttonRole="disabled"]:hover,
+            QPushButton[buttonRole="disabled"]:pressed {
+                background-color: #0f1430;
+                border-color: #252d52;
+                color: #67719d;
             }
             QPushButton[buttonRole="danger"]:hover {
                 background-color: #a72d62;
@@ -858,7 +871,7 @@ class MainWindow(QMainWindow):
         )
         self.open_analytics_button.setEnabled(True)
         self._sync_publish_history_buttons()
-        self.send_button.setEnabled(bool(self.current_safety.send_enabled and not self.runner.is_running))
+        self._apply_send_button_state(bool(self.current_safety.send_enabled and not self.runner.is_running))
 
     def _sync_preview_action_button(self) -> None:
         label, tooltip = build_preview_action_copy(self.current_state)
@@ -889,7 +902,14 @@ class MainWindow(QMainWindow):
         )
         self.open_analytics_button.setEnabled(not running)
         self._sync_publish_history_buttons()
-        self.send_button.setEnabled(not running and self.current_safety.send_enabled)
+        self._apply_send_button_state(not running and self.current_safety.send_enabled)
+
+    def _apply_send_button_state(self, enabled: bool) -> None:
+        self.send_button.setEnabled(enabled)
+        self._set_button_role(self.send_button, "danger" if enabled else "disabled")
+        self.send_button.setCursor(
+            Qt.CursorShape.PointingHandCursor if enabled else Qt.CursorShape.ArrowCursor
+        )
 
     def open_report(self) -> None:
         report_path = self._report_path()

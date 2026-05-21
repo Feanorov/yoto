@@ -5,6 +5,7 @@ from pathlib import Path
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from dealbot.operator_ui.command_runner import PreviewCommandRunner
@@ -411,6 +412,8 @@ def test_main_window_does_not_invoke_send_for_already_published_preview(tmp_path
     assert window.current_safety.send_enabled is False
     assert flags["disabled_dialog"] == 1
     assert window.send_button.isEnabled() is False
+    assert window.send_button.property("buttonRole") == "disabled"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
     window.close()
     app.processEvents()
 
@@ -514,6 +517,8 @@ def test_main_window_refresh_local_state_disables_send_for_latest_already_publis
     assert window.current_state.selected_target.offer_id == "steam:413150"
     assert window.current_safety.send_enabled is False
     assert window.send_button.isEnabled() is False
+    assert window.send_button.property("buttonRole") == "disabled"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
     assert window.send_reason_label.text() == "Отключено: этот preview уже опубликован в Telegram."
 
     window.close()
@@ -630,7 +635,136 @@ def test_main_window_hides_reused_already_published_preview_after_preview_run(tm
     assert window.current_state.truth_ready is False
     assert any("already published" in warning for warning in window.current_state.warnings)
     assert window.send_button.isEnabled() is False
+    assert window.send_button.property("buttonRole") == "disabled"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
     assert window.current_preview_title_label.text() == "Активное превью не загружено."
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_keeps_send_button_visually_disabled_for_stale_preview(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        stale=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Stale Preview", offer_id="steam:stale"),
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:stale",
+            idempotency_key="stale-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is False
+    assert window.send_button.isEnabled() is False
+    assert window.send_button.property("buttonRole") == "disabled"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
+    assert window.send_reason_label.text() == "Отключено: превью устарело."
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_keeps_send_button_visually_disabled_for_unknown_blocked_preview(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Blocked",
+        truth_ready=False,
+        post_type_key="unknown",
+        post_type_label="Unknown/Unsupported",
+        selected_target=SelectedTarget(title="Blocked Preview", offer_id="steam:blocked"),
+        report_exists=True,
+        paths=PreviewPaths(truth_report_path=report_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is False
+    assert window.send_button.isEnabled() is False
+    assert window.send_button.property("buttonRole") == "disabled"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.ArrowCursor
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_uses_danger_style_only_for_valid_sendable_preview(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Subnautica", offer_id="steam:264710"),
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:264710",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is True
+    assert window.send_button.isEnabled() is True
+    assert window.send_button.property("buttonRole") == "danger"
+    assert window.send_button.cursor().shape() == Qt.CursorShape.PointingHandCursor
 
     window.close()
     app.processEvents()
