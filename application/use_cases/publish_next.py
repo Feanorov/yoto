@@ -14,6 +14,7 @@ from domain.entities.analytics_artifact import AnalyticsArtifact
 from domain.entities.offer import AssetBundle, Offer, OfferKind, OfferSource
 from domain.entities.post_artifact import PostArtifact
 from domain.policies.content_lane_policy import ContentLanePolicy
+from domain.policies.dedup_policy import DedupPolicy
 from domain.policies.publish_priority_engine import PublishPriority, PublishPriorityEngine
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
 from infrastructure.db.repositories import QueueRecord, Repositories
@@ -164,6 +165,7 @@ class PublishNextUseCase:
         dry_run_render: DryRunRenderUseCase,
         publisher: TelegramPublisher,
         content_lanes: ContentLanePolicy | None = None,
+        dedup_policy: DedupPolicy | None = None,
         publish_priority_engine: PublishPriorityEngine | None = None,
         editorial_stream_controller: EditorialStreamController | None = None,
         controlled_reserve_release: ControlledReserveRelease | None = None,
@@ -175,6 +177,7 @@ class PublishNextUseCase:
         self.dry_run_render = dry_run_render
         self.publisher = publisher
         self.content_lanes = content_lanes or ContentLanePolicy()
+        self.dedup_policy = dedup_policy or DedupPolicy()
         self.publish_priority_engine = publish_priority_engine or PublishPriorityEngine(self.content_lanes)
         self.editorial_stream_controller = editorial_stream_controller or EditorialStreamController()
         self.controlled_reserve_release = controlled_reserve_release or ControlledReserveRelease()
@@ -269,6 +272,16 @@ class PublishNextUseCase:
         lane_usage_cache: dict[str, int] = {}
         rankable: list[tuple[QueueRecord, PublishPriority]] = []
         for record in candidates:
+            blocker_reason, blocker_detail = self._published_candidate_blocker(record, now_utc)
+            if blocker_reason is not None:
+                blocked_candidates.append(
+                    self._candidate_snapshot(
+                        record,
+                        blocker_reason=blocker_reason,
+                        blocker_detail=blocker_detail,
+                    )
+                )
+                continue
             lane = str(record.decision_json.get('lane') or record.lane)
             lane_usage = lane_usage_cache.setdefault(lane, self.repositories.get_daily_lane_count(now_local.date().isoformat(), lane))
             manual_force_override = bool(record.decision_json.get('manual_force_override'))
@@ -429,6 +442,10 @@ class PublishNextUseCase:
     async def execute(self, now_utc: datetime, now_local: datetime, force_publish: bool = False) -> PublishResult | None:
         record, publish_priority, editorial_adjustment, roundup_injection = self._select_record(now_utc, now_local)
         if record is None:
+            blocked_result = self._blocked_selection_result(now_utc, now_local)
+            if blocked_result is not None:
+                self.metrics.inc('publish.idempotent_skip')
+                return blocked_result
             self.metrics.inc('publish.queue_empty')
             return None
         self.metrics.inc(f'publish.selected.bucket.{record.bucket}')
@@ -1273,6 +1290,52 @@ class PublishNextUseCase:
             created_at=record.created_at.isoformat() if isinstance(record.created_at, datetime) else None,
         )
 
+    def _published_candidate_blocker(self, record: QueueRecord, now_utc: datetime) -> tuple[str | None, str | None]:
+        if self._is_roundup_candidate(record):
+            return None, None
+        game_id = str(record.offer.game_id or '').strip()
+        if not game_id:
+            return None, None
+        game_history = self.repositories.get_game_history(game_id)
+        if game_history is None:
+            return None, None
+        dedup = self.dedup_policy.evaluate(record.offer, game_history, None, now_utc)
+        if dedup.accepted:
+            return None, None
+        detail = (
+            f'game_id={game_id} posted_at={game_history.posted_at.isoformat()} '
+            f'lane={game_history.lane or "unknown"} dedup_reason={dedup.reason}'
+        )
+        return 'already_published', detail
+
+    def _blocked_selection_result(self, now_utc: datetime, now_local: datetime) -> PublishResult | None:
+        inspection = self.inspect_selection(now_utc, now_local)
+        blocker_reason = str(inspection.blocker_reason or '').strip()
+        if blocker_reason not in {'already_published', 'already_sent_finalize_only'}:
+            return None
+        blocked_candidate = next(
+            (candidate for candidate in inspection.blocked_candidates if candidate.blocker_reason == blocker_reason),
+            None,
+        )
+        if blocked_candidate is None:
+            return None
+        record = self._queue_record_by_row_id(blocked_candidate.row_id)
+        if record is None:
+            return None
+        return self._result(
+            record,
+            blocker_reason,
+            False,
+            failure_detail=blocked_candidate.blocker_detail,
+        )
+
+    def _queue_record_by_row_id(self, row_id: int) -> QueueRecord | None:
+        for bucket in ('planned', 'reserve'):
+            for record in self.repositories.list_queue(bucket):
+                if int(record.row_id) == int(row_id):
+                    return record
+        return None
+
     def _selection_blocker(
         self,
         *,
@@ -1287,7 +1350,7 @@ class PublishNextUseCase:
         if planned_total <= 0 and reserve_total > 0 and not allow_reserve:
             return 'quiet_hours_reserve_hidden', 'Only reserve rows exist, and reserve is hidden during quiet hours.'
         if blocked_candidates:
-            priority = ['daily_lane_cap_reached', 'controlled_reserve_release_held', 'quiet_hours_reserve_hidden']
+            priority = ['already_published', 'already_sent_finalize_only', 'daily_lane_cap_reached', 'controlled_reserve_release_held', 'quiet_hours_reserve_hidden']
             blocked_candidates.sort(key=lambda item: priority.index(item.blocker_reason) if item.blocker_reason in priority else len(priority))
             winner = blocked_candidates[0]
             return winner.blocker_reason, winner.blocker_detail
@@ -1403,6 +1466,9 @@ class PublishNextUseCase:
         lane_usage_cache: dict[str, int] = {}
         rankable: list[tuple[QueueRecord, PublishPriority]] = []
         for record in candidates:
+            blocker_reason, _ = self._published_candidate_blocker(record, now_utc)
+            if blocker_reason is not None:
+                continue
             lane = str(record.decision_json.get('lane') or record.lane)
             lane_usage = lane_usage_cache.setdefault(lane, self.repositories.get_daily_lane_count(day_key, lane))
             manual_force_override = bool(record.decision_json.get('manual_force_override'))

@@ -18,6 +18,7 @@ SEND_DISABLED_CAPTION_HASH_RU = "Отключено: проверка caption_ha
 SEND_DISABLED_IMAGE_HASH_RU = "Отключено: проверка image_hash не пройдена."
 SEND_DISABLED_TRUTH_NOT_READY_RU = "Отключено: превью не готово к отправке."
 SEND_DISABLED_BACKEND_BLOCKER_RU = "Отключено: backend заблокировал отправку."
+SEND_DISABLED_ALREADY_PUBLISHED_RU = "Отключено: этот preview уже опубликован в Telegram."
 SEND_ENABLED_READY_RU = "Превью готово к безопасной публикации."
 
 PREVIEW_ACTION_DEFAULT_RU = "Собрать превью"
@@ -43,6 +44,9 @@ _UI_TEXT_TRANSLATIONS = {
     "Pinned publish caption hash verification failed.": "Проверка pinned caption_hash не пройдена.",
     "Pinned publish image hash verification failed.": "Проверка pinned image_hash не пройдена.",
     "Preview is not truth-ready yet.": "Превью ещё не готово к отправке.",
+    "This preview was already published in Telegram.": "Этот preview уже опубликован в Telegram.",
+    "already_published": "этот preview уже опубликован в Telegram",
+    "already_sent_finalize_only": "этот preview уже отправлен и ждёт финализации",
     "No preview workflow artifact exists yet.": "Артефакты превью ещё не созданы.",
     "No new preview workflow artifact was created after the current run; showing the latest known preview.": (
         "После текущего запуска не появился новый workflow preview; показано последнее известное превью."
@@ -65,7 +69,8 @@ def localize_ui_message(text: str) -> str:
         return ""
     if normalized.startswith("Backend blocker:"):
         reason = normalized.removeprefix("Backend blocker:").strip()
-        return f"Блокировка backend: {reason}" if reason else "Блокировка backend."
+        localized_reason = _UI_TEXT_TRANSLATIONS.get(reason, reason)
+        return f"Блокировка backend: {localized_reason}" if reason else "Блокировка backend."
     return _UI_TEXT_TRANSLATIONS.get(normalized, normalized)
 
 
@@ -148,6 +153,10 @@ def evaluate_preview_safety(state: PreviewState | None) -> SafetyState:
         if not pinned.image_hash_verified:
             blockers.append(localize_ui_message("Pinned publish image hash verification failed."))
             send_disabled_reason = _first_disabled_reason(send_disabled_reason, SEND_DISABLED_IMAGE_HASH_RU)
+
+    if _is_preview_already_published(state):
+        blockers.append(localize_ui_message("This preview was already published in Telegram."))
+        send_disabled_reason = SEND_DISABLED_ALREADY_PUBLISHED_RU
 
     preview_ready = bool(state.truth_ready and not blockers)
     send_enabled = preview_ready
@@ -246,9 +255,49 @@ def _is_no_preview_loaded(state: PreviewState | None) -> bool:
 def _is_preview_already_published(state: PreviewState) -> bool:
     if not state.last_publish.success:
         return False
-    report_path = _normalized_path(state.paths.truth_report_path)
+    current_offer_id = _text(
+        state.pinned_publish.offer_id
+        or (state.selected_target.offer_id if state.selected_target is not None else "")
+        or (state.fingerprint.offer_id if state.fingerprint is not None else "")
+    )
+    published_offer_id = _text(state.last_publish.offer_id)
+    if not current_offer_id or current_offer_id != published_offer_id:
+        return False
+
+    report_path = _normalized_path(state.paths.truth_report_path or (state.fingerprint.report_path if state.fingerprint else None))
     publish_report_path = _normalized_path(state.last_publish.source_report_path)
-    return bool(report_path and publish_report_path and report_path == publish_report_path)
+    if report_path and publish_report_path and report_path == publish_report_path:
+        return True
+
+    current_idempotency_key = _text(
+        state.pinned_publish.idempotency_key or (state.fingerprint.idempotency_key if state.fingerprint is not None else "")
+    )
+    published_idempotency_key = _text(state.last_publish.idempotency_key)
+    if current_idempotency_key and published_idempotency_key and current_idempotency_key == published_idempotency_key:
+        return True
+
+    current_caption_hash = _text(
+        state.pinned_publish.caption_hash
+        or state.caption_hash
+        or (state.fingerprint.caption_hash if state.fingerprint is not None else "")
+    )
+    current_image_hash = _text(
+        state.pinned_publish.image_hash or (state.fingerprint.image_hash if state.fingerprint is not None else "")
+    )
+    published_caption_hash = _text(state.last_publish.caption_hash)
+    published_image_hash = _text(state.last_publish.image_hash)
+    return bool(
+        current_caption_hash
+        and current_image_hash
+        and published_caption_hash
+        and published_image_hash
+        and current_caption_hash == published_caption_hash
+        and current_image_hash == published_image_hash
+    )
+
+
+def _text(value: object) -> str:
+    return str(value or "").strip()
 
 
 def _should_prepare_next_post(state: PreviewState | None) -> bool:

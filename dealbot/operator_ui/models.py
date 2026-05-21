@@ -119,6 +119,10 @@ class LastPublishState:
     outbox_status: str = ""
     reason: str = ""
     source_report_path: Path | None = None
+    idempotency_key: str | None = None
+    caption_hash: str | None = None
+    image_hash: str | None = None
+    image_path: Path | None = None
 
     @property
     def present(self) -> bool:

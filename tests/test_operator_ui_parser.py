@@ -170,6 +170,10 @@ def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Pat
                 "message_id": 182,
                 "outbox_status": "published",
                 "reason": "published",
+                "idempotency_key": "preview-key",
+                "caption_hash": "caption-hash",
+                "image_hash": "image-hash",
+                "image_path": str(tmp_path / "output" / "cards" / "card.png"),
                 "source_report_path": str(tmp_path / "output" / "analytics" / "truth.json"),
                 "publish_outcome_path": str(publish_outcome_path),
                 "selected": {
@@ -184,6 +188,9 @@ def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Pat
                 "publish_outcome": {
                     "outbox_status": "published",
                     "reason": "published",
+                    "idempotency_key": "preview-key",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
                 },
             },
         )
@@ -198,6 +205,10 @@ def test_build_preview_state_maps_last_publish_successful_workflow(tmp_path: Pat
     assert state.last_publish.telegram_verified is True
     assert state.last_publish.outbox_status == "published"
     assert state.last_publish.reason == "published"
+    assert state.last_publish.idempotency_key == "preview-key"
+    assert state.last_publish.caption_hash == "caption-hash"
+    assert state.last_publish.image_hash == "image-hash"
+    assert state.last_publish.image_path == tmp_path / "output" / "cards" / "card.png"
     assert state.last_publish.workflow_path == workflow_path
     assert state.last_publish.publish_outcome_path == publish_outcome_path
 

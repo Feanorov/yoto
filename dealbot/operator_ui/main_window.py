@@ -675,25 +675,7 @@ class MainWindow(QMainWindow):
         if state is None or state.selected_target is None or report_path is None:
             self.show_send_disabled_dialog()
             return
-        pinned = state.pinned_publish
-        details = "\n".join(
-            [
-                f"Тип поста: {_translate_post_type_label(state.post_type_label)}",
-                f"Title: {_or_none(state.selected_target.title)}",
-                f"offer_id: {_or_none(state.selected_target.offer_id)}",
-                f"idempotency_key: {_or_none(pinned.idempotency_key)}",
-                f"caption_hash: {_or_none(pinned.caption_hash)}",
-                f"image_hash: {_or_none(pinned.image_hash)}",
-                f"report_path: {report_path}",
-            ]
-        )
-        answer = QMessageBox.question(
-            self,
-            "Подтвердить публикацию",
-            f"{_PUBLISH_CONFIRMATION_WARNING}\n\n{details}",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,
-        )
+        answer = self._confirm_publish(state, report_path)
         if answer != QMessageBox.StandardButton.Yes:
             return
         self._publish_started_at = time.time()
@@ -701,7 +683,11 @@ class MainWindow(QMainWindow):
         started = self.runner.run_publish_previewed(self.project_root, report_path)
         if not started:
             self.append_log("[ui] Не удалось запустить yoto.bat publish-previewed")
-            QMessageBox.warning(self, "Публикация не выполнена", "Публикация не выполнена: process_start_failed")
+            self._show_message_box(
+                QMessageBox.Icon.Warning,
+                "Публикация не выполнена",
+                "Публикация не выполнена: process_start_failed",
+            )
 
     def refresh_local_state(self, initial: bool = False) -> None:
         if self.current_state and self.current_state.fingerprint:
@@ -749,18 +735,30 @@ class MainWindow(QMainWindow):
             self.append_log(f"[ui] Найден workflow publish-previewed: {workflow_path}")
         success, reason, message_id = _verify_publish_previewed_identity(state, workflow_payload)
         if success and message_id is not None:
-            QMessageBox.information(self, "Публикация завершена", f"Опубликовано в Telegram. message_id: {message_id}")
+            self._show_message_box(
+                QMessageBox.Icon.Information,
+                "Публикация завершена",
+                f"Опубликовано в Telegram. message_id: {message_id}",
+            )
             self.refresh_local_state()
             return
         if reason == "identity_mismatch":
-            QMessageBox.critical(self, "Ошибка публикации", _PUBLISH_IDENTITY_MISMATCH_FULL_TEXT)
+            self._show_message_box(
+                QMessageBox.Icon.Critical,
+                "Ошибка публикации",
+                _PUBLISH_IDENTITY_MISMATCH_FULL_TEXT,
+            )
             self.refresh_local_state()
             return
         if workflow_payload is not None and exit_code != 0:
             failure_reason = _text(workflow_payload.get("reason")) or reason or "publish_failed"
         else:
             failure_reason = reason or _extract_publish_reason(self.runner.last_output) or f"exit_code_{exit_code}"
-        QMessageBox.warning(self, "Публикация не выполнена", f"Публикация не выполнена: {failure_reason}")
+        self._show_message_box(
+            QMessageBox.Icon.Warning,
+            "Публикация не выполнена",
+            f"Публикация не выполнена: {failure_reason}",
+        )
         self.refresh_local_state()
 
     def _apply_state(self, state: PreviewState) -> None:
@@ -898,13 +896,111 @@ class MainWindow(QMainWindow):
             QDesktopServices.openUrl(QUrl.fromLocalFile(str(publish_outcome_path)))
 
     def show_send_disabled_dialog(self) -> None:
-        QMessageBox.information(self, "Отправка отключена", self.current_safety.send_disabled_reason)
+        self._show_message_box(
+            QMessageBox.Icon.Information,
+            "Отправка отключена",
+            self.current_safety.send_disabled_reason,
+        )
 
     def append_log(self, text: str) -> None:
         stripped = text.rstrip()
         if not stripped:
             return
         self.log_text.appendPlainText(stripped)
+
+    def _confirm_publish(self, state: PreviewState, report_path: Path) -> QMessageBox.StandardButton:
+        dialog = self._build_publish_confirmation_dialog(state, report_path)
+        return QMessageBox.StandardButton(dialog.exec())
+
+    def _build_publish_confirmation_dialog(self, state: PreviewState, report_path: Path) -> QMessageBox:
+        pinned = state.pinned_publish
+        details = "\n".join(
+            [
+                f"Тип поста: {_translate_post_type_label(state.post_type_label)}",
+                f"Title: {_or_none(state.selected_target.title if state.selected_target is not None else '')}",
+                f"offer_id: {_or_none(state.selected_target.offer_id if state.selected_target is not None else '')}",
+                f"idempotency_key: {_or_none(pinned.idempotency_key)}",
+                f"caption_hash: {_or_none(pinned.caption_hash)}",
+                f"image_hash: {_or_none(pinned.image_hash)}",
+                f"report_path: {report_path}",
+            ]
+        )
+        return self._build_message_box(
+            QMessageBox.Icon.Question,
+            "Подтвердить публикацию",
+            _PUBLISH_CONFIRMATION_WARNING,
+            informative_text=details,
+            buttons=QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            default_button=QMessageBox.StandardButton.No,
+        )
+
+    def _show_message_box(
+        self,
+        icon: QMessageBox.Icon,
+        title: str,
+        text: str,
+        *,
+        informative_text: str = "",
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
+        default_button: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
+    ) -> QMessageBox.StandardButton:
+        dialog = self._build_message_box(
+            icon,
+            title,
+            text,
+            informative_text=informative_text,
+            buttons=buttons,
+            default_button=default_button,
+        )
+        return QMessageBox.StandardButton(dialog.exec())
+
+    def _build_message_box(
+        self,
+        icon: QMessageBox.Icon,
+        title: str,
+        text: str,
+        *,
+        informative_text: str = "",
+        buttons: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
+        default_button: QMessageBox.StandardButton = QMessageBox.StandardButton.Ok,
+    ) -> QMessageBox:
+        dialog = QMessageBox(self)
+        dialog.setIcon(icon)
+        dialog.setWindowTitle(title)
+        dialog.setText(text)
+        dialog.setInformativeText(informative_text)
+        dialog.setStandardButtons(buttons)
+        dialog.setDefaultButton(default_button)
+        dialog.setStyleSheet(self._dialog_style())
+        return dialog
+
+    @staticmethod
+    def _dialog_style() -> str:
+        return (
+            "QMessageBox {"
+            " background-color: #0b1126;"
+            "}"
+            "QMessageBox QLabel {"
+            " color: #edf1ff;"
+            " min-width: 520px;"
+            "}"
+            "QMessageBox QPushButton {"
+            " background-color: #182043;"
+            " border: 1px solid #33407b;"
+            " border-radius: 10px;"
+            " padding: 8px 12px;"
+            " color: #eef2ff;"
+            " font-weight: 600;"
+            " min-width: 96px;"
+            "}"
+            "QMessageBox QPushButton:hover {"
+            " background-color: #232e5e;"
+            " border-color: #7b75ff;"
+            "}"
+            "QMessageBox QPushButton:pressed {"
+            " background-color: #131b39;"
+            "}"
+        )
 
     def _report_path(self) -> Path | None:
         if self.current_state is None:
@@ -1088,6 +1184,10 @@ class MainWindow(QMainWindow):
             lines.append(f"  outbox_status: {_or_none(state.last_publish.outbox_status)}")
             lines.append(f"  reason: {_or_none(state.last_publish.reason)}")
             lines.append(f"  source_report_path: {_or_none(state.last_publish.source_report_path)}")
+            lines.append(f"  idempotency_key: {_or_none(state.last_publish.idempotency_key)}")
+            lines.append(f"  caption_hash: {_or_none(state.last_publish.caption_hash)}")
+            lines.append(f"  image_hash: {_or_none(state.last_publish.image_hash)}")
+            lines.append(f"  image_path: {_or_none(state.last_publish.image_path)}")
             lines.append(f"  publish_outcome_path: {_or_none(state.last_publish.publish_outcome_path)}")
             lines.append(f"  workflow_path: {_or_none(state.last_publish.workflow_path)}")
             lines.append(f"  workflow_modified_at: {_or_none(state.last_publish.workflow_modified_at)}")

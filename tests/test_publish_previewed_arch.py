@@ -12,6 +12,7 @@ from typing import Any
 import pytest
 
 from application.use_cases.publish_previewed import PublishPreviewedUseCase
+from application.use_cases.publish_next import PublishNextUseCase
 from dealbot import operator_cli
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
 from infrastructure.db.repositories import Repositories
@@ -20,7 +21,7 @@ from domain.entities.post_artifact import PostArtifact
 
 from .support import make_test_settings
 from .test_caption_builder_arch import make_offer
-from .test_publish_reliability_arch import make_decision_json
+from .test_publish_reliability_arch import RecordingPublisher as PublishNextRecordingPublisher, StaticRenderUseCase, make_decision_json
 
 
 class RecordingPublisher:
@@ -386,6 +387,75 @@ def test_publish_previewed_writes_exact_publish_outcome_artifact(tmp_path: Path)
     assert publish_payload['publish_outcome']['source_report_run_key'] == payload['run_key']
     assert publish_payload['publish_outcome']['message_id'] == 915
     assert publisher.calls == [(image_path, payload['pinned_publish']['artifact']['caption_html'])]
+
+
+def test_publish_previewed_success_suppresses_same_offer_from_selection_when_another_candidate_exists(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+
+    published_offer = make_offer()
+    published_offer.offer_id = 'steam:413150'
+    published_offer.game_id = '413150'
+    published_offer.franchise_key = '413150'
+    published_offer.title = 'Stardew Valley'
+
+    fallback_offer = make_offer()
+    fallback_offer.offer_id = 'steam:264710'
+    fallback_offer.game_id = '264710'
+    fallback_offer.franchise_key = '264710'
+    fallback_offer.title = 'Subnautica'
+
+    repo.replace_queue(
+        'planned',
+        [
+            (150.0, published_offer, make_decision_json()),
+            (120.0, fallback_offer, make_decision_json()),
+        ],
+        created_at='2026-05-21T12:00:00',
+    )
+
+    use_case, _, _ = _build_use_case(tmp_path)
+    payload, _ = _build_preview_report_payload(tmp_path, offer_id='steam:413150', idempotency_key='published-key')
+    payload['send_test_target']['candidate']['title'] = 'Stardew Valley'
+    payload['pinned_publish']['candidate']['title'] = 'Stardew Valley'
+    payload['pinned_publish']['offer_snapshot']['game_id'] = '413150'
+    payload['pinned_publish']['offer_snapshot']['franchise_key'] = '413150'
+    payload['pinned_publish']['offer_snapshot']['title'] = 'Stardew Valley'
+    report_path = _write_report(tmp_path, payload)
+
+    result = asyncio.run(
+        use_case.execute(
+            report_path=report_path,
+            now_utc=datetime(2026, 5, 21, 12, 0),
+            now_local=datetime(2026, 5, 21, 15, 0),
+        )
+    )
+
+    assert result.published is True
+    assert repo.get_game_history('413150') is not None
+
+    image_path = tmp_path / 'selection-card.png'
+    image_path.write_bytes(b'card')
+    selector = PublishNextUseCase(
+        settings,
+        repo,
+        StaticRenderUseCase(image_path, idempotency_key='selection-key'),
+        PublishNextRecordingPublisher(),
+    )
+
+    inspection = selector.inspect_selection(datetime(2026, 5, 21, 12, 1), datetime(2026, 5, 21, 15, 1))
+    target = asyncio.run(selector.preview_send_test_target(datetime(2026, 5, 21, 12, 1), datetime(2026, 5, 21, 15, 1)))
+
+    assert inspection.selected_candidate is not None
+    assert inspection.selected_candidate.offer_id == 'steam:264710'
+    assert any(
+        candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
+        for candidate in inspection.blocked_candidates
+    )
+    assert target.candidate is not None
+    assert target.candidate['offer_id'] == 'steam:264710'
+    assert target.would_send is True
 
 
 def test_publish_previewed_cli_uses_direct_backend_path_and_writes_workflow_identity(

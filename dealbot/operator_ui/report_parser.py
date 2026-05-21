@@ -203,6 +203,14 @@ def _build_last_publish_state(bundle: ArtifactBundle) -> LastPublishState:
         outbox_status=_text(workflow.get("outbox_status") or publish_outcome_details.get("outbox_status")),
         reason=_text(workflow.get("reason") or publish_outcome.get("reason") or publish_outcome_details.get("reason")),
         source_report_path=source_report_path,
+        idempotency_key=_text(workflow.get("idempotency_key") or publish_outcome_details.get("idempotency_key")) or None,
+        caption_hash=_text(workflow.get("caption_hash") or publish_outcome_details.get("caption_hash")) or None,
+        image_hash=_text(workflow.get("image_hash") or publish_outcome_details.get("image_hash")) or None,
+        image_path=_path_or_none(
+            workflow.get("image_path")
+            or publish_outcome.get("image_path")
+            or publish_outcome_details.get("image_path")
+        ),
     )
 
 
@@ -243,6 +251,14 @@ def _build_publish_history_entry(record: dict[str, Any]) -> LastPublishState:
         outbox_status=_text(workflow.get("outbox_status") or publish_outcome_details.get("outbox_status")),
         reason=_text(workflow.get("reason") or publish_outcome.get("reason") or publish_outcome_details.get("reason")),
         source_report_path=_path_or_none(workflow.get("source_report_path")),
+        idempotency_key=_text(workflow.get("idempotency_key") or publish_outcome_details.get("idempotency_key")) or None,
+        caption_hash=_text(workflow.get("caption_hash") or publish_outcome_details.get("caption_hash")) or None,
+        image_hash=_text(workflow.get("image_hash") or publish_outcome_details.get("image_hash")) or None,
+        image_path=_path_or_none(
+            workflow.get("image_path")
+            or publish_outcome.get("image_path")
+            or publish_outcome_details.get("image_path")
+        ),
     )
 
 

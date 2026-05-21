@@ -138,6 +138,88 @@ def test_publish_next_preview_send_test_target_exposes_selected_artifact_details
     assert target.artifact['caption_preview']
 
 
+def test_publish_next_inspect_selection_skips_already_published_queue_rows(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+
+    published_offer = make_offer()
+    published_offer.offer_id = 'steam:413150'
+    published_offer.game_id = '413150'
+    published_offer.franchise_key = '413150'
+    published_offer.title = 'Stardew Valley'
+
+    fallback_offer = make_offer()
+    fallback_offer.offer_id = 'steam:264710'
+    fallback_offer.game_id = '264710'
+    fallback_offer.franchise_key = '264710'
+    fallback_offer.title = 'Subnautica'
+
+    repo.replace_queue(
+        'planned',
+        [
+            (150.0, published_offer, make_decision_json('high_value_discount', score=150.0)),
+            (120.0, fallback_offer, make_decision_json('high_value_discount', score=120.0)),
+        ],
+    )
+    repo.record_publication(published_offer, 'high_value_discount', 183)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    inspection = use_case.inspect_selection(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0))
+    target = asyncio.run(use_case.preview_send_test_target(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0)))
+
+    assert inspection.selected_candidate is not None
+    assert inspection.selected_candidate.offer_id == 'steam:264710'
+    assert any(
+        candidate.offer_id == 'steam:413150' and candidate.blocker_reason == 'already_published'
+        for candidate in inspection.blocked_candidates
+    )
+    assert target.candidate is not None
+    assert target.candidate['offer_id'] == 'steam:264710'
+
+
+def test_publish_next_allows_repeat_same_game_when_price_improves_meaningfully(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+
+    improved_offer = make_offer()
+    improved_offer.offer_id = 'steam:413150'
+    improved_offer.game_id = '413150'
+    improved_offer.franchise_key = '413150'
+    improved_offer.title = 'Stardew Valley'
+    improved_offer.price_after_minor = 900
+    improved_offer.discount_percent = 80
+
+    previously_published_offer = make_offer()
+    previously_published_offer.offer_id = 'steam:413150'
+    previously_published_offer.game_id = '413150'
+    previously_published_offer.franchise_key = '413150'
+    previously_published_offer.title = 'Stardew Valley'
+    previously_published_offer.price_after_minor = 1900
+    previously_published_offer.discount_percent = 60
+
+    repo.replace_queue(
+        'planned',
+        [(150.0, improved_offer, make_decision_json('high_value_discount', score=150.0))],
+    )
+    repo.record_publication(previously_published_offer, 'high_value_discount', 183)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    inspection = use_case.inspect_selection(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0))
+    target = asyncio.run(use_case.preview_send_test_target(datetime(2026, 3, 20, 12, 0), datetime(2026, 3, 20, 12, 0)))
+
+    assert inspection.selected_candidate is not None
+    assert inspection.selected_candidate.offer_id == 'steam:413150'
+    assert all(candidate.offer_id != 'steam:413150' for candidate in inspection.blocked_candidates)
+    assert target.candidate is not None
+    assert target.candidate['offer_id'] == 'steam:413150'
+
+
 def test_operator_truth_report_emits_queue_selection_and_target_details(tmp_path: Path) -> None:
     settings = make_test_settings(tmp_path, dry_run=True)
     repo = Repositories(settings.db_path)
