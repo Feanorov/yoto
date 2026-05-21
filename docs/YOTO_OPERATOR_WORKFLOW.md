@@ -4,6 +4,14 @@ Use `yoto.bat` as the operator entrypoint. The new launcher layer keeps the exis
 
 ## Recommended Daily Commands
 
+Daily desktop launch options:
+
+- double-click `yoto-ui.bat`
+  - opens the Operator UI from the bundle root through the existing `yoto.bat ui` launcher path
+
+- run `.\yoto.bat ui` from PowerShell
+  - opens the same Operator UI entrypoint when you are already working in a terminal
+
 - `yoto.bat ui`
   - opens the desktop Operator UI only
   - uses the same launcher Python resolution and project-root bootstrap as the other safe operator commands
