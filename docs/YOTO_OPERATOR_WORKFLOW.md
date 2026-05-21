@@ -2,6 +2,10 @@
 
 Use `yoto.bat` as the operator entrypoint. The new launcher layer keeps the existing planner, publish, outbox, and video seams unchanged, but it now ends the main daily commands with a short verdict, the latest artifact paths, and the next step to take.
 
+Stable Operator UI handoff reference:
+
+- `docs/YOTO_OPERATOR_UI_MVP_CHECKPOINT.md`
+
 ## Recommended Daily Commands
 
 Daily desktop launch options:
