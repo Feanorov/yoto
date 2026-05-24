@@ -13,6 +13,9 @@ import pytest
 
 from application.use_cases.publish_previewed import PublishPreviewedUseCase
 from application.use_cases.publish_next import PublishNextUseCase
+from application.use_cases.operator_truth_report import OperatorTruthReporter
+from application.use_cases.plan_queue import QueuePlan
+from application.use_cases.preview_selected import PreviewSelectedUseCase
 from dealbot import operator_cli
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
 from infrastructure.db.repositories import Repositories
@@ -21,6 +24,7 @@ from domain.entities.post_artifact import PostArtifact
 
 from .support import make_test_settings
 from .test_caption_builder_arch import make_offer
+from .test_operator_visibility_arch import VerifiedRenderUseCase
 from .test_publish_reliability_arch import RecordingPublisher as PublishNextRecordingPublisher, StaticRenderUseCase, make_decision_json
 
 
@@ -458,6 +462,104 @@ def test_publish_previewed_success_suppresses_same_offer_from_selection_when_ano
     assert target.candidate is not None
     assert target.candidate['offer_id'] == 'steam:264710'
     assert target.would_send is True
+
+
+def test_publish_previewed_accepts_preview_selected_generated_report(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    source_image_path = tmp_path / 'source-card.png'
+    source_image_path.write_bytes(b'card')
+    source_now = datetime(2026, 5, 21, 12, 0)
+    selected_now = datetime(2026, 5, 21, 12, 1)
+    publish_now = datetime(2026, 5, 21, 12, 2)
+
+    recommended_offer = make_offer()
+    recommended_offer.offer_id = 'steam:source-top'
+    recommended_offer.game_id = 'source-top'
+    recommended_offer.franchise_key = 'source-top'
+    recommended_offer.title = 'Source Top Candidate'
+
+    ready_offer = make_offer()
+    ready_offer.offer_id = 'steam:source-ready'
+    ready_offer.game_id = 'source-ready'
+    ready_offer.franchise_key = 'source-ready'
+    ready_offer.title = 'Source Ready Candidate'
+
+    recommended_decision = make_decision_json()
+    recommended_decision['score'] = 150.0
+    ready_decision = make_decision_json()
+    ready_decision['score'] = 120.0
+    repo.replace_queue(
+        'planned',
+        [
+            (150.0, recommended_offer, recommended_decision),
+            (120.0, ready_offer, ready_decision),
+        ],
+        created_at=source_now,
+    )
+
+    selector = PublishNextUseCase(settings, repo, VerifiedRenderUseCase(source_image_path), PublishNextRecordingPublisher())
+    selection = selector.inspect_selection(source_now, source_now)
+    target = asyncio.run(selector.preview_send_test_target(source_now, source_now))
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(settings.analytics_output_dir))
+    source_report = reporter.emit(
+        now_utc=source_now,
+        mode='preview',
+        settings=settings,
+        plan=QueuePlan(
+            planned=[],
+            reserve=[],
+            metrics={},
+            context={'source': 'current_queue', 'selection_summary': {'capacity_hold': 0}},
+        ),
+        selection=selection,
+        target=target,
+    )
+    assert source_report.json_path is not None and source_report.json_path.exists()
+
+    source_payload = json.loads(source_report.json_path.read_text(encoding='utf-8'))
+    ready_row = next(
+        row
+        for row in source_payload['selection']['candidate_rows']
+        if row['offer_id'] == 'steam:source-ready'
+    )
+
+    preview_selected = PreviewSelectedUseCase(
+        settings=settings,
+        repositories=repo,
+        selector=selector,
+        reporter=reporter,
+    )
+    selected_result = asyncio.run(
+        preview_selected.execute(
+            report_path=source_report.json_path,
+            candidate_id=int(ready_row['candidate_id']),
+            now_utc=selected_now,
+            now_local=selected_now,
+        )
+    )
+
+    assert selected_result.created_report is True
+    assert selected_result.report_path is not None and selected_result.report_path.exists()
+
+    publish_use_case = PublishPreviewedUseCase(
+        repo,
+        RecordingPublisher(message_id=944),
+        AnalyticsArtifactWriter(settings.analytics_output_dir),
+    )
+    publish_result = asyncio.run(
+        publish_use_case.execute(
+            report_path=selected_result.report_path,
+            now_utc=publish_now,
+            now_local=publish_now,
+        )
+    )
+
+    assert publish_result.published is True
+    assert publish_result.reason == 'published'
+    assert publish_result.selected['offer_id'] == 'steam:source-ready'
+    assert publish_result.selected['row_id'] == ready_row['row_id']
 
 
 def test_publish_previewed_cli_uses_direct_backend_path_and_writes_workflow_identity(

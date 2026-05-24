@@ -12,17 +12,30 @@ import time
 from types import SimpleNamespace
 from typing import Any, Callable
 
+import httpx
+from application.use_cases.dry_run_render import DryRunRenderUseCase
+from application.use_cases.operator_truth_report import OperatorTruthReporter
+from application.use_cases.preview_selected import PreviewSelectedResult, PreviewSelectedUseCase
+from application.use_cases.publish_next import PublishNextUseCase
 from application.use_cases.publish_previewed import PublishPreviewedResult, PublishPreviewedUseCase
 from dealbot.settings import AppSettings, load_project_env, render_bootstrap_diagnostics
 from domain.entities.analytics_artifact import AnalyticsArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
+from infrastructure.clients.base_http import ResilientHttpClient
 from infrastructure.db.repositories import Repositories
+from infrastructure.render.cards.renderer_selector import CardRendererRouter
+from infrastructure.telegram.caption_builder import TelegramCaptionBuilder
 from infrastructure.telegram.publisher import TelegramPublisher
 from video_generator.application.use_cases.build_voice_ready_package import BuildVoiceReadyPackageResult
 from video_generator.cli import build_voice_ready_use_case
 
 
 Runner = Callable[[list[str], Path], int]
+
+
+class _PreviewOnlyPublisher:
+    async def publish_photo(self, image_path: Path, caption_html: str):
+        raise AssertionError('preview-selected must not publish to Telegram')
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,6 +92,22 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         '--from-report',
         required=True,
         help='Path to the explicit preview truth report that contains pinned_publish.',
+    )
+
+    preview_selected_parser = subparsers.add_parser(
+        'preview-selected',
+        help='Build an exact preview truth report for one explicit candidate row from an existing preview truth report.',
+    )
+    preview_selected_parser.add_argument(
+        '--from-report',
+        required=True,
+        help='Path to the source preview truth report that contains selection.candidate_rows[].',
+    )
+    preview_selected_parser.add_argument(
+        '--candidate-id',
+        required=True,
+        type=int,
+        help='Exact candidate_id / row_id from selection.candidate_rows[].',
     )
 
     daily_check_parser = subparsers.add_parser(
@@ -549,6 +578,35 @@ def build_publish_previewed_summary(
     }
 
 
+def build_preview_selected_summary(
+    *,
+    result: PreviewSelectedResult,
+    artifacts: LatestArtifacts,
+) -> dict[str, Any]:
+    next_action = 'Inspect the failure reason, refresh the base preview if needed, and choose another candidate row.'
+    if result.created_report and result.report_path is not None:
+        next_action = f'If the selected preview looks right, run yoto.bat publish-previewed --from-report "{result.report_path}".'
+    return {
+        'command': 'preview-selected',
+        'status': result.status,
+        'reason': result.reason,
+        'source_report_path': str(result.source_report_path) if result.source_report_path is not None else None,
+        'source_report_run_key': result.source_report_run_key,
+        'report_path': str(result.report_path) if result.report_path is not None else None,
+        'candidate_id': result.candidate_id,
+        'selected': dict(result.selected or {}),
+        'truth_ready': result.truth_ready,
+        'would_send': result.would_send,
+        'blocker_category': result.blocker_category,
+        'blocker_detail': result.blocker_detail,
+        'caption_hash': result.caption_hash,
+        'image_hash': result.image_hash,
+        'image_path': str(result.image_path) if result.image_path is not None else None,
+        'next_action': next_action,
+        'latest_artifacts': build_latest_artifacts_payload(artifacts),
+    }
+
+
 def render_voice_package_summary(summary: dict[str, Any]) -> list[str]:
     return [
         '',
@@ -584,6 +642,32 @@ def render_publish_previewed_summary(summary: dict[str, Any]) -> list[str]:
         f'message_id: {summary.get("message_id") or "none"}',
         f'outbox_status: {summary.get("outbox_status") or "none"}',
         f'publish_outcome: {summary.get("publish_outcome_path") or "none"}',
+        f'workflow_artifact: {summary.get("workflow_artifact_path") or "none"}',
+        f'next: {summary.get("next_action")}',
+    ]
+
+
+def render_preview_selected_summary(summary: dict[str, Any]) -> list[str]:
+    selected = dict(summary.get('selected') or {})
+    return [
+        '',
+        '=== Preview Selected Verdict ===',
+        f'status: {summary.get("status")}',
+        f'reason: {summary.get("reason") or "none"}',
+        f'source_report: {summary.get("source_report_path") or "none"}',
+        f'source_run_key: {summary.get("source_report_run_key") or "none"}',
+        f'candidate_id: {summary.get("candidate_id") or "none"}',
+        f'selected_offer_id: {selected.get("offer_id") or "none"}',
+        f'selected_title: {selected.get("title") or "none"}',
+        f'selected_status: {selected.get("status") or "none"}',
+        f'generated_report: {summary.get("report_path") or "none"}',
+        f'truth_ready: {"yes" if summary.get("truth_ready") else "no"}',
+        f'would_send: {"yes" if summary.get("would_send") else "no"}',
+        f'blocker: {summary.get("blocker_category") or "none"} / {summary.get("reason") or "none"}',
+        f'blocker_detail: {summary.get("blocker_detail") or "none"}',
+        f'caption_hash: {summary.get("caption_hash") or "none"}',
+        f'image_hash: {summary.get("image_hash") or "none"}',
+        f'image_path: {summary.get("image_path") or "none"}',
         f'workflow_artifact: {summary.get("workflow_artifact_path") or "none"}',
         f'next: {summary.get("next_action")}',
     ]
@@ -751,6 +835,53 @@ def build_voice_ready_package(root_dir: Path, args: argparse.Namespace) -> tuple
     return result, manifest_path
 
 
+async def _execute_preview_selected(
+    *,
+    settings: AppSettings,
+    report_path: Path,
+    candidate_id: int,
+) -> PreviewSelectedResult:
+    repositories = Repositories(settings.db_path)
+    repositories.initialize()
+    async with httpx.AsyncClient(
+        timeout=settings.static.http_timeout_seconds,
+        follow_redirects=True,
+        headers={
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+            'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7',
+        },
+    ) as http_client:
+        render = DryRunRenderUseCase(
+            caption_builder=TelegramCaptionBuilder(settings.static.caption_limit),
+            renderer=CardRendererRouter(
+                settings.card_output_dir,
+                renderer_mode=settings.rendering.card_renderer,
+                fallback_to_legacy=settings.rendering.fallback_to_legacy,
+            ),
+            http=ResilientHttpClient(http_client),
+        )
+        selector = PublishNextUseCase(
+            settings=settings,
+            repositories=repositories,
+            dry_run_render=render,
+            publisher=_PreviewOnlyPublisher(),
+        )
+        reporter = OperatorTruthReporter(
+            repositories=repositories,
+            writer=AnalyticsArtifactWriter(settings.analytics_output_dir),
+        )
+        use_case = PreviewSelectedUseCase(
+            settings=settings,
+            repositories=repositories,
+            selector=selector,
+            reporter=reporter,
+        )
+        return await use_case.execute(
+            report_path=report_path,
+            candidate_id=candidate_id,
+        )
+
+
 def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
     args = parse_args(argv)
     root_dir = Path(__file__).resolve().parents[1]
@@ -830,6 +961,26 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
         for line in render_voice_package_summary(summary):
             safe_print(line)
         return 0 if summary.get('status') == 'ok' else 1
+
+    if args.command == 'preview-selected':
+        for line in render_bootstrap_diagnostics(load_project_env(root_dir)):
+            safe_print(line)
+        settings = AppSettings.from_env(root_dir)
+        result = asyncio.run(
+            _execute_preview_selected(
+                settings=settings,
+                report_path=resolve_report_path(root_dir, args.from_report),
+                candidate_id=int(args.candidate_id),
+            )
+        )
+        artifacts = discover_latest_artifacts(root_dir)
+        summary = build_preview_selected_summary(result=result, artifacts=artifacts)
+        summary['workflow_artifact_path'] = str(
+            emit_workflow_artifact(root_dir, summary, subject_id='preview-selected')
+        )
+        for line in render_preview_selected_summary(summary):
+            safe_print(line)
+        return 0 if result.created_report else 1
 
     if args.command == 'publish-previewed':
         for line in render_bootstrap_diagnostics(load_project_env(root_dir)):

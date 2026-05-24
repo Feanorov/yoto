@@ -13,6 +13,7 @@ from application.use_cases.dry_run_render import RenderResult
 from application.use_cases.offline_validation_snapshot import OfflineSnapshotBundle
 from application.use_cases.operator_truth_report import OperatorTruthReporter
 from application.use_cases.plan_queue import PlannedCandidate, QueuePlan
+from application.use_cases.preview_selected import PreviewSelectedUseCase
 from application.use_cases.publish_next import PublishNextUseCase
 from domain.entities.post_artifact import PostArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
@@ -487,6 +488,267 @@ def test_operator_truth_report_candidate_rows_mark_already_published_status(tmp_
     assert rows['steam:413150']['blocker_reason'] == 'already_published'
     assert 'blocked:already_published_recently' in str(rows['steam:413150']['blocker_detail'])
     assert rows['steam:264710']['status'] == 'recommended'
+
+
+def test_preview_selected_builds_new_preview_report_for_exact_ready_candidate(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    source_now = datetime(2026, 3, 20, 12, 0)
+    selected_now = datetime(2026, 3, 20, 12, 1)
+
+    recommended_offer = make_offer()
+    recommended_offer.offer_id = 'steam:recommended-preview-selected'
+    recommended_offer.game_id = 'recommended-preview-selected'
+    recommended_offer.franchise_key = 'recommended-preview-selected'
+    recommended_offer.title = 'Recommended Source Candidate'
+
+    ready_offer = make_offer()
+    ready_offer.offer_id = 'steam:ready-preview-selected'
+    ready_offer.game_id = 'ready-preview-selected'
+    ready_offer.franchise_key = 'ready-preview-selected'
+    ready_offer.title = 'Ready Source Candidate'
+
+    recommended_decision = make_decision_json('high_value_discount', score=140.0)
+    ready_decision = make_decision_json('high_value_discount', score=120.0)
+    repo.replace_queue(
+        'planned',
+        [
+            (140.0, recommended_offer, recommended_decision),
+            (120.0, ready_offer, ready_decision),
+        ],
+        created_at=source_now,
+    )
+
+    selector = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = selector.inspect_selection(source_now, source_now)
+    target = asyncio.run(selector.preview_send_test_target(source_now, source_now))
+    plan = QueuePlan(
+        planned=[
+            make_candidate(recommended_offer, recommended_decision, 140.0),
+            make_candidate(ready_offer, ready_decision, 120.0),
+        ],
+        reserve=[],
+        metrics={'offers.ingested_total': 2, 'offers.enriched_total': 2},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': source_now.isoformat(),
+            'selection_summary': {'solo_post': 2, 'roundup_candidate': 0, 'capacity_hold': 0},
+        },
+    )
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    source_report = reporter.emit(
+        now_utc=source_now,
+        mode='preview',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+    )
+    assert source_report.json_path is not None and source_report.json_path.exists()
+
+    source_payload = json.loads(source_report.json_path.read_text(encoding='utf-8'))
+    ready_row = next(
+        row
+        for row in source_payload['selection']['candidate_rows']
+        if row['offer_id'] == 'steam:ready-preview-selected'
+    )
+
+    use_case = PreviewSelectedUseCase(
+        settings=settings,
+        repositories=repo,
+        selector=selector,
+        reporter=reporter,
+    )
+    result = asyncio.run(
+        use_case.execute(
+            report_path=source_report.json_path,
+            candidate_id=int(ready_row['candidate_id']),
+            now_utc=selected_now,
+            now_local=selected_now,
+        )
+    )
+
+    assert result.created_report is True
+    assert result.reason == 'selected_preview_ready'
+    assert result.report_path is not None and result.report_path.exists()
+    generated = json.loads(result.report_path.read_text(encoding='utf-8'))
+    assert generated['send_test_target']['candidate']['row_id'] == ready_row['row_id']
+    assert generated['send_test_target']['candidate']['offer_id'] == 'steam:ready-preview-selected'
+    assert generated['selection']['selected_candidate']['row_id'] == ready_row['row_id']
+    assert generated['pinned_publish']['candidate']['row_id'] == ready_row['row_id']
+    assert generated['pinned_publish']['candidate']['offer_id'] == 'steam:ready-preview-selected'
+    generated_rows = {row['offer_id']: row for row in generated['selection']['candidate_rows']}
+    assert generated_rows['steam:ready-preview-selected']['status'] == 'recommended'
+    assert generated_rows['steam:recommended-preview-selected']['status'] == 'ready'
+
+
+def test_preview_selected_rejects_blocked_candidate_from_source_report(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    source_now = datetime(2026, 3, 20, 12, 0)
+    selected_now = datetime(2026, 3, 20, 12, 1)
+
+    blocked_offer = make_offer()
+    blocked_offer.offer_id = 'steam:blocked-preview-selected'
+    blocked_offer.game_id = 'blocked-preview-selected'
+    blocked_offer.franchise_key = 'blocked-preview-selected'
+    blocked_offer.title = 'Blocked Source Candidate'
+
+    ready_offer = make_offer()
+    ready_offer.offer_id = 'steam:ready-other'
+    ready_offer.game_id = 'ready-other'
+    ready_offer.franchise_key = 'ready-other'
+    ready_offer.title = 'Ready Other Candidate'
+
+    repo.increment_daily_lane('2026-03-20', 'game_of_the_day')
+    blocked_decision = make_decision_json('game_of_the_day', score=180.0)
+    ready_decision = make_decision_json('high_value_discount', score=120.0)
+    repo.replace_queue(
+        'planned',
+        [
+            (180.0, blocked_offer, blocked_decision),
+            (120.0, ready_offer, ready_decision),
+        ],
+        created_at=source_now,
+    )
+
+    selector = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = selector.inspect_selection(source_now, source_now)
+    target = asyncio.run(selector.preview_send_test_target(source_now, source_now))
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    source_report = reporter.emit(
+        now_utc=source_now,
+        mode='preview',
+        settings=settings,
+        plan=QueuePlan(
+            planned=[
+                make_candidate(blocked_offer, blocked_decision, 180.0),
+                make_candidate(ready_offer, ready_decision, 120.0),
+            ],
+            reserve=[],
+            metrics={},
+            context={'source': 'current_queue', 'selection_summary': {'capacity_hold': 0}},
+        ),
+        selection=selection,
+        target=target,
+    )
+    assert source_report.json_path is not None and source_report.json_path.exists()
+
+    source_payload = json.loads(source_report.json_path.read_text(encoding='utf-8'))
+    blocked_row = next(
+        row
+        for row in source_payload['selection']['candidate_rows']
+        if row['offer_id'] == 'steam:blocked-preview-selected'
+    )
+
+    use_case = PreviewSelectedUseCase(
+        settings=settings,
+        repositories=repo,
+        selector=selector,
+        reporter=reporter,
+    )
+    result = asyncio.run(
+        use_case.execute(
+            report_path=source_report.json_path,
+            candidate_id=int(blocked_row['candidate_id']),
+            now_utc=selected_now,
+            now_local=selected_now,
+        )
+    )
+
+    assert result.created_report is False
+    assert result.reason == 'candidate_blocked'
+    assert result.blocker_category == 'queue_state'
+    assert 'daily_lane_cap_reached' in str(result.blocker_detail)
+
+
+def test_preview_selected_rejects_already_published_candidate_from_source_report(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    source_now = datetime(2026, 3, 20, 12, 0)
+    selected_now = datetime(2026, 3, 20, 12, 1)
+
+    published_offer = make_offer()
+    published_offer.offer_id = 'steam:413150'
+    published_offer.game_id = '413150'
+    published_offer.franchise_key = '413150'
+    published_offer.title = 'Stardew Valley'
+
+    fallback_offer = make_offer()
+    fallback_offer.offer_id = 'steam:264710'
+    fallback_offer.game_id = '264710'
+    fallback_offer.franchise_key = '264710'
+    fallback_offer.title = 'Subnautica'
+
+    published_decision = make_decision_json('high_value_discount', score=150.0)
+    fallback_decision = make_decision_json('high_value_discount', score=120.0)
+    repo.replace_queue(
+        'planned',
+        [
+            (150.0, published_offer, published_decision),
+            (120.0, fallback_offer, fallback_decision),
+        ],
+        created_at=source_now,
+    )
+    repo.record_publication(published_offer, 'high_value_discount', 183)
+
+    selector = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = selector.inspect_selection(source_now, source_now)
+    target = asyncio.run(selector.preview_send_test_target(source_now, source_now))
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    source_report = reporter.emit(
+        now_utc=source_now,
+        mode='preview',
+        settings=settings,
+        plan=QueuePlan(
+            planned=[
+                make_candidate(published_offer, published_decision, 150.0),
+                make_candidate(fallback_offer, fallback_decision, 120.0),
+            ],
+            reserve=[],
+            metrics={},
+            context={'source': 'current_queue', 'selection_summary': {'capacity_hold': 0}},
+        ),
+        selection=selection,
+        target=target,
+    )
+    assert source_report.json_path is not None and source_report.json_path.exists()
+
+    source_payload = json.loads(source_report.json_path.read_text(encoding='utf-8'))
+    published_row = next(
+        row
+        for row in source_payload['selection']['candidate_rows']
+        if row['offer_id'] == 'steam:413150'
+    )
+
+    use_case = PreviewSelectedUseCase(
+        settings=settings,
+        repositories=repo,
+        selector=selector,
+        reporter=reporter,
+    )
+    result = asyncio.run(
+        use_case.execute(
+            report_path=source_report.json_path,
+            candidate_id=int(published_row['candidate_id']),
+            now_utc=selected_now,
+            now_local=selected_now,
+        )
+    )
+
+    assert result.created_report is False
+    assert result.reason == 'already_published'
+    assert result.blocker_category == 'queue_state'
+    assert 'blocked:already_published_recently' in str(result.blocker_detail)
 
 
 def test_operator_truth_report_includes_verified_pinned_publish_payload(tmp_path: Path) -> None:

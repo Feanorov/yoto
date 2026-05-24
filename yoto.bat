@@ -24,6 +24,7 @@ if /I "%ACTION%"=="preview-golden" goto :preview_golden
 if /I "%ACTION%"=="send-test" goto :send_test
 if /I "%ACTION%"=="send-test-offline" goto :send_test_offline
 if /I "%ACTION%"=="send-test-golden" goto :send_test_golden
+if /I "%ACTION%"=="preview-selected" goto :preview_selected
 if /I "%ACTION%"=="publish-previewed" goto :publish_previewed
 if /I "%ACTION%"=="daily-check" goto :daily_check
 if /I "%ACTION%"=="doctor" goto :doctor
@@ -95,6 +96,19 @@ call :resolve_python
 if errorlevel 1 exit /b 1
 set YOTO_COMMAND="%YOTO_PYTHON%" -m dealbot.operator_cli send-test --offline-snapshot golden %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto :execute_from_root
+
+:preview_selected
+call :resolve_python
+if errorlevel 1 exit /b 1
+pushd "%ROOT%" >nul
+if errorlevel 1 (
+    echo [YOTO] Failed to enter bundle root: %ROOT%
+    exit /b 1
+)
+call "%YOTO_PYTHON%" -m dealbot.operator_cli preview-selected %1 %2 %3 %4 %5 %6 %7 %8 %9
+set "EXIT_CODE=%ERRORLEVEL%"
+popd >nul
+exit /b %EXIT_CODE%
 
 :publish_previewed
 call :resolve_python
@@ -333,6 +347,7 @@ echo   yoto.bat preview-golden
 echo   yoto.bat daily-check
 echo   yoto.bat ui
 echo   yoto.bat operator-ui
+echo   yoto.bat preview-selected --from-report [truth report path] --candidate-id [row_id]
 echo   yoto.bat snapshot-offline
 echo   yoto.bat build-voice-package
 echo   yoto.bat generate-captions [tool args]
@@ -349,6 +364,7 @@ echo   yoto.bat test-video
 echo   yoto.bat video-smoke
 echo.
 echo Publish-capable or state-changing commands:
+echo   yoto.bat preview-selected --from-report [truth report path] --candidate-id [row_id]
 echo   yoto.bat publish-previewed --from-report [truth report path]
 echo   yoto.bat send-test
 echo   yoto.bat send-test-offline
@@ -366,6 +382,7 @@ echo   yoto.bat daily-check
 echo   yoto.bat ui
 echo   yoto.bat operator-ui
 echo   yoto.bat preview
+echo   yoto.bat preview-selected --from-report [truth report path] --candidate-id [row_id]
 echo   yoto.bat send-test
 echo   yoto.bat build-voice-package
 echo   yoto.bat latest-artifacts

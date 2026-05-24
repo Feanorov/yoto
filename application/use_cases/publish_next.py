@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, time, timedelta
 import hashlib
 import logging
@@ -497,6 +497,66 @@ class PublishNextUseCase:
                 candidate=inspection.selected_candidate.to_snapshot(),
             )
 
+        return await self._preview_target_for_record(record, inspection.selected_candidate)
+
+    async def preview_selected_target(
+        self,
+        now_utc: datetime,
+        now_local: datetime,
+        row_id: int,
+    ) -> tuple[SelectionInspection, SendTestTargetPreview]:
+        inspection = self.inspect_selection(now_utc, now_local)
+        candidate = self._selection_candidate_by_row_id(inspection, row_id)
+        if candidate is None:
+            return inspection, SendTestTargetPreview(
+                truth_ready=False,
+                would_send=False,
+                blocker_category='queue_state',
+                blocker_reason='candidate_not_found',
+                blocker_detail=f'row_id={int(row_id)}',
+            )
+
+        blocker_reason, blocker_detail = self._selected_preview_status_blocker(candidate)
+        if blocker_reason is not None:
+            return inspection, SendTestTargetPreview(
+                truth_ready=False,
+                would_send=False,
+                blocker_category=self._blocker_category(blocker_reason),
+                blocker_reason=blocker_reason,
+                blocker_detail=blocker_detail,
+                candidate=candidate.to_snapshot(),
+            )
+
+        selected_inspection = self._selection_with_selected_candidate(inspection, row_id)
+        selected_candidate = selected_inspection.selected_candidate
+        if selected_candidate is None:
+            return inspection, SendTestTargetPreview(
+                truth_ready=False,
+                would_send=False,
+                blocker_category='queue_state',
+                blocker_reason='selected_preview_unsupported',
+                blocker_detail=f'row_id={int(row_id)} was not selector-eligible for exact preview.',
+                candidate=candidate.to_snapshot(),
+            )
+
+        record = self._queue_record_by_row_id(row_id)
+        if record is None:
+            return selected_inspection, SendTestTargetPreview(
+                truth_ready=False,
+                would_send=False,
+                blocker_category='queue_state',
+                blocker_reason='selected_preview_unsupported',
+                blocker_detail=f'row_id={int(row_id)} is not an addressable queue row.',
+                candidate=selected_candidate.to_snapshot(),
+            )
+
+        return selected_inspection, await self._preview_target_for_record(record, selected_candidate)
+
+    async def _preview_target_for_record(
+        self,
+        record: QueueRecord,
+        candidate_snapshot: SelectionCandidateSnapshot,
+    ) -> SendTestTargetPreview:
         if self._is_roundup_candidate(record):
             image_path = Path(str(record.decision_json.get('roundup_card_asset_path') or '').strip())
             artifact = self._roundup_post_artifact(record, image_path)
@@ -514,7 +574,7 @@ class PublishNextUseCase:
                 blocker_category=self._blocker_category(blocker_reason),
                 blocker_reason=blocker_reason,
                 blocker_detail=blocker_detail,
-                candidate=inspection.selected_candidate.to_snapshot(),
+                candidate=candidate_snapshot.to_snapshot(),
                 offer_snapshot=record.offer.to_snapshot(),
                 decision_snapshot=dict(record.decision_json),
                 artifact=self._artifact_preview(artifact, image_path),
@@ -531,7 +591,7 @@ class PublishNextUseCase:
                 blocker_category='asset_localization',
                 blocker_reason='render_failed',
                 blocker_detail=self._failure_detail(exc),
-                candidate=inspection.selected_candidate.to_snapshot(),
+                candidate=candidate_snapshot.to_snapshot(),
                 offer_snapshot=record.offer.to_snapshot(),
                 decision_snapshot=dict(record.decision_json),
             )
@@ -551,7 +611,7 @@ class PublishNextUseCase:
             blocker_category=self._blocker_category(blocker_reason),
             blocker_reason=blocker_reason,
             blocker_detail=blocker_detail,
-            candidate=inspection.selected_candidate.to_snapshot(),
+            candidate=candidate_snapshot.to_snapshot(),
             offer_snapshot=record.offer.to_snapshot(),
             decision_snapshot=dict(record.decision_json),
             artifact=self._artifact_preview(artifact, render_result.image_path),
@@ -1468,6 +1528,68 @@ class PublishNextUseCase:
                     return record
         return None
 
+    def find_selection_candidate(
+        self,
+        inspection: SelectionInspection,
+        row_id: int,
+    ) -> SelectionCandidateSnapshot | None:
+        return self._selection_candidate_by_row_id(inspection, row_id)
+
+    @staticmethod
+    def _selection_candidate_by_row_id(
+        inspection: SelectionInspection,
+        row_id: int,
+    ) -> SelectionCandidateSnapshot | None:
+        for candidate in list(inspection.eligible_candidates) + list(inspection.blocked_candidates):
+            if int(candidate.row_id) == int(row_id):
+                return candidate
+        return None
+
+    @staticmethod
+    def _selection_with_selected_candidate(
+        inspection: SelectionInspection,
+        row_id: int,
+    ) -> SelectionInspection:
+        selected_candidate: SelectionCandidateSnapshot | None = None
+        eligible_candidates: list[SelectionCandidateSnapshot] = []
+        for candidate in inspection.eligible_candidates:
+            updated = replace(candidate, selected=int(candidate.row_id) == int(row_id))
+            eligible_candidates.append(updated)
+            if updated.selected:
+                selected_candidate = updated
+        return SelectionInspection(
+            quiet_hours=inspection.quiet_hours,
+            allow_reserve=inspection.allow_reserve,
+            planned_total=inspection.planned_total,
+            reserve_total=inspection.reserve_total,
+            visible_reserve_total=inspection.visible_reserve_total,
+            eligible_candidates=eligible_candidates,
+            blocked_candidates=list(inspection.blocked_candidates),
+            selected_candidate=selected_candidate,
+            roundup_injection=dict(inspection.roundup_injection or {}),
+            reserve_release_reason=inspection.reserve_release_reason,
+            blocker_reason=None if selected_candidate is not None else inspection.blocker_reason,
+            blocker_detail=None if selected_candidate is not None else inspection.blocker_detail,
+        )
+
+    @staticmethod
+    def _selected_preview_status_blocker(candidate: SelectionCandidateSnapshot) -> tuple[str | None, str | None]:
+        status = candidate.operator_status()
+        if status in {'recommended', 'ready', 'reserve'}:
+            return None, None
+        if status == 'already_published':
+            return 'already_published', candidate.blocker_detail or f'row_id={candidate.row_id}'
+        if status == 'duplicate':
+            return 'duplicate', candidate.blocker_detail or f'row_id={candidate.row_id}'
+        if status == 'no_price':
+            return 'no_price', candidate.blocker_detail or f'row_id={candidate.row_id}'
+        if status == 'no_visual':
+            return 'no_visual', candidate.blocker_detail or f'row_id={candidate.row_id}'
+        if status == 'blocked':
+            detail = candidate.blocker_detail or candidate.blocker_reason or f'row_id={candidate.row_id}'
+            return 'selected_candidate_blocked', detail
+        return 'selected_preview_unsupported', f'row_id={candidate.row_id} status={status}'
+
     def _selection_blocker(
         self,
         *,
@@ -1542,6 +1664,7 @@ class PublishNextUseCase:
             'card_asset_missing_on_disk',
             'missing_card_asset_path',
             'planned_assets_not_localized',
+            'no_visual',
         }:
             return 'asset_localization'
         if normalized in {'publish_failed'}:

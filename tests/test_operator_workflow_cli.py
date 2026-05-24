@@ -4,7 +4,11 @@ from datetime import datetime
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
+import pytest
+
+from application.use_cases.preview_selected import PreviewSelectedResult
 from dealbot.operator_cli import (
     LatestArtifacts,
     _run_dealbot_command,
@@ -414,3 +418,97 @@ def test_run_dealbot_command_does_not_reuse_stale_truth_report_when_command_fail
     assert report_path is None
     assert payload is None
     assert artifacts.operator_truth_report == stale_report
+
+
+def test_preview_selected_cli_uses_direct_backend_path_and_writes_workflow_identity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import dealbot.operator_cli as operator_cli_module
+
+    source_report_path = _write_json(
+        tmp_path / 'analytics' / '20260524T120000Z_operator_truth_report_preview.json',
+        {'run_key': '20260524T120000Z'},
+        mtime=10,
+    )
+    generated_report = _write_json(
+        tmp_path / 'analytics' / '20260524T120100Z_operator_truth_report_preview.json',
+        {
+            'run_key': '20260524T120100Z',
+            'send_test_target': {'candidate': {'offer_id': 'steam:264710'}},
+            'pinned_publish': {'candidate': {'offer_id': 'steam:264710'}},
+        },
+        mtime=20,
+    )
+    captured_workflow: dict[str, object] = {}
+
+    def fail(*args, **kwargs):
+        raise AssertionError('forbidden path called')
+
+    async def fake_execute_preview_selected(*, settings, report_path: Path, candidate_id: int):
+        assert report_path == source_report_path.resolve()
+        assert candidate_id == 1307
+        return PreviewSelectedResult(
+            status='ok',
+            reason='selected_preview_ready',
+            created_report=True,
+            source_report_path=report_path,
+            source_report_run_key='20260524T120000Z',
+            report_path=generated_report,
+            report_payload={'run_key': '20260524T120100Z'},
+            candidate_id=1307,
+            selected={
+                'offer_id': 'steam:264710',
+                'title': 'Subnautica',
+                'source': 'steam',
+                'lane': 'high_value_discount',
+                'bucket': 'planned',
+                'row_id': 1307,
+                'status': 'recommended',
+            },
+            truth_ready=True,
+            would_send=True,
+            caption_hash='caption-hash',
+            image_hash='image-hash',
+            image_path=tmp_path / 'cards' / 'subnautica.png',
+        )
+
+    monkeypatch.setattr(operator_cli_module, '_run_dealbot_command', fail)
+    import dealbot.main as main_module
+    monkeypatch.setattr(main_module, 'async_main', fail)
+    monkeypatch.setattr(operator_cli_module, '_execute_preview_selected', fake_execute_preview_selected)
+    monkeypatch.setattr(operator_cli_module, 'AppSettings', SimpleNamespace(from_env=lambda root_dir: object()))
+    monkeypatch.setattr(operator_cli_module, 'discover_latest_artifacts', lambda root_dir: LatestArtifacts())
+    monkeypatch.setattr(operator_cli_module, 'safe_print', lambda line: None)
+    monkeypatch.setattr(operator_cli_module, 'load_project_env', lambda root_dir: object())
+    monkeypatch.setattr(operator_cli_module, 'render_bootstrap_diagnostics', lambda bootstrap: [])
+
+    def fake_emit(root_dir: Path, payload: dict[str, object], *, subject_id: str) -> Path:
+        captured_workflow.clear()
+        captured_workflow.update(payload)
+        output_path = tmp_path / 'analytics' / f'{subject_id}.json'
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding='utf-8')
+        return output_path
+
+    monkeypatch.setattr(operator_cli_module, 'emit_workflow_artifact', fake_emit)
+
+    exit_code = operator_cli_module.main(
+        ['preview-selected', '--from-report', str(source_report_path), '--candidate-id', '1307']
+    )
+
+    assert exit_code == 0
+    assert captured_workflow['command'] == 'preview-selected'
+    assert captured_workflow['status'] == 'ok'
+    assert captured_workflow['reason'] == 'selected_preview_ready'
+    assert captured_workflow['source_report_path'] == str(source_report_path.resolve())
+    assert captured_workflow['source_report_run_key'] == '20260524T120000Z'
+    assert captured_workflow['report_path'] == str(generated_report)
+    assert captured_workflow['candidate_id'] == 1307
+    assert captured_workflow['selected']['offer_id'] == 'steam:264710'
+    assert captured_workflow['selected']['row_id'] == 1307
+    assert captured_workflow['selected']['status'] == 'recommended'
+    assert captured_workflow['truth_ready'] is True
+    assert captured_workflow['would_send'] is True
+    assert captured_workflow['caption_hash'] == 'caption-hash'
+    assert captured_workflow['image_hash'] == 'image-hash'
