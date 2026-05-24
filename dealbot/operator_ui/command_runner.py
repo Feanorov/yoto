@@ -56,11 +56,13 @@ class PreviewCommandRunner(QObject):
         if self.is_running:
             return False
         batch_path = Path(project_root) / "yoto.bat"
+        if not batch_path.exists():
+            return False
         self._current_command = command_name
         self._output_buffer = []
         self._process.setWorkingDirectory(str(project_root))
         self._process.start("cmd.exe", ["/c", str(batch_path), *arguments])
-        return self._process.waitForStarted(3000)
+        return True
 
     def _on_started(self) -> None:
         self.running_changed.emit(True)
@@ -77,6 +79,11 @@ class PreviewCommandRunner(QObject):
     def _on_error(self, _error: QProcess.ProcessError) -> None:
         if self._process.errorString():
             self.output_ready.emit(f"[runner] {self._process.errorString()}")
+        if self._process.state() == QProcess.ProcessState.NotRunning and self._current_command:
+            command_name = self._current_command
+            self.running_changed.emit(False)
+            self.finished.emit(command_name, -1)
+            self._current_command = ""
 
     def _read_stdout(self) -> None:
         payload = bytes(self._process.readAllStandardOutput())

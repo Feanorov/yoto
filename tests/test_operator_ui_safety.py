@@ -960,7 +960,9 @@ def test_main_window_disables_roundup_preview_in_single_discount_mode(tmp_path: 
     assert window.current_safety.send_enabled is False
     assert window.send_button.isEnabled() is False
     assert window.send_reason_label.text() == "Отключено: тип поста не выбран в текущем режиме."
-    assert window.status_label.text() == "Доступна подборка, но текущий режим ожидает одиночную скидку."
+    assert window.status_label.text() == "Собрано превью типа Подборка, но выбран режим Одиночные скидки."
+    assert "Подборки" in window.preview_selection_hint_label.text()
+    assert "соберите подходящее превью" in window.preview_selection_hint_label.text().lower()
     assert window.current_preview_title_label.text() == "Roundup: Weekly Picks"
     assert window.open_card_button.isEnabled() is True
 
@@ -1240,6 +1242,166 @@ def test_main_window_candidate_selection_gates_send_until_preview_matches(tmp_pa
     app.processEvents()
 
 
+def test_main_window_marks_preview_command_running_immediately(tmp_path: Path, monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+
+    monkeypatch.setattr(window.runner, "run_preview", lambda project_root: True)
+
+    window.run_preview()
+
+    assert window.active_job_label.text().startswith("Выполняется: сбор превью")
+    assert window.run_preview_button.isEnabled() is False
+    assert window.refresh_button.isEnabled() is False
+    assert window.post_type_mode_combo.isEnabled() is False
+    assert window.candidate_table.isEnabled() is False
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_marks_mode_mismatch_preview_as_failed(tmp_path: Path, monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "roundup.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"roundup")
+    workflow_path = tmp_path / "output" / "analytics" / "workflow.json"
+    workflow_path.write_text("{}", encoding="utf-8")
+
+    bundle = ArtifactBundle(
+        project_root=tmp_path,
+        output_dir=tmp_path / "output",
+        workflow_path=workflow_path,
+        truth_report_path=report_path,
+        workflow_payload={
+            "status": "ok",
+            "command": "preview",
+            "report_path": str(report_path),
+        },
+        truth_payload={
+            "selection": {
+                "candidate_rows": [
+                    {
+                        "candidate_id": 8,
+                        "row_id": 8,
+                        "title": "Roundup: Big Discount Highlights",
+                        "offer_id": "roundup:weekly",
+                        "source": "steam",
+                        "platform": "steam",
+                        "post_type": "roundup",
+                        "status": "recommended",
+                        "bucket": "planned",
+                        "lane": "roundup",
+                    },
+                    {
+                        "candidate_id": 2,
+                        "row_id": 2,
+                        "title": "Single Discount Candidate",
+                        "offer_id": "steam:single",
+                        "source": "steam",
+                        "platform": "steam",
+                        "post_type": "discount",
+                        "status": "ready",
+                        "bucket": "planned",
+                        "lane": "high_value_discount",
+                    },
+                ]
+            },
+            "send_test_target": {
+                "candidate": {
+                    "candidate_id": 8,
+                    "row_id": 8,
+                    "title": "Roundup: Big Discount Highlights",
+                    "offer_id": "roundup:weekly",
+                    "source": "steam",
+                    "lane": "roundup",
+                    "bucket": "planned",
+                    "content_family": "roundup",
+                    "post_type": "roundup",
+                },
+                "artifact": {
+                    "offer_id": "roundup:weekly",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Roundup</b>",
+                    "caption_preview": "Roundup preview",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "roundup-key",
+                    "card_family": "TOP_LIST",
+                    "template_id": "roundup_digest",
+                },
+            },
+            "pinned_publish": {
+                "contract_version": 1,
+                "source": "preview",
+                "candidate": {
+                    "candidate_id": 8,
+                    "row_id": 8,
+                    "title": "Roundup: Big Discount Highlights",
+                    "offer_id": "roundup:weekly",
+                    "source": "steam",
+                    "lane": "roundup",
+                    "bucket": "planned",
+                    "content_family": "roundup",
+                    "post_type": "roundup",
+                },
+                "artifact": {
+                    "offer_id": "roundup:weekly",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Roundup</b>",
+                    "caption_preview": "Roundup preview",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "roundup-key",
+                    "card_family": "TOP_LIST",
+                    "template_id": "roundup_digest",
+                },
+                "validation": {
+                    "image_exists": True,
+                    "caption_hash_verified": True,
+                    "image_hash_verified": True,
+                },
+            },
+            "verdict": {
+                "verdict": "truthful_send_test_ready",
+                "truth_ready": True,
+                "telegram_verified": False,
+            },
+        },
+    )
+
+    captured_dialog: dict[str, object] = {}
+    monkeypatch.setattr(window.resolver, "load_preview_run", lambda started_at: bundle)
+    monkeypatch.setattr(window, "_active_job_elapsed_seconds", lambda: 34)
+    monkeypatch.setattr(
+        window,
+        "_show_message_box",
+        lambda icon, title, text: captured_dialog.update(icon=icon, title=title, text=text),
+    )
+
+    window._preview_started_at = 1.0
+    window._start_active_job("preview")
+    window._handle_preview_finished(0)
+
+    log_text = window.log_text.toPlainText()
+
+    assert window.active_job_label.text() == "Активных задач нет."
+    assert "Сбор превью failed за 34 сек:" in log_text
+    assert "Собрано превью типа Подборка, но выбран режим Одиночные скидки." in log_text
+    assert window.status_label.text() == "Собрано превью типа Подборка, но выбран режим Одиночные скидки."
+    assert "Собрать превью выбранного" in window.preview_selection_hint_label.text()
+    assert window.send_button.isEnabled() is False
+    assert captured_dialog["icon"] == QMessageBox.Icon.Warning
+    assert "Одиночные скидки" in str(captured_dialog["text"])
+
+    window.close()
+    app.processEvents()
+
+
 def test_main_window_runs_preview_selected_for_selected_candidate(tmp_path: Path, monkeypatch) -> None:
     app = QApplication.instance() or QApplication([])
     window = MainWindow(tmp_path)
@@ -1303,6 +1465,10 @@ def test_main_window_runs_preview_selected_for_selected_candidate(tmp_path: Path
         "report_path": report_path,
         "candidate_id": "2",
     }
+    assert window.active_job_label.text().startswith("Выполняется: сбор превью выбранного")
+    assert window.build_selected_preview_button.isEnabled() is False
+    assert window.post_type_mode_combo.isEnabled() is False
+    assert window.candidate_table.isEnabled() is False
     assert "building selected preview for 2" in window.log_text.toPlainText()
 
     window.close()
@@ -1343,6 +1509,45 @@ def test_main_window_disables_preview_selected_for_blocked_candidate(tmp_path: P
 
     assert window.build_selected_preview_button.isEnabled() is False
     assert window.build_selected_preview_reason_label.text() == "blocked: daily_lane_cap_reached"
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_disables_preview_selected_for_candidate_mode_mismatch(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        preview_candidate_id="8",
+        candidate_rows=[
+            CandidateRow(
+                candidate_id="8",
+                row_id="8",
+                title="Roundup Candidate",
+                offer_id="roundup:weekly",
+                post_type="roundup",
+                status="ready",
+            ),
+        ],
+        report_exists=True,
+        paths=PreviewPaths(truth_report_path=report_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+    window.candidate_table.selectRow(0)
+    app.processEvents()
+
+    assert window.build_selected_preview_button.isEnabled() is False
+    assert "не подходит для режима Одиночные скидки" in window.build_selected_preview_reason_label.text()
 
     window.close()
     app.processEvents()

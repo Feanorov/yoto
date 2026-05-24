@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from PySide6.QtCore import Qt, QUrl
+from PySide6.QtCore import QTimer, Qt, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QPixmap
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -260,8 +260,13 @@ class MainWindow(QMainWindow):
         self.current_state: PreviewState | None = None
         self.current_safety: SafetyState = evaluate_preview_safety(None, default_operator_post_type_mode())
         self.selected_candidate_id: str = ""
+        self._active_job_command: str = ""
+        self._active_job_started_at: float | None = None
         self._preview_started_at: float | None = None
         self._publish_started_at: float | None = None
+        self._job_timer = QTimer(self)
+        self._job_timer.setInterval(1000)
+        self._job_timer.timeout.connect(self._tick_active_job)
 
         self.setWindowTitle("Пульт YOTO: превью поста")
         self.resize(1560, 920)
@@ -341,12 +346,16 @@ class MainWindow(QMainWindow):
         self.safety_label = QLabel("")
         self.safety_label.setObjectName("safetySummaryLabel")
         self.safety_label.setWordWrap(True)
+        self.active_job_label = QLabel("РђРєС‚РёРІРЅС‹С… Р·Р°РґР°С‡ РЅРµС‚.")
+        self.active_job_label.setObjectName("activeJobLabel")
+        self.active_job_label.setWordWrap(True)
         status_layout.addWidget(self.status_label)
         status_layout.addWidget(self.post_type_mode_label)
         status_layout.addWidget(self.post_type_mode_combo)
         status_layout.addWidget(self.post_type_badge)
         status_layout.addWidget(self.send_reason_label)
         status_layout.addWidget(self.safety_label)
+        status_layout.addWidget(self.active_job_label)
         layout.addWidget(status_group)
 
         actions_group = QGroupBox("Действия")
@@ -634,6 +643,7 @@ class MainWindow(QMainWindow):
                 color: #b8c2f4;
             }
             QLabel#operatorStatusFacts, QLabel#safetySummaryLabel, QLabel#sendReasonLabel, QLabel#lastPublishLabel,
+            QLabel#activeJobLabel,
             QLabel#selectedCandidateSummary, QLabel#selectedPreviewReasonLabel, QLabel#previewSelectionHint {
                 color: #c8d1ff;
             }
@@ -801,33 +811,172 @@ class MainWindow(QMainWindow):
         if self.current_state is not None:
             self._apply_state(self.current_state)
 
+    @staticmethod
+    def _command_action_label(command_name: str) -> str:
+        mapping = {
+            "preview": "сбор превью",
+            "preview-selected": "сбор превью выбранного",
+            "publish-previewed": "публикация",
+        }
+        return mapping.get(command_name, "операция")
+
+    @staticmethod
+    def _command_result_label(command_name: str) -> str:
+        mapping = {
+            "preview": "Сбор превью",
+            "preview-selected": "Сбор превью выбранного",
+            "publish-previewed": "Публикация",
+        }
+        return mapping.get(command_name, "Операция")
+
+    @staticmethod
+    def _format_elapsed_hhmmss(elapsed_seconds: int) -> str:
+        minutes, seconds = divmod(max(0, int(elapsed_seconds)), 60)
+        return f"{minutes:02d}:{seconds:02d}"
+
+    def _start_active_job(self, command_name: str) -> None:
+        self._active_job_command = command_name
+        self._active_job_started_at = time.monotonic()
+        self._tick_active_job()
+        self._job_timer.start()
+        self._set_running(True)
+
+    def _finish_active_job(self) -> int:
+        elapsed_seconds = self._active_job_elapsed_seconds()
+        self._job_timer.stop()
+        self._active_job_command = ""
+        self._active_job_started_at = None
+        self.active_job_label.setText("Активных задач нет.")
+        self.active_job_label.setStyleSheet("color: #c8d1ff;")
+        self._set_running(self.runner.is_running)
+        return elapsed_seconds
+
+    def _record_active_job_outcome(self, command_name: str, *, success: bool, reason: str | None = None) -> int:
+        elapsed_seconds = self._finish_active_job()
+        result_label = self._command_result_label(command_name)
+        if success:
+            self.append_log(f"[ui] {result_label} завершён за {elapsed_seconds} сек.")
+            return elapsed_seconds
+        detail_suffix = f": {reason}" if reason else ""
+        self.append_log(f"[ui] {result_label} failed за {elapsed_seconds} сек{detail_suffix}")
+        return elapsed_seconds
+
+    def _active_job_elapsed_seconds(self) -> int:
+        if self._active_job_started_at is None:
+            return 0
+        return max(0, int(time.monotonic() - self._active_job_started_at))
+
+    def _tick_active_job(self) -> None:
+        if not self._active_job_command:
+            self.active_job_label.setText("Активных задач нет.")
+            self.active_job_label.setStyleSheet("color: #c8d1ff;")
+            return
+        elapsed_text = self._format_elapsed_hhmmss(self._active_job_elapsed_seconds())
+        action_label = self._command_action_label(self._active_job_command)
+        self.active_job_label.setText(f"Выполняется: {action_label}... {elapsed_text}")
+        self.active_job_label.setStyleSheet("color: #93c5fd;")
+
+    @staticmethod
+    def _candidate_post_type_key(candidate: CandidateRow) -> str:
+        normalized = _text(candidate.post_type).lower()
+        mapping = {
+            "discount": "single_discount",
+            "single_discount": "single_discount",
+            "freebie": "freebie",
+            "roundup": "roundup",
+            "roundup_digest": "roundup",
+            "roundup_toplist": "roundup_toplist",
+            "toplist": "toplist",
+        }
+        return mapping.get(normalized, normalized or "unknown")
+
+    def _mode_matching_candidates(self, state: PreviewState) -> list[CandidateRow]:
+        mode = self._current_post_type_mode()
+        if mode.key == "any":
+            return list(state.candidate_rows)
+        matches: list[CandidateRow] = []
+        for candidate in state.candidate_rows:
+            candidate_post_type_key = self._candidate_post_type_key(candidate)
+            if candidate_post_type_key and mode.allows(candidate_post_type_key):
+                matches.append(candidate)
+        return matches
+
+    @staticmethod
+    def _preferred_mode_label_for_post_type(post_type_key: str) -> str:
+        mapping = {
+            "single_discount": "Одиночные скидки",
+            "freebie": "Раздачи",
+            "roundup": "Подборки",
+            "roundup_toplist": "Подборки",
+            "toplist": "Подборки",
+        }
+        return mapping.get(_text(post_type_key), "Любой тип")
+
+    def _is_mode_mismatch_state(self, state: PreviewState) -> bool:
+        return is_post_type_mode_mismatch(state, self._current_post_type_mode())
+
+    def _mode_mismatch_guidance(self, state: PreviewState) -> str:
+        mode = self._current_post_type_mode()
+        built_type_label = _translate_post_type_label(state.post_type_label)
+        mode_label = mode.label
+        preferred_mode_label = self._preferred_mode_label_for_post_type(state.post_type_key)
+        matching_candidates = self._mode_matching_candidates(state)
+        prefix = f"Собрано превью типа {built_type_label}, но выбран режим {mode_label}."
+        if matching_candidates:
+            return (
+                f"{prefix} Выберите кандидата подходящего типа в таблице и нажмите "
+                "\"Собрать превью выбранного\" или переключите режим на "
+                f"{preferred_mode_label}."
+            )
+        return f"{prefix} Выберите режим {preferred_mode_label} или соберите подходящее превью."
+
+    def _selected_preview_action_state(self) -> tuple[bool, str]:
+        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        candidate = self._selected_candidate_row()
+        if not allowed or candidate is None:
+            return allowed, reason
+        mode = self._current_post_type_mode()
+        candidate_post_type_key = self._candidate_post_type_key(candidate)
+        if mode.key == "any" or candidate_post_type_key in {"", "unknown"} or mode.allows(candidate_post_type_key):
+            return True, reason
+        candidate_type_label = self._preferred_mode_label_for_post_type(candidate_post_type_key)
+        mismatch_reason = (
+            f"Кандидат типа {candidate_type_label} не подходит для режима {mode.label}. "
+            "Выберите другую строку в таблице или переключите режим."
+        )
+        return False, mismatch_reason
+
     def run_preview(self) -> None:
-        if self.runner.is_running:
+        if self.runner.is_running or self._active_job_command:
             return
         self._preview_started_at = time.time()
         self.log_text.clear()
+        self._start_active_job("preview")
         self.append_log(f"[ui] Запуск превью: {self.project_root / 'yoto.bat'}")
         started = self.runner.run_preview(self.project_root)
         if not started:
             self.append_log("[ui] Не удалось запустить yoto.bat для сборки превью")
+            self._record_active_job_outcome("preview", success=False, reason="process_start_failed")
             self.status_label.setText(_translate_status_text("Preview Failed"))
 
     def run_preview_selected(self) -> None:
-        if self.runner.is_running:
+        if self.runner.is_running or self._active_job_command:
             return
         state = self.current_state
         report_path = self._selected_preview_report_path()
         candidate_id = self.selected_candidate_id
-        allowed, reason = evaluate_selected_preview_eligibility(state, candidate_id)
+        allowed, reason = self._selected_preview_action_state()
         if not allowed or report_path is None:
             self.build_selected_preview_reason_label.setText(reason)
             self.build_selected_preview_button.setToolTip(reason)
             self.append_log(f"[ui] selected preview skipped: {reason}")
             return
         self._preview_started_at = time.time()
+        self._start_active_job("preview-selected")
         self.append_log(f"[ui] building selected preview for {candidate_id}")
         started = self.runner.run_preview_selected(self.project_root, report_path, candidate_id)
         if not started:
+            self._record_active_job_outcome("preview-selected", success=False, reason="process_start_failed")
             self.append_log(f"[ui] selected preview failed: process_start_failed ({candidate_id})")
             self._show_message_box(
                 QMessageBox.Icon.Warning,
@@ -836,7 +985,7 @@ class MainWindow(QMainWindow):
             )
 
     def handle_send_clicked(self) -> None:
-        if self.runner.is_running:
+        if self.runner.is_running or self._active_job_command:
             return
         if not self.current_safety.send_enabled:
             self.show_send_disabled_dialog()
@@ -850,9 +999,11 @@ class MainWindow(QMainWindow):
         if answer != QMessageBox.StandardButton.Yes:
             return
         self._publish_started_at = time.time()
+        self._start_active_job("publish-previewed")
         self.append_log(f"[ui] Запуск publish-previewed: {report_path}")
         started = self.runner.run_publish_previewed(self.project_root, report_path)
         if not started:
+            self._record_active_job_outcome("publish-previewed", success=False, reason="process_start_failed")
             self.append_log("[ui] Не удалось запустить yoto.bat publish-previewed")
             self._show_message_box(
                 QMessageBox.Icon.Warning,
@@ -899,6 +1050,19 @@ class MainWindow(QMainWindow):
                 self.append_log("[ui] Команда превью завершилась без новых workflow/truth артефактов")
         self._apply_state(state)
         self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
+        mode_mismatch = self._is_mode_mismatch_state(state)
+        failure_reason = state.current_run_backend_reason or _extract_publish_reason(self.runner.last_output) or f"exit_code_{exit_code}"
+        if state.current_run_missing_artifact or exit_code != 0 or mode_mismatch:
+            if mode_mismatch:
+                failure_reason = self._mode_mismatch_guidance(state)
+                self._show_message_box(
+                    QMessageBox.Icon.Warning,
+                    "Превью не соответствует режиму",
+                    failure_reason,
+                )
+            self._record_active_job_outcome("preview", success=False, reason=failure_reason)
+            return
+        self._record_active_job_outcome("preview", success=True)
 
     def _handle_selected_preview_finished(self, exit_code: int) -> None:
         started_at = self._preview_started_at or 0.0
@@ -913,13 +1077,19 @@ class MainWindow(QMainWindow):
             state.current_run_backend_reason = self._extract_preview_backend_reason(self.runner.last_output)
         self._apply_state(state)
         self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
+        mode_mismatch = self._is_mode_mismatch_state(state)
         failure_reason = (
             state.current_run_backend_reason
             or _extract_publish_reason(self.runner.last_output)
             or f"exit_code_{exit_code}"
         )
-        if state.current_run_missing_artifact or exit_code != 0 or not self._selected_candidate_matches_preview():
+        if mode_mismatch:
+            failure_reason = self._mode_mismatch_guidance(state)
+        elif not self._selected_candidate_matches_preview():
+            failure_reason = SEND_DISABLED_SELECTION_MISMATCH_RU
+        if state.current_run_missing_artifact or exit_code != 0 or mode_mismatch or not self._selected_candidate_matches_preview():
             self.append_log(f"[ui] selected preview failed: {failure_reason}")
+            self._record_active_job_outcome("preview-selected", success=False, reason=failure_reason)
             self._show_message_box(
                 QMessageBox.Icon.Warning,
                 "Превью не собрано",
@@ -927,6 +1097,7 @@ class MainWindow(QMainWindow):
             )
             return
         self.append_log(f"[ui] selected preview ready: {self.selected_candidate_id}")
+        self._record_active_job_outcome("preview-selected", success=True)
 
     def _handle_publish_finished(self, exit_code: int) -> None:
         state = self.current_state
@@ -940,6 +1111,7 @@ class MainWindow(QMainWindow):
             self.append_log(f"[ui] Найден workflow publish-previewed: {workflow_path}")
         success, reason, message_id = _verify_publish_previewed_identity(state, workflow_payload)
         if success and message_id is not None:
+            self._record_active_job_outcome("publish-previewed", success=True)
             self._show_message_box(
                 QMessageBox.Icon.Information,
                 "Публикация завершена",
@@ -948,6 +1120,7 @@ class MainWindow(QMainWindow):
             self.refresh_local_state()
             return
         if reason == "identity_mismatch":
+            self._record_active_job_outcome("publish-previewed", success=False, reason="identity_mismatch")
             self._show_message_box(
                 QMessageBox.Icon.Critical,
                 "Ошибка публикации",
@@ -959,6 +1132,7 @@ class MainWindow(QMainWindow):
             failure_reason = _text(workflow_payload.get("reason")) or reason or "publish_failed"
         else:
             failure_reason = reason or _extract_publish_reason(self.runner.last_output) or f"exit_code_{exit_code}"
+        self._record_active_job_outcome("publish-previewed", success=False, reason=failure_reason)
         self._show_message_box(
             QMessageBox.Icon.Warning,
             "Публикация не выполнена",
@@ -1093,7 +1267,9 @@ class MainWindow(QMainWindow):
             if self.current_state is not None and self.current_state.preview_candidate_id:
                 detail_parts.append(f"Текущее pinned candidate_id: {self.current_state.preview_candidate_id}")
             self.preview_selection_hint_label.setText(" · ".join(detail_parts))
-        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        if self.current_state is not None and self._is_mode_mismatch_state(self.current_state):
+            self.preview_selection_hint_label.setText(self._mode_mismatch_guidance(self.current_state))
+        allowed, reason = self._selected_preview_action_state()
         self.build_selected_preview_button.setToolTip(reason)
         self.build_selected_preview_reason_label.setText(reason)
         self.build_selected_preview_reason_label.setStyleSheet(
@@ -1122,9 +1298,8 @@ class MainWindow(QMainWindow):
 
     @staticmethod
     def _mode_mismatch_status_text(state: PreviewState, mode: OperatorPostTypeMode) -> str:
-        if mode.key == "single_discount" and state.post_type_key in {"roundup", "roundup_toplist", "toplist"}:
-            return "Доступна подборка, но текущий режим ожидает одиночную скидку."
-        return SEND_DISABLED_POST_TYPE_MODE_RU
+        built_type_label = _translate_post_type_label(state.post_type_label)
+        return f"Собрано превью типа {built_type_label}, но выбран режим {mode.label}."
 
     @staticmethod
     def _inactive_preview_status_text(state: PreviewState, safety: SafetyState) -> str:
@@ -1198,25 +1373,28 @@ class MainWindow(QMainWindow):
     def _sync_buttons(self) -> None:
         self._sync_preview_action_button()
         report_path = self._report_path()
+        running = bool(self.runner.is_running or self._active_job_command)
         card_path = (
             self.current_state.card_path
             if self.current_state is not None and self._has_active_preview(self.current_state)
             else None
         )
         last_publish = self.current_state.last_publish if self.current_state else LastPublishState()
-        self.open_report_button.setEnabled(bool(report_path and report_path.exists()))
-        self.open_card_button.setEnabled(bool(card_path and card_path.exists()))
-        self.open_output_button.setEnabled(True)
-        self.open_publish_proof_button.setEnabled(bool(last_publish.workflow_path and last_publish.workflow_path.exists()))
+        self.post_type_mode_combo.setEnabled(not running)
+        self.candidate_table.setEnabled(not running)
+        self.open_report_button.setEnabled(bool(not running and report_path and report_path.exists()))
+        self.open_card_button.setEnabled(bool(not running and card_path and card_path.exists()))
+        self.open_output_button.setEnabled(not running)
+        self.open_publish_proof_button.setEnabled(bool(not running and last_publish.workflow_path and last_publish.workflow_path.exists()))
         self.open_publish_outcome_button.setEnabled(
-            bool(last_publish.publish_outcome_path and last_publish.publish_outcome_path.exists())
+            bool(not running and last_publish.publish_outcome_path and last_publish.publish_outcome_path.exists())
         )
-        self.open_analytics_button.setEnabled(True)
-        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
-        self.build_selected_preview_button.setEnabled(bool(allowed and not self.runner.is_running))
+        self.open_analytics_button.setEnabled(not running)
+        allowed, reason = self._selected_preview_action_state()
+        self.build_selected_preview_button.setEnabled(bool(allowed and not running))
         self.build_selected_preview_button.setToolTip(reason)
         self._sync_publish_history_buttons()
-        self._apply_send_button_state(bool(self.current_safety.send_enabled and not self.runner.is_running))
+        self._apply_send_button_state(bool(self.current_safety.send_enabled and not running))
 
     def _sync_preview_action_button(self) -> None:
         label, tooltip = build_preview_action_copy(self.current_state)
@@ -1226,6 +1404,8 @@ class MainWindow(QMainWindow):
     def _set_running(self, running: bool) -> None:
         self.run_preview_button.setEnabled(not running)
         self.refresh_button.setEnabled(not running)
+        self.post_type_mode_combo.setEnabled(not running)
+        self.candidate_table.setEnabled(not running)
         self.open_report_button.setEnabled(not running and bool(self._report_path() and self._report_path().exists()))
         self.open_card_button.setEnabled(
             not running and bool(self.current_state and self._has_active_preview(self.current_state) and self.current_state.card_exists)
@@ -1248,7 +1428,7 @@ class MainWindow(QMainWindow):
             )
         )
         self.open_analytics_button.setEnabled(not running)
-        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        allowed, reason = self._selected_preview_action_state()
         self.build_selected_preview_button.setEnabled(bool(not running and allowed))
         self.build_selected_preview_button.setToolTip(reason)
         self._sync_publish_history_buttons()
@@ -1454,7 +1634,7 @@ class MainWindow(QMainWindow):
         self._sync_publish_history_buttons()
 
     def _sync_publish_history_buttons(self) -> None:
-        running = self.runner.is_running
+        running = bool(self.runner.is_running or self._active_job_command)
         item = self.publish_history_list.currentItem()
         workflow_path = _path_from_item_data(item, 0) if item is not None else None
         publish_outcome_path = _path_from_item_data(item, 1) if item is not None else None
@@ -1470,9 +1650,14 @@ class MainWindow(QMainWindow):
 
     def _update_operator_status_banner(self, state: PreviewState, safety: SafetyState) -> None:
         operator_status = build_operator_status(state, safety)
+        status_text = operator_status.status_text
+        next_action = operator_status.next_action
+        if self._is_mode_mismatch_state(state):
+            status_text = self._mode_mismatch_status_text(state, self._current_post_type_mode())
+            next_action = self._mode_mismatch_guidance(state)
         self.operator_status_summary_label.setText(
-            f"Статус: {operator_status.status_text}\n"
-            f"Следующее действие: {operator_status.next_action}"
+            f"Статус: {status_text}\n"
+            f"Следующее действие: {next_action}"
         )
         fact_lines: list[str] = []
         if operator_status.last_publish_title or operator_status.last_publish_offer_id:
