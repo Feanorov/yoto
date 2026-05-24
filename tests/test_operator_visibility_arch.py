@@ -312,6 +312,183 @@ def test_operator_truth_report_emits_queue_selection_and_target_details(tmp_path
     assert payload['verdict']['truth_ready'] is True
 
 
+def test_operator_truth_report_emits_selection_candidate_rows_contract(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    now = datetime(2026, 3, 20, 12, 0)
+
+    blocked_offer = make_offer()
+    blocked_offer.offer_id = 'steam:blocked-row'
+    blocked_offer.game_id = 'blocked-row'
+    blocked_offer.franchise_key = 'blocked-row'
+    blocked_offer.title = 'Blocked Candidate'
+
+    recommended_offer = make_offer()
+    recommended_offer.offer_id = 'steam:recommended-row'
+    recommended_offer.game_id = 'recommended-row'
+    recommended_offer.franchise_key = 'recommended-row'
+    recommended_offer.title = 'Recommended Candidate'
+    recommended_offer.price_before_minor = 35000
+    recommended_offer.price_after_minor = 17500
+    recommended_offer.discount_percent = 50
+    recommended_offer.review_score = 94
+    recommended_offer.review_count = 42000
+
+    ready_offer = make_offer()
+    ready_offer.offer_id = 'steam:ready-row'
+    ready_offer.game_id = 'ready-row'
+    ready_offer.franchise_key = 'ready-row'
+    ready_offer.title = 'Ready Candidate'
+
+    reserve_offer = make_offer()
+    reserve_offer.offer_id = 'steam:reserve-row'
+    reserve_offer.game_id = 'reserve-row'
+    reserve_offer.franchise_key = 'reserve-row'
+    reserve_offer.title = 'Reserve Candidate'
+
+    blocked_decision = make_decision_json('game_of_the_day', score=180.0)
+    recommended_decision = make_decision_json('high_value_discount', score=130.0)
+    ready_decision = make_decision_json('high_value_discount', score=120.0)
+    reserve_decision = make_decision_json('high_value_discount', score=90.0, queue_bucket='reserve')
+    reserve_decision['selection_outcome'] = 'reserve'
+    reserve_decision['recommended_post_mode'] = 'roundup_candidate'
+
+    repo.increment_daily_lane('2026-03-20', 'game_of_the_day')
+    repo.replace_queue(
+        'planned',
+        [
+            (180.0, blocked_offer, blocked_decision),
+            (130.0, recommended_offer, recommended_decision),
+            (120.0, ready_offer, ready_decision),
+        ],
+        created_at=now,
+    )
+    repo.replace_queue('reserve', [(90.0, reserve_offer, reserve_decision)], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now)
+    target = asyncio.run(use_case.preview_send_test_target(now, now))
+    plan = QueuePlan(
+        planned=[
+            make_candidate(blocked_offer, blocked_decision, 180.0),
+            make_candidate(recommended_offer, recommended_decision, 130.0),
+            make_candidate(ready_offer, ready_decision, 120.0),
+        ],
+        reserve=[make_candidate(reserve_offer, reserve_decision, 90.0)],
+        metrics={'offers.ingested_total': 4, 'offers.enriched_total': 4},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': now.isoformat(),
+            'selection_summary': {'solo_post': 2, 'roundup_candidate': 1, 'capacity_hold': 0},
+        },
+    )
+
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    artifact = reporter.emit(
+        now_utc=now,
+        mode='preview',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+    )
+
+    assert artifact.json_path is not None and artifact.json_path.exists()
+    payload = json.loads(artifact.json_path.read_text(encoding='utf-8'))
+    rows = {row['offer_id']: row for row in payload['selection']['candidate_rows']}
+
+    assert len(payload['selection']['candidate_rows']) == 4
+    assert rows['steam:recommended-row']['candidate_id'] == rows['steam:recommended-row']['row_id']
+    assert rows['steam:recommended-row']['status'] == 'recommended'
+    assert rows['steam:ready-row']['status'] == 'ready'
+    assert rows['steam:reserve-row']['status'] == 'reserve'
+    assert rows['steam:blocked-row']['status'] == 'blocked'
+    assert rows['steam:blocked-row']['blocker_reason'] == 'daily_lane_cap_reached'
+    assert rows['steam:blocked-row']['blocker_detail'] == 'lane=game_of_the_day published_today=1'
+    assert rows['steam:recommended-row']['source'] == 'steam'
+    assert rows['steam:recommended-row']['platform'] == 'steam'
+    assert rows['steam:recommended-row']['post_type'] == 'discount'
+    assert rows['steam:recommended-row']['current_price'] == 17500
+    assert rows['steam:recommended-row']['old_price'] == 35000
+    assert rows['steam:recommended-row']['discount'] == 50
+    assert rows['steam:recommended-row']['reviews'] == 42000
+    assert rows['steam:recommended-row']['positive_pct'] == 94
+    assert rows['steam:recommended-row']['already_published'] is False
+
+
+def test_operator_truth_report_candidate_rows_mark_already_published_status(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    now = datetime(2026, 3, 20, 12, 0)
+
+    published_offer = make_offer()
+    published_offer.offer_id = 'steam:413150'
+    published_offer.game_id = '413150'
+    published_offer.franchise_key = '413150'
+    published_offer.title = 'Stardew Valley'
+
+    fallback_offer = make_offer()
+    fallback_offer.offer_id = 'steam:264710'
+    fallback_offer.game_id = '264710'
+    fallback_offer.franchise_key = '264710'
+    fallback_offer.title = 'Subnautica'
+
+    published_decision = make_decision_json('high_value_discount', score=150.0)
+    fallback_decision = make_decision_json('high_value_discount', score=120.0)
+    repo.replace_queue(
+        'planned',
+        [
+            (150.0, published_offer, published_decision),
+            (120.0, fallback_offer, fallback_decision),
+        ],
+        created_at=now,
+    )
+    repo.record_publication(published_offer, 'high_value_discount', 183)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now)
+    target = asyncio.run(use_case.preview_send_test_target(now, now))
+    plan = QueuePlan(
+        planned=[
+            make_candidate(published_offer, published_decision, 150.0),
+            make_candidate(fallback_offer, fallback_decision, 120.0),
+        ],
+        reserve=[],
+        metrics={'offers.ingested_total': 2, 'offers.enriched_total': 2},
+        context={
+            'source': 'current_queue',
+            'queue_snapshot_at': now.isoformat(),
+            'selection_summary': {'solo_post': 1, 'roundup_candidate': 0, 'capacity_hold': 0},
+        },
+    )
+
+    reporter = OperatorTruthReporter(repo, AnalyticsArtifactWriter(tmp_path / 'analytics'))
+    artifact = reporter.emit(
+        now_utc=now,
+        mode='preview',
+        settings=settings,
+        plan=plan,
+        selection=selection,
+        target=target,
+    )
+
+    assert artifact.json_path is not None and artifact.json_path.exists()
+    payload = json.loads(artifact.json_path.read_text(encoding='utf-8'))
+    rows = {row['offer_id']: row for row in payload['selection']['candidate_rows']}
+
+    assert rows['steam:413150']['status'] == 'already_published'
+    assert rows['steam:413150']['already_published'] is True
+    assert rows['steam:413150']['blocker_reason'] == 'already_published'
+    assert 'blocked:already_published_recently' in str(rows['steam:413150']['blocker_detail'])
+    assert rows['steam:264710']['status'] == 'recommended'
+
+
 def test_operator_truth_report_includes_verified_pinned_publish_payload(tmp_path: Path) -> None:
     settings = make_test_settings(tmp_path, dry_run=True)
     repo = Repositories(settings.db_path)
@@ -357,6 +534,29 @@ def test_operator_truth_report_includes_verified_pinned_publish_payload(tmp_path
     assert pinned_publish['contract_version'] == 1
     assert pinned_publish['source'] == 'preview'
     assert pinned_publish['report_run_key'] == payload['run_key']
+    assert set(pinned_publish['candidate']) == {
+        'row_id',
+        'bucket',
+        'lane',
+        'content_family',
+        'source',
+        'offer_id',
+        'title',
+        'template_id',
+        'score',
+        'total_priority',
+        'selected',
+        'eligible',
+        'blocker_reason',
+        'blocker_detail',
+        'recommended_post_mode',
+        'publish_priority',
+        'editorial_adjustment',
+        'decision_reasons',
+        'quality_reasons',
+        'store_url',
+        'created_at',
+    }
     assert pinned_publish['candidate']['offer_id'] == 'steam:pinned'
     assert pinned_publish['offer_snapshot']['offer_id'] == 'steam:pinned'
     assert pinned_publish['decision_snapshot']['lane'] == 'high_value_discount'

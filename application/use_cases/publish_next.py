@@ -7,7 +7,7 @@ import hashlib
 import logging
 from pathlib import Path
 import sqlite3
-from typing import Any
+from typing import Any, ClassVar
 
 from dealbot.settings import AppSettings
 from domain.entities.analytics_artifact import AnalyticsArtifact
@@ -41,16 +41,34 @@ class PublishResult:
 
 @dataclass(slots=True)
 class SelectionCandidateSnapshot:
+    OPERATOR_STATUS_PRECEDENCE: ClassVar[dict[str, int]] = {
+        'already_published': 1,
+        'duplicate': 2,
+        'no_price': 3,
+        'no_visual': 4,
+        'blocked': 5,
+        'recommended': 6,
+        'reserve': 7,
+        'ready': 8,
+    }
+
     row_id: int
     bucket: str
     lane: str
     content_family: str
     source: str
+    platform: str
     offer_id: str
     title: str
+    post_type: str
     template_id: str | None
     score: float
     total_priority: float | None
+    current_price: int | None = None
+    old_price: int | None = None
+    discount: int | None = None
+    reviews: int | None = None
+    positive_pct: int | None = None
     selected: bool = False
     eligible: bool = False
     blocker_reason: str | None = None
@@ -88,6 +106,93 @@ class SelectionCandidateSnapshot:
             'created_at': self.created_at,
         }
 
+    def to_candidate_row(self) -> dict[str, Any]:
+        return {
+            'candidate_id': self.row_id,
+            'row_id': self.row_id,
+            'title': self.title,
+            'offer_id': self.offer_id,
+            'source': self.source,
+            'platform': self.platform,
+            'post_type': self.post_type,
+            'current_price': self.current_price,
+            'old_price': self.old_price,
+            'discount': self.discount,
+            'reviews': self.reviews,
+            'positive_pct': self.positive_pct,
+            'status': self.operator_status(),
+            'blocker_reason': self.blocker_reason,
+            'blocker_detail': self.blocker_detail,
+            'already_published': self._is_already_published(),
+            'bucket': self.bucket,
+            'lane': self.lane,
+            'score': self.score,
+            'total_priority': self.total_priority,
+            'recommended_post_mode': self.recommended_post_mode,
+            'store_url': self.store_url,
+            'created_at': self.created_at,
+        }
+
+    def operator_status(self) -> str:
+        if self._is_already_published():
+            return 'already_published'
+        if self._is_duplicate():
+            return 'duplicate'
+        if self._is_explicit_no_price():
+            return 'no_price'
+        if self._is_explicit_no_visual():
+            return 'no_visual'
+        if self.blocker_reason or self.blocker_detail:
+            return 'blocked'
+        if self.selected:
+            return 'recommended'
+        if self.bucket == 'reserve':
+            return 'reserve'
+        return 'ready'
+
+    def status_precedence(self) -> int:
+        return self.OPERATOR_STATUS_PRECEDENCE.get(self.operator_status(), 999)
+
+    def _is_already_published(self) -> bool:
+        normalized_reason = self._normalized_blocker_reason()
+        return normalized_reason in {'already_published', 'already_sent_finalize_only'}
+
+    def _is_duplicate(self) -> bool:
+        if self._is_already_published():
+            return False
+        normalized_reason = self._normalized_blocker_reason()
+        normalized_detail = self._normalized_blocker_detail()
+        if normalized_reason in {'duplicate', 'duplicate_within_game_cooldown'}:
+            return True
+        return 'dedup_reason=duplicate_within_game_cooldown' in normalized_detail
+
+    def _is_explicit_no_price(self) -> bool:
+        normalized_reason = self._normalized_blocker_reason()
+        normalized_detail = self._normalized_blocker_detail()
+        if self.current_price is None and self.post_type not in {'event', 'roundup'}:
+            return True
+        return normalized_reason in {'no_price', 'missing_price'} or any(
+            marker in normalized_detail for marker in ('no_price', 'missing_price', 'price_missing')
+        )
+
+    def _is_explicit_no_visual(self) -> bool:
+        normalized_reason = self._normalized_blocker_reason()
+        normalized_detail = self._normalized_blocker_detail()
+        markers = (
+            'no_visual',
+            'render_failed',
+            'card_asset_missing_on_disk',
+            'missing_card_asset_path',
+            'planned_assets_not_localized',
+        )
+        return normalized_reason in markers or any(marker in normalized_detail for marker in markers)
+
+    def _normalized_blocker_reason(self) -> str:
+        return str(self.blocker_reason or '').strip().lower()
+
+    def _normalized_blocker_detail(self) -> str:
+        return str(self.blocker_detail or '').strip().lower()
+
 
 @dataclass(slots=True)
 class SelectionInspection:
@@ -116,11 +221,26 @@ class SelectionInspection:
             'selected_candidate': self.selected_candidate.to_snapshot() if self.selected_candidate else None,
             'eligible_candidates': [candidate.to_snapshot() for candidate in self.eligible_candidates],
             'blocked_candidates': [candidate.to_snapshot() for candidate in self.blocked_candidates],
+            'candidate_rows': [candidate.to_candidate_row() for candidate in self._candidate_rows()],
             'roundup_injection': dict(self.roundup_injection),
             'reserve_release_reason': self.reserve_release_reason,
             'blocker_reason': self.blocker_reason,
             'blocker_detail': self.blocker_detail,
         }
+
+    def _candidate_rows(self) -> list[SelectionCandidateSnapshot]:
+        selected_by_row_id: dict[int, SelectionCandidateSnapshot] = {}
+        ordered_row_ids: list[int] = []
+        for candidate in list(self.eligible_candidates) + list(self.blocked_candidates):
+            row_id = int(candidate.row_id)
+            existing = selected_by_row_id.get(row_id)
+            if existing is None:
+                selected_by_row_id[row_id] = candidate
+                ordered_row_ids.append(row_id)
+                continue
+            if candidate.status_precedence() < existing.status_precedence():
+                selected_by_row_id[row_id] = candidate
+        return [selected_by_row_id[row_id] for row_id in ordered_row_ids]
 
 
 @dataclass(slots=True)
@@ -1272,11 +1392,18 @@ class PublishNextUseCase:
             lane=str(record.decision_json.get('lane') or record.lane),
             content_family=self._content_family(record),
             source=str(record.offer.source.value),
+            platform=str(record.offer.source.value),
             offer_id=str(record.offer.offer_id),
             title=str(record.offer.title),
+            post_type=self._content_family(record),
             template_id=str(record.decision_json.get('template_id') or '') or None,
             score=float(record.decision_json.get('score') or record.score or 0.0),
             total_priority=total_priority,
+            current_price=record.offer.price_after_minor,
+            old_price=record.offer.price_before_minor,
+            discount=record.offer.discount_percent,
+            reviews=record.offer.review_count,
+            positive_pct=record.offer.review_score,
             selected=selected,
             eligible=eligible,
             blocker_reason=blocker_reason,
