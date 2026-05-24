@@ -15,9 +15,11 @@ from application.use_cases.operator_truth_report import OperatorTruthReporter
 from application.use_cases.plan_queue import PlannedCandidate, QueuePlan
 from application.use_cases.preview_selected import PreviewSelectedUseCase
 from application.use_cases.publish_next import PublishNextUseCase
+from application.use_cases.controlled_reserve_release import ReleaseDecision
+from domain.entities.offer import OfferKind
 from domain.entities.post_artifact import PostArtifact
 from infrastructure.analytics.artifact_writer import AnalyticsArtifactWriter
-from infrastructure.db.repositories import Repositories
+from infrastructure.db.repositories import QueueRecord, Repositories
 
 from .support import make_test_settings
 from .test_caption_builder_arch import make_offer
@@ -48,6 +50,40 @@ def make_decision_json(
 
 def make_candidate(offer, decision_json: dict, score: float) -> PlannedCandidate:
     return PlannedCandidate(score=score, offer=offer, decision_json=decision_json)
+
+
+def make_roundup_record(now: datetime, image_path: Path, *, score: float = 200.0) -> QueueRecord:
+    offer = make_offer()
+    offer.offer_id = 'roundup:weekly'
+    offer.game_id = 'roundup:weekly'
+    offer.franchise_key = 'roundup:weekly'
+    offer.title = 'Roundup: Freebies To Claim'
+
+    decision_json = {
+        'lane': 'roundup_digest',
+        'template_id': 'roundup_digest',
+        'queue_bucket': 'planned',
+        'decision_reasons': ['roundup_digest'],
+        'quality_reasons': ['roundup_artifact_ready'],
+        'dedup_reason': 'roundup_snapshot',
+        'score': score,
+        'manual_force_override': False,
+        'selection_outcome': 'roundup_publish_candidate',
+        'recommended_post_mode': 'roundup',
+        'content_type': 'roundup',
+        'roundup_caption_html': '<b>Roundup</b>',
+        'roundup_card_asset_path': str(image_path),
+        'roundup_queue_row_ids': [1],
+    }
+    return QueueRecord(
+        row_id=999,
+        bucket='planned',
+        lane='roundup_digest',
+        score=score,
+        offer=offer,
+        decision_json=decision_json,
+        created_at=now,
+    )
 
 
 class VerifiedRenderUseCase:
@@ -137,6 +173,87 @@ def test_publish_next_preview_send_test_target_exposes_selected_artifact_details
     assert target.artifact['template_id'] == 'steam_discount'
     assert target.artifact['image_path'] == str(image_path)
     assert target.artifact['caption_preview']
+
+
+def test_publish_next_preview_send_test_target_respects_requested_post_mode(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    now = datetime(2026, 3, 20, 12, 0)
+
+    discount_offer = make_offer()
+    discount_offer.offer_id = 'steam:single-mode'
+    discount_offer.game_id = 'single-mode'
+    discount_offer.franchise_key = 'single-mode'
+    discount_offer.title = 'Single Discount Candidate'
+    repo.replace_queue('planned', [(120.0, discount_offer, make_decision_json('high_value_discount', score=120.0))], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    roundup_record = make_roundup_record(now, image_path, score=200.0)
+    monkeypatch.setattr(
+        use_case,
+        '_build_roundup_candidate',
+        lambda reserve_candidates, recent_stream: (
+            roundup_record,
+            {'attempted': True, 'status': 'candidate_ready', 'reason': None, 'release_status': 'visible'},
+        ),
+    )
+    monkeypatch.setattr(
+        use_case.controlled_reserve_release,
+        'release',
+        lambda **kwargs: ReleaseDecision(
+            visible_reserve_candidates=[],
+            visible_roundup_candidate=kwargs['roundup_candidate'],
+            reason='leading_discount_streak',
+            released_content_type='roundup',
+        ),
+    )
+
+    generic_target = asyncio.run(use_case.preview_send_test_target(now, now, requested_post_mode='any'))
+    filtered_selection = use_case.inspect_selection(now, now, requested_post_mode='single_discount')
+    filtered_target = asyncio.run(use_case.preview_send_test_target(now, now, requested_post_mode='single_discount'))
+
+    assert generic_target.candidate is not None
+    assert generic_target.candidate['offer_id'] == 'roundup:weekly'
+    assert filtered_selection.selected_candidate is not None
+    assert filtered_selection.selected_candidate.offer_id == 'steam:single-mode'
+    assert filtered_selection.eligible_candidates[0].offer_id == 'steam:single-mode'
+    assert filtered_target.candidate is not None
+    assert filtered_target.candidate['offer_id'] == 'steam:single-mode'
+
+
+def test_publish_next_preview_send_test_target_reports_no_candidates_for_requested_mode(tmp_path: Path) -> None:
+    settings = make_test_settings(tmp_path, dry_run=True)
+    repo = Repositories(settings.db_path)
+    repo.initialize()
+    image_path = tmp_path / 'card.png'
+    image_path.write_bytes(b'card')
+    now = datetime(2026, 3, 20, 12, 0)
+
+    freebie_offer = make_offer()
+    freebie_offer.offer_id = 'steam:freebie-only'
+    freebie_offer.game_id = 'freebie-only'
+    freebie_offer.franchise_key = 'freebie-only'
+    freebie_offer.title = 'Freebie Candidate'
+    freebie_offer.offer_kind = OfferKind.FREEBIE
+    freebie_offer.price_before_minor = 1200
+    freebie_offer.price_after_minor = 0
+    freebie_offer.discount_percent = 100
+    repo.replace_queue('planned', [(150.0, freebie_offer, make_decision_json('breaking_freebie', score=150.0))], created_at=now)
+
+    use_case = PublishNextUseCase(settings, repo, StaticRenderUseCase(image_path), RecordingPublisher())
+    selection = use_case.inspect_selection(now, now, requested_post_mode='single_discount')
+    target = asyncio.run(use_case.preview_send_test_target(now, now, requested_post_mode='single_discount'))
+
+    assert selection.selected_candidate is None
+    assert selection.blocker_reason == 'no_candidates_for_post_mode'
+    assert selection.blocker_detail == 'Нет кандидатов для выбранного режима: Одиночные скидки'
+    assert target.truth_ready is False
+    assert target.would_send is False
+    assert target.blocker_reason == 'no_candidates_for_post_mode'
+    assert target.blocker_detail == 'Нет кандидатов для выбранного режима: Одиночные скидки'
 
 
 def test_publish_next_inspect_selection_skips_already_published_queue_rows(tmp_path: Path) -> None:
@@ -995,9 +1112,10 @@ def test_async_main_allows_offline_preview_without_publish_credentials(
         async def __aexit__(self, exc_type, exc, tb) -> None:
             return None
 
-        async def preview_offline(self, incoming_bundle: OfflineSnapshotBundle) -> None:
+        async def preview_offline(self, incoming_bundle: OfflineSnapshotBundle, post_mode: str = 'any') -> None:
             captured['bundle'] = incoming_bundle
             captured['db_path'] = self.settings.db_path
+            captured['post_mode'] = post_mode
 
     monkeypatch.setattr(main_module.AppSettings, 'from_env', staticmethod(fake_from_env))
     monkeypatch.setattr(main_module, 'OfflineValidationSnapshotManager', FakeSnapshotManager)
@@ -1010,3 +1128,4 @@ def test_async_main_allows_offline_preview_without_publish_credentials(
 
     assert captured['bundle'] == bundle
     assert captured['db_path'] == db_path
+    assert captured['post_mode'] == 'any'

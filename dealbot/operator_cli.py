@@ -71,6 +71,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help='Read from an offline snapshot instead of live ingest. Omit the value to use the latest snapshot.',
     )
+    preview_parser.add_argument(
+        '--post-mode',
+        choices=('single_discount', 'freebie', 'roundup', 'any'),
+        default='any',
+        help='Restrict preview selection to the requested operator post mode.',
+    )
 
     send_test_parser = subparsers.add_parser(
         'send-test',
@@ -120,6 +126,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         const='latest',
         default=None,
         help='Run the daily check from an offline snapshot instead of live ingest.',
+    )
+    daily_check_parser.add_argument(
+        '--post-mode',
+        choices=('single_discount', 'freebie', 'roundup', 'any'),
+        default='any',
+        help='Restrict preview selection to the requested operator post mode.',
     )
 
     doctor_parser = subparsers.add_parser(
@@ -890,7 +902,12 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
     if args.command == 'preview':
         exit_code, _, _, _ = _run_dealbot_command(
             root_dir=root_dir,
-            args=['--preview', *(['--offline-snapshot', args.offline_snapshot] if args.offline_snapshot is not None else [])],
+            args=[
+                '--preview',
+                '--post-mode',
+                args.post_mode,
+                *(['--offline-snapshot', args.offline_snapshot] if args.offline_snapshot is not None else []),
+            ],
             command_name='preview',
             runner=command_runner,
         )
@@ -899,7 +916,12 @@ def main(argv: list[str] | None = None, *, runner: Runner | None = None) -> int:
     if args.command == 'daily-check':
         exit_code, _, payload, artifacts = _run_dealbot_command(
             root_dir=root_dir,
-            args=['--preview', *(['--offline-snapshot', args.offline_snapshot] if args.offline_snapshot is not None else [])],
+            args=[
+                '--preview',
+                '--post-mode',
+                args.post_mode,
+                *(['--offline-snapshot', args.offline_snapshot] if args.offline_snapshot is not None else []),
+            ],
             command_name='daily-check',
             runner=command_runner,
         )

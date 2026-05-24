@@ -420,6 +420,26 @@ def test_run_dealbot_command_does_not_reuse_stale_truth_report_when_command_fail
     assert artifacts.operator_truth_report == stale_report
 
 
+def test_preview_cli_forwards_post_mode_to_backend_runner(monkeypatch: pytest.MonkeyPatch) -> None:
+    import dealbot.operator_cli as operator_cli_module
+
+    captured: dict[str, object] = {}
+
+    def fake_run_dealbot_command(*, root_dir: Path, args: list[str], command_name: str, runner):
+        captured["root_dir"] = root_dir
+        captured["args"] = args
+        captured["command_name"] = command_name
+        return 0, None, None, LatestArtifacts()
+
+    monkeypatch.setattr(operator_cli_module, "_run_dealbot_command", fake_run_dealbot_command)
+
+    exit_code = operator_cli_module.main(["preview", "--post-mode", "roundup"])
+
+    assert exit_code == 0
+    assert captured["command_name"] == "preview"
+    assert captured["args"] == ["--preview", "--post-mode", "roundup"]
+
+
 def test_preview_selected_cli_uses_direct_backend_path_and_writes_workflow_identity(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

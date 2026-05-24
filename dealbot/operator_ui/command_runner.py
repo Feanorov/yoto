@@ -27,8 +27,9 @@ class PreviewCommandRunner(QObject):
     def is_running(self) -> bool:
         return self._process.state() != QProcess.ProcessState.NotRunning
 
-    def run_preview(self, project_root: Path) -> bool:
-        return self._start_command(project_root, "preview", ["preview"])
+    def run_preview(self, project_root: Path, post_mode: str = "any") -> bool:
+        normalized_post_mode = str(post_mode or "any").strip() or "any"
+        return self._start_command(project_root, "preview", ["preview", "--post-mode", normalized_post_mode])
 
     def run_preview_selected(self, project_root: Path, report_path: Path, candidate_id: str) -> bool:
         return self._start_command(

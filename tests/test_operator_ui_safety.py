@@ -1246,9 +1246,19 @@ def test_main_window_marks_preview_command_running_immediately(tmp_path: Path, m
     app = QApplication.instance() or QApplication([])
     window = MainWindow(tmp_path)
 
-    monkeypatch.setattr(window.runner, "run_preview", lambda project_root: True)
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(
+        window.runner,
+        "run_preview",
+        lambda project_root, post_mode: captured.update(project_root=project_root, post_mode=post_mode) or True,
+    )
 
     window.run_preview()
+
+    assert captured == {
+        "project_root": tmp_path.resolve(),
+        "post_mode": "single_discount",
+    }
 
     assert window.active_job_label.text().startswith("Выполняется: сбор превью")
     assert window.run_preview_button.isEnabled() is False
@@ -1397,6 +1407,79 @@ def test_main_window_marks_mode_mismatch_preview_as_failed(tmp_path: Path, monke
     assert window.send_button.isEnabled() is False
     assert captured_dialog["icon"] == QMessageBox.Icon.Warning
     assert "Одиночные скидки" in str(captured_dialog["text"])
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_marks_mode_filtered_no_candidate_preview_as_failed(tmp_path: Path, monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    workflow_path = tmp_path / "output" / "analytics" / "workflow.json"
+    workflow_path.write_text("{}", encoding="utf-8")
+
+    bundle = ArtifactBundle(
+        project_root=tmp_path,
+        output_dir=tmp_path / "output",
+        workflow_path=workflow_path,
+        truth_report_path=report_path,
+        workflow_payload={
+            "status": "ok",
+            "command": "preview",
+            "report_path": str(report_path),
+        },
+        truth_payload={
+            "selection": {
+                "candidate_rows": [
+                    {
+                        "candidate_id": 8,
+                        "row_id": 8,
+                        "title": "Roundup: Freebies To Claim",
+                        "offer_id": "roundup:weekly",
+                        "source": "steam",
+                        "platform": "steam",
+                        "post_type": "roundup",
+                        "status": "ready",
+                        "bucket": "planned",
+                        "lane": "roundup",
+                    },
+                ]
+            },
+            "verdict": {
+                "verdict": "truthful_send_test_blocked",
+                "truth_ready": False,
+                "telegram_verified": False,
+                "blocker_category": "queue_state",
+                "blocker_reason": "no_candidates_for_post_mode",
+                "blocker_detail": "Нет кандидатов для выбранного режима: Одиночные скидки",
+            },
+        },
+    )
+
+    captured_dialog: dict[str, object] = {}
+    monkeypatch.setattr(window.resolver, "load_preview_run", lambda started_at: bundle)
+    monkeypatch.setattr(window, "_active_job_elapsed_seconds", lambda: 12)
+    monkeypatch.setattr(
+        window,
+        "_show_message_box",
+        lambda icon, title, text: captured_dialog.update(icon=icon, title=title, text=text),
+    )
+
+    window._preview_started_at = 1.0
+    window._start_active_job("preview")
+    window._handle_preview_finished(0)
+
+    log_text = window.log_text.toPlainText()
+
+    assert "Сбор превью failed за 12 сек" in log_text
+    assert "Нет кандидатов для выбранного режима: Одиночные скидки" in log_text
+    assert window.status_label.text() == "Нет кандидатов для выбранного режима: Одиночные скидки"
+    assert window.send_button.isEnabled() is False
+    assert captured_dialog["icon"] == QMessageBox.Icon.Warning
+    assert captured_dialog["text"] == "Нет кандидатов для выбранного режима: Одиночные скидки"
 
     window.close()
     app.processEvents()
@@ -1571,7 +1654,29 @@ def test_preview_command_runner_still_invokes_preview(monkeypatch, tmp_path: Pat
     assert captured == {
         "project_root": tmp_path,
         "command_name": "preview",
-        "arguments": ["preview"],
+        "arguments": ["preview", "--post-mode", "any"],
+    }
+
+
+def test_preview_command_runner_invokes_preview_with_explicit_post_mode(monkeypatch, tmp_path: Path) -> None:
+    runner = PreviewCommandRunner()
+    captured: dict[str, object] = {}
+
+    def fake_start_command(project_root: Path, command_name: str, arguments: list[str]) -> bool:
+        captured["project_root"] = project_root
+        captured["command_name"] = command_name
+        captured["arguments"] = arguments
+        return True
+
+    monkeypatch.setattr(runner, "_start_command", fake_start_command)
+
+    started = runner.run_preview(tmp_path, "roundup")
+
+    assert started is True
+    assert captured == {
+        "project_root": tmp_path,
+        "command_name": "preview",
+        "arguments": ["preview", "--post-mode", "roundup"],
     }
 
 

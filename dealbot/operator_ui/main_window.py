@@ -949,11 +949,12 @@ class MainWindow(QMainWindow):
     def run_preview(self) -> None:
         if self.runner.is_running or self._active_job_command:
             return
+        post_mode = self._current_post_type_mode().key
         self._preview_started_at = time.time()
         self.log_text.clear()
         self._start_active_job("preview")
         self.append_log(f"[ui] Запуск превью: {self.project_root / 'yoto.bat'}")
-        started = self.runner.run_preview(self.project_root)
+        started = self.runner.run_preview(self.project_root, post_mode)
         if not started:
             self.append_log("[ui] Не удалось запустить yoto.bat для сборки превью")
             self._record_active_job_outcome("preview", success=False, reason="process_start_failed")
@@ -1051,13 +1052,21 @@ class MainWindow(QMainWindow):
         self._apply_state(state)
         self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
         mode_mismatch = self._is_mode_mismatch_state(state)
+        mode_filter_blocked = self._is_mode_filter_blocked_state(state)
         failure_reason = state.current_run_backend_reason or _extract_publish_reason(self.runner.last_output) or f"exit_code_{exit_code}"
-        if state.current_run_missing_artifact or exit_code != 0 or mode_mismatch:
+        if state.current_run_missing_artifact or exit_code != 0 or mode_mismatch or mode_filter_blocked:
             if mode_mismatch:
                 failure_reason = self._mode_mismatch_guidance(state)
                 self._show_message_box(
                     QMessageBox.Icon.Warning,
                     "Превью не соответствует режиму",
+                    failure_reason,
+                )
+            if mode_filter_blocked and not mode_mismatch:
+                failure_reason = _text(state.blocker_detail or state.blocker_reason) or "no_candidates_for_post_mode"
+                self._show_message_box(
+                    QMessageBox.Icon.Warning,
+                    "Preview not built",
                     failure_reason,
                 )
             self._record_active_job_outcome("preview", success=False, reason=failure_reason)
@@ -1305,11 +1314,17 @@ class MainWindow(QMainWindow):
     def _inactive_preview_status_text(state: PreviewState, safety: SafetyState) -> str:
         if is_preview_already_published(state) or safety.send_disabled_reason == SEND_DISABLED_ALREADY_PUBLISHED_RU:
             return "Этот оффер уже опубликован."
+        if state.blocker_reason == "no_candidates_for_post_mode" and state.selected_target is None:
+            return _text(state.blocker_detail) or "No candidates for the selected mode."
         if state.blocker_reason and state.selected_target is None:
             return "Нет готового поста для публикации."
         if state.stale:
             return "Новый preview не создан."
         return _translate_status_text(state.status_text)
+
+    @staticmethod
+    def _is_mode_filter_blocked_state(state: PreviewState) -> bool:
+        return state.selected_target is None and state.blocker_reason == "no_candidates_for_post_mode"
 
     @staticmethod
     def _extract_preview_backend_reason(output_text: str) -> str | None:

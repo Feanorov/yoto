@@ -277,6 +277,12 @@ class PublishNextUseCase:
     RETRY_BACKOFF_MINUTES = 15
     ROUNDUP_LANE = 'roundup_digest'
     ROUNDUP_SPACING_POSTS = 4
+    REQUESTED_POST_MODE_LABELS: ClassVar[dict[str, str]] = {
+        'single_discount': 'Одиночные скидки',
+        'freebie': 'Раздачи',
+        'roundup': 'Подборки',
+        'any': 'Любой тип',
+    }
 
     def __init__(
         self,
@@ -306,7 +312,13 @@ class PublishNextUseCase:
         self.card_qa_writer = AnalyticsArtifactWriter(self.settings.analytics_output_dir)
         self.logger = logging.getLogger(__name__)
 
-    def inspect_selection(self, now_utc: datetime, now_local: datetime) -> SelectionInspection:
+    def inspect_selection(
+        self,
+        now_utc: datetime,
+        now_local: datetime,
+        *,
+        requested_post_mode: str | None = None,
+    ) -> SelectionInspection:
         quiet_hours = self._is_quiet_hours(now_local)
         allow_reserve = not quiet_hours
         planned_candidates = list(self.repositories.list_queue('planned'))
@@ -428,6 +440,8 @@ class PublishNextUseCase:
 
         eligible_candidates: list[SelectionCandidateSnapshot] = []
         selected_candidate: SelectionCandidateSnapshot | None = None
+        requested_mode = self._normalize_requested_post_mode(requested_post_mode)
+        blocked_by_requested_mode = False
         if rankable:
             recent_stream = self.repositories.list_recent_published_stream(limit=self.editorial_stream_controller.RECENT_WINDOW)
             eligible_records = [record for record, _ in rankable]
@@ -445,20 +459,22 @@ class PublishNextUseCase:
                 ranked.append((self._priority_sort_key(record, priority, editorial_adjustment), snapshot))
             ranked.sort(key=lambda item: item[0], reverse=True)
             eligible_candidates = [snapshot for _, snapshot in ranked]
-            if eligible_candidates:
-                eligible_candidates[0].selected = True
-                selected_candidate = eligible_candidates[0]
+            selected_candidate = self._select_candidate_for_requested_mode(eligible_candidates, requested_mode)
+            blocked_by_requested_mode = selected_candidate is None and requested_mode != 'any' and bool(eligible_candidates)
 
-        blocker_reason, blocker_detail = self._selection_blocker(
-            planned_total=len(planned_candidates),
-            reserve_total=len(reserve_all),
-            allow_reserve=allow_reserve,
-            blocked_candidates=blocked_candidates,
-            roundup_injection=roundup_injection,
-        )
         if selected_candidate is not None:
             blocker_reason = None
             blocker_detail = None
+        elif blocked_by_requested_mode:
+            blocker_reason, blocker_detail = self._requested_post_mode_blocker(requested_mode)
+        else:
+            blocker_reason, blocker_detail = self._selection_blocker(
+                planned_total=len(planned_candidates),
+                reserve_total=len(reserve_all),
+                allow_reserve=allow_reserve,
+                blocked_candidates=blocked_candidates,
+                roundup_injection=roundup_injection,
+            )
 
         return SelectionInspection(
             quiet_hours=quiet_hours,
@@ -475,8 +491,14 @@ class PublishNextUseCase:
             blocker_detail=blocker_detail,
         )
 
-    async def preview_send_test_target(self, now_utc: datetime, now_local: datetime) -> SendTestTargetPreview:
-        inspection = self.inspect_selection(now_utc, now_local)
+    async def preview_send_test_target(
+        self,
+        now_utc: datetime,
+        now_local: datetime,
+        *,
+        requested_post_mode: str | None = None,
+    ) -> SendTestTargetPreview:
+        inspection = self.inspect_selection(now_utc, now_local, requested_post_mode=requested_post_mode)
         if inspection.selected_candidate is None:
             return SendTestTargetPreview(
                 truth_ready=False,
@@ -486,7 +508,7 @@ class PublishNextUseCase:
                 blocker_detail=inspection.blocker_detail,
             )
 
-        record, _, _, _ = self._select_record(now_utc, now_local)
+        record, _, _, _ = self._select_record(now_utc, now_local, requested_post_mode=requested_post_mode)
         if record is None:
             return SendTestTargetPreview(
                 truth_ready=False,
@@ -1678,10 +1700,61 @@ class PublishNextUseCase:
         text = str(exc).strip()
         return text or exc.__class__.__name__
 
+    @classmethod
+    def _normalize_requested_post_mode(cls, requested_post_mode: str | None) -> str:
+        normalized = str(requested_post_mode or '').strip().lower()
+        if normalized in cls.REQUESTED_POST_MODE_LABELS:
+            return normalized
+        return 'any'
+
+    @classmethod
+    def _requested_post_mode_label(cls, requested_post_mode: str | None) -> str:
+        normalized = cls._normalize_requested_post_mode(requested_post_mode)
+        return cls.REQUESTED_POST_MODE_LABELS.get(normalized, cls.REQUESTED_POST_MODE_LABELS['any'])
+
+    @classmethod
+    def _matches_requested_post_mode(cls, content_family: str, requested_post_mode: str | None) -> bool:
+        normalized_mode = cls._normalize_requested_post_mode(requested_post_mode)
+        normalized_family = str(content_family or '').strip().lower()
+        if normalized_mode == 'any':
+            return normalized_family in {'discount', 'freebie', 'roundup', 'event'} or bool(normalized_family)
+        if normalized_mode == 'single_discount':
+            return normalized_family == 'discount'
+        if normalized_mode == 'freebie':
+            return normalized_family == 'freebie'
+        if normalized_mode == 'roundup':
+            return normalized_family == 'roundup'
+        return True
+
+    @classmethod
+    def _requested_post_mode_blocker(cls, requested_post_mode: str | None) -> tuple[str, str]:
+        label = cls._requested_post_mode_label(requested_post_mode)
+        return 'no_candidates_for_post_mode', f'Нет кандидатов для выбранного режима: {label}'
+
+    def _select_candidate_for_requested_mode(
+        self,
+        candidates: list[SelectionCandidateSnapshot],
+        requested_post_mode: str | None,
+    ) -> SelectionCandidateSnapshot | None:
+        normalized_mode = self._normalize_requested_post_mode(requested_post_mode)
+        selected_candidate: SelectionCandidateSnapshot | None = None
+        selected_index: int | None = None
+        for index, candidate in enumerate(candidates):
+            candidate.selected = False
+            if selected_candidate is None and self._matches_requested_post_mode(candidate.content_family, normalized_mode):
+                candidate.selected = True
+                selected_candidate = candidate
+                selected_index = index
+        if selected_candidate is not None and selected_index not in (None, 0):
+            candidates.insert(0, candidates.pop(selected_index))
+        return selected_candidate
+
     def _select_record(
         self,
         now_utc: datetime,
         now_local: datetime,
+        *,
+        requested_post_mode: str | None = None,
     ) -> tuple[QueueRecord | None, dict[str, Any] | None, dict[str, Any] | None, dict[str, Any] | None]:
         allow_reserve = not self._is_quiet_hours(now_local)
         planned_candidates = list(self.repositories.list_queue('planned'))
@@ -1742,6 +1815,14 @@ class PublishNextUseCase:
                 now_utc=now_utc,
             )
             rankable.append((record, priority))
+
+        requested_mode = self._normalize_requested_post_mode(requested_post_mode)
+        if requested_mode != 'any':
+            rankable = [
+                (record, priority)
+                for record, priority in rankable
+                if self._matches_requested_post_mode(self._content_family(record), requested_mode)
+            ]
 
         if not rankable:
             return None, None, None, roundup_injection

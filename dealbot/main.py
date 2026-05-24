@@ -75,6 +75,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--send-test', action='store_true', help='Plan queue and force-send one test post to Telegram')
     parser.add_argument('--preview', action='store_true', help='Refresh queue and print planned/reserve items without posting')
     parser.add_argument(
+        '--post-mode',
+        choices=('single_discount', 'freebie', 'roundup', 'any'),
+        default='any',
+        help='Optional preview filter for operator mode. Applies only to --preview.',
+    )
+    parser.add_argument(
         '--offline-snapshot',
         nargs='?',
         const='latest',
@@ -218,7 +224,7 @@ class BotRuntime:
         now_local = datetime.now(self.timezone).replace(tzinfo=None)
         return now_utc, now_local
 
-    async def preview(self) -> None:
+    async def preview(self, post_mode: str = 'any') -> None:
         now_utc, now_local = self.now()
         plan = await self.planner.execute(now_utc, now_local)
         diagnostics = self.ingest_health.evaluate(now_utc, plan)
@@ -228,6 +234,8 @@ class BotRuntime:
             LOGGER.warning('Roundup side output failed during preview: %s', exc)
         bundle = await self._capture_offline_snapshot(now_utc, plan)
         self._maybe_preserve_first_golden_snapshot(bundle, source='preview')
+        selection = self.publisher.inspect_selection(now_utc, now_local, requested_post_mode=post_mode)
+        target = await self.publisher.preview_send_test_target(now_utc, now_local, requested_post_mode=post_mode)
         self.last_operator_truth_artifact = await self._emit_operator_truth_report(
             now_utc,
             now_local,
@@ -235,13 +243,17 @@ class BotRuntime:
             mode='preview',
             diagnostics=diagnostics,
             offline_bundle=bundle,
+            selection=selection,
+            target=target,
         )
 
-    async def preview_offline(self, bundle: OfflineSnapshotBundle) -> None:
+    async def preview_offline(self, bundle: OfflineSnapshotBundle, post_mode: str = 'any') -> None:
         self.active_offline_snapshot = bundle
         now_utc, now_local = self.now()
         plan = self._queue_plan_from_repository(bundle)
         diagnostics = self.ingest_health.evaluate(now_utc, plan)
+        selection = self.publisher.inspect_selection(now_utc, now_local, requested_post_mode=post_mode)
+        target = await self.publisher.preview_send_test_target(now_utc, now_local, requested_post_mode=post_mode)
         self.last_operator_truth_artifact = await self._emit_operator_truth_report(
             now_utc,
             now_local,
@@ -249,6 +261,8 @@ class BotRuntime:
             mode='preview_offline',
             diagnostics=diagnostics,
             offline_bundle=bundle,
+            selection=selection,
+            target=target,
         )
 
     async def publish_from_existing_queue(
@@ -714,9 +728,9 @@ async def async_main() -> None:
             return
         if args.preview:
             if offline_bundle is not None:
-                await runtime.preview_offline(offline_bundle)
+                await runtime.preview_offline(offline_bundle, args.post_mode)
             else:
-                await runtime.preview()
+                await runtime.preview(args.post_mode)
                 _print_auto_golden_status(runtime)
             return
         if args.send_test:
