@@ -30,6 +30,13 @@ class PreviewCommandRunner(QObject):
     def run_preview(self, project_root: Path) -> bool:
         return self._start_command(project_root, "preview", ["preview"])
 
+    def run_preview_selected(self, project_root: Path, report_path: Path, candidate_id: str) -> bool:
+        return self._start_command(
+            project_root,
+            "preview-selected",
+            ["preview-selected", "--from-report", str(report_path), "--candidate-id", str(candidate_id)],
+        )
+
     def run_publish_previewed(self, project_root: Path, report_path: Path) -> bool:
         return self._start_command(
             project_root,

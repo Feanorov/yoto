@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .models import (
+    CandidateRow,
     OperatorPostTypeMode,
     OperatorStatusState,
     PreviewState,
@@ -30,6 +31,15 @@ SEND_DISABLED_NO_READY_POST_RU = "Нет готового поста для пу
 SEND_DISABLED_POST_TYPE_MODE_RU = "Отключено: тип поста не выбран в текущем режиме."
 SEND_DISABLED_ALREADY_SENT_RU = "Этот оффер уже отправлен и ждёт финализации."
 SEND_ENABLED_READY_RU = "Превью готово к безопасной публикации."
+SEND_DISABLED_SELECTION_MISMATCH_RU = "Сначала собери превью выбранной игры"
+SELECTED_PREVIEW_DISABLED_NO_SELECTION_RU = "Выберите кандидата из таблицы."
+SELECTED_PREVIEW_DISABLED_NO_REPORT_RU = "Нужен preview report с candidate_rows[]."
+SELECTED_PREVIEW_DISABLED_NOT_FOUND_RU = "Выбранный кандидат не найден в текущем отчёте."
+SELECTED_PREVIEW_ENABLED_RU = "Можно собрать preview-selected для выбранного кандидата."
+
+UNSAFE_SELECTED_PREVIEW_STATUSES = frozenset(
+    {"blocked", "already_published", "duplicate", "no_price", "no_visual"}
+)
 
 PREVIEW_ACTION_DEFAULT_RU = "Собрать превью"
 PREVIEW_ACTION_NEXT_POST_RU = "Собрать следующий пост"
@@ -102,6 +112,56 @@ def localize_ui_message(text: str) -> str:
 def build_preview_action_copy(state: PreviewState | None) -> tuple[str, str]:
     label = PREVIEW_ACTION_NEXT_POST_RU if _should_prepare_next_post(state) else PREVIEW_ACTION_DEFAULT_RU
     return label, PREVIEW_ACTION_TOOLTIP_RU
+
+
+def enforce_selected_candidate_send_gate(
+    base_safety: SafetyState,
+    state: PreviewState | None,
+    selected_candidate_id: str | None,
+) -> SafetyState:
+    if state is None or not state.candidate_rows or not _text(state.preview_candidate_id) or not base_safety.preview_ready:
+        return base_safety
+    candidate_id = _text(selected_candidate_id)
+    if candidate_id and candidate_id == _text(state.preview_candidate_id):
+        return base_safety
+    blockers = list(base_safety.blockers)
+    blockers.append(SEND_DISABLED_SELECTION_MISMATCH_RU)
+    return SafetyState(
+        send_enabled=False,
+        send_disabled_reason=SEND_DISABLED_SELECTION_MISMATCH_RU,
+        blockers=_dedupe(blockers),
+        warnings=list(base_safety.warnings),
+        preview_ready=False,
+    )
+
+
+def evaluate_selected_preview_eligibility(
+    state: PreviewState | None,
+    selected_candidate_id: str | None,
+) -> tuple[bool, str]:
+    if state is None or state.paths.truth_report_path is None or not state.report_exists or not state.candidate_rows:
+        return False, SELECTED_PREVIEW_DISABLED_NO_REPORT_RU
+    candidate_id = _text(selected_candidate_id)
+    if not candidate_id:
+        return False, SELECTED_PREVIEW_DISABLED_NO_SELECTION_RU
+    candidate = find_candidate_row(state, candidate_id)
+    if candidate is None:
+        return False, SELECTED_PREVIEW_DISABLED_NOT_FOUND_RU
+    if candidate.already_published or candidate.status in UNSAFE_SELECTED_PREVIEW_STATUSES:
+        return False, _candidate_preview_disabled_reason(candidate)
+    return True, SELECTED_PREVIEW_ENABLED_RU
+
+
+def find_candidate_row(state: PreviewState | None, candidate_id: str | None) -> CandidateRow | None:
+    if state is None:
+        return None
+    normalized = _text(candidate_id)
+    if not normalized:
+        return None
+    for candidate in state.candidate_rows:
+        if _text(candidate.stable_candidate_id) == normalized:
+            return candidate
+    return None
 
 
 def evaluate_preview_safety(
@@ -425,6 +485,17 @@ def _backend_blocker_next_action(state: PreviewState) -> str:
     if state.blocker_reason:
         return localize_ui_message(f"Backend blocker: {state.blocker_reason}")
     return SEND_DISABLED_NO_READY_POST_RU
+
+
+def _candidate_preview_disabled_reason(candidate: CandidateRow) -> str:
+    if candidate.already_published or candidate.status == "already_published":
+        return SEND_DISABLED_ALREADY_PUBLISHED_RU
+    blocker_reason = _text(candidate.blocker_reason)
+    if blocker_reason:
+        return f"{candidate.status}: {blocker_reason}"
+    if candidate.status:
+        return candidate.status
+    return SEND_DISABLED_BACKEND_BLOCKER_RU
 
 
 def _first_disabled_reason(current: str, candidate: str) -> str:

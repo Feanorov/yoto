@@ -14,14 +14,21 @@ class PreviewArtifactResolver:
         self.analytics_dir = self.output_dir / "analytics"
 
     def load_latest_local_state(self) -> ArtifactBundle:
-        workflow_path = self._find_newest(self.analytics_dir, ("*_operator_workflow_preview.json",))
+        workflow_path = self._find_newest(
+            self.analytics_dir,
+            ("*_operator_workflow_preview.json", "*_operator_workflow_preview-selected.json"),
+        )
         warnings: list[str] = []
         if workflow_path is None:
             warnings.append("No preview workflow artifact exists yet.")
         return self._build_bundle(workflow_path=workflow_path, warnings=warnings)
 
     def load_preview_run(self, started_at: float) -> ArtifactBundle:
-        workflow_candidates = self._find_since(self.analytics_dir, "*_operator_workflow_preview.json", started_at)
+        workflow_candidates = self._find_since_many(
+            self.analytics_dir,
+            ("*_operator_workflow_preview.json", "*_operator_workflow_preview-selected.json"),
+            started_at,
+        )
         truth_candidates = self._find_since(self.analytics_dir, "*_operator_truth_report_preview.json", started_at)
         warnings: list[str] = []
         ambiguous = len(workflow_candidates) > 1 or (not workflow_candidates and len(truth_candidates) > 1)
@@ -34,7 +41,11 @@ class PreviewArtifactResolver:
         if current_run_missing_artifact:
             latest_preview_artifact = self._find_newest(
                 self.analytics_dir,
-                ("*_operator_workflow_preview.json", "*_operator_truth_report_preview.json"),
+                (
+                    "*_operator_workflow_preview.json",
+                    "*_operator_workflow_preview-selected.json",
+                    "*_operator_truth_report_preview.json",
+                ),
             )
             stale = latest_preview_artifact is not None and self._sort_key(latest_preview_artifact)[0] < started_at
             warnings.append("No new preview workflow or truth artifact was created after the current run.")
@@ -95,7 +106,10 @@ class PreviewArtifactResolver:
     def is_preview_stale(self, fingerprint: PreviewFingerprint | None) -> bool:
         if fingerprint is None or fingerprint.workflow_path is None:
             return False
-        latest_workflow = self._find_newest(self.analytics_dir, ("*_operator_workflow_preview.json",))
+        latest_workflow = self._find_newest(
+            self.analytics_dir,
+            ("*_operator_workflow_preview.json", "*_operator_workflow_preview-selected.json"),
+        )
         if latest_workflow is None:
             return False
         if fingerprint.workflow_path.resolve() == latest_workflow.resolve():
@@ -216,6 +230,12 @@ class PreviewArtifactResolver:
             for path in base_dir.rglob(pattern)
             if path.is_file() and path.stat().st_mtime >= started_at
         ]
+
+    def _find_since_many(self, base_dir: Path, patterns: tuple[str, ...], started_at: float) -> list[Path]:
+        candidates: list[Path] = []
+        for pattern in patterns:
+            candidates.extend(self._find_since(base_dir, pattern, started_at))
+        return candidates
 
     def _find_newest(self, base_dir: Path, patterns: tuple[str, ...]) -> Path | None:
         if not base_dir.exists():

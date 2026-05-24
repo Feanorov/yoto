@@ -16,14 +16,61 @@ class SourceHealth:
 
 @dataclass(slots=True)
 class SelectedTarget:
+    candidate_id: str = ""
+    row_id: str = ""
     title: str = ""
     offer_id: str = ""
     source: str = ""
+    platform: str = ""
+    post_type: str = ""
     lane: str = ""
     bucket: str = ""
+    status: str = ""
+    blocker_reason: str = ""
+    blocker_detail: str = ""
+    already_published: bool = False
     content_family: str = ""
     recommended_post_mode: str = ""
     store_url: str = ""
+    current_price: int | float | None = None
+    old_price: int | float | None = None
+    discount: int | float | None = None
+    reviews: int | None = None
+    positive_pct: int | float | None = None
+    score: int | float | None = None
+    total_priority: int | float | None = None
+    created_at: str = ""
+
+
+@dataclass(slots=True)
+class CandidateRow:
+    candidate_id: str = ""
+    row_id: str = ""
+    title: str = ""
+    offer_id: str = ""
+    source: str = ""
+    platform: str = ""
+    post_type: str = ""
+    current_price: int | float | None = None
+    old_price: int | float | None = None
+    discount: int | float | None = None
+    reviews: int | None = None
+    positive_pct: int | float | None = None
+    status: str = ""
+    blocker_reason: str = ""
+    blocker_detail: str = ""
+    already_published: bool = False
+    bucket: str = ""
+    lane: str = ""
+    score: int | float | None = None
+    total_priority: int | float | None = None
+    recommended_post_mode: str = ""
+    store_url: str = ""
+    created_at: str = ""
+
+    @property
+    def stable_candidate_id(self) -> str:
+        return str(self.candidate_id or self.row_id).strip()
 
 
 @dataclass(slots=True)
@@ -169,6 +216,8 @@ class PreviewState:
     post_type_key: str = "unknown"
     post_type_label: str = "Unknown/Unsupported"
     selected_target: SelectedTarget | None = None
+    preview_candidate_id: str = ""
+    candidate_rows: list[CandidateRow] = field(default_factory=list)
     caption_html: str = ""
     caption_preview: str = ""
     caption_hash: str | None = None

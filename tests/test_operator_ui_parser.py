@@ -130,6 +130,128 @@ def test_build_preview_state_maps_discount_preview_payload(tmp_path: Path) -> No
     assert state.fingerprint.image_path == card_path
 
 
+def test_build_preview_state_exposes_candidate_rows_and_preview_candidate_id(tmp_path: Path) -> None:
+    card_path = tmp_path / "output" / "cards" / "selected.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    bundle = ArtifactBundle(
+        project_root=tmp_path,
+        output_dir=tmp_path / "output",
+        workflow_path=tmp_path / "output" / "analytics" / "workflow.json",
+        truth_report_path=tmp_path / "output" / "analytics" / "truth.json",
+        workflow_payload={
+            "status": "ok",
+            "verdict": "truthful_send_test_ready",
+            "report_path": str(tmp_path / "output" / "analytics" / "truth.json"),
+        },
+        truth_payload={
+            "selection": {
+                "candidate_rows": [
+                    {
+                        "candidate_id": 2,
+                        "row_id": 2,
+                        "title": "Recommended Candidate",
+                        "offer_id": "steam:recommended",
+                        "source": "steam",
+                        "platform": "steam",
+                        "post_type": "discount",
+                        "current_price": 17500,
+                        "old_price": 35000,
+                        "discount": 50,
+                        "reviews": 42000,
+                        "positive_pct": 94,
+                        "status": "recommended",
+                        "already_published": False,
+                        "bucket": "planned",
+                        "lane": "high_value_discount",
+                        "recommended_post_mode": "solo_post",
+                        "store_url": "https://store.steampowered.com/app/10",
+                        "created_at": "2026-03-20T12:00:00",
+                    },
+                    {
+                        "candidate_id": 4,
+                        "row_id": 4,
+                        "title": "Blocked Candidate",
+                        "offer_id": "steam:blocked",
+                        "source": "steam",
+                        "platform": "steam",
+                        "post_type": "discount",
+                        "status": "blocked",
+                        "blocker_reason": "daily_lane_cap_reached",
+                        "blocker_detail": "lane=game_of_the_day published_today=1",
+                        "already_published": False,
+                        "bucket": "planned",
+                        "lane": "game_of_the_day",
+                    },
+                ]
+            },
+            "send_test_target": {
+                "candidate": {
+                    "title": "Recommended Candidate",
+                    "offer_id": "steam:recommended",
+                    "source": "steam",
+                    "lane": "high_value_discount",
+                    "bucket": "planned",
+                    "content_family": "discount",
+                },
+                "artifact": {
+                    "offer_id": "steam:recommended",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Recommended Candidate</b>",
+                    "caption_preview": "Recommended Candidate preview",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
+                    "card_family": "DISCOUNT",
+                    "template_id": "steam_discount",
+                },
+            },
+            "pinned_publish": {
+                "contract_version": 1,
+                "source": "preview",
+                "candidate": {
+                    "title": "Recommended Candidate",
+                    "offer_id": "steam:recommended",
+                },
+                "artifact": {
+                    "offer_id": "steam:recommended",
+                    "image_path": str(card_path),
+                    "caption_html": "<b>Recommended Candidate</b>",
+                    "caption_preview": "Recommended Candidate preview",
+                    "caption_hash": "caption-hash",
+                    "image_hash": "image-hash",
+                    "idempotency_key": "preview-key",
+                    "card_family": "DISCOUNT",
+                    "template_id": "steam_discount",
+                },
+                "validation": {
+                    "image_exists": True,
+                    "caption_hash_verified": True,
+                    "image_hash_verified": True,
+                },
+            },
+            "verdict": {
+                "verdict": "truthful_send_test_ready",
+                "truth_ready": True,
+                "telegram_verified": False,
+            },
+        },
+    )
+
+    state = build_preview_state(bundle)
+
+    assert len(state.candidate_rows) == 2
+    assert state.preview_candidate_id == "2"
+    assert state.selected_target is not None
+    assert state.selected_target.row_id == "2"
+    assert state.selected_target.current_price == 17500
+    assert state.selected_target.discount == 50
+    assert state.selected_target.platform == "steam"
+    assert state.candidate_rows[1].status == "blocked"
+    assert state.candidate_rows[1].blocker_reason == "daily_lane_cap_reached"
+
+
 def test_preview_artifact_resolver_marks_ambiguous_preview_run(tmp_path: Path) -> None:
     analytics_dir = tmp_path / "output" / "analytics"
     truth_path = tmp_path / "output" / "analytics" / "truth.json"

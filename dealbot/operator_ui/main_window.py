@@ -9,9 +9,11 @@ from typing import Any
 from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QColor, QDesktopServices, QPixmap
 from PySide6.QtWidgets import (
+    QAbstractItemView,
     QComboBox,
     QFrame,
     QGroupBox,
+    QHeaderView,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -23,6 +25,8 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
     QTabWidget,
     QTextBrowser,
     QVBoxLayout,
@@ -32,6 +36,7 @@ from PySide6.QtWidgets import (
 from .artifact_resolver import PreviewArtifactResolver
 from .command_runner import PreviewCommandRunner
 from .models import (
+    CandidateRow,
     LastPublishState,
     OperatorPostTypeMode,
     OPERATOR_POST_TYPE_MODES,
@@ -46,9 +51,13 @@ from .safety import (
     SEND_DISABLED_NO_NEW_PREVIEW_RU,
     SEND_DISABLED_POST_TYPE_MODE_RU,
     SEND_DISABLED_REASON_RU,
+    SEND_DISABLED_SELECTION_MISMATCH_RU,
     build_operator_status,
     build_preview_action_copy,
+    enforce_selected_candidate_send_gate,
     evaluate_preview_safety,
+    evaluate_selected_preview_eligibility,
+    find_candidate_row,
     is_post_type_mode_mismatch,
     is_preview_already_published,
     localize_ui_message,
@@ -103,6 +112,34 @@ def _yes_no_en(value: bool) -> str:
 def _or_none(value: object) -> str:
     text = str(value or "").strip()
     return text or "нет"
+
+
+def _format_number(value: object, *, suffix: str = "") -> str:
+    if value in (None, ""):
+        return ""
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        text = str(value).strip()
+        return f"{text}{suffix}" if text else ""
+    if number.is_integer():
+        text = f"{int(number)}"
+    else:
+        text = f"{number:.2f}".rstrip("0").rstrip(".")
+    return f"{text}{suffix}" if suffix else text
+
+
+def _format_price(value: object) -> str:
+    return _format_number(value)
+
+
+def _bucket_lane(candidate: CandidateRow) -> str:
+    parts = [_text(candidate.bucket), _text(candidate.lane)]
+    return "/".join(part for part in parts if part)
+
+
+def _candidate_reason(candidate: CandidateRow) -> str:
+    return _text(candidate.blocker_reason or candidate.blocker_detail)
 
 
 def _as_dict(value: Any) -> dict[str, Any]:
@@ -222,6 +259,7 @@ class MainWindow(QMainWindow):
         self.runner = PreviewCommandRunner(self)
         self.current_state: PreviewState | None = None
         self.current_safety: SafetyState = evaluate_preview_safety(None, default_operator_post_type_mode())
+        self.selected_candidate_id: str = ""
         self._preview_started_at: float | None = None
         self._publish_started_at: float | None = None
 
@@ -345,6 +383,57 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
+        candidates_group = QGroupBox("Кандидаты")
+        candidates_layout = QVBoxLayout(candidates_group)
+        self.candidate_table = QTableWidget(0, 12, candidates_group)
+        self.candidate_table.setObjectName("candidateTable")
+        self.candidate_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.candidate_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.candidate_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.candidate_table.verticalHeader().setVisible(False)
+        self.candidate_table.setHorizontalHeaderLabels(
+            [
+                "ID",
+                "Статус",
+                "Игра",
+                "Источник",
+                "Тип",
+                "Скидка",
+                "Цена",
+                "Было",
+                "Отзывы",
+                "Позитив",
+                "Bucket/Lane",
+                "Причина",
+            ]
+        )
+        header = self.candidate_table.horizontalHeader()
+        header.setStretchLastSection(True)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(4, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(5, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(7, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(8, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(9, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(10, QHeaderView.ResizeMode.ResizeToContents)
+        self.selected_candidate_summary_label = QLabel("Кандидат в таблице не выбран.")
+        self.selected_candidate_summary_label.setObjectName("selectedCandidateSummary")
+        self.selected_candidate_summary_label.setWordWrap(True)
+        self.build_selected_preview_button = QPushButton("Собрать превью выбранного")
+        self._set_button_role(self.build_selected_preview_button, "secondary")
+        self.build_selected_preview_reason_label = QLabel("Выберите кандидата из таблицы.")
+        self.build_selected_preview_reason_label.setObjectName("selectedPreviewReasonLabel")
+        self.build_selected_preview_reason_label.setWordWrap(True)
+        candidates_layout.addWidget(self.candidate_table)
+        candidates_layout.addWidget(self.selected_candidate_summary_label)
+        candidates_layout.addWidget(self.build_selected_preview_button)
+        candidates_layout.addWidget(self.build_selected_preview_reason_label)
+        layout.addWidget(candidates_group, stretch=2)
+
         preview_group = QGroupBox("Текущее превью")
         preview_layout = QVBoxLayout(preview_group)
         self.current_preview_title_label = QLabel("Активное превью не загружено.")
@@ -353,8 +442,12 @@ class MainWindow(QMainWindow):
         self.current_preview_meta_label = QLabel("Соберите превью, чтобы увидеть карточку, тип поста и offer_id.")
         self.current_preview_meta_label.setObjectName("currentPreviewMeta")
         self.current_preview_meta_label.setWordWrap(True)
+        self.preview_selection_hint_label = QLabel("Выберите строку в таблице, чтобы сверить её с текущим pinned preview.")
+        self.preview_selection_hint_label.setObjectName("previewSelectionHint")
+        self.preview_selection_hint_label.setWordWrap(True)
         preview_layout.addWidget(self.current_preview_title_label)
         preview_layout.addWidget(self.current_preview_meta_label)
+        preview_layout.addWidget(self.preview_selection_hint_label)
         layout.addWidget(preview_group)
 
         image_group = QGroupBox("Превью")
@@ -540,7 +633,8 @@ class MainWindow(QMainWindow):
             QLabel#currentPreviewMeta {
                 color: #b8c2f4;
             }
-            QLabel#operatorStatusFacts, QLabel#safetySummaryLabel, QLabel#sendReasonLabel, QLabel#lastPublishLabel {
+            QLabel#operatorStatusFacts, QLabel#safetySummaryLabel, QLabel#sendReasonLabel, QLabel#lastPublishLabel,
+            QLabel#selectedCandidateSummary, QLabel#selectedPreviewReasonLabel, QLabel#previewSelectionHint {
                 color: #c8d1ff;
             }
             QLabel#postTypeBadge {
@@ -601,7 +695,7 @@ class MainWindow(QMainWindow):
                 border-color: #2d3768;
                 color: #d6ddff;
             }
-            QPlainTextEdit, QTextBrowser, QListWidget {
+            QPlainTextEdit, QTextBrowser, QListWidget, QTableWidget {
                 background-color: #0b1025;
                 border: 1px solid #2d3768;
                 border-radius: 12px;
@@ -609,6 +703,16 @@ class MainWindow(QMainWindow):
                 selection-background-color: #5c55ff;
                 selection-color: #ffffff;
                 padding: 8px;
+            }
+            QTableWidget {
+                gridline-color: #202850;
+            }
+            QHeaderView::section {
+                background-color: #121938;
+                color: #d9e0ff;
+                border: 1px solid #202850;
+                padding: 6px;
+                font-weight: 600;
             }
             QTextBrowser a {
                 color: #8ea0ff;
@@ -671,6 +775,7 @@ class MainWindow(QMainWindow):
 
     def _connect_signals(self) -> None:
         self.run_preview_button.clicked.connect(self.run_preview)
+        self.build_selected_preview_button.clicked.connect(self.run_preview_selected)
         self.refresh_button.clicked.connect(self.refresh_local_state)
         self.open_report_button.clicked.connect(self.open_report)
         self.open_card_button.clicked.connect(self.open_card)
@@ -680,6 +785,7 @@ class MainWindow(QMainWindow):
         self.open_analytics_button.clicked.connect(self.open_analytics_folder)
         self.open_history_workflow_button.clicked.connect(self.open_selected_history_workflow)
         self.open_history_outcome_button.clicked.connect(self.open_selected_history_outcome)
+        self.candidate_table.itemSelectionChanged.connect(self._handle_candidate_selection_changed)
         self.publish_history_list.itemSelectionChanged.connect(self._sync_publish_history_buttons)
         self.publish_history_list.itemDoubleClicked.connect(self._open_history_workflow_item)
         self.send_button.clicked.connect(self.handle_send_clicked)
@@ -705,6 +811,29 @@ class MainWindow(QMainWindow):
         if not started:
             self.append_log("[ui] Не удалось запустить yoto.bat для сборки превью")
             self.status_label.setText(_translate_status_text("Preview Failed"))
+
+    def run_preview_selected(self) -> None:
+        if self.runner.is_running:
+            return
+        state = self.current_state
+        report_path = self._selected_preview_report_path()
+        candidate_id = self.selected_candidate_id
+        allowed, reason = evaluate_selected_preview_eligibility(state, candidate_id)
+        if not allowed or report_path is None:
+            self.build_selected_preview_reason_label.setText(reason)
+            self.build_selected_preview_button.setToolTip(reason)
+            self.append_log(f"[ui] selected preview skipped: {reason}")
+            return
+        self._preview_started_at = time.time()
+        self.append_log(f"[ui] building selected preview for {candidate_id}")
+        started = self.runner.run_preview_selected(self.project_root, report_path, candidate_id)
+        if not started:
+            self.append_log(f"[ui] selected preview failed: process_start_failed ({candidate_id})")
+            self._show_message_box(
+                QMessageBox.Icon.Warning,
+                "Превью не собрано",
+                "Превью выбранного кандидата не собрано: process_start_failed",
+            )
 
     def handle_send_clicked(self) -> None:
         if self.runner.is_running:
@@ -743,11 +872,15 @@ class MainWindow(QMainWindow):
         )
         self._apply_state(state)
         if not initial:
+            self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
             self.append_log("[ui] Локальное состояние превью обновлено с диска")
 
     def _handle_command_finished(self, command_name: str, exit_code: int) -> None:
         if command_name == "publish-previewed":
             self._handle_publish_finished(exit_code)
+            return
+        if command_name == "preview-selected":
+            self._handle_selected_preview_finished(exit_code)
             return
         self._handle_preview_finished(exit_code)
 
@@ -765,6 +898,35 @@ class MainWindow(QMainWindow):
             if exit_code != 0:
                 self.append_log("[ui] Команда превью завершилась без новых workflow/truth артефактов")
         self._apply_state(state)
+        self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
+
+    def _handle_selected_preview_finished(self, exit_code: int) -> None:
+        started_at = self._preview_started_at or 0.0
+        bundle = self.resolver.load_preview_run(started_at)
+        state = (
+            build_preview_state(bundle)
+            if bundle.workflow_path or bundle.truth_report_path or bundle.latest_publish_workflow_path
+            else PreviewState.empty(self.project_root)
+        )
+        if bundle.current_run_missing_artifact:
+            state.current_run_missing_artifact = True
+            state.current_run_backend_reason = self._extract_preview_backend_reason(self.runner.last_output)
+        self._apply_state(state)
+        self.append_log(f"[ui] loaded {len(state.candidate_rows)} candidates")
+        failure_reason = (
+            state.current_run_backend_reason
+            or _extract_publish_reason(self.runner.last_output)
+            or f"exit_code_{exit_code}"
+        )
+        if state.current_run_missing_artifact or exit_code != 0 or not self._selected_candidate_matches_preview():
+            self.append_log(f"[ui] selected preview failed: {failure_reason}")
+            self._show_message_box(
+                QMessageBox.Icon.Warning,
+                "Превью не собрано",
+                f"Превью выбранного кандидата не собрано: {failure_reason}",
+            )
+            return
+        self.append_log(f"[ui] selected preview ready: {self.selected_candidate_id}")
 
     def _handle_publish_finished(self, exit_code: int) -> None:
         state = self.current_state
@@ -806,7 +968,10 @@ class MainWindow(QMainWindow):
 
     def _apply_state(self, state: PreviewState) -> None:
         self.current_state = state
-        self.current_safety = evaluate_preview_safety(state, self._current_post_type_mode())
+        base_safety = evaluate_preview_safety(state, self._current_post_type_mode())
+        self.current_safety = enforce_selected_candidate_send_gate(base_safety, state, self.selected_candidate_id)
+        self._populate_candidate_table(state)
+        self._restore_candidate_selection(state)
         self.status_label.setText(self._build_status_headline(state, self.current_safety))
         self.post_type_badge.setText(_translate_post_type_label(state.post_type_label))
         self.post_type_badge.setStyleSheet(self._badge_style(state.post_type_key))
@@ -818,8 +983,122 @@ class MainWindow(QMainWindow):
         self._update_last_publish_panel(state.last_publish)
         self._update_publish_history_panel(state.publish_history)
         self._update_preview_content(state)
+        self._update_selected_candidate_summary()
         self.details_text.setPlainText(self._format_details(state, self.current_safety))
         self._sync_buttons()
+
+    def _populate_candidate_table(self, state: PreviewState) -> None:
+        self.candidate_table.blockSignals(True)
+        self.candidate_table.setRowCount(len(state.candidate_rows))
+        for row_index, candidate in enumerate(state.candidate_rows):
+            values = [
+                candidate.stable_candidate_id,
+                candidate.status,
+                candidate.title,
+                candidate.platform or candidate.source,
+                candidate.post_type,
+                _format_number(candidate.discount, suffix="%"),
+                _format_price(candidate.current_price),
+                _format_price(candidate.old_price),
+                _format_number(candidate.reviews),
+                _format_number(candidate.positive_pct, suffix="%"),
+                _bucket_lane(candidate),
+                _candidate_reason(candidate),
+            ]
+            for column, value in enumerate(values):
+                item = QTableWidgetItem(value)
+                if column == 0:
+                    item.setData(Qt.ItemDataRole.UserRole, candidate.stable_candidate_id)
+                self.candidate_table.setItem(row_index, column, item)
+        self.candidate_table.blockSignals(False)
+
+    def _restore_candidate_selection(self, state: PreviewState) -> None:
+        candidate_id = self.selected_candidate_id
+        matching_row = -1
+        for row_index, candidate in enumerate(state.candidate_rows):
+            if candidate.stable_candidate_id == candidate_id:
+                matching_row = row_index
+                break
+        self.candidate_table.blockSignals(True)
+        if matching_row >= 0:
+            self.candidate_table.selectRow(matching_row)
+        else:
+            self.selected_candidate_id = ""
+            self.candidate_table.clearSelection()
+        self.candidate_table.blockSignals(False)
+
+    def _selected_candidate_row(self) -> CandidateRow | None:
+        return find_candidate_row(self.current_state, self.selected_candidate_id)
+
+    def _selected_preview_report_path(self) -> Path | None:
+        state = self.current_state
+        if state is None:
+            return None
+        report_path = state.paths.truth_report_path
+        if report_path is None or not report_path.exists():
+            return None
+        return report_path
+
+    def _selected_candidate_matches_preview(self) -> bool:
+        state = self.current_state
+        if state is None or not state.candidate_rows:
+            return self.current_safety.send_enabled
+        if not self.selected_candidate_id or not state.preview_candidate_id:
+            return False
+        return self.selected_candidate_id == state.preview_candidate_id
+
+    def _handle_candidate_selection_changed(self) -> None:
+        item = self.candidate_table.currentItem()
+        candidate_id = _text(item.data(Qt.ItemDataRole.UserRole)) if item is not None else ""
+        self.selected_candidate_id = candidate_id
+        if candidate_id:
+            self.append_log(f"[ui] selected candidate {candidate_id}")
+        self.current_safety = enforce_selected_candidate_send_gate(
+            evaluate_preview_safety(self.current_state, self._current_post_type_mode()),
+            self.current_state,
+            self.selected_candidate_id,
+        )
+        self.send_reason_label.setText(self.current_safety.send_disabled_reason)
+        self.send_reason_label.setStyleSheet("color: #166534;" if self.current_safety.send_enabled else "color: #7c2d12;")
+        self.send_button.setToolTip(self.current_safety.send_disabled_reason)
+        self.safety_label.setText(self._format_safety_summary(self.current_safety))
+        if self.current_state is not None:
+            self.status_label.setText(self._build_status_headline(self.current_state, self.current_safety))
+            self._update_operator_status_banner(self.current_state, self.current_safety)
+            self._update_selected_candidate_summary()
+            self.details_text.setPlainText(self._format_details(self.current_state, self.current_safety))
+        self._sync_buttons()
+
+    def _update_selected_candidate_summary(self) -> None:
+        candidate = self._selected_candidate_row()
+        if candidate is None:
+            self.selected_candidate_summary_label.setText("Кандидат в таблице не выбран.")
+            self.preview_selection_hint_label.setText(
+                "Выберите строку в таблице, чтобы сверить её с текущим pinned preview."
+            )
+        else:
+            self.selected_candidate_summary_label.setText(
+                "Выбран кандидат "
+                f"{candidate.stable_candidate_id}: {_text(candidate.title) or 'без названия'} · "
+                f"status={_text(candidate.status) or 'unknown'} · "
+                f"offer_id={_text(candidate.offer_id) or 'none'}"
+            )
+            detail_parts = [
+                f"Источник: {_text(candidate.platform or candidate.source) or 'нет'}",
+                f"Тип: {_text(candidate.post_type) or 'нет'}",
+            ]
+            reason = _candidate_reason(candidate)
+            if reason:
+                detail_parts.append(f"Причина: {reason}")
+            if self.current_state is not None and self.current_state.preview_candidate_id:
+                detail_parts.append(f"Текущее pinned candidate_id: {self.current_state.preview_candidate_id}")
+            self.preview_selection_hint_label.setText(" · ".join(detail_parts))
+        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        self.build_selected_preview_button.setToolTip(reason)
+        self.build_selected_preview_reason_label.setText(reason)
+        self.build_selected_preview_reason_label.setStyleSheet(
+            "color: #166534;" if allowed else "color: #7c2d12;"
+        )
 
     def _has_active_preview(self, state: PreviewState) -> bool:
         return bool(
@@ -835,6 +1114,8 @@ class MainWindow(QMainWindow):
             return SEND_DISABLED_NO_NEW_PREVIEW_RU
         if is_post_type_mode_mismatch(state, mode):
             return self._mode_mismatch_status_text(state, mode)
+        if safety.send_disabled_reason == SEND_DISABLED_SELECTION_MISMATCH_RU:
+            return SEND_DISABLED_SELECTION_MISMATCH_RU
         if not self._has_active_preview(state):
             return self._inactive_preview_status_text(state, safety)
         return _translate_status_text(state.status_text)
@@ -931,6 +1212,9 @@ class MainWindow(QMainWindow):
             bool(last_publish.publish_outcome_path and last_publish.publish_outcome_path.exists())
         )
         self.open_analytics_button.setEnabled(True)
+        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        self.build_selected_preview_button.setEnabled(bool(allowed and not self.runner.is_running))
+        self.build_selected_preview_button.setToolTip(reason)
         self._sync_publish_history_buttons()
         self._apply_send_button_state(bool(self.current_safety.send_enabled and not self.runner.is_running))
 
@@ -964,6 +1248,9 @@ class MainWindow(QMainWindow):
             )
         )
         self.open_analytics_button.setEnabled(not running)
+        allowed, reason = evaluate_selected_preview_eligibility(self.current_state, self.selected_candidate_id)
+        self.build_selected_preview_button.setEnabled(bool(not running and allowed))
+        self.build_selected_preview_button.setToolTip(reason)
         self._sync_publish_history_buttons()
         self._apply_send_button_state(not running and self.current_safety.send_enabled)
 
@@ -1248,6 +1535,26 @@ class MainWindow(QMainWindow):
             lines.append(f"  lane: {_or_none(target.lane)}")
             lines.append(f"  bucket: {_or_none(target.bucket)}")
             lines.append(f"  content_family: {_or_none(target.content_family)}")
+            lines.append(f"  preview_candidate_id: {_or_none(state.preview_candidate_id)}")
+        lines.append("")
+        lines.append("Кандидат из таблицы")
+        selected_candidate = self._selected_candidate_row()
+        if selected_candidate is None:
+            lines.append("  нет")
+        else:
+            lines.append(f"  candidate_id: {_or_none(selected_candidate.stable_candidate_id)}")
+            lines.append(f"  title: {_or_none(selected_candidate.title)}")
+            lines.append(f"  status: {_or_none(selected_candidate.status)}")
+            lines.append(f"  offer_id: {_or_none(selected_candidate.offer_id)}")
+            lines.append(f"  source: {_or_none(selected_candidate.platform or selected_candidate.source)}")
+            lines.append(f"  post_type: {_or_none(selected_candidate.post_type)}")
+            lines.append(f"  current_price: {_or_none(_format_price(selected_candidate.current_price))}")
+            lines.append(f"  old_price: {_or_none(_format_price(selected_candidate.old_price))}")
+            lines.append(f"  discount: {_or_none(_format_number(selected_candidate.discount, suffix='%'))}")
+            lines.append(f"  blocker_reason: {_or_none(selected_candidate.blocker_reason)}")
+            lines.append(f"  blocker_detail: {_or_none(selected_candidate.blocker_detail)}")
+            lines.append(f"  already_published: {_yes_no(selected_candidate.already_published)}")
+            lines.append(f"  bucket_lane: {_or_none(_bucket_lane(selected_candidate))}")
         lines.append("")
         lines.append("Статус")
         lines.append(f"  status_text: {_translate_status_text(state.status_text)}")

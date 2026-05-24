@@ -12,6 +12,7 @@ from dealbot.operator_ui.command_runner import PreviewCommandRunner
 from dealbot.operator_ui.main_window import MainWindow
 from dealbot.operator_ui.models import (
     ArtifactBundle,
+    CandidateRow,
     LastPublishState,
     OPERATOR_POST_TYPE_MODES,
     PinnedPublishState,
@@ -20,7 +21,14 @@ from dealbot.operator_ui.models import (
     SelectedTarget,
     get_operator_post_type_mode,
 )
-from dealbot.operator_ui.safety import build_operator_status, build_preview_action_copy, evaluate_preview_safety
+from dealbot.operator_ui.safety import (
+    SEND_DISABLED_SELECTION_MISMATCH_RU,
+    build_operator_status,
+    build_preview_action_copy,
+    enforce_selected_candidate_send_gate,
+    evaluate_preview_safety,
+    evaluate_selected_preview_eligibility,
+)
 
 
 def test_evaluate_preview_safety_enables_send_for_verified_pinned_preview(tmp_path: Path) -> None:
@@ -68,6 +76,73 @@ def test_evaluate_preview_safety_enables_send_for_verified_pinned_preview(tmp_pa
     assert safety.send_disabled_reason == "Превью готово к безопасной публикации."
     assert safety.blockers == []
     assert safety.preview_ready is True
+
+
+def test_selected_candidate_send_gate_and_selected_preview_eligibility(tmp_path: Path) -> None:
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Recommended", offer_id="steam:recommended"),
+        preview_candidate_id="2",
+        candidate_rows=[
+            CandidateRow(candidate_id="2", row_id="2", title="Recommended", offer_id="steam:recommended", status="recommended"),
+            CandidateRow(
+                candidate_id="4",
+                row_id="4",
+                title="Blocked",
+                offer_id="steam:blocked",
+                status="blocked",
+                blocker_reason="daily_lane_cap_reached",
+            ),
+        ],
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:recommended",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    base_safety = evaluate_preview_safety(state)
+    assert base_safety.send_enabled is True
+
+    no_selection = enforce_selected_candidate_send_gate(base_safety, state, "")
+    mismatched_selection = enforce_selected_candidate_send_gate(base_safety, state, "4")
+    matched_selection = enforce_selected_candidate_send_gate(base_safety, state, "2")
+    ready_allowed, ready_reason = evaluate_selected_preview_eligibility(state, "2")
+    blocked_allowed, blocked_reason = evaluate_selected_preview_eligibility(state, "4")
+
+    assert no_selection.send_enabled is False
+    assert no_selection.send_disabled_reason == SEND_DISABLED_SELECTION_MISMATCH_RU
+    assert mismatched_selection.send_enabled is False
+    assert mismatched_selection.send_disabled_reason == SEND_DISABLED_SELECTION_MISMATCH_RU
+    assert matched_selection.send_enabled is True
+    assert ready_allowed is True
+    assert "preview-selected" in ready_reason
+    assert blocked_allowed is False
+    assert blocked_reason == "blocked: daily_lane_cap_reached"
 
 
 def test_evaluate_preview_safety_disables_send_for_post_type_mismatch(tmp_path: Path) -> None:
@@ -1100,6 +1175,179 @@ def test_main_window_builds_readable_publish_confirmation_dialog(tmp_path: Path)
     app.processEvents()
 
 
+def test_main_window_candidate_selection_gates_send_until_preview_matches(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Recommended", offer_id="steam:recommended"),
+        preview_candidate_id="2",
+        candidate_rows=[
+            CandidateRow(candidate_id="2", row_id="2", title="Recommended", offer_id="steam:recommended", status="recommended"),
+            CandidateRow(candidate_id="4", row_id="4", title="Reserve", offer_id="steam:reserve", status="reserve"),
+        ],
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:recommended",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.current_safety.send_enabled is False
+    assert window.send_button.isEnabled() is False
+    assert window.send_reason_label.text() == SEND_DISABLED_SELECTION_MISMATCH_RU
+    assert window.candidate_table.rowCount() == 2
+
+    window.candidate_table.selectRow(1)
+    app.processEvents()
+    assert window.selected_candidate_id == "4"
+    assert window.current_safety.send_enabled is False
+    assert window.send_reason_label.text() == SEND_DISABLED_SELECTION_MISMATCH_RU
+
+    window.candidate_table.selectRow(0)
+    app.processEvents()
+    assert window.selected_candidate_id == "2"
+    assert window.current_safety.send_enabled is True
+    assert window.send_button.isEnabled() is True
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_runs_preview_selected_for_selected_candidate(tmp_path: Path, monkeypatch) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+    captured: dict[str, object] = {}
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Recommended", offer_id="steam:recommended"),
+        preview_candidate_id="2",
+        candidate_rows=[
+            CandidateRow(candidate_id="2", row_id="2", title="Recommended", offer_id="steam:recommended", status="recommended"),
+        ],
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:recommended",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    monkeypatch.setattr(
+        window.runner,
+        "run_preview_selected",
+        lambda project_root, selected_report_path, candidate_id: captured.update(
+            project_root=project_root,
+            report_path=selected_report_path,
+            candidate_id=candidate_id,
+        )
+        or True,
+    )
+
+    window._apply_state(state)
+    window.candidate_table.selectRow(0)
+    app.processEvents()
+    window.run_preview_selected()
+
+    assert captured == {
+        "project_root": tmp_path.resolve(),
+        "report_path": report_path,
+        "candidate_id": "2",
+    }
+    assert "building selected preview for 2" in window.log_text.toPlainText()
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_disables_preview_selected_for_blocked_candidate(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Blocked",
+        truth_ready=False,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        preview_candidate_id="4",
+        candidate_rows=[
+            CandidateRow(
+                candidate_id="4",
+                row_id="4",
+                title="Blocked",
+                offer_id="steam:blocked",
+                status="blocked",
+                blocker_reason="daily_lane_cap_reached",
+            ),
+        ],
+        report_exists=True,
+        paths=PreviewPaths(truth_report_path=report_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+    window.candidate_table.selectRow(0)
+    app.processEvents()
+
+    assert window.build_selected_preview_button.isEnabled() is False
+    assert window.build_selected_preview_reason_label.text() == "blocked: daily_lane_cap_reached"
+
+    window.close()
+    app.processEvents()
+
+
 def test_preview_command_runner_still_invokes_preview(monkeypatch, tmp_path: Path) -> None:
     runner = PreviewCommandRunner()
     captured: dict[str, object] = {}
@@ -1119,4 +1367,27 @@ def test_preview_command_runner_still_invokes_preview(monkeypatch, tmp_path: Pat
         "project_root": tmp_path,
         "command_name": "preview",
         "arguments": ["preview"],
+    }
+
+
+def test_preview_command_runner_invokes_preview_selected(monkeypatch, tmp_path: Path) -> None:
+    runner = PreviewCommandRunner()
+    captured: dict[str, object] = {}
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+
+    def fake_start_command(project_root: Path, command_name: str, arguments: list[str]) -> bool:
+        captured["project_root"] = project_root
+        captured["command_name"] = command_name
+        captured["arguments"] = arguments
+        return True
+
+    monkeypatch.setattr(runner, "_start_command", fake_start_command)
+
+    started = runner.run_preview_selected(tmp_path, report_path, "42")
+
+    assert started is True
+    assert captured == {
+        "project_root": tmp_path,
+        "command_name": "preview-selected",
+        "arguments": ["preview-selected", "--from-report", str(report_path), "--candidate-id", "42"],
     }

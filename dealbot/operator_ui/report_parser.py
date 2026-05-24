@@ -6,6 +6,7 @@ from typing import Any
 
 from .models import (
     ArtifactBundle,
+    CandidateRow,
     LastPublishState,
     PinnedPublishState,
     PreviewFingerprint,
@@ -21,6 +22,8 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
     truth = _as_dict(bundle.truth_payload)
     verdict = _as_dict(truth.get("verdict"))
     selection = _as_dict(truth.get("selection"))
+    candidate_rows_payload = _candidate_row_payloads(selection)
+    candidate_rows = [_build_candidate_row(payload) for payload in candidate_rows_payload]
     target = _as_dict(truth.get("send_test_target"))
     pinned_publish_payload = _as_dict(truth.get("pinned_publish"))
     pinned_candidate = _as_dict(pinned_publish_payload.get("candidate"))
@@ -28,13 +31,24 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
     pinned_publish = _build_pinned_publish(pinned_publish_payload, pinned_candidate)
     publish_history = _build_publish_history(bundle)
     last_publish = publish_history[0] if publish_history else _build_last_publish_state(bundle)
+    selected_candidate = _as_dict(selection.get("selected_candidate"))
+    workflow_selected = _as_dict(workflow.get("selected"))
     candidate = _select_candidate(workflow, selection, target, pinned_candidate)
+    matched_candidate_row = _find_matching_candidate_row(
+        candidate_rows_payload,
+        candidate,
+        pinned_candidate,
+        selected_candidate,
+        workflow_selected,
+    )
+    candidate = _merge_candidate_payload(candidate, matched_candidate_row)
     card_path = _path_or_none(artifact.get("image_path") or pinned_publish.image_path or workflow.get("card_path"))
     caption_html = _text(artifact.get("caption_html") or pinned_publish.caption_html)
     caption_preview = _text(artifact.get("caption_preview") or pinned_publish.caption_preview or workflow.get("caption_preview"))
     card_family = _text(artifact.get("card_family") or pinned_publish.card_family).upper()
     template_id = _text(artifact.get("template_id") or pinned_publish.template_id)
     post_type_key, post_type_label = _derive_post_type(candidate, card_family, template_id)
+    preview_candidate_id = _candidate_identifier(candidate)
     warnings = list(bundle.warnings)
     if card_path is None:
         warnings.append("Preview card path is missing.")
@@ -62,6 +76,8 @@ def build_preview_state(bundle: ArtifactBundle) -> PreviewState:
         post_type_key=post_type_key,
         post_type_label=post_type_label,
         selected_target=selected_target,
+        preview_candidate_id=preview_candidate_id,
+        candidate_rows=candidate_rows,
         caption_html=caption_html,
         caption_preview=caption_preview,
         caption_hash=_text(artifact.get("caption_hash") or pinned_publish.caption_hash) or None,
@@ -166,15 +182,94 @@ def _build_selected_target(candidate: dict[str, Any]) -> SelectedTarget | None:
     if not title and not offer_id:
         return None
     return SelectedTarget(
+        candidate_id=_text(candidate.get("candidate_id") or candidate.get("row_id")),
+        row_id=_text(candidate.get("row_id") or candidate.get("candidate_id")),
         title=title,
         offer_id=offer_id,
         source=_text(candidate.get("source")),
+        platform=_text(candidate.get("platform") or candidate.get("source")),
+        post_type=_text(candidate.get("post_type")),
         lane=_text(candidate.get("lane")),
         bucket=_text(candidate.get("bucket")),
+        status=_text(candidate.get("status")),
+        blocker_reason=_text(candidate.get("blocker_reason")),
+        blocker_detail=_text(candidate.get("blocker_detail")),
+        already_published=bool(candidate.get("already_published")),
         content_family=_text(candidate.get("content_family")),
         recommended_post_mode=_text(candidate.get("recommended_post_mode")),
         store_url=_text(candidate.get("store_url")),
+        current_price=_number_or_none(candidate.get("current_price")),
+        old_price=_number_or_none(candidate.get("old_price")),
+        discount=_number_or_none(candidate.get("discount")),
+        reviews=_int_or_none(candidate.get("reviews")),
+        positive_pct=_number_or_none(candidate.get("positive_pct")),
+        score=_number_or_none(candidate.get("score")),
+        total_priority=_number_or_none(candidate.get("total_priority")),
+        created_at=_text(candidate.get("created_at")),
     )
+
+
+def _candidate_row_payloads(selection: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for item in list(selection.get("candidate_rows") or []):
+        if isinstance(item, dict):
+            rows.append(dict(item))
+    return rows
+
+
+def _build_candidate_row(payload: dict[str, Any]) -> CandidateRow:
+    return CandidateRow(
+        candidate_id=_text(payload.get("candidate_id") or payload.get("row_id")),
+        row_id=_text(payload.get("row_id") or payload.get("candidate_id")),
+        title=_text(payload.get("title")),
+        offer_id=_text(payload.get("offer_id")),
+        source=_text(payload.get("source")),
+        platform=_text(payload.get("platform") or payload.get("source")),
+        post_type=_text(payload.get("post_type")),
+        current_price=_number_or_none(payload.get("current_price")),
+        old_price=_number_or_none(payload.get("old_price")),
+        discount=_number_or_none(payload.get("discount")),
+        reviews=_int_or_none(payload.get("reviews")),
+        positive_pct=_number_or_none(payload.get("positive_pct")),
+        status=_text(payload.get("status")),
+        blocker_reason=_text(payload.get("blocker_reason")),
+        blocker_detail=_text(payload.get("blocker_detail")),
+        already_published=bool(payload.get("already_published")),
+        bucket=_text(payload.get("bucket")),
+        lane=_text(payload.get("lane")),
+        score=_number_or_none(payload.get("score")),
+        total_priority=_number_or_none(payload.get("total_priority")),
+        recommended_post_mode=_text(payload.get("recommended_post_mode")),
+        store_url=_text(payload.get("store_url")),
+        created_at=_text(payload.get("created_at")),
+    )
+
+
+def _find_matching_candidate_row(
+    candidate_rows: list[dict[str, Any]],
+    *candidates: dict[str, Any],
+) -> dict[str, Any]:
+    for candidate in candidates:
+        if not candidate:
+            continue
+        candidate_id = _candidate_identifier(candidate)
+        offer_id = _text(candidate.get("offer_id"))
+        for row in candidate_rows:
+            if candidate_id and _candidate_identifier(row) == candidate_id:
+                return dict(row)
+            if offer_id and _text(row.get("offer_id")) == offer_id:
+                return dict(row)
+    return {}
+
+
+def _merge_candidate_payload(candidate: dict[str, Any], candidate_row: dict[str, Any]) -> dict[str, Any]:
+    if not candidate_row:
+        return dict(candidate)
+    merged = dict(candidate_row)
+    merged.update({key: value for key, value in dict(candidate).items() if value not in (None, "")})
+    if not _text(merged.get("content_family")) and _text(merged.get("post_type")):
+        merged["content_family"] = _text(merged.get("post_type"))
+    return merged
 
 
 def _build_last_publish_state(bundle: ArtifactBundle) -> LastPublishState:
@@ -338,8 +433,19 @@ def _build_selection_diagnostics(truth: dict[str, Any]) -> list[str]:
 
 
 def _derive_post_type(candidate: dict[str, Any], card_family: str, template_id: str) -> tuple[str, str]:
+    post_type = _text(candidate.get("post_type")).lower()
     content_family = _text(candidate.get("content_family")).lower()
     normalized_template = template_id.lower()
+    if post_type in {"single_discount", "discount"}:
+        return "single_discount", "Single Discount"
+    if post_type == "freebie":
+        return "freebie", "Freebie"
+    if post_type in {"roundup", "roundup_digest"}:
+        return "roundup", "Roundup"
+    if post_type == "roundup_toplist":
+        return "roundup_toplist", "Roundup / Toplist"
+    if post_type == "toplist":
+        return "toplist", "Toplist"
     if card_family == "TOP_LIST" and content_family == "roundup":
         return "roundup_toplist", "Roundup / Toplist"
     if card_family == "TOP_LIST":
@@ -393,6 +499,31 @@ def _int_or_none(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _number_or_none(value: Any) -> int | float | None:
+    if value in (None, ""):
+        return None
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        if isinstance(value, float) and value.is_integer():
+            return int(value)
+        return value
+    text = _text(value)
+    if not text:
+        return None
+    try:
+        number = float(text)
+    except (TypeError, ValueError):
+        return None
+    if number.is_integer():
+        return int(number)
+    return number
+
+
+def _candidate_identifier(candidate: dict[str, Any]) -> str:
+    return _text(candidate.get("candidate_id") or candidate.get("row_id") or candidate.get("offer_id"))
 
 
 def _path_modified_at(path: Path | None) -> str | None:
