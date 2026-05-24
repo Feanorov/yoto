@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
     QFrame,
+    QGridLayout,
     QGroupBox,
     QHeaderView,
     QHBoxLayout,
@@ -83,6 +84,40 @@ _POST_TYPE_TRANSLATIONS = {
     "Unknown/Unsupported": "Неизвестный тип",
 }
 
+_CANDIDATE_STATUS_LABELS = {
+    "recommended": "Рекомендован",
+    "ready": "Готов",
+    "reserve": "Резерв",
+    "blocked": "Заблокирован",
+    "already_published": "Опубликован",
+    "duplicate": "Дубликат",
+    "no_price": "Нет цены",
+    "no_visual": "Нет визуала",
+}
+
+_CANDIDATE_STATUS_COLORS = {
+    "recommended": ("#0f2f28", "#8df7c0"),
+    "ready": ("#13263f", "#9bd3ff"),
+    "reserve": ("#211d3f", "#c8b4ff"),
+    "blocked": ("#311825", "#ffb2c7"),
+    "already_published": ("#2d2f3b", "#d4dae8"),
+    "duplicate": ("#352322", "#ffd0aa"),
+    "no_price": ("#34231b", "#ffcc8f"),
+    "no_visual": ("#2a1f36", "#dfb9ff"),
+}
+
+_CANDIDATE_POST_TYPE_LABELS = {
+    "discount": "Скидка",
+    "single_discount": "Скидка",
+    "freebie": "Раздача",
+    "roundup": "Подборка",
+    "roundup_toplist": "Подборка",
+    "roundup_digest": "Подборка",
+    "toplist": "Топ",
+}
+
+_AVAILABLE_CANDIDATE_STATUSES = {"recommended", "ready", "reserve"}
+
 _PUBLISH_CONFIRMATION_WARNING = (
     "Будет опубликован именно закреплённый preview payload из текущего отчёта. "
     "Проверь карточку и описание перед отправкой."
@@ -99,6 +134,31 @@ def _translate_status_text(text: str) -> str:
 def _translate_post_type_label(text: str) -> str:
     normalized = str(text or "").strip()
     return _POST_TYPE_TRANSLATIONS.get(normalized, normalized)
+
+
+def _translate_candidate_status(status: str) -> str:
+    normalized = _text(status).lower()
+    return _CANDIDATE_STATUS_LABELS.get(normalized, normalized or "unknown")
+
+
+def _candidate_status_palette(status: str) -> tuple[QColor, QColor]:
+    background, foreground = _CANDIDATE_STATUS_COLORS.get(
+        _text(status).lower(),
+        ("#1a2243", "#dbe3ff"),
+    )
+    return QColor(background), QColor(foreground)
+
+
+def _translate_candidate_post_type(post_type: str) -> str:
+    normalized = _text(post_type).lower()
+    return _CANDIDATE_POST_TYPE_LABELS.get(normalized, _text(post_type))
+
+
+def _shorten_text(value: object, *, limit: int = 44) -> str:
+    text = _text(value)
+    if len(text) <= limit:
+        return text
+    return f"{text[: max(0, limit - 1)].rstrip()}…"
 
 
 def _yes_no(value: bool) -> str:
@@ -340,9 +400,6 @@ class MainWindow(QMainWindow):
         self.post_type_badge.setWordWrap(True)
         self.post_type_badge.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.post_type_badge.setStyleSheet(self._badge_style("unknown"))
-        self.send_reason_label = QLabel(SEND_DISABLED_REASON_RU)
-        self.send_reason_label.setObjectName("sendReasonLabel")
-        self.send_reason_label.setWordWrap(True)
         self.safety_label = QLabel("")
         self.safety_label.setObjectName("safetySummaryLabel")
         self.safety_label.setWordWrap(True)
@@ -353,7 +410,6 @@ class MainWindow(QMainWindow):
         status_layout.addWidget(self.post_type_mode_label)
         status_layout.addWidget(self.post_type_mode_combo)
         status_layout.addWidget(self.post_type_badge)
-        status_layout.addWidget(self.send_reason_label)
         status_layout.addWidget(self.safety_label)
         status_layout.addWidget(self.active_job_label)
         layout.addWidget(status_group)
@@ -373,6 +429,9 @@ class MainWindow(QMainWindow):
         self.send_button = QPushButton("Отправить в Telegram")
         self._set_button_role(self.send_button, "danger")
         self.send_button.setToolTip(SEND_DISABLED_REASON_RU)
+        self.send_reason_label = QLabel(SEND_DISABLED_REASON_RU)
+        self.send_reason_label.setObjectName("sendReasonLabel")
+        self.send_reason_label.setWordWrap(True)
         self._apply_send_button_state(False)
         self._sync_preview_action_button()
         actions_layout.addWidget(self.run_preview_button)
@@ -380,8 +439,12 @@ class MainWindow(QMainWindow):
         actions_layout.addWidget(self.open_report_button)
         actions_layout.addWidget(self.open_card_button)
         actions_layout.addWidget(self.open_output_button)
-        actions_layout.addWidget(self.send_button)
         layout.addWidget(actions_group)
+        publish_group = QGroupBox("Публикация")
+        publish_layout = QVBoxLayout(publish_group)
+        publish_layout.addWidget(self.send_button)
+        publish_layout.addWidget(self.send_reason_label)
+        layout.addWidget(publish_group)
         layout.addStretch(1)
         return panel
 
@@ -392,6 +455,42 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
 
+        kpi_strip = QWidget(panel)
+        kpi_strip.setObjectName("kpiStrip")
+        kpi_layout = QGridLayout(kpi_strip)
+        kpi_layout.setContentsMargins(0, 0, 0, 0)
+        kpi_layout.setHorizontalSpacing(12)
+        kpi_layout.setVerticalSpacing(12)
+        (
+            self.kpi_total_card,
+            self.kpi_total_value_label,
+            self.kpi_total_meta_label,
+        ) = self._build_kpi_card("Найдено кандидатов")
+        (
+            self.kpi_ready_card,
+            self.kpi_ready_value_label,
+            self.kpi_ready_meta_label,
+        ) = self._build_kpi_card("Готово / доступно")
+        (
+            self.kpi_blocked_card,
+            self.kpi_blocked_value_label,
+            self.kpi_blocked_meta_label,
+        ) = self._build_kpi_card("Заблокировано")
+        (
+            self.kpi_last_publish_card,
+            self.kpi_last_publish_value_label,
+            self.kpi_last_publish_meta_label,
+        ) = self._build_kpi_card("Последняя публикация")
+        kpi_layout.addWidget(self.kpi_total_card, 0, 0)
+        kpi_layout.addWidget(self.kpi_ready_card, 0, 1)
+        kpi_layout.addWidget(self.kpi_blocked_card, 0, 2)
+        kpi_layout.addWidget(self.kpi_last_publish_card, 0, 3)
+        kpi_layout.setColumnStretch(0, 1)
+        kpi_layout.setColumnStretch(1, 1)
+        kpi_layout.setColumnStretch(2, 1)
+        kpi_layout.setColumnStretch(3, 2)
+        layout.addWidget(kpi_strip)
+
         candidates_group = QGroupBox("Кандидаты")
         candidates_layout = QVBoxLayout(candidates_group)
         self.candidate_table = QTableWidget(0, 12, candidates_group)
@@ -399,7 +498,11 @@ class MainWindow(QMainWindow):
         self.candidate_table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.candidate_table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.candidate_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.candidate_table.setAlternatingRowColors(True)
+        self.candidate_table.setShowGrid(False)
+        self.candidate_table.setWordWrap(False)
         self.candidate_table.verticalHeader().setVisible(False)
+        self.candidate_table.verticalHeader().setDefaultSectionSize(44)
         self.candidate_table.setHorizontalHeaderLabels(
             [
                 "ID",
@@ -417,8 +520,8 @@ class MainWindow(QMainWindow):
             ]
         )
         header = self.candidate_table.horizontalHeader()
-        header.setStretchLastSection(True)
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setStretchLastSection(False)
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
@@ -428,7 +531,12 @@ class MainWindow(QMainWindow):
         header.setSectionResizeMode(7, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(8, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(9, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(10, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(10, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(11, QHeaderView.ResizeMode.Interactive)
+        self.candidate_table.setColumnWidth(0, 56)
+        self.candidate_table.setColumnWidth(2, 360)
+        self.candidate_table.setColumnWidth(10, 170)
+        self.candidate_table.setColumnWidth(11, 220)
         self.selected_candidate_summary_label = QLabel("Кандидат в таблице не выбран.")
         self.selected_candidate_summary_label.setObjectName("selectedCandidateSummary")
         self.selected_candidate_summary_label.setWordWrap(True)
@@ -438,12 +546,29 @@ class MainWindow(QMainWindow):
         self.build_selected_preview_reason_label.setObjectName("selectedPreviewReasonLabel")
         self.build_selected_preview_reason_label.setWordWrap(True)
         candidates_layout.addWidget(self.candidate_table)
-        candidates_layout.addWidget(self.selected_candidate_summary_label)
-        candidates_layout.addWidget(self.build_selected_preview_button)
-        candidates_layout.addWidget(self.build_selected_preview_reason_label)
+        candidate_footer = QFrame(candidates_group)
+        candidate_footer.setObjectName("candidateFooter")
+        candidate_footer_layout = QHBoxLayout(candidate_footer)
+        candidate_footer_layout.setContentsMargins(0, 0, 0, 0)
+        candidate_footer_layout.setSpacing(12)
+        candidate_summary_box = QWidget(candidate_footer)
+        candidate_summary_layout = QVBoxLayout(candidate_summary_box)
+        candidate_summary_layout.setContentsMargins(0, 0, 0, 0)
+        candidate_summary_layout.setSpacing(6)
+        candidate_summary_layout.addWidget(self.selected_candidate_summary_label)
+        candidate_summary_layout.addWidget(self.build_selected_preview_reason_label)
+        candidate_actions_box = QWidget(candidate_footer)
+        candidate_actions_layout = QVBoxLayout(candidate_actions_box)
+        candidate_actions_layout.setContentsMargins(0, 0, 0, 0)
+        candidate_actions_layout.addStretch(1)
+        candidate_actions_layout.addWidget(self.build_selected_preview_button)
+        candidate_actions_layout.addStretch(1)
+        candidate_footer_layout.addWidget(candidate_summary_box, 1)
+        candidate_footer_layout.addWidget(candidate_actions_box, 0)
+        candidates_layout.addWidget(candidate_footer)
         layout.addWidget(candidates_group, stretch=2)
 
-        preview_group = QGroupBox("Текущее превью")
+        preview_group = QGroupBox("Предпросмотр поста")
         preview_layout = QVBoxLayout(preview_group)
         self.current_preview_title_label = QLabel("Активное превью не загружено.")
         self.current_preview_title_label.setObjectName("currentPreviewTitle")
@@ -457,13 +582,14 @@ class MainWindow(QMainWindow):
         preview_layout.addWidget(self.current_preview_title_label)
         preview_layout.addWidget(self.current_preview_meta_label)
         preview_layout.addWidget(self.preview_selection_hint_label)
-        layout.addWidget(preview_group)
+        preview_body = QHBoxLayout()
+        preview_body.setSpacing(12)
 
-        image_group = QGroupBox("Превью")
+        image_group = QGroupBox("Карточка")
         image_layout = QVBoxLayout(image_group)
         self.image_label = ScaledImageLabel(image_group)
         image_layout.addWidget(self.image_label)
-        layout.addWidget(image_group, stretch=3)
+        preview_body.addWidget(image_group, 3)
 
         caption_group = QGroupBox("Описание")
         caption_layout = QVBoxLayout(caption_group)
@@ -479,7 +605,9 @@ class MainWindow(QMainWindow):
         self.caption_tabs.addTab(self.caption_html_browser, "HTML описания")
         self.caption_tabs.setCurrentWidget(self.caption_preview_text)
         caption_layout.addWidget(self.caption_tabs)
-        layout.addWidget(caption_group, stretch=2)
+        preview_body.addWidget(caption_group, 2)
+        preview_layout.addLayout(preview_body)
+        layout.addWidget(preview_group, stretch=3)
         return panel
 
     def _build_right_panel(self) -> QWidget:
@@ -488,6 +616,16 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(panel)
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(12)
+
+        log_group = QGroupBox("Лог процесса")
+        log_layout = QVBoxLayout(log_group)
+        self.log_text = QPlainTextEdit()
+        self.log_text.setObjectName("logText")
+        self.log_text.setReadOnly(True)
+        self.log_text.setMaximumBlockCount(2000)
+        self.log_text.setMinimumHeight(220)
+        log_layout.addWidget(self.log_text)
+        layout.addWidget(log_group)
 
         self.side_tabs = QTabWidget(panel)
         self.side_tabs.setObjectName("sideTabs")
@@ -532,36 +670,38 @@ class MainWindow(QMainWindow):
         technical_layout = QVBoxLayout(technical_tab)
         technical_layout.setContentsMargins(0, 0, 0, 0)
 
-        splitter = QSplitter(Qt.Orientation.Vertical, technical_tab)
-        splitter.setObjectName("sideSplitter")
-
         details_group = QGroupBox("Технические детали")
         details_layout = QVBoxLayout(details_group)
         self.details_text = QPlainTextEdit()
         self.details_text.setObjectName("detailsText")
         self.details_text.setReadOnly(True)
         details_layout.addWidget(self.details_text)
-
-        log_group = QGroupBox("Лог процесса")
-        log_layout = QVBoxLayout(log_group)
-        self.log_text = QPlainTextEdit()
-        self.log_text.setObjectName("logText")
-        self.log_text.setReadOnly(True)
-        self.log_text.setMaximumBlockCount(2000)
-        log_layout.addWidget(self.log_text)
-
-        splitter.addWidget(details_group)
-        splitter.addWidget(log_group)
-        splitter.setStretchFactor(0, 2)
-        splitter.setStretchFactor(1, 1)
-        splitter.setSizes([420, 260])
-
-        technical_layout.addWidget(splitter)
+        technical_layout.addWidget(details_group)
 
         self.side_tabs.addTab(publish_tab, "Публикации")
-        self.side_tabs.addTab(technical_tab, "Техническое")
-        layout.addWidget(self.side_tabs)
+        self.side_tabs.addTab(technical_tab, "Детали")
+        layout.addWidget(self.side_tabs, 1)
         return panel
+
+    def _build_kpi_card(self, title: str) -> tuple[QFrame, QLabel, QLabel]:
+        card = QFrame(self)
+        card.setObjectName("kpiCard")
+        layout = QVBoxLayout(card)
+        layout.setContentsMargins(16, 14, 16, 14)
+        layout.setSpacing(4)
+        title_label = QLabel(title, card)
+        title_label.setObjectName("kpiCaption")
+        title_label.setWordWrap(True)
+        value_label = QLabel("—", card)
+        value_label.setObjectName("kpiValue")
+        value_label.setWordWrap(True)
+        meta_label = QLabel("", card)
+        meta_label.setObjectName("kpiMeta")
+        meta_label.setWordWrap(True)
+        layout.addWidget(title_label)
+        layout.addWidget(value_label)
+        layout.addWidget(meta_label)
+        return card, value_label, meta_label
 
     @staticmethod
     def _set_button_role(button: QPushButton, role: str) -> None:
@@ -647,6 +787,30 @@ class MainWindow(QMainWindow):
             QLabel#selectedCandidateSummary, QLabel#selectedPreviewReasonLabel, QLabel#previewSelectionHint {
                 color: #c8d1ff;
             }
+            QFrame#kpiCard {
+                background-color: #101733;
+                border: 1px solid #283462;
+                border-radius: 16px;
+            }
+            QFrame#candidateFooter {
+                background-color: #101733;
+                border: 1px solid #26315c;
+                border-radius: 14px;
+            }
+            QLabel#kpiCaption {
+                color: #91a0da;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+            QLabel#kpiValue {
+                color: #ffffff;
+                font-size: 24px;
+                font-weight: 700;
+            }
+            QLabel#kpiMeta {
+                color: #b8c2f4;
+            }
             QLabel#postTypeBadge {
                 border: 1px solid #404b83;
             }
@@ -716,6 +880,10 @@ class MainWindow(QMainWindow):
             }
             QTableWidget {
                 gridline-color: #202850;
+                alternate-background-color: #0f1530;
+            }
+            QTableWidget::item {
+                padding: 6px;
             }
             QHeaderView::section {
                 background-color: #121938;
@@ -1154,6 +1322,7 @@ class MainWindow(QMainWindow):
         base_safety = evaluate_preview_safety(state, self._current_post_type_mode())
         self.current_safety = enforce_selected_candidate_send_gate(base_safety, state, self.selected_candidate_id)
         self._populate_candidate_table(state)
+        self._update_dashboard_kpis(state)
         self._restore_candidate_selection(state)
         self.status_label.setText(self._build_status_headline(state, self.current_safety))
         self.post_type_badge.setText(_translate_post_type_label(state.post_type_label))
@@ -1176,10 +1345,10 @@ class MainWindow(QMainWindow):
         for row_index, candidate in enumerate(state.candidate_rows):
             values = [
                 candidate.stable_candidate_id,
-                candidate.status,
+                _translate_candidate_status(candidate.status),
                 candidate.title,
                 candidate.platform or candidate.source,
-                candidate.post_type,
+                _translate_candidate_post_type(candidate.post_type),
                 _format_number(candidate.discount, suffix="%"),
                 _format_price(candidate.current_price),
                 _format_price(candidate.old_price),
@@ -1190,10 +1359,73 @@ class MainWindow(QMainWindow):
             ]
             for column, value in enumerate(values):
                 item = QTableWidgetItem(value)
+                item.setData(Qt.ItemDataRole.UserRole, candidate.stable_candidate_id)
+                item.setToolTip(_text(value))
                 if column == 0:
-                    item.setData(Qt.ItemDataRole.UserRole, candidate.stable_candidate_id)
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                    item.setForeground(QColor("#7f8ab8"))
+                elif column == 1:
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                    status_background, status_foreground = _candidate_status_palette(candidate.status)
+                    item.setBackground(status_background)
+                    item.setForeground(status_foreground)
+                    font = item.font()
+                    font.setBold(True)
+                    item.setFont(font)
+                elif column in {5, 6, 7, 8, 9}:
+                    item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+                elif column == 10:
+                    item.setForeground(QColor("#91a0da"))
+                elif column == 11:
+                    item.setForeground(QColor("#f9c8d7" if _candidate_reason(candidate) else "#c8d1ff"))
+                if column == 2 and _text(candidate.status).lower() == "recommended":
+                    font = item.font()
+                    font.setBold(True)
+                    item.setFont(font)
                 self.candidate_table.setItem(row_index, column, item)
         self.candidate_table.blockSignals(False)
+
+    def _update_dashboard_kpis(self, state: PreviewState) -> None:
+        total_candidates = len(state.candidate_rows)
+        available_candidates = sum(
+            1 for candidate in state.candidate_rows if _text(candidate.status).lower() in _AVAILABLE_CANDIDATE_STATUSES
+        )
+        blocked_candidates = max(0, total_candidates - available_candidates)
+        last_publish_value, last_publish_meta, last_publish_color = self._last_publish_kpi(state.last_publish)
+
+        self.kpi_total_value_label.setText(str(total_candidates))
+        self.kpi_total_value_label.setStyleSheet("color: #f8fbff;")
+        self.kpi_total_meta_label.setText("В текущем отчёте")
+
+        self.kpi_ready_value_label.setText(str(available_candidates))
+        self.kpi_ready_value_label.setStyleSheet("color: #8df7c0;")
+        self.kpi_ready_meta_label.setText("recommended / ready / reserve")
+
+        self.kpi_blocked_value_label.setText(str(blocked_candidates))
+        self.kpi_blocked_value_label.setStyleSheet("color: #ffb2c7;")
+        self.kpi_blocked_meta_label.setText("blocked / published / duplicate")
+
+        self.kpi_last_publish_value_label.setText(last_publish_value)
+        self.kpi_last_publish_value_label.setStyleSheet(f"color: {last_publish_color};")
+        self.kpi_last_publish_meta_label.setText(last_publish_meta)
+
+    @staticmethod
+    def _last_publish_kpi(last_publish: LastPublishState) -> tuple[str, str, str]:
+        if not last_publish.present:
+            return "нет", "UI-публикаций пока не было", "#dbe3ff"
+        title = _shorten_text(last_publish.title or last_publish.offer_id or "без названия", limit=34)
+        status = _text(last_publish.outbox_status or last_publish.reason or last_publish.workflow_status) or "unknown"
+        if last_publish.success:
+            color = "#8df7c0"
+        elif last_publish.workflow_status == "failed" or not last_publish.published:
+            color = "#ffb2c7"
+        else:
+            color = "#dbe3ff"
+        created_at = _text(last_publish.created_at or last_publish.workflow_modified_at)
+        meta_parts = [status]
+        if created_at:
+            meta_parts.append(created_at)
+        return title, " | ".join(meta_parts), color
 
     def _restore_candidate_selection(self, state: PreviewState) -> None:
         candidate_id = self.selected_candidate_id

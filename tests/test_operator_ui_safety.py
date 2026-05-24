@@ -6,6 +6,7 @@ from pathlib import Path
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QApplication, QMessageBox
 
 from dealbot.operator_ui.command_runner import PreviewCommandRunner
@@ -1237,6 +1238,149 @@ def test_main_window_candidate_selection_gates_send_until_preview_matches(tmp_pa
     assert window.selected_candidate_id == "2"
     assert window.current_safety.send_enabled is True
     assert window.send_button.isEnabled() is True
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_updates_dashboard_kpis_from_current_report(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Recommended", offer_id="steam:recommended"),
+        preview_candidate_id="2",
+        candidate_rows=[
+            CandidateRow(candidate_id="2", row_id="2", title="Recommended", offer_id="steam:recommended", status="recommended"),
+            CandidateRow(candidate_id="3", row_id="3", title="Ready", offer_id="steam:ready", status="ready"),
+            CandidateRow(candidate_id="4", row_id="4", title="Reserve", offer_id="steam:reserve", status="reserve"),
+            CandidateRow(candidate_id="5", row_id="5", title="Blocked", offer_id="steam:blocked", status="blocked"),
+        ],
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:recommended",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        last_publish=LastPublishState(
+            workflow_path=tmp_path / "output" / "analytics" / "publish-previewed.json",
+            created_at="2026-05-24T11:30:00",
+            workflow_status="completed",
+            title="Steam Hit",
+            offer_id="steam:published",
+            message_id=321,
+            published=True,
+            telegram_verified=True,
+            outbox_status="sent",
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    assert window.kpi_total_value_label.text() == "4"
+    assert window.kpi_ready_value_label.text() == "3"
+    assert window.kpi_blocked_value_label.text() == "1"
+    assert window.kpi_last_publish_value_label.text() == "Steam Hit"
+    assert "sent" in window.kpi_last_publish_meta_label.text()
+    assert "2026-05-24T11:30:00" in window.kpi_last_publish_meta_label.text()
+
+    window.close()
+    app.processEvents()
+
+
+def test_main_window_styles_candidate_status_cell_and_keeps_candidate_id(tmp_path: Path) -> None:
+    app = QApplication.instance() or QApplication([])
+    window = MainWindow(tmp_path)
+    report_path = tmp_path / "output" / "analytics" / "truth.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text("{}", encoding="utf-8")
+    card_path = tmp_path / "output" / "cards" / "card.png"
+    card_path.parent.mkdir(parents=True, exist_ok=True)
+    card_path.write_bytes(b"card")
+
+    state = PreviewState(
+        project_root=tmp_path,
+        status_text="Preview Ready",
+        truth_ready=True,
+        post_type_key="single_discount",
+        post_type_label="Single Discount",
+        selected_target=SelectedTarget(title="Recommended", offer_id="steam:recommended"),
+        preview_candidate_id="2",
+        candidate_rows=[
+            CandidateRow(
+                candidate_id="2",
+                row_id="2",
+                title="Recommended",
+                offer_id="steam:recommended",
+                status="recommended",
+                post_type="discount",
+                current_price=999,
+                old_price=1999,
+                discount=50,
+            ),
+            CandidateRow(
+                candidate_id="7",
+                row_id="7",
+                title="No price",
+                offer_id="steam:no-price",
+                status="no_price",
+                blocker_reason="missing_price",
+            ),
+        ],
+        caption_html="<b>Caption</b>",
+        caption_preview="Caption",
+        card_path=card_path,
+        card_exists=True,
+        report_exists=True,
+        pinned_publish=PinnedPublishState(
+            contract_version=1,
+            source="preview",
+            offer_id="steam:recommended",
+            idempotency_key="preview-key",
+            caption_hash="caption-hash",
+            image_path=card_path,
+            image_hash="image-hash",
+            image_exists=True,
+            caption_hash_verified=True,
+            image_hash_verified=True,
+        ),
+        paths=PreviewPaths(truth_report_path=report_path, image_path=card_path, output_dir=tmp_path / "output"),
+    )
+
+    window._apply_state(state)
+
+    status_item = window.candidate_table.item(0, 1)
+    technical_item = window.candidate_table.item(0, 10)
+
+    assert status_item is not None
+    assert status_item.text() == "Рекомендован"
+    assert status_item.background().color() == QColor("#0f2f28")
+    assert status_item.foreground().color() == QColor("#8df7c0")
+    assert technical_item is not None
+    assert technical_item.data(Qt.ItemDataRole.UserRole) == "2"
 
     window.close()
     app.processEvents()
