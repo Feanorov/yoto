@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-01-NORMALIZED-VIDEO-OFFER-CONTRACT
+VIDEO-04-SCENE-LAYOUT-PAYLOAD
 
 Current next action:
-Create normalized VideoOffer adapter from YOTO preview/pinned_publish artifacts.
+Create deterministic offline scene_layout_payload.json export from VideoOffer + scene_asset_plan.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -89,3 +89,44 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
   draft_video_manifest.json
 - Added tests.
 - Production behavior unchanged.
+
+### 2026-06-18 - VIDEO-03 selected
+
+- Next Codex task:
+  VIDEO-03-SCENE-ASSET-PLANNER
+- Goal:
+  create deterministic offline scene planner:
+  VideoOffer + draft manifest -> scene_asset_plan.json
+- Scope:
+  no rendering, no MP4, no FFmpeg, no UI wiring, no Telegram integration.
+
+### 2026-06-18 - VIDEO-03 implementation
+
+- Added `dealbot/video/scene_planner.py`.
+- Added deterministic 5-scene asset selection plan with fixed MVP timings.
+- Added optional exporter / CLI flag:
+  `--with-scene-plan`
+- Added `scene_asset_plan.json` export for QA only.
+- Added tests for asset priority, card-only warnings, no-visual failure, deterministic ordering, and exporter flag wiring.
+- Production behavior unchanged by default.
+
+### 2026-06-25 - VIDEO-04 selected
+
+- Next Codex task:
+  VIDEO-04-SCENE-LAYOUT-PAYLOAD
+- Goal:
+  convert the deterministic 5-scene asset plan into renderer-ready text/layout payloads
+- Scope:
+  offline only, no rendering, no MP4, no Telegram, no UI wiring
+
+### 2026-06-25 - VIDEO-04 implementation
+
+- Added `dealbot/video/layout_builder.py`.
+- Added deterministic scene text block and safe-zone payload generation from `VideoOffer + SceneAssetPlan`.
+- Added optional exporter / CLI flag:
+  `--with-layout-payload`
+- `--with-layout-payload` implies scene planning and exports:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+- Added tests for stable layout ordering, required text blocks, CTA variant preservation, non-fabrication, and exporter flag behavior.
+- Production behavior unchanged by default.

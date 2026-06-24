@@ -7,6 +7,8 @@ from typing import Any
 
 from .models import VideoOfferValidationError
 from .offer_adapter import build_video_manifest_draft, build_video_offer_from_preview_report
+from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
+from .scene_planner import SceneAssetPlanError, build_scene_asset_plan
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,6 +17,8 @@ class VideoOfferExportResult:
     output_dir: Path
     video_offer_json_path: Path
     draft_manifest_json_path: Path
+    scene_asset_plan_json_path: Path | None
+    scene_layout_payload_json_path: Path | None
     offer_id: str
     template: str
     scene_count: int
@@ -28,6 +32,9 @@ class VideoOfferExportError(ValueError):
 def export_video_offer_artifacts(
     source_report_path: str | Path,
     output_dir: str | Path | None = None,
+    *,
+    with_scene_plan: bool = False,
+    with_layout_payload: bool = False,
 ) -> VideoOfferExportResult:
     input_path = _resolve_input_path(source_report_path)
     report_path, report_payload = _load_export_source(input_path)
@@ -37,20 +44,35 @@ def export_video_offer_artifacts(
         source_report_path=str(report_path),
     )
     draft_manifest = build_video_manifest_draft(video_offer)
+    should_export_scene_plan = with_scene_plan or with_layout_payload
+    scene_asset_plan = build_scene_asset_plan(video_offer, draft_manifest) if should_export_scene_plan else None
+    scene_layout_payload = (
+        build_scene_layout_payload(video_offer, scene_asset_plan)
+        if with_layout_payload and scene_asset_plan is not None
+        else None
+    )
 
     resolved_output_dir = _resolve_output_dir(report_path=report_path, output_dir=output_dir)
     video_offer_json_path = resolved_output_dir / "video_offer.json"
     draft_manifest_json_path = resolved_output_dir / "draft_video_manifest.json"
+    scene_asset_plan_json_path = resolved_output_dir / "scene_asset_plan.json" if should_export_scene_plan else None
+    scene_layout_payload_json_path = resolved_output_dir / "scene_layout_payload.json" if with_layout_payload else None
 
     resolved_output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(video_offer_json_path, video_offer.to_dict())
     _write_json(draft_manifest_json_path, draft_manifest)
+    if scene_asset_plan_json_path is not None and scene_asset_plan is not None:
+        _write_json(scene_asset_plan_json_path, scene_asset_plan)
+    if scene_layout_payload_json_path is not None and scene_layout_payload is not None:
+        _write_json(scene_layout_payload_json_path, scene_layout_payload)
 
     return VideoOfferExportResult(
         source_report_path=report_path,
         output_dir=resolved_output_dir,
         video_offer_json_path=video_offer_json_path,
         draft_manifest_json_path=draft_manifest_json_path,
+        scene_asset_plan_json_path=scene_asset_plan_json_path,
+        scene_layout_payload_json_path=scene_layout_payload_json_path,
         offer_id=video_offer.offer_id,
         template=str(draft_manifest.get("template") or ""),
         scene_count=len(list(draft_manifest.get("scenes") or [])),
