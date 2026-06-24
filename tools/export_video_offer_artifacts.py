@@ -9,6 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from dealbot.video import (
+    RendererInputAdapterError,
     SceneAssetPlanError,
     SceneLayoutPayloadError,
     VideoOfferExportError,
@@ -31,7 +32,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Optional output directory for video_offer.json, draft_video_manifest.json, "
-            "and optional scene_asset_plan.json / scene_layout_payload.json."
+            "and optional scene_asset_plan.json / scene_layout_payload.json / renderer_input.json."
         ),
     )
     parser.add_argument(
@@ -44,6 +45,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Also export scene_layout_payload.json and imply scene_asset_plan.json.",
     )
+    parser.add_argument(
+        "--with-renderer-input",
+        action="store_true",
+        help="Also export renderer_input.json and imply scene_asset_plan.json + scene_layout_payload.json.",
+    )
     return parser.parse_args(argv)
 
 
@@ -55,9 +61,11 @@ def main(argv: list[str] | None = None) -> int:
             output_dir=args.output_dir,
             with_scene_plan=args.with_scene_plan,
             with_layout_payload=args.with_layout_payload,
+            with_renderer_input=args.with_renderer_input,
         )
     except (
         FileNotFoundError,
+        RendererInputAdapterError,
         SceneAssetPlanError,
         SceneLayoutPayloadError,
         VideoOfferExportError,
@@ -75,9 +83,15 @@ def main(argv: list[str] | None = None) -> int:
         print(f"scene_asset_plan_json_path: {result.scene_asset_plan_json_path}")
     if result.scene_layout_payload_json_path is not None:
         print(f"scene_layout_payload_json_path: {result.scene_layout_payload_json_path}")
+    if result.renderer_input_json_path is not None:
+        print(f"renderer_input_json_path: {result.renderer_input_json_path}")
     print(f"offer_id: {result.offer_id}")
     print(f"template: {result.template}")
     print(f"scene_count: {result.scene_count}")
+    if result.renderer_scene_count is not None:
+        print(f"renderer_scene_count: {result.renderer_scene_count}")
+    if result.renderer_total_duration_sec is not None:
+        print(f"renderer_total_duration_sec: {result.renderer_total_duration_sec}")
     return 0
 
 

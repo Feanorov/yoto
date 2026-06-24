@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-04-SCENE-LAYOUT-PAYLOAD
+VIDEO-05-RENDERER-INPUT-ADAPTER
 
 Current next action:
-Create deterministic offline scene_layout_payload.json export from VideoOffer + scene_asset_plan.
+Create deterministic offline renderer_input.json export from VideoOffer + scene_asset_plan + scene_layout_payload.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -129,4 +129,30 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
   `scene_asset_plan.json`
   `scene_layout_payload.json`
 - Added tests for stable layout ordering, required text blocks, CTA variant preservation, non-fabrication, and exporter flag behavior.
+- Production behavior unchanged by default.
+
+### 2026-06-25 - VIDEO-05 selected
+
+- Next Codex task:
+  VIDEO-05-RENDERER-INPUT-ADAPTER
+- Goal:
+  convert `VideoOffer + SceneAssetPlan + SceneLayoutPayload` into deterministic renderer-facing input JSON
+- Scope:
+  offline only, no rendering, no MP4, no UI wiring, no Telegram integration
+
+### 2026-06-25 - VIDEO-05 implementation
+
+- Added `dealbot/video/renderer_input_adapter.py`.
+- Added strict cross-contract validation for scene IDs, order, types, durations, selected visuals, and canvas.
+- Added optional exporter / CLI flag:
+  `--with-renderer-input`
+- `--with-renderer-input` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+- Added renderer metadata on export results:
+  `renderer_input_json_path`
+  `renderer_scene_count`
+  `renderer_total_duration_sec`
+- Added tests for deterministic timestamps, strict mismatch failures, CTA preservation, non-fabrication, and export flag behavior.
 - Production behavior unchanged by default.

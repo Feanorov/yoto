@@ -91,6 +91,7 @@ def build_scene_layout_payload(video_offer: VideoOffer, scene_asset_plan: dict[s
         "template": _pick_text(scene_asset_plan.get("template")) or "single_offer_gameplay_first",
         "format": _pick_text(scene_asset_plan.get("format")) or "vertical_1080x1920",
         "scene_count": len(scenes),
+        "total_duration_sec": round(sum(scene["duration_sec"] for scene in scenes), 3),
         "scenes": scenes,
         "warnings": warnings,
     }

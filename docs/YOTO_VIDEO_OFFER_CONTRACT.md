@@ -128,6 +128,7 @@ An offline QA exporter is available for selected preview artifacts:
 - `draft_video_manifest.json`
 - optional `scene_asset_plan.json`
 - optional `scene_layout_payload.json`
+- optional `renderer_input.json`
 
 The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves both JSON artifacts for review.
 
@@ -135,6 +136,7 @@ This is QA/export only. It does not render scenes, does not call FFmpeg, and doe
 
 `scene_asset_plan.json` is exported only when `--with-scene-plan` is requested. Default exporter behavior remains unchanged.
 `scene_layout_payload.json` is exported only when `--with-layout-payload` is requested. That flag also implies `scene_asset_plan.json`.
+`renderer_input.json` is exported only when `--with-renderer-input` is requested. That flag also implies `scene_asset_plan.json` and `scene_layout_payload.json`.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -219,7 +221,57 @@ Scene text rules:
 - `telegram_cta`:
   Telegram CTA only, with platform-specific CTA variants preserved and no raw store URL
 
-Current limits after VIDEO-04:
+## VIDEO-05 Renderer Input Adapter
+
+`build_renderer_input(video_offer, scene_asset_plan, scene_layout_payload)` converts the offline planning contracts into a deterministic renderer-facing input payload.
+
+Renderer input guarantees:
+
+- `schema_version = 1`
+- exactly 5 scenes
+- fixed scene order:
+  `hook`, `identity`, `offer_proof`, `trust_or_deadline`, `telegram_cta`
+- fixed top-level canvas:
+  `1080x1920`
+- `fps = 30`
+- cumulative `start_sec` / `end_sec` timestamps built deterministically from scene durations
+- `total_duration_sec` must match the layout payload scene timing
+- strict validation across upstream contracts for:
+  `offer_id`, scene IDs, order, scene types, durations, selected visuals, and canvas
+- no invented facts, text, asset refs, URLs, Telegram handles, or rendering outputs
+- no rendering, Pillow, FFmpeg, Telegram, UI, or network calls
+
+Top-level renderer fields:
+
+- `schema_version`
+- `offer_id`
+- `template`
+- `format`
+- `canvas`
+- `total_duration_sec`
+- `fps`
+- `voice_mode`
+- `music_required`
+- `scenes`
+- `warnings`
+
+Each renderer scene includes:
+
+- `scene_id`
+- `order`
+- `scene_type`
+- `start_sec`
+- `end_sec`
+- `duration_sec`
+- `visual`
+- `text_blocks`
+- `safe_zone_profile`
+- `motion`
+- `warnings`
+
+The CTA renderer scene also preserves `platform_variants` when they exist so downstream renderers can keep TikTok / Shorts / Reels CTA text available without re-deriving it.
+
+Current limits after VIDEO-05:
 
 - only normalized single-offer planning contracts are defined
 - no renderer integration

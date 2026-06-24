@@ -8,6 +8,7 @@ from typing import Any
 from .models import VideoOfferValidationError
 from .offer_adapter import build_video_manifest_draft, build_video_offer_from_preview_report
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
+from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_planner import SceneAssetPlanError, build_scene_asset_plan
 
 
@@ -19,9 +20,12 @@ class VideoOfferExportResult:
     draft_manifest_json_path: Path
     scene_asset_plan_json_path: Path | None
     scene_layout_payload_json_path: Path | None
+    renderer_input_json_path: Path | None
     offer_id: str
     template: str
     scene_count: int
+    renderer_scene_count: int | None = None
+    renderer_total_duration_sec: float | None = None
     status: str = "exported"
 
 
@@ -35,6 +39,7 @@ def export_video_offer_artifacts(
     *,
     with_scene_plan: bool = False,
     with_layout_payload: bool = False,
+    with_renderer_input: bool = False,
 ) -> VideoOfferExportResult:
     input_path = _resolve_input_path(source_report_path)
     report_path, report_payload = _load_export_source(input_path)
@@ -44,11 +49,17 @@ def export_video_offer_artifacts(
         source_report_path=str(report_path),
     )
     draft_manifest = build_video_manifest_draft(video_offer)
-    should_export_scene_plan = with_scene_plan or with_layout_payload
+    should_export_layout_payload = with_layout_payload or with_renderer_input
+    should_export_scene_plan = with_scene_plan or should_export_layout_payload
     scene_asset_plan = build_scene_asset_plan(video_offer, draft_manifest) if should_export_scene_plan else None
     scene_layout_payload = (
         build_scene_layout_payload(video_offer, scene_asset_plan)
-        if with_layout_payload and scene_asset_plan is not None
+        if should_export_layout_payload and scene_asset_plan is not None
+        else None
+    )
+    renderer_input = (
+        build_renderer_input(video_offer, scene_asset_plan, scene_layout_payload)
+        if with_renderer_input and scene_asset_plan is not None and scene_layout_payload is not None
         else None
     )
 
@@ -56,7 +67,10 @@ def export_video_offer_artifacts(
     video_offer_json_path = resolved_output_dir / "video_offer.json"
     draft_manifest_json_path = resolved_output_dir / "draft_video_manifest.json"
     scene_asset_plan_json_path = resolved_output_dir / "scene_asset_plan.json" if should_export_scene_plan else None
-    scene_layout_payload_json_path = resolved_output_dir / "scene_layout_payload.json" if with_layout_payload else None
+    scene_layout_payload_json_path = (
+        resolved_output_dir / "scene_layout_payload.json" if should_export_layout_payload else None
+    )
+    renderer_input_json_path = resolved_output_dir / "renderer_input.json" if with_renderer_input else None
 
     resolved_output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(video_offer_json_path, video_offer.to_dict())
@@ -65,6 +79,8 @@ def export_video_offer_artifacts(
         _write_json(scene_asset_plan_json_path, scene_asset_plan)
     if scene_layout_payload_json_path is not None and scene_layout_payload is not None:
         _write_json(scene_layout_payload_json_path, scene_layout_payload)
+    if renderer_input_json_path is not None and renderer_input is not None:
+        _write_json(renderer_input_json_path, renderer_input)
 
     return VideoOfferExportResult(
         source_report_path=report_path,
@@ -73,9 +89,14 @@ def export_video_offer_artifacts(
         draft_manifest_json_path=draft_manifest_json_path,
         scene_asset_plan_json_path=scene_asset_plan_json_path,
         scene_layout_payload_json_path=scene_layout_payload_json_path,
+        renderer_input_json_path=renderer_input_json_path,
         offer_id=video_offer.offer_id,
         template=str(draft_manifest.get("template") or ""),
         scene_count=len(list(draft_manifest.get("scenes") or [])),
+        renderer_scene_count=len(list(renderer_input.get("scenes") or [])) if renderer_input is not None else None,
+        renderer_total_duration_sec=(
+            float(renderer_input.get("total_duration_sec")) if renderer_input is not None else None
+        ),
     )
 
 
