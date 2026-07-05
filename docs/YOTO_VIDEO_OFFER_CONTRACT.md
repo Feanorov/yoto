@@ -129,6 +129,7 @@ An offline QA exporter is available for selected preview artifacts:
 - optional `scene_asset_plan.json`
 - optional `scene_layout_payload.json`
 - optional `renderer_input.json`
+- optional `scene_visual_qa_report.json`
 - optional `scene_previews/01_hook.png` .. `05_telegram_cta.png`
 
 The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves offline review artifacts.
@@ -138,8 +139,9 @@ This is QA/export only. It does not call FFmpeg and does not generate MP4 output
 `scene_asset_plan.json` is exported only when `--with-scene-plan` is requested. Default exporter behavior remains unchanged.
 `scene_layout_payload.json` is exported only when `--with-layout-payload` is requested. That flag also implies `scene_asset_plan.json`.
 `renderer_input.json` is exported only when `--with-renderer-input` is requested. That flag also implies `scene_asset_plan.json` and `scene_layout_payload.json`.
+`scene_visual_qa_report.json` is exported only when `--with-visual-qa-report` is requested, or automatically when scene previews are rendered. That flag implies `renderer_input.json`.
 `renderer_input_staged.json` and `staged_visuals/*` are exported only when `--stage-visuals` is requested, or when scene previews need staged local visuals.
-`scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, `renderer_input.json`, and staged-local visual preparation before rendering.
+`scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, `renderer_input.json`, staged-local visual preparation, and `scene_visual_qa_report.json` before preview rendering.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -346,6 +348,47 @@ Exporter behavior after VIDEO-07:
   `staged_visuals/*`
 - `--render-scene-previews` stages visuals first and renders previews from the staged local payload
 - default exporter behavior without staging or preview flags remains unchanged
+
+## VIDEO-08 Scene Visual QA Report
+
+`build_scene_visual_qa_report(renderer_input)` inspects renderer-scene visuals offline and produces `scene_visual_qa_report.json` before any future MP4 work.
+
+Visual QA guarantees:
+
+- accepts either raw `renderer_input` or staged-local `renderer_input_staged`
+- does not modify images
+- uses Pillow only for local image dimension inspection
+- reports:
+  missing visual files
+  remote visual URLs
+  unsupported visual file extensions
+  duplicate visual reuse across scenes
+  fallback/card-image visual usage
+  non-vertical source aspect-ratio risk
+  very small source images
+  empty text blocks
+  scenes with too many text blocks
+  CTA scenes missing primary CTA text
+  scene-count mismatch from the 5-scene MVP contract
+- no FFmpeg
+- no MP4 rendering
+- no Telegram, UI, Steam API, or page-scraping calls
+
+Report structure includes:
+
+- `status`
+- `error_count`
+- `warning_count`
+- top-level `findings`
+- per-scene QA entries under `scenes`
+- duplicate reuse groups under `duplicate_visual_groups`
+
+Exporter behavior after VIDEO-08:
+
+- `--with-visual-qa-report` implies `--with-renderer-input`
+- when staged renderer input exists, visual QA uses the staged payload instead of raw remote refs
+- `--render-scene-previews` now writes `scene_visual_qa_report.json` automatically after staging and before preview rendering
+- default exporter behavior without QA / staging / preview flags remains unchanged
 
 ## Why This Is Not A Renderer Task
 

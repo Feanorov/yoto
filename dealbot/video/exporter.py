@@ -11,6 +11,7 @@ from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
 from .scene_planner import SceneAssetPlanError, build_scene_asset_plan
+from .scene_visual_qa import SceneVisualQAError, build_scene_visual_qa_report
 from .visual_staging import VisualStagingError, stage_renderer_visuals
 
 
@@ -24,6 +25,7 @@ class VideoOfferExportResult:
     scene_layout_payload_json_path: Path | None
     renderer_input_json_path: Path | None
     renderer_input_staged_json_path: Path | None
+    scene_visual_qa_report_json_path: Path | None
     staged_visuals_dir_path: Path | None
     scene_previews_dir_path: Path | None
     offer_id: str
@@ -31,6 +33,9 @@ class VideoOfferExportResult:
     scene_count: int
     renderer_scene_count: int | None = None
     renderer_total_duration_sec: float | None = None
+    visual_qa_status: str | None = None
+    visual_qa_error_count: int | None = None
+    visual_qa_warning_count: int | None = None
     staged_scene_count: int | None = None
     staged_visual_count: int | None = None
     rendered_scene_count: int | None = None
@@ -48,6 +53,7 @@ def export_video_offer_artifacts(
     with_scene_plan: bool = False,
     with_layout_payload: bool = False,
     with_renderer_input: bool = False,
+    with_visual_qa_report: bool = False,
     stage_visuals_flag: bool = False,
     render_scene_previews_flag: bool = False,
 ) -> VideoOfferExportResult:
@@ -59,7 +65,10 @@ def export_video_offer_artifacts(
         source_report_path=str(report_path),
     )
     draft_manifest = build_video_manifest_draft(video_offer)
-    should_export_renderer_input = with_renderer_input or stage_visuals_flag or render_scene_previews_flag
+    should_export_visual_qa_report = with_visual_qa_report or render_scene_previews_flag
+    should_export_renderer_input = (
+        with_renderer_input or should_export_visual_qa_report or stage_visuals_flag or render_scene_previews_flag
+    )
     should_export_layout_payload = with_layout_payload or should_export_renderer_input
     should_export_scene_plan = with_scene_plan or should_export_layout_payload
     scene_asset_plan = build_scene_asset_plan(video_offer, draft_manifest) if should_export_scene_plan else None
@@ -86,6 +95,9 @@ def export_video_offer_artifacts(
     renderer_input_staged_json_path = (
         resolved_output_dir / "renderer_input_staged.json" if should_stage_visuals else None
     )
+    scene_visual_qa_report_json_path = (
+        resolved_output_dir / "scene_visual_qa_report.json" if should_export_visual_qa_report else None
+    )
     staged_visuals_dir_path = resolved_output_dir / "staged_visuals" if should_stage_visuals else None
     scene_previews_dir_path = resolved_output_dir / "scene_previews" if render_scene_previews_flag else None
 
@@ -103,6 +115,12 @@ def export_video_offer_artifacts(
     if should_stage_visuals and renderer_input is not None and renderer_input_staged_json_path is not None:
         staged_renderer_input, staging_metadata = stage_renderer_visuals(renderer_input, resolved_output_dir)
         _write_json(renderer_input_staged_json_path, staged_renderer_input)
+    visual_qa_report: dict[str, Any] | None = None
+    if should_export_visual_qa_report and scene_visual_qa_report_json_path is not None:
+        qa_renderer_input = staged_renderer_input if staged_renderer_input is not None else renderer_input
+        if qa_renderer_input is not None:
+            visual_qa_report = build_scene_visual_qa_report(qa_renderer_input)
+            _write_json(scene_visual_qa_report_json_path, visual_qa_report)
     rendered_scene_paths = (
         render_scene_previews(staged_renderer_input, scene_previews_dir_path)
         if render_scene_previews_flag and staged_renderer_input is not None and scene_previews_dir_path is not None
@@ -120,6 +138,9 @@ def export_video_offer_artifacts(
         renderer_input_staged_json_path=(
             renderer_input_staged_json_path.resolve() if renderer_input_staged_json_path is not None else None
         ),
+        scene_visual_qa_report_json_path=(
+            scene_visual_qa_report_json_path.resolve() if scene_visual_qa_report_json_path is not None else None
+        ),
         staged_visuals_dir_path=staged_visuals_dir_path.resolve() if staged_visuals_dir_path is not None else None,
         scene_previews_dir_path=scene_previews_dir_path.resolve() if scene_previews_dir_path is not None else None,
         offer_id=video_offer.offer_id,
@@ -128,6 +149,15 @@ def export_video_offer_artifacts(
         renderer_scene_count=len(list(renderer_input.get("scenes") or [])) if renderer_input is not None else None,
         renderer_total_duration_sec=(
             float(renderer_input.get("total_duration_sec")) if renderer_input is not None else None
+        ),
+        visual_qa_status=(
+            str(visual_qa_report.get("status")) if visual_qa_report is not None and visual_qa_report.get("status") else None
+        ),
+        visual_qa_error_count=(
+            int(visual_qa_report.get("error_count")) if visual_qa_report is not None else None
+        ),
+        visual_qa_warning_count=(
+            int(visual_qa_report.get("warning_count")) if visual_qa_report is not None else None
         ),
         staged_scene_count=(
             int(staging_metadata.get("staged_scene_count")) if staging_metadata is not None else None

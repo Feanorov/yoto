@@ -13,6 +13,7 @@ from dealbot.video import (
     SceneAssetPlanError,
     SceneLayoutPayloadError,
     ScenePreviewRenderError,
+    SceneVisualQAError,
     VideoOfferExportError,
     VideoOfferValidationError,
     VisualStagingError,
@@ -54,6 +55,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Also export renderer_input.json and imply scene_asset_plan.json + scene_layout_payload.json.",
     )
     parser.add_argument(
+        "--with-visual-qa-report",
+        action="store_true",
+        help="Write scene_visual_qa_report.json using staged renderer input when available.",
+    )
+    parser.add_argument(
         "--stage-visuals",
         action="store_true",
         help="Stage remote renderer visuals into staged_visuals/ and write renderer_input_staged.json.",
@@ -78,6 +84,7 @@ def main(argv: list[str] | None = None) -> int:
             with_scene_plan=args.with_scene_plan,
             with_layout_payload=args.with_layout_payload,
             with_renderer_input=args.with_renderer_input,
+            with_visual_qa_report=args.with_visual_qa_report,
             stage_visuals_flag=args.stage_visuals,
             render_scene_previews_flag=args.render_scene_previews,
         )
@@ -87,6 +94,7 @@ def main(argv: list[str] | None = None) -> int:
         SceneAssetPlanError,
         SceneLayoutPayloadError,
         ScenePreviewRenderError,
+        SceneVisualQAError,
         VideoOfferExportError,
         VideoOfferValidationError,
         VisualStagingError,
@@ -107,6 +115,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"renderer_input_json_path: {result.renderer_input_json_path}")
     if result.renderer_input_staged_json_path is not None:
         print(f"renderer_input_staged_json_path: {result.renderer_input_staged_json_path}")
+    if result.scene_visual_qa_report_json_path is not None:
+        print(f"scene_visual_qa_report_json_path: {result.scene_visual_qa_report_json_path}")
     if result.staged_visuals_dir_path is not None:
         print(f"staged_visuals_dir_path: {result.staged_visuals_dir_path}")
     if result.scene_previews_dir_path is not None:
@@ -118,6 +128,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"renderer_scene_count: {result.renderer_scene_count}")
     if result.renderer_total_duration_sec is not None:
         print(f"renderer_total_duration_sec: {result.renderer_total_duration_sec}")
+    if result.visual_qa_status is not None:
+        print(f"visual_qa_status: {result.visual_qa_status}")
+    if result.visual_qa_error_count is not None:
+        print(f"visual_qa_error_count: {result.visual_qa_error_count}")
+    if result.visual_qa_warning_count is not None:
+        print(f"visual_qa_warning_count: {result.visual_qa_warning_count}")
     if result.staged_scene_count is not None:
         print(f"staged_scene_count: {result.staged_scene_count}")
     if result.staged_visual_count is not None:

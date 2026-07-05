@@ -410,11 +410,14 @@ def test_rendering_occurs_only_with_new_flag_and_existing_behavior_remains_uncha
     assert preview_result.scene_layout_payload_json_path == (preview_dir / "scene_layout_payload.json").resolve()
     assert preview_result.renderer_input_json_path == (preview_dir / "renderer_input.json").resolve()
     assert preview_result.renderer_input_staged_json_path == (preview_dir / "renderer_input_staged.json").resolve()
+    assert preview_result.scene_visual_qa_report_json_path == (preview_dir / "scene_visual_qa_report.json").resolve()
     assert preview_result.staged_visuals_dir_path == (preview_dir / "staged_visuals").resolve()
     assert preview_result.scene_previews_dir_path == (preview_dir / "scene_previews").resolve()
     assert preview_result.renderer_input_staged_json_path.exists()
+    assert preview_result.scene_visual_qa_report_json_path.exists()
     assert preview_result.staged_visuals_dir_path.exists()
     assert preview_result.scene_previews_dir_path.exists()
+    assert preview_result.visual_qa_status in {"warn", "pass"}
     assert preview_result.staged_scene_count == 0
     assert preview_result.staged_visual_count == 0
     assert preview_result.rendered_scene_count == 5
@@ -455,7 +458,11 @@ def test_cli_render_scene_previews_flag_wires_optional_export(
     assert "scene_layout_payload_json_path:" in preview_stdout
     assert "renderer_input_json_path:" in preview_stdout
     assert "renderer_input_staged_json_path:" in preview_stdout
+    assert "scene_visual_qa_report_json_path:" in preview_stdout
     assert "staged_visuals_dir_path:" in preview_stdout
+    assert "visual_qa_status:" in preview_stdout
+    assert "visual_qa_error_count:" in preview_stdout
+    assert "visual_qa_warning_count:" in preview_stdout
     assert "staged_scene_count: 0" in preview_stdout
     assert "staged_visual_count: 0" in preview_stdout
     assert "scene_previews_dir_path:" in preview_stdout

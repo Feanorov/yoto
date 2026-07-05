@@ -11,6 +11,7 @@ from .offer_adapter import (
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
+from .scene_visual_qa import SceneVisualQAError, build_scene_visual_qa_report
 from .visual_staging import VisualStagingError, stage_renderer_visuals
 from .exporter import (
     VideoOfferExportError,
@@ -25,6 +26,7 @@ __all__ = [
     "SceneLayoutPayloadError",
     "RendererInputAdapterError",
     "ScenePreviewRenderError",
+    "SceneVisualQAError",
     "VideoOfferExportError",
     "VideoOfferExportResult",
     "VisualStagingError",
@@ -33,6 +35,7 @@ __all__ = [
     "VideoVisualAssets",
     "build_renderer_input",
     "render_scene_previews",
+    "build_scene_visual_qa_report",
     "stage_renderer_visuals",
     "build_scene_layout_payload",
     "build_scene_asset_plan",

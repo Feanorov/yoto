@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-07-LOCAL-VISUAL-STAGING-ADAPTER
+VIDEO-08-SCENE-VISUAL-QA-REPORT
 
 Current next action:
-Stage remote direct-image visuals into local preview artifacts before offline scene preview rendering.
+Write an offline visual QA report from renderer input before preview rendering or any future MP4 step.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -207,3 +207,26 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
   raw remote URLs still fail when passed directly.
 - Added tests for remote staging, local preservation, clear failure modes, staged exporter artifacts, and preview rendering through staged visuals.
 - Production behavior unchanged without staging / preview flags.
+
+### 2026-07-05 - VIDEO-08 selected
+
+- Next Codex task:
+  VIDEO-08-SCENE-VISUAL-QA-REPORT
+- Goal:
+  add an offline QA report for renderer scene visuals before preview or future MP4 work
+- Scope:
+  QA/reporting only, no MP4, no FFmpeg, no UI wiring, no Telegram integration
+
+### 2026-07-05 - VIDEO-08 implementation
+
+- Added `dealbot/video/scene_visual_qa.py`.
+- Added `build_scene_visual_qa_report(renderer_input)` with structured error/warning findings.
+- Added optional exporter / CLI flag:
+  `--with-visual-qa-report`
+- `--with-visual-qa-report` implies:
+  `renderer_input.json`
+  `scene_visual_qa_report.json`
+- When staged input exists, QA now inspects staged-local visuals instead of raw remote refs.
+- `--render-scene-previews` now writes the QA report after staging and before PNG preview rendering.
+- Added tests for clean reports, duplicates, remote refs, missing files, small images, aspect-ratio risk, CTA gaps, preview export wiring, and isolation.
+- Production behavior unchanged without QA / staging / preview flags.
