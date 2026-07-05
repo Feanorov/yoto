@@ -8,6 +8,7 @@ from typing import Any
 from .models import VideoOfferValidationError
 from .offer_adapter import build_video_manifest_draft, build_video_offer_from_preview_report
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
+from .mp4_assembler import MP4AssemblerError, assemble_scene_previews_mp4
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
 from .scene_planner import SceneAssetPlanError, build_scene_asset_plan
@@ -26,6 +27,8 @@ class VideoOfferExportResult:
     renderer_input_json_path: Path | None
     renderer_input_staged_json_path: Path | None
     scene_visual_qa_report_json_path: Path | None
+    video_preview_mp4_path: Path | None
+    video_assembly_manifest_json_path: Path | None
     staged_visuals_dir_path: Path | None
     scene_previews_dir_path: Path | None
     offer_id: str
@@ -36,6 +39,7 @@ class VideoOfferExportResult:
     visual_qa_status: str | None = None
     visual_qa_error_count: int | None = None
     visual_qa_warning_count: int | None = None
+    video_preview_duration_sec: float | None = None
     staged_scene_count: int | None = None
     staged_visual_count: int | None = None
     rendered_scene_count: int | None = None
@@ -56,6 +60,7 @@ def export_video_offer_artifacts(
     with_visual_qa_report: bool = False,
     stage_visuals_flag: bool = False,
     render_scene_previews_flag: bool = False,
+    assemble_mp4_preview_flag: bool = False,
 ) -> VideoOfferExportResult:
     input_path = _resolve_input_path(source_report_path)
     report_path, report_payload = _load_export_source(input_path)
@@ -65,9 +70,10 @@ def export_video_offer_artifacts(
         source_report_path=str(report_path),
     )
     draft_manifest = build_video_manifest_draft(video_offer)
-    should_export_visual_qa_report = with_visual_qa_report or render_scene_previews_flag
+    should_render_scene_previews = render_scene_previews_flag or assemble_mp4_preview_flag
+    should_export_visual_qa_report = with_visual_qa_report or should_render_scene_previews
     should_export_renderer_input = (
-        with_renderer_input or should_export_visual_qa_report or stage_visuals_flag or render_scene_previews_flag
+        with_renderer_input or should_export_visual_qa_report or stage_visuals_flag or should_render_scene_previews
     )
     should_export_layout_payload = with_layout_payload or should_export_renderer_input
     should_export_scene_plan = with_scene_plan or should_export_layout_payload
@@ -91,15 +97,19 @@ def export_video_offer_artifacts(
         resolved_output_dir / "scene_layout_payload.json" if should_export_layout_payload else None
     )
     renderer_input_json_path = resolved_output_dir / "renderer_input.json" if should_export_renderer_input else None
-    should_stage_visuals = stage_visuals_flag or render_scene_previews_flag
+    should_stage_visuals = stage_visuals_flag or should_render_scene_previews
     renderer_input_staged_json_path = (
         resolved_output_dir / "renderer_input_staged.json" if should_stage_visuals else None
     )
     scene_visual_qa_report_json_path = (
         resolved_output_dir / "scene_visual_qa_report.json" if should_export_visual_qa_report else None
     )
+    video_preview_mp4_path = resolved_output_dir / "video_preview.mp4" if assemble_mp4_preview_flag else None
+    video_assembly_manifest_json_path = (
+        resolved_output_dir / "video_assembly_manifest.json" if assemble_mp4_preview_flag else None
+    )
     staged_visuals_dir_path = resolved_output_dir / "staged_visuals" if should_stage_visuals else None
-    scene_previews_dir_path = resolved_output_dir / "scene_previews" if render_scene_previews_flag else None
+    scene_previews_dir_path = resolved_output_dir / "scene_previews" if should_render_scene_previews else None
 
     resolved_output_dir.mkdir(parents=True, exist_ok=True)
     _write_json(video_offer_json_path, video_offer.to_dict())
@@ -123,9 +133,12 @@ def export_video_offer_artifacts(
             _write_json(scene_visual_qa_report_json_path, visual_qa_report)
     rendered_scene_paths = (
         render_scene_previews(staged_renderer_input, scene_previews_dir_path)
-        if render_scene_previews_flag and staged_renderer_input is not None and scene_previews_dir_path is not None
+        if should_render_scene_previews and staged_renderer_input is not None and scene_previews_dir_path is not None
         else []
     )
+    assembly_manifest: dict[str, Any] | None = None
+    if assemble_mp4_preview_flag and staged_renderer_input is not None and scene_previews_dir_path is not None:
+        assembly_manifest = assemble_scene_previews_mp4(staged_renderer_input, scene_previews_dir_path, resolved_output_dir)
 
     return VideoOfferExportResult(
         source_report_path=report_path,
@@ -140,6 +153,10 @@ def export_video_offer_artifacts(
         ),
         scene_visual_qa_report_json_path=(
             scene_visual_qa_report_json_path.resolve() if scene_visual_qa_report_json_path is not None else None
+        ),
+        video_preview_mp4_path=video_preview_mp4_path.resolve() if video_preview_mp4_path is not None else None,
+        video_assembly_manifest_json_path=(
+            video_assembly_manifest_json_path.resolve() if video_assembly_manifest_json_path is not None else None
         ),
         staged_visuals_dir_path=staged_visuals_dir_path.resolve() if staged_visuals_dir_path is not None else None,
         scene_previews_dir_path=scene_previews_dir_path.resolve() if scene_previews_dir_path is not None else None,
@@ -158,6 +175,9 @@ def export_video_offer_artifacts(
         ),
         visual_qa_warning_count=(
             int(visual_qa_report.get("warning_count")) if visual_qa_report is not None else None
+        ),
+        video_preview_duration_sec=(
+            float(assembly_manifest.get("total_duration_sec")) if assembly_manifest is not None else None
         ),
         staged_scene_count=(
             int(staging_metadata.get("staged_scene_count")) if staging_metadata is not None else None

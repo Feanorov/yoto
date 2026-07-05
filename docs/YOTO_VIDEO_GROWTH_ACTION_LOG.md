@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-08-SCENE-VISUAL-QA-REPORT
+VIDEO-09-OFFLINE-MP4-ASSEMBLER
 
 Current next action:
-Write an offline visual QA report from renderer input before preview rendering or any future MP4 step.
+Assemble a local vertical MP4 preview from staged renderer input and scene preview PNGs.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -230,3 +230,31 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
 - `--render-scene-previews` now writes the QA report after staging and before PNG preview rendering.
 - Added tests for clean reports, duplicates, remote refs, missing files, small images, aspect-ratio risk, CTA gaps, preview export wiring, and isolation.
 - Production behavior unchanged without QA / staging / preview flags.
+
+### 2026-07-05 - VIDEO-09 selected
+
+- Next Codex task:
+  VIDEO-09-OFFLINE-MP4-ASSEMBLER
+- Goal:
+  assemble a local offline MP4 preview from staged renderer input and rendered scene PNGs
+- Scope:
+  local artifact assembly only, no publish flow, no UI wiring, no Telegram integration
+
+### 2026-07-05 - VIDEO-09 implementation
+
+- Added `dealbot/video/mp4_assembler.py`.
+- Added `assemble_scene_previews_mp4(renderer_input, scene_previews_dir, output_dir)`.
+- Added optional exporter / CLI flag:
+  `--assemble-mp4-preview`
+- `--assemble-mp4-preview` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `scene_visual_qa_report.json`
+  `scene_previews/*.png`
+  `video_preview.mp4`
+  `video_assembly_manifest.json`
+- Kept FFmpeg isolated to the new offline assembler only.
+- Added tests for scene-count validation, missing previews, invalid PNG size, deterministic FFmpeg command planning, exporter flag wiring, missing FFmpeg handling, and module-isolation guarantees.
+- Production behavior unchanged without the MP4 assembly flag.

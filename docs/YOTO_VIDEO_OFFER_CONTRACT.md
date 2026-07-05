@@ -130,6 +130,8 @@ An offline QA exporter is available for selected preview artifacts:
 - optional `scene_layout_payload.json`
 - optional `renderer_input.json`
 - optional `scene_visual_qa_report.json`
+- optional `video_preview.mp4`
+- optional `video_assembly_manifest.json`
 - optional `scene_previews/01_hook.png` .. `05_telegram_cta.png`
 
 The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves offline review artifacts.
@@ -142,6 +144,7 @@ This is QA/export only. It does not call FFmpeg and does not generate MP4 output
 `scene_visual_qa_report.json` is exported only when `--with-visual-qa-report` is requested, or automatically when scene previews are rendered. That flag implies `renderer_input.json`.
 `renderer_input_staged.json` and `staged_visuals/*` are exported only when `--stage-visuals` is requested, or when scene previews need staged local visuals.
 `scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, `renderer_input.json`, staged-local visual preparation, and `scene_visual_qa_report.json` before preview rendering.
+`video_preview.mp4` and `video_assembly_manifest.json` are exported only when `--assemble-mp4-preview` is requested. That flag implies scene planning, layout payload, renderer input, staged visuals, visual QA, and scene preview rendering.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -389,6 +392,52 @@ Exporter behavior after VIDEO-08:
 - when staged renderer input exists, visual QA uses the staged payload instead of raw remote refs
 - `--render-scene-previews` now writes `scene_visual_qa_report.json` automatically after staging and before preview rendering
 - default exporter behavior without QA / staging / preview flags remains unchanged
+
+## VIDEO-09 Offline MP4 Assembler
+
+`assemble_scene_previews_mp4(renderer_input, scene_previews_dir, output_dir)` assembles a local vertical MP4 preview from the staged renderer contract plus rendered PNG scene previews.
+
+MP4 assembly guarantees:
+
+- validates exactly 5 renderer scenes
+- validates the expected PNG sequence exists:
+  `01_hook.png`
+  `02_identity.png`
+  `03_offer_proof.png`
+  `04_trust_or_deadline.png`
+  `05_telegram_cta.png`
+- validates each preview PNG is exactly `1080x1920`
+- preserves renderer scene order
+- uses scene durations from `renderer_input`
+- writes:
+  `video_preview.mp4`
+  `video_assembly_manifest.json`
+- fails clearly when FFmpeg is missing or preview PNGs are missing/invalid
+- keeps FFmpeg isolated to this offline assembler only
+
+FFmpeg scope after VIDEO-09:
+
+- allowed only inside `dealbot/video/mp4_assembler.py`
+- not used by:
+  preview renderer
+  visual staging
+  visual QA
+  Telegram flow
+  production publishing
+  old `video_generator`
+
+Exporter behavior after VIDEO-09:
+
+- `--assemble-mp4-preview` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `scene_visual_qa_report.json`
+  `scene_previews/*.png`
+  `video_preview.mp4`
+  `video_assembly_manifest.json`
+- default exporter behavior without MP4 assembly remains unchanged
 
 ## Why This Is Not A Renderer Task
 

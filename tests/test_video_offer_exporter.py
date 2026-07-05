@@ -143,6 +143,8 @@ def test_exports_video_offer_and_manifest_json_from_preview_report(tmp_path: Pat
     assert result.scene_count == 5
     assert result.renderer_input_staged_json_path is None
     assert result.scene_visual_qa_report_json_path is None
+    assert result.video_preview_mp4_path is None
+    assert result.video_assembly_manifest_json_path is None
     assert result.staged_visuals_dir_path is None
 
 

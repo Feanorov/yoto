@@ -9,6 +9,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from dealbot.video import (
+    MP4AssemblerError,
     RendererInputAdapterError,
     SceneAssetPlanError,
     SceneLayoutPayloadError,
@@ -72,6 +73,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "renderer_input.json + renderer_input_staged.json when staging is needed."
         ),
     )
+    parser.add_argument(
+        "--assemble-mp4-preview",
+        action="store_true",
+        help=(
+            "Render scene previews, stage visuals, run visual QA, and assemble local video_preview.mp4 plus "
+            "video_assembly_manifest.json."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -87,9 +96,11 @@ def main(argv: list[str] | None = None) -> int:
             with_visual_qa_report=args.with_visual_qa_report,
             stage_visuals_flag=args.stage_visuals,
             render_scene_previews_flag=args.render_scene_previews,
+            assemble_mp4_preview_flag=args.assemble_mp4_preview,
         )
     except (
         FileNotFoundError,
+        MP4AssemblerError,
         RendererInputAdapterError,
         SceneAssetPlanError,
         SceneLayoutPayloadError,
@@ -117,6 +128,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"renderer_input_staged_json_path: {result.renderer_input_staged_json_path}")
     if result.scene_visual_qa_report_json_path is not None:
         print(f"scene_visual_qa_report_json_path: {result.scene_visual_qa_report_json_path}")
+    if result.video_preview_mp4_path is not None:
+        print(f"video_preview_mp4_path: {result.video_preview_mp4_path}")
+    if result.video_assembly_manifest_json_path is not None:
+        print(f"video_assembly_manifest_json_path: {result.video_assembly_manifest_json_path}")
     if result.staged_visuals_dir_path is not None:
         print(f"staged_visuals_dir_path: {result.staged_visuals_dir_path}")
     if result.scene_previews_dir_path is not None:
@@ -134,6 +149,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"visual_qa_error_count: {result.visual_qa_error_count}")
     if result.visual_qa_warning_count is not None:
         print(f"visual_qa_warning_count: {result.visual_qa_warning_count}")
+    if result.video_preview_duration_sec is not None:
+        print(f"video_preview_duration_sec: {result.video_preview_duration_sec}")
     if result.staged_scene_count is not None:
         print(f"staged_scene_count: {result.staged_scene_count}")
     if result.staged_visual_count is not None:
