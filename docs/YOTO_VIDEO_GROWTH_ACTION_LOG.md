@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-06-OFFLINE-SCENE-PREVIEW-RENDERER
+VIDEO-07-LOCAL-VISUAL-STAGING-ADAPTER
 
 Current next action:
-Render deterministic offline scene preview PNGs from renderer_input.json using local visuals only.
+Stage remote direct-image visuals into local preview artifacts before offline scene preview rendering.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -182,3 +182,28 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
   `rendered_scene_count`
 - Added tests for deterministic filenames, local visual rendering, safe-zone text fitting, Cyrillic rendering, clear failure modes, and flag wiring.
 - Production behavior unchanged by default.
+
+### 2026-07-05 - VIDEO-07 selected
+
+- Next Codex task:
+  VIDEO-07-LOCAL-VISUAL-STAGING-ADAPTER
+- Goal:
+  convert remote renderer visual refs into staged local still-image files before preview rendering
+- Scope:
+  offline-safe preview preparation only, no MP4, no FFmpeg, no UI wiring, no Telegram integration
+
+### 2026-07-05 - VIDEO-07 implementation
+
+- Added `dealbot/video/visual_staging.py`.
+- Added `stage_renderer_visuals(renderer_input, output_dir)` for staged-local visual rewrites.
+- Added optional exporter / CLI flag:
+  `--stage-visuals`
+- `--stage-visuals` implies:
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `staged_visuals/*`
+- `--render-scene-previews` now stages remote direct-image visuals before rendering PNG previews.
+- Preview renderer remains strict:
+  raw remote URLs still fail when passed directly.
+- Added tests for remote staging, local preservation, clear failure modes, staged exporter artifacts, and preview rendering through staged visuals.
+- Production behavior unchanged without staging / preview flags.

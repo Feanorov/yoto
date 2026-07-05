@@ -141,6 +141,8 @@ def test_exports_video_offer_and_manifest_json_from_preview_report(tmp_path: Pat
     assert result.offer_id == "steam:export-test"
     assert result.template == "single_offer_gameplay_first"
     assert result.scene_count == 5
+    assert result.renderer_input_staged_json_path is None
+    assert result.staged_visuals_dir_path is None
 
 
 def test_exported_files_are_valid_json_and_preserve_identity_fields(tmp_path: Path) -> None:

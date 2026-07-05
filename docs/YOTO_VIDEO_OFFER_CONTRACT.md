@@ -138,7 +138,8 @@ This is QA/export only. It does not call FFmpeg and does not generate MP4 output
 `scene_asset_plan.json` is exported only when `--with-scene-plan` is requested. Default exporter behavior remains unchanged.
 `scene_layout_payload.json` is exported only when `--with-layout-payload` is requested. That flag also implies `scene_asset_plan.json`.
 `renderer_input.json` is exported only when `--with-renderer-input` is requested. That flag also implies `scene_asset_plan.json` and `scene_layout_payload.json`.
-`scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, and `renderer_input.json`.
+`renderer_input_staged.json` and `staged_visuals/*` are exported only when `--stage-visuals` is requested, or when scene previews need staged local visuals.
+`scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, `renderer_input.json`, and staged-local visual preparation before rendering.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -314,6 +315,37 @@ Current limits after VIDEO-06:
 - no old `video_generator` reuse in runtime
 - no dynamic scene timing beyond the fixed 14.5-second MVP plan
 - no voice script generation
+
+## VIDEO-07 Local Visual Staging Adapter
+
+`stage_renderer_visuals(renderer_input, output_dir)` converts renderer-scene visual refs into preview-safe local still images before PNG scene rendering.
+
+Visual staging guarantees:
+
+- `renderer_input.json` stays unchanged as the raw upstream contract artifact
+- remote image refs are rewritten only in a separate staged payload:
+  `renderer_input_staged.json`
+- allowed remote sources are limited to direct image assets with:
+  `.jpg`, `.jpeg`, `.png`, `.webp`
+- URLs without an image extension are accepted only when the response returns a safe supported image content-type
+- unsupported schemes, trailer/video refs, non-image URLs, and missing local files fail clearly
+- staged downloads are written into:
+  `staged_visuals/`
+- scene order, durations, timestamps, text blocks, motion hints, safe-zone profiles, CTA variants, and warnings are preserved exactly
+- preview rendering still rejects raw remote URLs; it only succeeds after staged-local rewrite
+- no Steam API calls
+- no page scraping
+- no Telegram, FFmpeg, UI, or MP4 integration
+
+Exporter behavior after VIDEO-07:
+
+- `--stage-visuals` implies `--with-renderer-input`
+- `--stage-visuals` writes:
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `staged_visuals/*`
+- `--render-scene-previews` stages visuals first and renders previews from the staged local payload
+- default exporter behavior without staging or preview flags remains unchanged
 
 ## Why This Is Not A Renderer Task
 

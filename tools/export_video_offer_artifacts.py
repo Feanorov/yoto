@@ -15,6 +15,7 @@ from dealbot.video import (
     ScenePreviewRenderError,
     VideoOfferExportError,
     VideoOfferValidationError,
+    VisualStagingError,
     export_video_offer_artifacts,
 )
 
@@ -33,7 +34,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Optional output directory for video_offer.json, draft_video_manifest.json, "
-            "and optional scene_asset_plan.json / scene_layout_payload.json / renderer_input.json / scene_previews."
+            "and optional scene_asset_plan.json / scene_layout_payload.json / "
+            "renderer_input.json / renderer_input_staged.json / staged_visuals / scene_previews."
         ),
     )
     parser.add_argument(
@@ -52,9 +54,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Also export renderer_input.json and imply scene_asset_plan.json + scene_layout_payload.json.",
     )
     parser.add_argument(
+        "--stage-visuals",
+        action="store_true",
+        help="Stage remote renderer visuals into staged_visuals/ and write renderer_input_staged.json.",
+    )
+    parser.add_argument(
         "--render-scene-previews",
         action="store_true",
-        help="Render scene_previews/*.png and imply scene_asset_plan.json + scene_layout_payload.json + renderer_input.json.",
+        help=(
+            "Render scene_previews/*.png and imply scene_asset_plan.json + scene_layout_payload.json + "
+            "renderer_input.json + renderer_input_staged.json when staging is needed."
+        ),
     )
     return parser.parse_args(argv)
 
@@ -68,6 +78,7 @@ def main(argv: list[str] | None = None) -> int:
             with_scene_plan=args.with_scene_plan,
             with_layout_payload=args.with_layout_payload,
             with_renderer_input=args.with_renderer_input,
+            stage_visuals_flag=args.stage_visuals,
             render_scene_previews_flag=args.render_scene_previews,
         )
     except (
@@ -78,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
         ScenePreviewRenderError,
         VideoOfferExportError,
         VideoOfferValidationError,
+        VisualStagingError,
     ) as exc:
         print(f"status: failed", file=sys.stderr)
         print(str(exc), file=sys.stderr)
@@ -93,6 +105,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"scene_layout_payload_json_path: {result.scene_layout_payload_json_path}")
     if result.renderer_input_json_path is not None:
         print(f"renderer_input_json_path: {result.renderer_input_json_path}")
+    if result.renderer_input_staged_json_path is not None:
+        print(f"renderer_input_staged_json_path: {result.renderer_input_staged_json_path}")
+    if result.staged_visuals_dir_path is not None:
+        print(f"staged_visuals_dir_path: {result.staged_visuals_dir_path}")
     if result.scene_previews_dir_path is not None:
         print(f"scene_previews_dir_path: {result.scene_previews_dir_path}")
     print(f"offer_id: {result.offer_id}")
@@ -102,6 +118,10 @@ def main(argv: list[str] | None = None) -> int:
         print(f"renderer_scene_count: {result.renderer_scene_count}")
     if result.renderer_total_duration_sec is not None:
         print(f"renderer_total_duration_sec: {result.renderer_total_duration_sec}")
+    if result.staged_scene_count is not None:
+        print(f"staged_scene_count: {result.staged_scene_count}")
+    if result.staged_visual_count is not None:
+        print(f"staged_visual_count: {result.staged_visual_count}")
     if result.rendered_scene_count is not None:
         print(f"rendered_scene_count: {result.rendered_scene_count}")
     return 0
