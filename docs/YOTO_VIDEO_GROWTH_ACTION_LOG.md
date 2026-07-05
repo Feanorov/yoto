@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-05-RENDERER-INPUT-ADAPTER
+VIDEO-06-OFFLINE-SCENE-PREVIEW-RENDERER
 
 Current next action:
-Create deterministic offline renderer_input.json export from VideoOffer + scene_asset_plan + scene_layout_payload.
+Render deterministic offline scene preview PNGs from renderer_input.json using local visuals only.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -155,4 +155,30 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
   `renderer_scene_count`
   `renderer_total_duration_sec`
 - Added tests for deterministic timestamps, strict mismatch failures, CTA preservation, non-fabrication, and export flag behavior.
+- Production behavior unchanged by default.
+
+### 2026-06-25 - VIDEO-06 selected
+
+- Next Codex task:
+  VIDEO-06-OFFLINE-SCENE-PREVIEW-RENDERER
+- Goal:
+  render deterministic vertical PNG scene previews from `renderer_input.json`
+- Scope:
+  offline only, no MP4, no FFmpeg, no UI wiring, no Telegram integration
+
+### 2026-06-25 - VIDEO-06 implementation
+
+- Added `dealbot/video/scene_preview_renderer.py`.
+- Added offline Pillow-based preview rendering for the 5 renderer scenes.
+- Added optional exporter / CLI flag:
+  `--render-scene-previews`
+- `--render-scene-previews` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+  `scene_previews/*.png`
+- Added exporter metadata:
+  `scene_previews_dir_path`
+  `rendered_scene_count`
+- Added tests for deterministic filenames, local visual rendering, safe-zone text fitting, Cyrillic rendering, clear failure modes, and flag wiring.
 - Production behavior unchanged by default.

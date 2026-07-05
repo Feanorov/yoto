@@ -10,6 +10,7 @@ from .offer_adapter import (
 )
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
+from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
 from .exporter import (
     VideoOfferExportError,
     VideoOfferExportResult,
@@ -22,12 +23,14 @@ __all__ = [
     "SceneAssetPlanError",
     "SceneLayoutPayloadError",
     "RendererInputAdapterError",
+    "ScenePreviewRenderError",
     "VideoOfferExportError",
     "VideoOfferExportResult",
     "VideoOffer",
     "VideoOfferValidationError",
     "VideoVisualAssets",
     "build_renderer_input",
+    "render_scene_previews",
     "build_scene_layout_payload",
     "build_scene_asset_plan",
     "build_video_manifest_draft",

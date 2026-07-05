@@ -12,6 +12,7 @@ from dealbot.video import (
     RendererInputAdapterError,
     SceneAssetPlanError,
     SceneLayoutPayloadError,
+    ScenePreviewRenderError,
     VideoOfferExportError,
     VideoOfferValidationError,
     export_video_offer_artifacts,
@@ -32,7 +33,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=None,
         help=(
             "Optional output directory for video_offer.json, draft_video_manifest.json, "
-            "and optional scene_asset_plan.json / scene_layout_payload.json / renderer_input.json."
+            "and optional scene_asset_plan.json / scene_layout_payload.json / renderer_input.json / scene_previews."
         ),
     )
     parser.add_argument(
@@ -50,6 +51,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Also export renderer_input.json and imply scene_asset_plan.json + scene_layout_payload.json.",
     )
+    parser.add_argument(
+        "--render-scene-previews",
+        action="store_true",
+        help="Render scene_previews/*.png and imply scene_asset_plan.json + scene_layout_payload.json + renderer_input.json.",
+    )
     return parser.parse_args(argv)
 
 
@@ -62,12 +68,14 @@ def main(argv: list[str] | None = None) -> int:
             with_scene_plan=args.with_scene_plan,
             with_layout_payload=args.with_layout_payload,
             with_renderer_input=args.with_renderer_input,
+            render_scene_previews_flag=args.render_scene_previews,
         )
     except (
         FileNotFoundError,
         RendererInputAdapterError,
         SceneAssetPlanError,
         SceneLayoutPayloadError,
+        ScenePreviewRenderError,
         VideoOfferExportError,
         VideoOfferValidationError,
     ) as exc:
@@ -85,6 +93,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"scene_layout_payload_json_path: {result.scene_layout_payload_json_path}")
     if result.renderer_input_json_path is not None:
         print(f"renderer_input_json_path: {result.renderer_input_json_path}")
+    if result.scene_previews_dir_path is not None:
+        print(f"scene_previews_dir_path: {result.scene_previews_dir_path}")
     print(f"offer_id: {result.offer_id}")
     print(f"template: {result.template}")
     print(f"scene_count: {result.scene_count}")
@@ -92,6 +102,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"renderer_scene_count: {result.renderer_scene_count}")
     if result.renderer_total_duration_sec is not None:
         print(f"renderer_total_duration_sec: {result.renderer_total_duration_sec}")
+    if result.rendered_scene_count is not None:
+        print(f"rendered_scene_count: {result.rendered_scene_count}")
     return 0
 
 

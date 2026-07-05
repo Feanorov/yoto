@@ -129,14 +129,16 @@ An offline QA exporter is available for selected preview artifacts:
 - optional `scene_asset_plan.json`
 - optional `scene_layout_payload.json`
 - optional `renderer_input.json`
+- optional `scene_previews/01_hook.png` .. `05_telegram_cta.png`
 
-The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves both JSON artifacts for review.
+The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves offline review artifacts.
 
-This is QA/export only. It does not render scenes, does not call FFmpeg, and does not generate MP4 output.
+This is QA/export only. It does not call FFmpeg and does not generate MP4 output. PNG scene previews are rendered only when `--render-scene-previews` is explicitly requested.
 
 `scene_asset_plan.json` is exported only when `--with-scene-plan` is requested. Default exporter behavior remains unchanged.
 `scene_layout_payload.json` is exported only when `--with-layout-payload` is requested. That flag also implies `scene_asset_plan.json`.
 `renderer_input.json` is exported only when `--with-renderer-input` is requested. That flag also implies `scene_asset_plan.json` and `scene_layout_payload.json`.
+`scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, and `renderer_input.json`.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -271,7 +273,38 @@ Each renderer scene includes:
 
 The CTA renderer scene also preserves `platform_variants` when they exist so downstream renderers can keep TikTok / Shorts / Reels CTA text available without re-deriving it.
 
-Current limits after VIDEO-05:
+## VIDEO-06 Offline Scene Preview Renderer
+
+`render_scene_previews(renderer_input, output_dir)` renders deterministic offline PNG previews from the existing renderer input contract.
+
+Preview renderer guarantees:
+
+- exactly 5 PNG files
+- fixed filenames:
+  `01_hook.png`
+  `02_identity.png`
+  `03_offer_proof.png`
+  `04_trust_or_deadline.png`
+  `05_telegram_cta.png`
+- fixed canvas per image:
+  `1080x1920`
+- deterministic scene order from `renderer_input.scenes`
+- local still-image visuals only
+- cover-cropped backgrounds
+- restrained dark readability overlay
+- text layout that respects `role`, `priority`, `alignment`, `anchor`, `size_class`, `max_lines`, and `safe_zone_profile`
+- no downloads
+- no FFmpeg
+- no MP4 output
+- no invented images, text, prices, or asset paths
+
+Operational limits:
+
+- a usable local Unicode font must exist; the renderer checks `YOTO_SCENE_PREVIEW_FONT_PATH` first, then local system font fallbacks
+- remote URLs and local non-image files fail clearly
+- trailer/video refs are not rendered into frames
+
+Current limits after VIDEO-06:
 
 - only normalized single-offer planning contracts are defined
 - no renderer integration
