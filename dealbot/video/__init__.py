@@ -10,6 +10,7 @@ from .offer_adapter import (
 )
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
 from .mp4_assembler import MP4AssemblerError, assemble_scene_previews_mp4
+from .release_gate import VideoReleaseGateError, build_video_release_gate_report
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
 from .scene_visual_qa import SceneVisualQAError, build_scene_visual_qa_report
@@ -28,6 +29,7 @@ __all__ = [
     "RendererInputAdapterError",
     "ScenePreviewRenderError",
     "SceneVisualQAError",
+    "VideoReleaseGateError",
     "VideoOfferExportError",
     "VideoOfferExportResult",
     "VisualStagingError",
@@ -38,6 +40,7 @@ __all__ = [
     "render_scene_previews",
     "build_scene_visual_qa_report",
     "assemble_scene_previews_mp4",
+    "build_video_release_gate_report",
     "stage_renderer_visuals",
     "build_scene_layout_payload",
     "build_scene_asset_plan",

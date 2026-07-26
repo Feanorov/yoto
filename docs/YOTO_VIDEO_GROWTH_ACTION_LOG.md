@@ -6,10 +6,10 @@ Branch focus:
 YOTO Video Strategy / Growth
 
 Current phase:
-VIDEO-09-OFFLINE-MP4-ASSEMBLER
+VIDEO-10-VIDEO-RELEASE-GATE
 
 Current next action:
-Assemble a local vertical MP4 preview from staged renderer input and scene preview PNGs.
+Add a deterministic offline release gate for local video preview bundles.
 
 Do not touch:
 Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_generator behavior.
@@ -258,3 +258,36 @@ Operator UI, publish-previewed, VDE, card renderer, caption pipeline, old video_
 - Kept FFmpeg isolated to the new offline assembler only.
 - Added tests for scene-count validation, missing previews, invalid PNG size, deterministic FFmpeg command planning, exporter flag wiring, missing FFmpeg handling, and module-isolation guarantees.
 - Production behavior unchanged without the MP4 assembly flag.
+
+### 2026-07-05 - VIDEO-10 selected
+
+- Next Codex task:
+  VIDEO-10-VIDEO-RELEASE-GATE
+- Goal:
+  add a deterministic offline release gate for staged renderer input, visual QA, assembled preview manifest, and local MP4 output
+- Scope:
+  local QA/reporting only, no publish flow, no UI wiring, no Telegram integration
+
+### 2026-07-05 - VIDEO-10 implementation
+
+- Added `dealbot/video/release_gate.py`.
+- Added `build_video_release_gate_report(renderer_input, scene_visual_qa_report, video_assembly_manifest, video_path)`.
+- Added optional exporter / CLI flag:
+  `--with-release-gate`
+- `--with-release-gate` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `scene_visual_qa_report.json`
+  `scene_previews/*.png`
+  `video_preview.mp4`
+  `video_assembly_manifest.json`
+  `video_release_gate_report.json`
+- Added deterministic release verdicts:
+  `pass`
+  `warn`
+  `block`
+- Kept the gate offline-only with `production_ready = false`.
+- Added tests for clean-pass, warning cases, missing/empty MP4 handling, QA error blocking, duration mismatch, canvas/fps mismatch, CTA enforcement, exporter wiring, CLI wiring, and module-isolation guarantees.
+- Production behavior unchanged without the release-gate flag.

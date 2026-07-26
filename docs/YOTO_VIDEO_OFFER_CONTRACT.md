@@ -9,7 +9,7 @@ It exists to bridge current YOTO preview artifacts and a future renderer-ready v
 - Telegram publish commands
 - Operator UI
 - old `video_generator`
-- MP4 rendering
+- production publishing
 
 The contract is intentionally small and isolated. It converts already resolved YOTO artifacts into a stable single-offer payload that a future video renderer can consume.
 
@@ -132,11 +132,12 @@ An offline QA exporter is available for selected preview artifacts:
 - optional `scene_visual_qa_report.json`
 - optional `video_preview.mp4`
 - optional `video_assembly_manifest.json`
+- optional `video_release_gate_report.json`
 - optional `scene_previews/01_hook.png` .. `05_telegram_cta.png`
 
 The exporter reads an existing report from disk, normalizes it into `VideoOffer`, and saves offline review artifacts.
 
-This is QA/export only. It does not call FFmpeg and does not generate MP4 output. PNG scene previews are rendered only when `--render-scene-previews` is explicitly requested.
+This is offline QA/export only. Production publish flows stay untouched. FFmpeg is used only when `--assemble-mp4-preview` or `--with-release-gate` is explicitly requested.
 
 `scene_asset_plan.json` is exported only when `--with-scene-plan` is requested. Default exporter behavior remains unchanged.
 `scene_layout_payload.json` is exported only when `--with-layout-payload` is requested. That flag also implies `scene_asset_plan.json`.
@@ -145,6 +146,7 @@ This is QA/export only. It does not call FFmpeg and does not generate MP4 output
 `renderer_input_staged.json` and `staged_visuals/*` are exported only when `--stage-visuals` is requested, or when scene previews need staged local visuals.
 `scene_previews/*.png` are rendered only when `--render-scene-previews` is requested. That flag also implies `scene_asset_plan.json`, `scene_layout_payload.json`, `renderer_input.json`, staged-local visual preparation, and `scene_visual_qa_report.json` before preview rendering.
 `video_preview.mp4` and `video_assembly_manifest.json` are exported only when `--assemble-mp4-preview` is requested. That flag implies scene planning, layout payload, renderer input, staged visuals, visual QA, and scene preview rendering.
+`video_release_gate_report.json` is exported only when `--with-release-gate` is requested. That flag implies scene planning, layout payload, renderer input, staged visuals, visual QA, scene preview rendering, and MP4 assembly.
 
 ## VIDEO-03 Scene Asset Planner
 
@@ -438,6 +440,64 @@ Exporter behavior after VIDEO-09:
   `video_preview.mp4`
   `video_assembly_manifest.json`
 - default exporter behavior without MP4 assembly remains unchanged
+
+## VIDEO-10 Offline Release Gate
+
+`build_video_release_gate_report(renderer_input, scene_visual_qa_report, video_assembly_manifest, video_path)` produces a deterministic offline release decision for the local MP4 preview bundle.
+
+Release gate guarantees:
+
+- offline-only verdict:
+  `pass`, `warn`, or `block`
+- blocks when:
+  `video_preview.mp4` is missing
+  `video_preview.mp4` is zero bytes
+  scene count is not `5`
+  visual QA reports errors
+  assembly duration differs from renderer input duration
+  assembly manifest does not reference exactly `5` scene previews
+  renderer input canvas is not `1080x1920`
+  renderer input fps is not `30`
+  CTA scene is missing CTA text
+- warns when:
+  visual QA status is `warn`
+  duplicate visuals are reported
+  source aspect-ratio risk is reported
+  fallback/card-image visual usage is reported
+  MP4 size looks suspiciously small
+  the assembled preview is silent
+- writes:
+  `video_release_gate_report.json`
+- keeps `production_ready = false`
+- does not publish anything
+- does not touch Telegram flow, Operator UI, VDE, or old `video_generator`
+
+Release gate report fields:
+
+- `schema_version`
+- `offer_id`
+- `verdict`
+- `block_reasons`
+- `warnings`
+- `checked_files`
+- `scene_count`
+- `total_duration_sec`
+- `video_file_size_bytes`
+- `production_ready`
+
+Exporter behavior after VIDEO-10:
+
+- `--with-release-gate` implies:
+  `scene_asset_plan.json`
+  `scene_layout_payload.json`
+  `renderer_input.json`
+  `renderer_input_staged.json`
+  `scene_visual_qa_report.json`
+  `scene_previews/*.png`
+  `video_preview.mp4`
+  `video_assembly_manifest.json`
+  `video_release_gate_report.json`
+- default exporter behavior without the release-gate flag remains unchanged
 
 ## Why This Is Not A Renderer Task
 

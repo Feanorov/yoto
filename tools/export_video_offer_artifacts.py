@@ -15,6 +15,7 @@ from dealbot.video import (
     SceneLayoutPayloadError,
     ScenePreviewRenderError,
     SceneVisualQAError,
+    VideoReleaseGateError,
     VideoOfferExportError,
     VideoOfferValidationError,
     VisualStagingError,
@@ -37,7 +38,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help=(
             "Optional output directory for video_offer.json, draft_video_manifest.json, "
             "and optional scene_asset_plan.json / scene_layout_payload.json / "
-            "renderer_input.json / renderer_input_staged.json / staged_visuals / scene_previews."
+            "renderer_input.json / renderer_input_staged.json / staged_visuals / scene_previews / "
+            "video_preview.mp4 / video_assembly_manifest.json / video_release_gate_report.json."
         ),
     )
     parser.add_argument(
@@ -81,6 +83,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
             "video_assembly_manifest.json."
         ),
     )
+    parser.add_argument(
+        "--with-release-gate",
+        action="store_true",
+        help=(
+            "Run the offline release gate after MP4 assembly and write video_release_gate_report.json."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -97,6 +106,7 @@ def main(argv: list[str] | None = None) -> int:
             stage_visuals_flag=args.stage_visuals,
             render_scene_previews_flag=args.render_scene_previews,
             assemble_mp4_preview_flag=args.assemble_mp4_preview,
+            with_release_gate=args.with_release_gate,
         )
     except (
         FileNotFoundError,
@@ -106,6 +116,7 @@ def main(argv: list[str] | None = None) -> int:
         SceneLayoutPayloadError,
         ScenePreviewRenderError,
         SceneVisualQAError,
+        VideoReleaseGateError,
         VideoOfferExportError,
         VideoOfferValidationError,
         VisualStagingError,
@@ -132,6 +143,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"video_preview_mp4_path: {result.video_preview_mp4_path}")
     if result.video_assembly_manifest_json_path is not None:
         print(f"video_assembly_manifest_json_path: {result.video_assembly_manifest_json_path}")
+    if result.video_release_gate_report_json_path is not None:
+        print(f"video_release_gate_report_json_path: {result.video_release_gate_report_json_path}")
     if result.staged_visuals_dir_path is not None:
         print(f"staged_visuals_dir_path: {result.staged_visuals_dir_path}")
     if result.scene_previews_dir_path is not None:
@@ -151,6 +164,12 @@ def main(argv: list[str] | None = None) -> int:
         print(f"visual_qa_warning_count: {result.visual_qa_warning_count}")
     if result.video_preview_duration_sec is not None:
         print(f"video_preview_duration_sec: {result.video_preview_duration_sec}")
+    if result.release_gate_verdict is not None:
+        print(f"release_gate_verdict: {result.release_gate_verdict}")
+    if result.release_gate_block_reason_count is not None:
+        print(f"release_gate_block_reason_count: {result.release_gate_block_reason_count}")
+    if result.release_gate_warning_count is not None:
+        print(f"release_gate_warning_count: {result.release_gate_warning_count}")
     if result.staged_scene_count is not None:
         print(f"staged_scene_count: {result.staged_scene_count}")
     if result.staged_visual_count is not None:

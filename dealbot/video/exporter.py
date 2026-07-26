@@ -9,6 +9,7 @@ from .models import VideoOfferValidationError
 from .offer_adapter import build_video_manifest_draft, build_video_offer_from_preview_report
 from .layout_builder import SceneLayoutPayloadError, build_scene_layout_payload
 from .mp4_assembler import MP4AssemblerError, assemble_scene_previews_mp4
+from .release_gate import VideoReleaseGateError, build_video_release_gate_report
 from .renderer_input_adapter import RendererInputAdapterError, build_renderer_input
 from .scene_preview_renderer import ScenePreviewRenderError, render_scene_previews
 from .scene_planner import SceneAssetPlanError, build_scene_asset_plan
@@ -29,6 +30,7 @@ class VideoOfferExportResult:
     scene_visual_qa_report_json_path: Path | None
     video_preview_mp4_path: Path | None
     video_assembly_manifest_json_path: Path | None
+    video_release_gate_report_json_path: Path | None
     staged_visuals_dir_path: Path | None
     scene_previews_dir_path: Path | None
     offer_id: str
@@ -40,6 +42,9 @@ class VideoOfferExportResult:
     visual_qa_error_count: int | None = None
     visual_qa_warning_count: int | None = None
     video_preview_duration_sec: float | None = None
+    release_gate_verdict: str | None = None
+    release_gate_block_reason_count: int | None = None
+    release_gate_warning_count: int | None = None
     staged_scene_count: int | None = None
     staged_visual_count: int | None = None
     rendered_scene_count: int | None = None
@@ -61,6 +66,7 @@ def export_video_offer_artifacts(
     stage_visuals_flag: bool = False,
     render_scene_previews_flag: bool = False,
     assemble_mp4_preview_flag: bool = False,
+    with_release_gate: bool = False,
 ) -> VideoOfferExportResult:
     input_path = _resolve_input_path(source_report_path)
     report_path, report_payload = _load_export_source(input_path)
@@ -70,7 +76,8 @@ def export_video_offer_artifacts(
         source_report_path=str(report_path),
     )
     draft_manifest = build_video_manifest_draft(video_offer)
-    should_render_scene_previews = render_scene_previews_flag or assemble_mp4_preview_flag
+    should_assemble_mp4_preview = assemble_mp4_preview_flag or with_release_gate
+    should_render_scene_previews = render_scene_previews_flag or should_assemble_mp4_preview
     should_export_visual_qa_report = with_visual_qa_report or should_render_scene_previews
     should_export_renderer_input = (
         with_renderer_input or should_export_visual_qa_report or stage_visuals_flag or should_render_scene_previews
@@ -104,9 +111,12 @@ def export_video_offer_artifacts(
     scene_visual_qa_report_json_path = (
         resolved_output_dir / "scene_visual_qa_report.json" if should_export_visual_qa_report else None
     )
-    video_preview_mp4_path = resolved_output_dir / "video_preview.mp4" if assemble_mp4_preview_flag else None
+    video_preview_mp4_path = resolved_output_dir / "video_preview.mp4" if should_assemble_mp4_preview else None
     video_assembly_manifest_json_path = (
-        resolved_output_dir / "video_assembly_manifest.json" if assemble_mp4_preview_flag else None
+        resolved_output_dir / "video_assembly_manifest.json" if should_assemble_mp4_preview else None
+    )
+    video_release_gate_report_json_path = (
+        resolved_output_dir / "video_release_gate_report.json" if with_release_gate else None
     )
     staged_visuals_dir_path = resolved_output_dir / "staged_visuals" if should_stage_visuals else None
     scene_previews_dir_path = resolved_output_dir / "scene_previews" if should_render_scene_previews else None
@@ -137,8 +147,24 @@ def export_video_offer_artifacts(
         else []
     )
     assembly_manifest: dict[str, Any] | None = None
-    if assemble_mp4_preview_flag and staged_renderer_input is not None and scene_previews_dir_path is not None:
+    if should_assemble_mp4_preview and staged_renderer_input is not None and scene_previews_dir_path is not None:
         assembly_manifest = assemble_scene_previews_mp4(staged_renderer_input, scene_previews_dir_path, resolved_output_dir)
+    release_gate_report: dict[str, Any] | None = None
+    if (
+        with_release_gate
+        and staged_renderer_input is not None
+        and visual_qa_report is not None
+        and assembly_manifest is not None
+        and video_preview_mp4_path is not None
+        and video_release_gate_report_json_path is not None
+    ):
+        release_gate_report = build_video_release_gate_report(
+            staged_renderer_input,
+            visual_qa_report,
+            assembly_manifest,
+            video_preview_mp4_path,
+        )
+        _write_json(video_release_gate_report_json_path, release_gate_report)
 
     return VideoOfferExportResult(
         source_report_path=report_path,
@@ -157,6 +183,9 @@ def export_video_offer_artifacts(
         video_preview_mp4_path=video_preview_mp4_path.resolve() if video_preview_mp4_path is not None else None,
         video_assembly_manifest_json_path=(
             video_assembly_manifest_json_path.resolve() if video_assembly_manifest_json_path is not None else None
+        ),
+        video_release_gate_report_json_path=(
+            video_release_gate_report_json_path.resolve() if video_release_gate_report_json_path is not None else None
         ),
         staged_visuals_dir_path=staged_visuals_dir_path.resolve() if staged_visuals_dir_path is not None else None,
         scene_previews_dir_path=scene_previews_dir_path.resolve() if scene_previews_dir_path is not None else None,
@@ -178,6 +207,17 @@ def export_video_offer_artifacts(
         ),
         video_preview_duration_sec=(
             float(assembly_manifest.get("total_duration_sec")) if assembly_manifest is not None else None
+        ),
+        release_gate_verdict=(
+            str(release_gate_report.get("verdict"))
+            if release_gate_report is not None and release_gate_report.get("verdict")
+            else None
+        ),
+        release_gate_block_reason_count=(
+            len(list(release_gate_report.get("block_reasons") or [])) if release_gate_report is not None else None
+        ),
+        release_gate_warning_count=(
+            len(list(release_gate_report.get("warnings") or [])) if release_gate_report is not None else None
         ),
         staged_scene_count=(
             int(staging_metadata.get("staged_scene_count")) if staging_metadata is not None else None
